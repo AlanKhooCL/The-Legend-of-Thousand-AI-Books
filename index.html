@@ -21,6 +21,7 @@
   --shadow:     rgba(14,10,6,0.7);
   --glow-gold:  0 0 20px rgba(200,168,75,0.4);
   --glow-red:   0 0 20px rgba(139,26,26,0.5);
+  --text-muted: rgba(200,168,75,0.7);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -516,26 +517,31 @@ html, body {
 .form-textarea { resize:vertical; min-height:80px; }
 .form-select option { background:#1a1006; color:var(--paper); }
 
-.model-pills {
-  display:flex;
-  gap:0.6rem;
-  flex-wrap:wrap;
+/* Model Selector specific styles */
+.glass-panel {
+  background: rgba(200,168,75,0.04);
+  border: 1px solid rgba(200,168,75,0.2);
 }
-.model-pill {
-  padding:0.4rem 1rem;
-  border:1px solid rgba(200,168,75,0.2);
-  background:transparent;
-  color:rgba(245,234,216,0.5);
-  font-family:'Noto Serif SC',serif;
-  font-size:0.72rem;
-  cursor:pointer;
-  transition:all 0.2s;
-  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+.model-chip-group {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
-.model-pill.selected {
-  border-color:var(--gold);
-  color:var(--gold);
-  background:rgba(200,168,75,0.1);
+.model-chip {
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(200,168,75,0.2);
+  background: transparent;
+  color: rgba(245,234,216,0.5);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+}
+.model-chip.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200,168,75,0.1);
 }
 
 .generating-state {
@@ -1002,6 +1008,7 @@ html, body {
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
 </head>
@@ -1160,14 +1167,18 @@ html, body {
           <option value="7">7 Chapters — Grand Conquest</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">◈ MODEL</label>
-        <div class="model-pills" id="model-pills">
-          <button class="model-pill selected" data-model="gemini-2.0-flash">gemini-2.0-flash</button>
-          <button class="model-pill" data-model="gemini-1.5-pro">gemini-1.5-pro</button>
-          <button class="model-pill" data-model="gemini-1.5-flash">gemini-1.5-flash</button>
-        </div>
+      
+      <div class="glass-panel" style="margin-bottom: 1rem; padding: 1.5rem;">
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">> SELECT_CORE_ENGINE:</p>
+          <div class="model-chip-group" id="model-chip-group">
+              <button type="button" class="model-chip" data-value="gemini-2.0-flash">2.0_FLASH (LEGACY)</button>
+              <button type="button" class="model-chip" data-value="gemini-2.5-flash">2.5_FLASH (STABLE)</button>
+              <button type="button" class="model-chip" data-value="gemini-2.5-pro">2.5_PRO (REASONING)</button>
+              <button type="button" class="model-chip active" data-value="gemini-3-flash-preview">3_FLASH (NEXT-GEN)</button>
+          </div>
+          <input type="hidden" id="modelSelect" value="gemini-3-flash-preview">
       </div>
+
       <div style="display:flex;gap:0.8rem;margin-top:1rem;">
         <button class="btn-primary" style="flex:1;" onclick="createQuest()">⚔ SUMMON QUEST</button>
         <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(200,168,75,0.2);color:rgba(245,234,216,0.5);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeCreateModal()">CANCEL</button>
@@ -1274,13 +1285,14 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
-// We'll use a hardcoded user document for now.
-const USER_ID = "guest_warrior_1"; 
+// Secure user ID handled dynamically by Firebase Auth now
+let USER_ID = null; 
 
 let STATE = {
   apiKey: sessionStorage.getItem('wuxia_api_key') || '',
-  selectedModel: 'gemini-2.0-flash',
+  selectedModel: document.getElementById('modelSelect')?.value || 'gemini-3-flash-preview',
   quests: [],
   player: {
     xp: 0, totalXp: 0, rank: 0, questsCreated: 0,
@@ -1295,6 +1307,8 @@ let STATE = {
 };
 
 async function loadState() {
+  if (!USER_ID) return; // Wait until Auth resolves
+
   try {
     const docRef = db.collection("users").doc(USER_ID);
     const docSnap = await docRef.get();
@@ -1321,11 +1335,12 @@ async function loadState() {
     }
   } catch (e) {
     console.error("Error loading DB state:", e);
-    showToast("Database connection failed. Check your Firebase rules.");
+    showToast("Database connection failed. Check your network or Firebase rules.");
   }
 }
 
 async function saveState() {
+  if (!USER_ID) return;
   try {
     await db.collection("users").doc(USER_ID).set({
       quests: STATE.quests,
@@ -1957,7 +1972,7 @@ function renderQuestGrid() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  CREATE QUEST MODAL
+//  CREATE QUEST MODAL & MODEL SELECTION
 // ═══════════════════════════════════════════════════════
 function openCreateModal() {
   if(!STATE.apiKey){
@@ -1973,11 +1988,14 @@ function closeCreateModal() {
   document.getElementById('create-modal').classList.remove('open');
 }
 
-document.getElementById('model-pills').addEventListener('click',e=>{
-  if(e.target.classList.contains('model-pill')){
-    document.querySelectorAll('.model-pill').forEach(p=>p.classList.remove('selected'));
-    e.target.classList.add('selected');
-    STATE.selectedModel = e.target.dataset.model;
+document.getElementById('model-chip-group').addEventListener('click', e => {
+  if(e.target.classList.contains('model-chip')){
+    document.querySelectorAll('.model-chip').forEach(p => p.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    const selectedValue = e.target.dataset.value;
+    document.getElementById('modelSelect').value = selectedValue;
+    STATE.selectedModel = selectedValue;
   }
 });
 
@@ -2407,7 +2425,6 @@ async function callClaude({system, user}) {
   return candidate.content?.parts?.map(p => p.text || '').join('') || '';
 }
 
-
 function parseJSON(text) {
   const clean = text.replace(/```json|```/g,'').trim();
   try { return JSON.parse(clean); }
@@ -2459,9 +2476,21 @@ document.querySelectorAll('.modal-overlay').forEach(overlay=>{
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
-// Load DB on boot
+// Wait for auth state to resolve before loading data
 window.addEventListener('DOMContentLoaded', () => {
-  loadState();
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // User is securely signed in invisibly
+      USER_ID = user.uid;
+      loadState();
+    } else {
+      // Not signed in? Generate a secure anonymous session
+      auth.signInAnonymously().catch((error) => {
+        console.error("Auth error:", error);
+        showToast("Authentication failed. Cannot connect to database.");
+      });
+    }
+  });
 });
 
 // Pre-draw char sprite on title (invisible but warms up)
