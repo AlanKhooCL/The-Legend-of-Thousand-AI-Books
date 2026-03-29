@@ -227,12 +227,23 @@ html, body {
   position:relative; z-index:1;
 }
 
+.char-name-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .char-name {
   font-family:'Ma Shan Zheng',serif;
   font-size:1.3rem;
   color:var(--gold);
   text-align:center;
   letter-spacing:0.2em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.char-name:hover {
+  opacity: 0.8;
 }
 .char-rank {
   font-size:0.7rem;
@@ -321,14 +332,16 @@ html, body {
   overflow-y:auto;
   display:flex;
   flex-direction:column;
-  gap:2rem;
 }
 
 .section-header {
   display:flex;
   align-items:center;
   gap:1rem;
-  margin-bottom:1rem;
+  margin-bottom:1.5rem;
+  padding-bottom: 0.5rem;
+  cursor: pointer;
+  user-select: none;
 }
 .section-title {
   font-family:'Ma Shan Zheng',serif;
@@ -339,6 +352,12 @@ html, body {
 .section-line {
   flex:1; height:1px;
   background:linear-gradient(90deg,rgba(200,168,75,0.3),transparent);
+}
+
+#quest-board-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 /* New quest button */
@@ -1046,7 +1065,9 @@ html, body {
         <div class="char-aura"></div>
         <canvas class="char-sprite" id="char-sprite" width="140" height="140"></canvas>
       </div>
-      <div class="char-name" id="char-name">Wei Xuan</div>
+      <div class="char-name-container">
+        <div class="char-name" id="char-name" onclick="renameCharacter()" title="Click to rename">Wei Xuan ✎</div>
+      </div>
       <div class="char-rank" id="char-rank">村民 · Commoner</div>
       <div class="xp-section">
         <div class="xp-label">
@@ -1077,27 +1098,30 @@ html, body {
         <div class="world-lore-title">◈ REALM CHRONICLES</div>
         <div class="world-lore-text" id="world-lore-text">
           The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. 
-          You, Wei Xuan, rise from dust — armed only with an empty scroll and an iron will.
+          You rise from dust — armed only with an empty scroll and an iron will.
         </div>
       </div>
     </div>
 
     <div class="quest-board">
       <div>
-        <div class="section-header">
+        <div class="section-header" onclick="toggleQuestBoard()">
           <div class="section-title">活躍任務 · Active Quests</div>
           <div class="section-line"></div>
+          <div id="quest-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▲</div>
         </div>
-        <button class="btn-new-quest" onclick="openCreateModal()">
-          <div class="plus">+</div>
-          <div>
-            <div style="font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">ISSUE NEW QUEST</div>
-            <div style="font-size:0.75rem;color:rgba(245,234,216,0.4);">Seek knowledge, summon a guardian demon, earn your rank</div>
-          </div>
-        </button>
+        <div id="quest-board-content">
+          <button class="btn-new-quest" onclick="openCreateModal()">
+            <div class="plus">+</div>
+            <div>
+              <div style="font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">ISSUE NEW QUEST</div>
+              <div style="font-size:0.75rem;color:rgba(245,234,216,0.4);">Seek knowledge, summon a guardian demon, earn your rank</div>
+            </div>
+          </button>
+          <div id="quest-grid" class="quest-grid">
+            </div>
+        </div>
       </div>
-      <div id="quest-grid" class="quest-grid">
-        </div>
     </div>
   </div>
 </div>
@@ -1255,7 +1279,7 @@ html, body {
     <div class="modal-subtitle">GEMINI API CONFIGURATION</div>
     <div class="form-group">
       <label class="form-label">◈ GOOGLE GEMINI API KEY</label>
-      <input class="form-input" id="api-key-input" type="password" placeholder="AIza..." />
+      <input class="form-input" id="api-key-input" type="password" placeholder="Paste Gemini API Key here (Not your Firebase key!)..." />
       <div class="api-note">Get your key at aistudio.google.com. Stored in this browser session only.</div>
     </div>
     <div style="display:flex;gap:0.8rem;">
@@ -1295,6 +1319,7 @@ let STATE = {
   selectedModel: document.getElementById('modelSelect')?.value || 'gemini-3-flash-preview',
   quests: [],
   player: {
+    name: "Wei Xuan",
     xp: 0, totalXp: 0, rank: 0, questsCreated: 0,
     chaptersCompleted: 0, bossesDefeated: 0, perfectRuns: 0
   },
@@ -1353,7 +1378,7 @@ async function saveState() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  RANKS
+//  RANKS & PLAYER
 // ═══════════════════════════════════════════════════════
 const RANKS = [
   { name:'村民',  en:'Commoner',       xp:0,   color:'#8a7a6a' },
@@ -1375,6 +1400,15 @@ function getNextRank() {
   const cur = getCurrentRank();
   const idx = RANKS.indexOf(cur);
   return idx < RANKS.length-1 ? RANKS[idx+1] : null;
+}
+
+function renameCharacter() {
+  const newName = prompt("Enter your character's name:", STATE.player.name || "Wei Xuan");
+  if (newName && newName.trim() !== "") {
+    STATE.player.name = newName.trim();
+    saveState();
+    renderHub();
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1880,7 +1914,7 @@ function renderChapterList(quest) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  HUB RENDER
+//  HUB RENDER & UI TOGGLES
 // ═══════════════════════════════════════════════════════
 function renderHub() {
   const player = STATE.player;
@@ -1892,7 +1926,7 @@ function renderHub() {
   const charCanvas = document.getElementById('char-sprite');
   drawCharSprite(charCanvas, rankIdx);
 
-  document.getElementById('char-name').textContent = 'Wei Xuan';
+  document.getElementById('char-name').innerHTML = `${player.name || 'Wei Xuan'} <span style="font-size:0.8em;opacity:0.5;">✎</span>`;
   document.getElementById('char-rank').textContent = `${rank.name} · ${rank.en}`;
 
   // XP
@@ -1912,14 +1946,14 @@ function renderHub() {
 
   // World lore
   const lores = [
-    'The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. You, Wei Xuan, rise from dust — armed only with an empty scroll and an iron will.',
-    'Word spreads through the eastern provinces — a scholar-warrior walks the land, binding demon knowledge to scroll and sword. The warlords take notice.',
-    'The Iron Chancellor of Bei Zhou sends his assassins. They return empty-handed. Wei Xuan is no longer just a scholar. The stars above Jiuzhou shift.',
-    'Three kingdoms now seek your counsel. The demon Scrolls you have mastered grant insight no general has possessed in a thousand years.',
-    'The Grand Conclave convenes at Mount Longhu. Five warlords present their case for the Dragon Throne. Wei Xuan alone holds the final seal.',
-    'Legends whisper of a general who defeated demons with knowledge alone. The rivers run gold in the provinces under your protection.',
-    'All under heaven bows to the banner of Wei Xuan. The Dragon Throne is within reach. One final conquest remains.',
-    'The Mandate of Heaven descends. Wei Xuan ascends the Dragon Throne. Ten thousand scrolls glow with accumulated wisdom. Jiuzhou is unified at last.',
+    `The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. You, ${player.name}, rise from dust — armed only with an empty scroll and an iron will.`,
+    `Word spreads through the eastern provinces — a scholar-warrior walks the land, binding demon knowledge to scroll and sword. The warlords take notice.`,
+    `The Iron Chancellor of Bei Zhou sends his assassins. They return empty-handed. ${player.name} is no longer just a scholar. The stars above Jiuzhou shift.`,
+    `Three kingdoms now seek your counsel. The demon Scrolls you have mastered grant insight no general has possessed in a thousand years.`,
+    `The Grand Conclave convenes at Mount Longhu. Five warlords present their case for the Dragon Throne. ${player.name} alone holds the final seal.`,
+    `Legends whisper of a general who defeated demons with knowledge alone. The rivers run gold in the provinces under your protection.`,
+    `All under heaven bows to the banner of ${player.name}. The Dragon Throne is within reach. One final conquest remains.`,
+    `The Mandate of Heaven descends. ${player.name} ascends the Dragon Throne. Ten thousand scrolls glow with accumulated wisdom. Jiuzhou is unified at last.`,
   ];
   document.getElementById('world-lore-text').textContent = lores[Math.min(rankIdx, lores.length-1)];
 
@@ -1969,6 +2003,19 @@ function renderQuestGrid() {
     card.addEventListener('click',()=>showQuestScreen(idx));
     grid.appendChild(card);
   });
+}
+
+function toggleQuestBoard() {
+  const content = document.getElementById('quest-board-content');
+  const icon = document.getElementById('quest-toggle-icon');
+  
+  if(content.style.display === 'none') {
+    content.style.display = 'flex';
+    icon.textContent = '▲';
+  } else {
+    content.style.display = 'none';
+    icon.textContent = '▼';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2073,15 +2120,15 @@ Return this exact JSON structure:
   "bossLore": "2 sentence background on this demon guardian, thematically tied to the topic",
   "chapters": [
     {
-      "title": "Chapter title (wuxia-flavored, tied to the subtopic)",
+      "title": "A clear, modern, educational chapter title (NO wuxia themes here, just clear learning)",
       "tag": "SUBTOPIC TAG IN CAPS",
-      "summary": "One sentence describing what the learner will master in this chapter"
+      "summary": "One sentence describing what the learner will master in this chapter (modern, clear language)"
     }
   ]
 }
 
 Make exactly ${numChapters} chapters, each covering a distinct aspect of the topic.
-The tone should be epic, scholarly, and wuxia-flavored.`
+The outer shell (Boss names, quest title) should be epic and wuxia-flavored, but the actual chapter titles and summaries MUST be clear, modern, educational language.`
   };
 }
 
@@ -2124,19 +2171,17 @@ async function loadChapterContent(chapterIdx) {
 
   try {
     const content = await callClaude({
-      system: `You are the Loremaster of Ten Thousand Scrolls — an expert teacher in a wuxia fantasy world.
-You write rich, engaging educational content formatted as HTML.
+      system: `You are an expert educator, writing clear, modern, and highly engaging learning material formatted as HTML.
 RESPOND WITH ONLY AN HTML FRAGMENT (no <html>/<body> tags). Use <h3>, <p>, <ul>, <li>, <strong>, <em>, <code>, <pre> tags.
-Make content comprehensive, educational, and weave in subtle wuxia metaphors naturally.`,
+DO NOT use fantasy, wuxia, or ancient Chinese metaphors in your teaching. Use straightforward, modern, real-world analogies to make the concepts easy to understand.`,
       user: `Topic: ${quest.topic}
-Quest: ${quest.questTitle}
 Chapter: ${ch.title} (${ch.tag})
 Summary: ${ch.summary}
 
 Write a comprehensive educational chapter (400-600 words) covering this topic.
-Start with a brief wuxia-flavored metaphor (1-2 sentences, in <em> tags), then dive into the actual educational content.
-Include practical examples, key concepts, and end with a brief "Scroll Mastery" summary box (<h3> tag).
-Make it genuinely educational and engaging.`
+Explain the concepts simply and directly using modern language.
+Include practical, real-world examples and key concepts. 
+End with a brief "Scroll Mastery" summary box (using an <h3> tag).`
     });
 
     quest.chapterContent[chapterIdx] = content;
@@ -2222,18 +2267,17 @@ async function openBattleModal() {
 
 function buildQuizPrompt(quest) {
   return {
-    system:`You are the Loremaster of Ten Thousand Scrolls. Generate quiz questions.
-ALWAYS respond with ONLY valid JSON, no markdown.`,
+    system:`You are an expert educator generating multiple-choice quiz questions based on learning material.
+ALWAYS respond with ONLY valid JSON, no markdown. Use clear, modern language. DO NOT use fantasy or wuxia elements in the questions or answers.`,
     user:`Topic: ${quest.topic}
-Quest: ${quest.questTitle}
 Chapters: ${quest.chapters.map(c=>c.title).join(', ')}
 
-Create exactly 5 multiple-choice questions testing understanding of this topic.
+Create exactly 5 multiple-choice questions testing understanding of this topic in modern, clear English.
 Return JSON:
 {
   "questions": [
     {
-      "question": "Question text (can have wuxia flavor but tests real knowledge)",
+      "question": "Clear, modern question text",
       "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
       "correct": 0,
       "explanation": "Brief explanation of why this is correct"
@@ -2310,7 +2354,7 @@ function finishQuiz(quest) {
     document.getElementById('finishing-blow').classList.add('show');
     showDamageFloat('FINAL BLOW', true);
     document.getElementById('victory-lore').textContent =
-      `Perfect mastery! ${quest.bossName} crumbles before Wei Xuan's enlightened mind. The knowledge sealed within the scroll surges free, adding to the power of the realm.`;
+      `Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name || 'Wei Xuan'}'s enlightened mind. The knowledge sealed within the scroll surges free, adding to the power of the realm.`;
 
     STATE.player.perfectRuns++;
     STATE.player.xp += 50;
