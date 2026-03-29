@@ -256,9 +256,20 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   background:linear-gradient(180deg,rgba(7,5,10,0.9),rgba(14,10,15,0.95)); overflow-y:auto;
 }
 
-.char-stage { width:160px; height:170px; position:relative; display:flex; align-items:center; justify-content:center; }
-.char-aura { position:absolute; inset:-15px; border-radius:50%; animation: auraPulse 4s ease-in-out infinite; }
-@keyframes auraPulse { 0%,100% { opacity:0.5; transform:scale(1); } 50% { opacity:1; transform:scale(1.05); } }
+.char-stage {
+  width:160px; height:170px;
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.char-aura {
+  position:absolute; inset:-15px; border-radius:50%;
+  animation: auraPulse 4s ease-in-out infinite;
+}
+@keyframes auraPulse {
+  0%,100% { opacity:0.5; transform:scale(1); }
+  50% { opacity:1; transform:scale(1.05); }
+}
 
 .char-sprite { width:140px; height:160px; position:relative; z-index:1; image-rendering:pixelated; }
 
@@ -459,7 +470,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .boss-complete-btn:disabled { opacity:0.35; cursor:not-allowed; }
 
 /* ═══════════════════════════════
-   CHAPTER CONTENT & BATTLE MODALS
+   CHAPTER CONTENT MODAL
 ═══════════════════════════════ */
 #chapter-modal .modal-box { max-width:680px; }
 .chapter-content-area { margin-top:1.3rem; line-height:2; color:var(--paper); font-size:0.85rem; }
@@ -479,6 +490,9 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 }
 .chapter-complete-btn:hover { background:linear-gradient(135deg,rgba(30,92,74,0.55),rgba(18,60,46,0.65)); box-shadow:var(--glow-jade); }
 
+/* ═══════════════════════════════
+   BATTLE MODAL
+═══════════════════════════════ */
 #battle-modal .modal-box { max-width:660px; text-align:center; display:flex; flex-direction:column; }
 .battle-stage { position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin-bottom:0.8rem; overflow:hidden; }
 .battle-boss-canvas { width:130px; height:130px; }
@@ -506,7 +520,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .finishing-text { font-family:'Ma Shan Zheng',serif; font-size:2rem; color:var(--gold); text-shadow:var(--glow-gold); animation:finishPulse 0.5s ease infinite alternate; }
 
 /* ═══════════════════════════════
-   GAMBIT & FATE & SETTINGS MODALS
+   CELESTIAL GAMBIT & FATE SCROLL MODALS
 ═══════════════════════════════ */
 #gambit-modal .modal-box, #fate-modal .modal-box, #api-modal .modal-box { max-width:420px; text-align:center; }
 .gambit-coin {
@@ -519,6 +533,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 @keyframes coinSpin { 0%{transform:rotateY(0)} 50%{transform:rotateY(90deg) scaleX(0.1)} 100%{transform:rotateY(180deg)} }
 
 .fate-scroll { margin:1.5rem auto; width:80px; height:100px; position:relative; cursor:pointer; animation:scrollBob 2s ease-in-out infinite; }
+@keyframes scrollBob { 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-8px) rotate(3deg);} }
 .fate-reveal { font-family:'Ma Shan Zheng',serif; font-size:1.5rem; color:var(--gold); text-shadow:var(--glow-gold); animation:fadeSlideUp 0.5s ease; }
 
 /* ── Toast ── */
@@ -528,7 +543,8 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   padding:0.75rem 1.4rem; font-size:0.78rem; color:var(--gold);
   letter-spacing:0.1em; z-index:999; opacity:0; transition:opacity 0.4s;
   pointer-events:none; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
-  white-space:normal; width:90%; max-width:380px; text-align:center; line-height:1.5; box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  white-space:normal; width:90%; max-width:400px; text-align:center; line-height:1.4;
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
 }
 #toast.show { opacity:1; }
 
@@ -1014,7 +1030,7 @@ function renderSigils() {
 }
 
 // ════════════════════════════════
-//  FIREBASE / STATE (WITH AUTO-HEAL)
+//  FIREBASE / STATE (HEALER)
 // ════════════════════════════════
 async function loadState() {
   if(!USER_ID) return;
@@ -1040,11 +1056,13 @@ async function loadState() {
       isNewUser = true;
     }
   } catch(e) {
+    alert("🔥 DB LOAD ERROR:\n" + (e.message || e));
     console.error("DB load error:", e);
     showToast("Could not load data. Playing locally.");
     isNewUser = true;
   }
 
+  // Load public quests separately so it doesn't crash the main load
   try { await loadPublicQuests(); } catch(e) { console.error("Library load error:", e); }
 
   if (dataLoaded) {
@@ -1071,11 +1089,22 @@ async function loadState() {
   }
 }
 
+window.enterRealm = function() {
+  if (!STATE.player) {
+    showScreen('screen-path');
+    try { renderPathSprites(); } catch(e) { console.error("Render path error:", e); }
+  } else {
+    showScreen('screen-hub');
+    try { renderHub(); } catch(e) { console.error("Render error:", e); }
+  }
+};
+
 function syncActiveSaveToState() {
   const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
   if(s) { 
     STATE.player = s.player; 
     
+    // Auto-heal corrupted quest data
     STATE.quests = (s.quests || []).filter(q => q != null).map(q => ({
         ...q,
         topic: q.topic || 'Unknown Discipline',
@@ -1587,17 +1616,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-
-window.enterRealm = function() {
-  if (!STATE.player) {
-    showScreen('screen-path');
-    renderPathSprites();
-  } else {
-    showScreen('screen-hub');
-    renderHub();
-  }
-};
-
 window.showHub = function() { showScreen('screen-hub'); renderHub(); };
 
 window.showQuestScreen = function(questIdx) {
@@ -1914,68 +1932,88 @@ window.copyPublicQuest = function(idx) {
 };
 
 window.createQuest = async function() {
-  const topic=document.getElementById('topic-input').value.trim();
-  if(!topic){showToast('Please enter a topic.');return;}
-  const objective=document.getElementById('objective-input').value.trim();
-  const numChapters=parseInt(document.getElementById('chapters-input').value);
-  document.getElementById('create-form').style.display='none';
-  document.getElementById('generating-state').classList.add('active');
   try {
-    setGenStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
-    
-    const questData=await callAI({ ...buildQuestPrompt(topic,objective,numChapters), isJSON: true });
-    let parsed=parseJSON(questData);
-    if (!parsed || typeof parsed !== 'object') parsed = {};
-    
-    setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
-    await delay(500);
-    
-    const chapters = parsed.chapters || parsed.chapterList || [];
-    if(chapters.length === 0) {
-        for(let i=0; i<numChapters; i++) chapters.push({ title: `Chapter ${i+1}`, tag: `PART ${i+1}`, summary: `Learning about ${topic}`});
-    }
-
-    const baseQuest={
-        topic: topic || "Unknown",
-        objective: objective || "",
-        questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
-        questNarrative: parsed.questNarrative || parsed.narrative || "A newly discovered scroll.",
-        bossName: parsed.bossName || parsed.boss || "Mo Wang",
-        bossTitle: parsed.bossTitle || "The Unknown",
-        bossLore: parsed.bossLore || parsed.lore || "A mysterious entity.",
-        chapters: chapters
-    };
-    
-    const userQuest={
-        ...baseQuest,
-        id: Date.now(),
-        bossMaxHp: 100,
-        bossHp: 100,
-        completed: new Array(chapters.length).fill(false),
-        chapterContent: {},
-        quiz: null,
-        defeated: false
-    };
-
-    STATE.quests.unshift(userQuest); STATE.player.questsCreated++;
-    await saveState();
-    
-    try {
-      const pubQ={...baseQuest,id:Date.now()};
-      await addDoc(collection(db,"public_quests"),pubQ);
-      STATE.publicQuests.unshift(pubQ);
-    } catch(e) { console.error("Public save failed:",e); }
-    
-    closeCreateModal();
-    showToast(`Quest summoned: "${userQuest.questTitle}"`);
-    const qbc=document.getElementById('quest-board-content');
-    if(qbc.style.display==='none'||qbc.style.display==='') { qbc.style.display='flex'; document.getElementById('quest-toggle-icon').textContent='▲'; }
-    window.showQuestScreen(0);
-    
+      const topic=document.getElementById('topic-input').value.trim();
+      if(!topic){showToast('Please enter a topic.');return;}
+      const objective=document.getElementById('objective-input').value.trim();
+      const numChapters=parseInt(document.getElementById('chapters-input').value);
+      
+      document.getElementById('create-form').style.display='none';
+      document.getElementById('generating-state').classList.add('active');
+  
+      setGenStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
+      
+      let questData;
+      try {
+          questData=await callAI({ ...buildQuestPrompt(topic,objective,numChapters), isJSON: true });
+      } catch (aiErr) {
+          throw new Error("AI Error: " + (aiErr.message || "Could not fetch scrolls."));
+      }
+      
+      let parsed=parseJSON(questData);
+      if (!parsed || typeof parsed !== 'object') parsed = {};
+      
+      setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
+      await delay(500);
+      
+      const chapters = parsed.chapters || parsed.chapterList || [];
+      if(chapters.length === 0) {
+          for(let i=0; i<numChapters; i++) chapters.push({ title: `Chapter ${i+1}`, tag: `PART ${i+1}`, summary: `Learning about ${topic}`});
+      }
+  
+      const baseQuest={
+          topic: topic || "Unknown",
+          objective: objective || "",
+          questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
+          questNarrative: parsed.questNarrative || parsed.narrative || "A newly discovered scroll.",
+          bossName: parsed.bossName || parsed.boss || "Mo Wang",
+          bossTitle: parsed.bossTitle || "The Unknown",
+          bossLore: parsed.bossLore || parsed.lore || "A mysterious entity.",
+          chapters: chapters
+      };
+      
+      const userQuest={
+          ...baseQuest,
+          id: Date.now(),
+          bossMaxHp: 100,
+          bossHp: 100,
+          completed: new Array(chapters.length).fill(false),
+          chapterContent: {},
+          quiz: null,
+          defeated: false
+      };
+      
+      if (!STATE.quests) STATE.quests = [];
+      if (!STATE.player) throw new Error("STATE.player is undefined! Save data didn't load properly.");
+  
+      STATE.quests.unshift(userQuest); 
+      STATE.player.questsCreated = (STATE.player.questsCreated || 0) + 1;
+      
+      try {
+          await saveState();
+      } catch(dbErr) {
+          alert("Failed to save to Firestore: " + dbErr.message);
+      }
+      
+      try {
+        const pubQ={...baseQuest,id:Date.now()};
+        await addDoc(collection(db,"public_quests"),pubQ);
+        STATE.publicQuests.unshift(pubQ);
+      } catch(e) { 
+        // Silent fail for public library 
+      }
+      
+      closeCreateModal();
+      showToast(`Quest summoned: "${userQuest.questTitle}"`);
+      const qbc=document.getElementById('quest-board-content');
+      if(qbc.style.display==='none'||qbc.style.display==='') { qbc.style.display='flex'; document.getElementById('quest-toggle-icon').textContent='▲'; }
+      window.showQuestScreen(0);
+      
   } catch(e) {
-    document.getElementById('create-form').style.display='block';
-    document.getElementById('generating-state').classList.remove('active');
-    showToast('Error: '+e.message.substring(0,60));
+      alert("🔥 CRASH LOG:\n" + (e.stack || e.message || e));
+      document.getElementById('create-form').style.display='block';
+      document.getElementById('generating-state').classList.remove('active');
+      showToast('Error: '+ (e.message ? e.message.substring(0,60) : 'Unknown'));
   }
 };
 
@@ -2338,7 +2376,10 @@ async function callAI({system, user, isJSON = false}) {
     const text = result?.response?.text ? result.response.text() : "";
     if (!text) throw new Error("The scrolls returned empty. Try again.");
     return text;
-  } catch(e) { throw new Error(e.message||"Failed to communicate with the scrolls."); }
+  } catch(e) { 
+    alert("🔥 AI API ERROR:\n" + (e.message || e)); 
+    throw new Error(e.message||"Failed to communicate with the scrolls."); 
+  }
 }
 
 function parseJSON(text) {
@@ -2374,6 +2415,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
+setTimeout(()=>renderPathSprites(),200);
 </script>
 </body>
 </html>
