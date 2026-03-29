@@ -5,23 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>萬卷書 — Ten Thousand Scrolls</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Cinzel+Decorative:wght@400;700&family=Ma+Shan+Zheng&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Cinzel+Decorative:wght@400;700&family=Ma+Shan+Zheng&display=swap');
 
 :root {
   --ink:        #0e0a06;
-  --paper:      #f5ead8;
-  --paper2:     #ede0c4;
-  --gold:       #c8a84b;
-  --gold2:      #e8c96a;
-  --red:        #8b1a1a;
-  --red2:       #c0392b;
-  --jade:       #2e6b5e;
-  --jade2:      #3d8a7a;
-  --mist:       rgba(245,234,216,0.06);
-  --shadow:     rgba(14,10,6,0.7);
-  --glow-gold:  0 0 20px rgba(200,168,75,0.4);
-  --glow-red:   0 0 20px rgba(139,26,26,0.5);
-  --text-muted: rgba(200,168,75,0.7);
+  --paper:      #fdf6e3; /* Brightened for readability */
+  --paper2:     #f5ead8;
+  --gold:       #d4b86a; /* Slightly brighter gold */
+  --gold2:      #f0d689;
+  --red:        #9e1b1b;
+  --red2:       #d64535;
+  --jade:       #367c6d;
+  --jade2:      #4ca391;
+  --mist:       rgba(253,246,227,0.08);
+  --shadow:     rgba(14,10,6,0.8);
+  --glow-gold:  0 0 20px rgba(212,184,106,0.4);
+  --glow-red:   0 0 20px rgba(158,27,27,0.5);
+  --text-muted: rgba(253,246,227,0.7); /* Improved contrast for muted text */
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -31,7 +31,7 @@ html, body {
   background: var(--ink);
   font-family: 'Noto Serif SC', serif;
   color: var(--paper);
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23c8a84b'/%3E%3C/svg%3E") 10 10, default;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23d4b86a'/%3E%3C/svg%3E") 10 10, default;
 }
 
 /* ═══════════════════════════════
@@ -69,13 +69,13 @@ html, body {
   position:relative;
   animation: sealSpin 20s linear infinite;
   margin-bottom:2rem;
-  box-shadow: var(--glow-gold), inset 0 0 30px rgba(200,168,75,0.1);
+  box-shadow: var(--glow-gold), inset 0 0 30px rgba(212,184,106,0.15);
 }
 .title-seal::before {
   content:'';
   position:absolute; inset:6px;
   border-radius:50%;
-  border:1px solid rgba(200,168,75,0.3);
+  border:1px solid rgba(212,184,106,0.4);
 }
 .title-seal-char {
   font-family:'Ma Shan Zheng',serif;
@@ -92,7 +92,7 @@ html, body {
   font-weight:700;
   letter-spacing:0.2em;
   color:var(--gold);
-  text-shadow: 0 0 40px rgba(200,168,75,0.6), 0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 0 0 40px rgba(212,184,106,0.6), 0 2px 4px rgba(0,0,0,0.9);
   margin-bottom:0.4rem;
   animation: fadeSlideUp 1s ease 0.3s both;
   text-align: center;
@@ -102,7 +102,7 @@ html, body {
   font-size:clamp(1rem,2.5vw,1.6rem);
   color:var(--paper2);
   letter-spacing:0.8em;
-  opacity:0.7;
+  opacity:0.85;
   animation: fadeSlideUp 1s ease 0.5s both;
   margin-bottom:2.5rem;
   text-align: center;
@@ -122,9 +122,9 @@ html, body {
 .title-lore {
   max-width:480px;
   text-align:center;
-  font-size:0.9rem;
+  font-size:1rem;
   line-height:1.9;
-  color:rgba(245,234,216,0.65);
+  color:var(--text-muted);
   font-style:italic;
   animation: fadeSlideUp 1s ease 0.9s both;
   margin-bottom:3rem;
@@ -132,12 +132,13 @@ html, body {
 }
 
 .btn-primary {
-  padding:0.9rem 3rem;
-  background:linear-gradient(135deg,#8b1a1a,#6b1010);
+  padding:1rem 3rem;
+  background:linear-gradient(135deg,#9e1b1b,#7a1212);
   border:1px solid var(--gold);
   color:var(--gold);
   font-family:'Cinzel Decorative',serif;
-  font-size:0.85rem;
+  font-size:0.9rem;
+  font-weight: 700;
   letter-spacing:0.25em;
   cursor:pointer;
   transition:all 0.3s;
@@ -146,8 +147,8 @@ html, body {
   animation: fadeSlideUp 1s ease 1.1s both;
 }
 .btn-primary:hover {
-  background:linear-gradient(135deg,#a02020,#8b1a1a);
-  box-shadow: var(--glow-red), 0 0 40px rgba(139,26,26,0.4);
+  background:linear-gradient(135deg,#b32424,#9e1b1b);
+  box-shadow: var(--glow-red), 0 0 40px rgba(158,27,27,0.5);
   transform:translateY(-2px);
 }
 .btn-primary:disabled {
@@ -157,7 +158,6 @@ html, body {
   box-shadow: none;
 }
 
-/* Auth Buttons Container */
 #auth-buttons {
   display: none;
   flex-direction: column;
@@ -180,8 +180,8 @@ html, body {
   align-items:center;
   justify-content:space-between;
   padding:1.2rem 2rem;
-  border-bottom:1px solid rgba(200,168,75,0.2);
-  background:linear-gradient(180deg,rgba(14,10,6,0.95),rgba(14,10,6,0.7));
+  border-bottom:1px solid rgba(212,184,106,0.25);
+  background:linear-gradient(180deg,rgba(14,10,6,0.98),rgba(14,10,6,0.85));
   backdrop-filter:blur(10px);
   position:sticky; top:0; z-index:20;
   flex-shrink:0;
@@ -189,7 +189,7 @@ html, body {
 
 .hub-title {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.5rem;
+  font-size:1.6rem;
   color:var(--gold);
   letter-spacing:0.3em;
 }
@@ -205,13 +205,13 @@ html, body {
 
 /* ── Character Panel ── */
 .char-panel {
-  border-right:1px solid rgba(200,168,75,0.15);
+  border-right:1px solid rgba(212,184,106,0.2);
   padding:2rem 1.5rem;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:1.5rem;
-  background:linear-gradient(180deg,rgba(14,10,6,0.8),rgba(20,14,8,0.9));
+  background:linear-gradient(180deg,rgba(14,10,6,0.85),rgba(20,14,8,0.95));
   overflow-y:auto;
 }
 
@@ -229,8 +229,8 @@ html, body {
   animation: auraPulse 3s ease-in-out infinite;
 }
 @keyframes auraPulse {
-  0%,100% { box-shadow:0 0 20px rgba(200,168,75,0.2), 0 0 40px rgba(200,168,75,0.1); }
-  50% { box-shadow:0 0 40px rgba(200,168,75,0.4), 0 0 80px rgba(200,168,75,0.2); }
+  0%,100% { box-shadow:0 0 20px rgba(212,184,106,0.25), 0 0 40px rgba(212,184,106,0.15); }
+  50% { box-shadow:0 0 40px rgba(212,184,106,0.45), 0 0 80px rgba(212,184,106,0.25); }
 }
 
 .char-sprite {
@@ -246,37 +246,38 @@ html, body {
 
 .char-name {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.3rem;
+  font-size:1.4rem;
   color:var(--gold);
   text-align:center;
   letter-spacing:0.2em;
   cursor: pointer;
   transition: opacity 0.2s;
 }
-.char-name:hover {
-  opacity: 0.8;
-}
+.char-name:hover { opacity: 0.8; }
+
 .char-rank {
-  font-size:0.7rem;
-  color:rgba(200,168,75,0.6);
+  font-size:0.75rem;
+  color:var(--text-muted);
   letter-spacing:0.3em;
   text-transform:uppercase;
   text-align:center;
   margin-top:-0.8rem;
+  font-weight: 500;
 }
 
 .xp-section { width:100%; }
 .xp-label {
   display:flex;justify-content:space-between;
-  font-size:0.65rem;
-  color:rgba(245,234,216,0.5);
+  font-size:0.7rem;
+  color:var(--text-muted);
   letter-spacing:0.15em;
   margin-bottom:0.4rem;
+  font-weight: 600;
 }
 .xp-bar {
-  height:6px;
-  background:rgba(200,168,75,0.1);
-  border:1px solid rgba(200,168,75,0.2);
+  height:8px;
+  background:rgba(212,184,106,0.15);
+  border:1px solid rgba(212,184,106,0.3);
   border-radius:0;
   overflow:hidden;
 }
@@ -300,40 +301,43 @@ html, body {
   gap:0.6rem;
 }
 .stat-box {
-  background:rgba(200,168,75,0.05);
-  border:1px solid rgba(200,168,75,0.1);
-  padding:0.6rem;
+  background:rgba(212,184,106,0.08);
+  border:1px solid rgba(212,184,106,0.2);
+  padding:0.8rem 0.6rem;
   text-align:center;
 }
 .stat-val {
   font-family:'Cinzel Decorative',serif;
-  font-size:1.1rem;
+  font-size:1.2rem;
   color:var(--gold);
+  font-weight: 700;
 }
 .stat-lbl {
-  font-size:0.55rem;
-  color:rgba(245,234,216,0.4);
+  font-size:0.6rem;
+  color:var(--text-muted);
   letter-spacing:0.2em;
-  margin-top:0.2rem;
+  margin-top:0.3rem;
+  font-weight: 500;
 }
 
 .world-lore-box {
   width:100%;
-  background:rgba(200,168,75,0.04);
-  border:1px solid rgba(200,168,75,0.1);
+  background:rgba(212,184,106,0.06);
+  border:1px solid rgba(212,184,106,0.2);
   border-left:3px solid var(--red);
   padding:1rem;
 }
 .world-lore-title {
-  font-size:0.6rem;
+  font-size:0.65rem;
   letter-spacing:0.3em;
   color:var(--red2);
-  margin-bottom:0.5rem;
+  margin-bottom:0.6rem;
+  font-weight: 600;
 }
 .world-lore-text {
-  font-size:0.72rem;
-  line-height:1.8;
-  color:rgba(245,234,216,0.55);
+  font-size:0.8rem;
+  line-height:1.7;
+  color:var(--text-muted);
   font-style:italic;
 }
 
@@ -356,13 +360,13 @@ html, body {
 }
 .section-title {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.2rem;
+  font-size:1.3rem;
   color:var(--gold);
   letter-spacing:0.3em;
 }
 .section-line {
   flex:1; height:1px;
-  background:linear-gradient(90deg,rgba(200,168,75,0.3),transparent);
+  background:linear-gradient(90deg,rgba(212,184,106,0.4),transparent);
 }
 
 #quest-board-content {
@@ -371,21 +375,20 @@ html, body {
   gap: 2rem;
 }
 
-/* New quest button */
 .btn-new-quest {
   display:flex;
   align-items:center;
   gap:1rem;
   padding:1.2rem 1.5rem;
-  background:linear-gradient(135deg,rgba(139,26,26,0.15),rgba(139,26,26,0.05));
-  border:1px dashed rgba(200,168,75,0.3);
+  background:linear-gradient(135deg,rgba(158,27,27,0.15),rgba(158,27,27,0.05));
+  border:1px dashed rgba(212,184,106,0.4);
   cursor:pointer;
   transition:all 0.3s;
-  color:var(--paper2);
+  color:var(--paper);
   font-family:'Noto Serif SC',serif;
 }
 .btn-new-quest:hover {
-  background:linear-gradient(135deg,rgba(139,26,26,0.3),rgba(139,26,26,0.1));
+  background:linear-gradient(135deg,rgba(158,27,27,0.25),rgba(158,27,27,0.1));
   border-color:var(--gold);
   box-shadow:var(--glow-red);
 }
@@ -399,16 +402,15 @@ html, body {
   clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
 
-/* Quest cards */
 .quest-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:1rem;
+  gap:1.2rem;
 }
 
 .quest-card {
-  background:linear-gradient(135deg,rgba(20,14,8,0.9),rgba(14,10,6,0.95));
-  border:1px solid rgba(200,168,75,0.15);
+  background:linear-gradient(135deg,rgba(20,14,8,0.95),rgba(14,10,6,0.98));
+  border:1px solid rgba(212,184,106,0.25);
   padding:1.5rem;
   cursor:pointer;
   transition:all 0.3s;
@@ -423,7 +425,7 @@ html, body {
   opacity:0;
   transition:opacity 0.3s;
 }
-.quest-card:hover { border-color:rgba(200,168,75,0.4); transform:translateY(-3px); }
+.quest-card:hover { border-color:rgba(212,184,106,0.5); transform:translateY(-3px); }
 .quest-card:hover::before { opacity:1; }
 
 .quest-boss-preview {
@@ -432,20 +434,18 @@ html, body {
   gap:1rem;
   margin-bottom:1rem;
 }
-.boss-mini-sprite {
-  width:60px;height:60px;
-  flex-shrink:0;
-}
-.quest-info {}
+.boss-mini-sprite { width:60px;height:60px; flex-shrink:0; }
+
 .quest-topic {
-  font-size:0.65rem;
+  font-size:0.7rem;
   color:var(--red2);
   letter-spacing:0.3em;
-  margin-bottom:0.3rem;
+  margin-bottom:0.4rem;
+  font-weight: 600;
 }
 .quest-title {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1rem;
+  font-size:1.1rem;
   color:var(--gold);
   line-height:1.4;
   padding-right: 1.5rem; 
@@ -453,28 +453,28 @@ html, body {
 
 .chapter-progress {
   display:flex;
-  gap:4px;
-  margin-top:0.8rem;
+  gap:6px;
+  margin-top:1rem;
 }
 .chapter-pip {
   flex:1; height:4px;
-  background:rgba(200,168,75,0.1);
-  border:1px solid rgba(200,168,75,0.15);
+  background:rgba(212,184,106,0.15);
+  border:1px solid rgba(212,184,106,0.2);
   transition:background 0.3s;
 }
-.chapter-pip.done { background:var(--gold); }
-.chapter-pip.active { background:var(--red2); animation:pipPulse 1s ease-in-out infinite; }
+.chapter-pip.done { background:var(--gold); border-color: var(--gold); }
+.chapter-pip.active { background:var(--red2); border-color: var(--red2); animation:pipPulse 1s ease-in-out infinite; }
 @keyframes pipPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 .quest-status {
-  margin-top:0.8rem;
+  margin-top:1rem;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-.quest-hp-bar { flex:1; height:4px; background:rgba(139,26,26,0.2); margin-right:0.5rem; }
-.quest-hp-fill { height:100%; background:linear-gradient(90deg,var(--red2),#e74c3c); transition:width 0.5s; }
-.quest-hp-label { font-size:0.6rem; color:rgba(245,234,216,0.4); letter-spacing:0.1em; }
+.quest-hp-bar { flex:1; height:6px; background:rgba(158,27,27,0.25); margin-right:0.5rem; }
+.quest-hp-fill { height:100%; background:linear-gradient(90deg,var(--red2),#ff5a4a); transition:width 0.5s; }
+.quest-hp-label { font-size:0.65rem; color:var(--text-muted); letter-spacing:0.1em; font-weight: 500; }
 
 /* ═══════════════════════════════
    CREATE QUEST MODAL
@@ -491,14 +491,14 @@ html, body {
 
 .modal-box {
   background:linear-gradient(135deg,rgba(20,14,8,0.98),rgba(14,10,6,0.99));
-  border:1px solid rgba(200,168,75,0.25);
+  border:1px solid rgba(212,184,106,0.3);
   max-width:560px;
   width:90%;
   max-height:88vh;
   overflow-y:auto;
   position:relative;
   padding:2.5rem;
-  box-shadow:0 0 60px rgba(139,26,26,0.3), 0 0 120px rgba(14,10,6,0.8);
+  box-shadow:0 0 60px rgba(158,27,27,0.3), 0 0 120px rgba(14,10,6,0.8);
 }
 .modal-box::before {
   content:'';
@@ -509,14 +509,14 @@ html, body {
 
 .modal-title {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.5rem;
+  font-size:1.6rem;
   color:var(--gold);
   letter-spacing:0.3em;
-  margin-bottom:0.3rem;
+  margin-bottom:0.4rem;
 }
 .modal-subtitle {
-  font-size:0.72rem;
-  color:rgba(245,234,216,0.4);
+  font-size:0.8rem;
+  color:var(--text-muted);
   letter-spacing:0.15em;
   margin-bottom:2rem;
 }
@@ -524,47 +524,44 @@ html, body {
 .form-group { margin-bottom:1.5rem; }
 .form-label {
   display:block;
-  font-size:0.65rem;
+  font-size:0.7rem;
   letter-spacing:0.3em;
-  color:rgba(200,168,75,0.7);
+  color:var(--gold);
   margin-bottom:0.6rem;
+  font-weight: 600;
 }
 .form-input, .form-textarea, .form-select {
   width:100%;
-  background:rgba(200,168,75,0.04);
-  border:1px solid rgba(200,168,75,0.2);
+  background:rgba(212,184,106,0.06);
+  border:1px solid rgba(212,184,106,0.25);
   color:var(--paper);
   font-family:'Noto Serif SC',serif;
-  font-size:0.88rem;
+  font-size:0.95rem;
   padding:0.8rem 1rem;
   outline:none;
   transition:border-color 0.2s;
   -webkit-appearance:none;
 }
 .form-input:focus, .form-textarea:focus, .form-select:focus {
-  border-color:rgba(200,168,75,0.5);
-  box-shadow:0 0 10px rgba(200,168,75,0.1);
+  border-color:rgba(212,184,106,0.6);
+  box-shadow:0 0 10px rgba(212,184,106,0.15);
 }
 .form-textarea { resize:vertical; min-height:80px; }
 .form-select option { background:#1a1006; color:var(--paper); }
 
 /* Model Selector specific styles */
 .glass-panel {
-  background: rgba(200,168,75,0.04);
-  border: 1px solid rgba(200,168,75,0.2);
+  background: rgba(212,184,106,0.05);
+  border: 1px solid rgba(212,184,106,0.2);
 }
-.model-chip-group {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
+.model-chip-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .model-chip {
-  padding: 0.4rem 1rem;
-  border: 1px solid rgba(200,168,75,0.2);
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(212,184,106,0.25);
   background: transparent;
-  color: rgba(245,234,216,0.5);
+  color: var(--text-muted);
   font-family: 'Noto Serif SC', serif;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
   clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
@@ -572,14 +569,11 @@ html, body {
 .model-chip.active {
   border-color: var(--gold);
   color: var(--gold);
-  background: rgba(200,168,75,0.1);
+  background: rgba(212,184,106,0.15);
+  font-weight: 600;
 }
 
-.generating-state {
-  text-align:center;
-  padding:2rem 0;
-  display:none;
-}
+.generating-state { text-align:center; padding:2rem 0; display:none; }
 .generating-state.active { display:block; }
 .gen-spinner {
   font-family:'Ma Shan Zheng',serif;
@@ -591,24 +585,20 @@ html, body {
 }
 .gen-text {
   font-style:italic;
-  color:rgba(245,234,216,0.5);
-  font-size:0.85rem;
+  color:var(--text-muted);
+  font-size:0.9rem;
   animation:textBreathe 2s ease-in-out infinite;
 }
-@keyframes textBreathe { 0%,100%{opacity:0.4} 50%{opacity:1} }
 
 /* ═══════════════════════════════
    QUEST / CHAPTER VIEW
 ═══════════════════════════════ */
-#screen-quest {
-  flex-direction:column;
-  overflow:hidden;
-}
+#screen-quest { flex-direction:column; overflow:hidden; }
 
 .quest-header {
   padding:1.2rem 2rem;
-  border-bottom:1px solid rgba(200,168,75,0.15);
-  background:rgba(14,10,6,0.9);
+  border-bottom:1px solid rgba(212,184,106,0.2);
+  background:rgba(14,10,6,0.95);
   backdrop-filter:blur(10px);
   display:flex;
   align-items:center;
@@ -616,12 +606,13 @@ html, body {
   flex-shrink:0;
 }
 .back-btn {
-  background:none;border:1px solid rgba(200,168,75,0.2);
-  color:rgba(200,168,75,0.6);
-  padding:0.4rem 0.8rem;
+  background:none;border:1px solid rgba(212,184,106,0.3);
+  color:var(--text-muted);
+  padding:0.5rem 1rem;
   cursor:pointer;
   font-family:'Noto Serif SC',serif;
-  font-size:0.75rem;
+  font-size:0.8rem;
+  font-weight: 600;
   letter-spacing:0.1em;
   transition:all 0.2s;
 }
@@ -637,32 +628,31 @@ html, body {
 .chapters-panel {
   padding:2rem;
   overflow-y:auto;
-  border-right:1px solid rgba(200,168,75,0.1);
+  border-right:1px solid rgba(212,184,106,0.15);
 }
 
-.chapter-list { display:flex; flex-direction:column; gap:0.8rem; }
+.chapter-list { display:flex; flex-direction:column; gap:1rem; }
 
 .chapter-item {
   display:flex;
   align-items:flex-start;
   gap:1rem;
-  padding:1.2rem;
-  background:rgba(200,168,75,0.03);
-  border:1px solid rgba(200,168,75,0.1);
+  padding:1.4rem;
+  background:rgba(212,184,106,0.04);
+  border:1px solid rgba(212,184,106,0.15);
   cursor:pointer;
   transition:all 0.3s;
   position:relative;
 }
-.chapter-item:hover { border-color:rgba(200,168,75,0.3); background:rgba(200,168,75,0.06); }
-.chapter-item.completed { border-left:3px solid var(--jade2); }
-.chapter-item.locked { opacity:0.4; cursor:not-allowed; }
+.chapter-item:hover { border-color:rgba(212,184,106,0.4); background:rgba(212,184,106,0.08); }
+.chapter-item.completed { border-left:4px solid var(--jade2); }
 
 .chapter-num {
-  width:36px;height:36px;
-  border:1px solid rgba(200,168,75,0.3);
+  width:40px;height:40px;
+  border:1px solid rgba(212,184,106,0.4);
   display:flex;align-items:center;justify-content:center;
   font-family:'Cinzel Decorative',serif;
-  font-size:0.75rem;
+  font-size:0.85rem;
   color:var(--gold);
   flex-shrink:0;
   clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
@@ -670,33 +660,34 @@ html, body {
 .chapter-item.completed .chapter-num {
   background:var(--jade);
   border-color:var(--jade2);
+  color: #fff;
 }
 
-.chapter-meta {}
 .chapter-tag {
-  font-size:0.6rem;
+  font-size:0.65rem;
   letter-spacing:0.25em;
   color:var(--red2);
-  margin-bottom:0.3rem;
+  margin-bottom:0.4rem;
+  font-weight: 600;
 }
 .chapter-title-text {
   font-family:'Ma Shan Zheng',serif;
-  font-size:0.95rem;
+  font-size:1.1rem;
   color:var(--paper);
   line-height:1.4;
 }
 .chapter-desc {
-  font-size:0.72rem;
-  color:rgba(245,234,216,0.4);
-  margin-top:0.3rem;
+  font-size:0.8rem;
+  color:var(--text-muted);
+  margin-top:0.4rem;
   line-height:1.6;
 }
-
 .chapter-done-badge {
-  position:absolute;top:0.5rem;right:0.5rem;
-  font-size:0.6rem;
+  position:absolute;top:0.6rem;right:0.6rem;
+  font-size:0.65rem;
   color:var(--jade2);
   letter-spacing:0.2em;
+  font-weight: 600;
 }
 
 /* Boss panel */
@@ -721,26 +712,23 @@ html, body {
   animation:bossAura 2s ease-in-out infinite;
 }
 @keyframes bossAura {
-  0%,100% { box-shadow:0 0 30px rgba(139,26,26,0.3), 0 0 60px rgba(139,26,26,0.1); }
-  50% { box-shadow:0 0 60px rgba(139,26,26,0.5), 0 0 100px rgba(139,26,26,0.2); }
+  0%,100% { box-shadow:0 0 30px rgba(158,27,27,0.3), 0 0 60px rgba(158,27,27,0.1); }
+  50% { box-shadow:0 0 60px rgba(158,27,27,0.5), 0 0 100px rgba(158,27,27,0.2); }
 }
 
-.boss-sprite-canvas {
-  width:160px;height:160px;
-  position:relative;z-index:1;
-}
+.boss-sprite-canvas { width:160px;height:160px; position:relative;z-index:1; }
 
 .boss-name-display {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.3rem;
+  font-size:1.4rem;
   color:var(--red2);
   text-align:center;
   letter-spacing:0.2em;
   text-shadow:var(--glow-red);
 }
 .boss-title-display {
-  font-size:0.65rem;
-  color:rgba(200,168,75,0.5);
+  font-size:0.7rem;
+  color:var(--text-muted);
   letter-spacing:0.3em;
   text-align:center;
   margin-top:-0.8rem;
@@ -749,124 +737,111 @@ html, body {
 .boss-hp-section { width:100%; }
 .boss-hp-label {
   display:flex;justify-content:space-between;
-  font-size:0.62rem;
-  color:rgba(245,234,216,0.4);
+  font-size:0.65rem;
+  color:var(--text-muted);
   letter-spacing:0.15em;
   margin-bottom:0.4rem;
+  font-weight: 600;
 }
 .boss-hp-bar {
-  height:10px;
-  background:rgba(139,26,26,0.2);
-  border:1px solid rgba(139,26,26,0.3);
+  height:12px;
+  background:rgba(158,27,27,0.2);
+  border:1px solid rgba(158,27,27,0.4);
   overflow:hidden;
   position:relative;
 }
 .boss-hp-fill {
   height:100%;
-  background:linear-gradient(90deg,#4a0a0a,var(--red2),#e74c3c);
+  background:linear-gradient(90deg,#6b1010,var(--red2),#ff5a4a);
   transition:width 1s ease;
   position:relative;
 }
 .boss-hp-fill::after {
   content:'';
   position:absolute;right:0;top:0;bottom:0;width:4px;
-  background:#ff6060;
-  box-shadow:0 0 8px rgba(255,96,96,0.8);
-}
-
-.boss-lore-box {
-  width:100%;
-  background:rgba(139,26,26,0.05);
-  border:1px solid rgba(139,26,26,0.15);
-  border-left:3px solid var(--red);
-  padding:1rem;
-}
-.boss-lore-title {
-  font-size:0.6rem;letter-spacing:0.3em;color:var(--red2);margin-bottom:0.5rem;
-}
-.boss-lore-text {
-  font-size:0.72rem;line-height:1.8;
-  color:rgba(245,234,216,0.55);font-style:italic;
+  background:#ff8a80;
+  box-shadow:0 0 8px rgba(255,138,128,0.8);
 }
 
 .boss-complete-btn {
   width:100%;
-  padding:0.9rem;
-  background:linear-gradient(135deg,rgba(139,26,26,0.3),rgba(100,10,10,0.5));
+  padding:1rem;
+  background:linear-gradient(135deg,rgba(158,27,27,0.3),rgba(107,16,16,0.5));
   border:1px solid var(--red);
   color:var(--gold);
   font-family:'Cinzel Decorative',serif;
-  font-size:0.75rem;
+  font-size:0.8rem;
+  font-weight: 700;
   letter-spacing:0.2em;
   cursor:pointer;
   transition:all 0.3s;
   clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
 .boss-complete-btn:hover {
-  background:linear-gradient(135deg,rgba(139,26,26,0.5),rgba(100,10,10,0.7));
+  background:linear-gradient(135deg,rgba(158,27,27,0.5),rgba(107,16,16,0.7));
   box-shadow:var(--glow-red);
 }
-.boss-complete-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.boss-complete-btn:disabled { opacity:0.4; cursor:not-allowed; }
 
 /* ═══════════════════════════════
    CHAPTER CONTENT MODAL
 ═══════════════════════════════ */
-#chapter-modal .modal-box {
-  max-width:700px;
-}
+#chapter-modal .modal-box { max-width:700px; }
 .chapter-content-area {
   margin-top:1.5rem;
-  line-height:2;
-  color:rgba(245,234,216,0.85);
-  font-size:0.88rem;
+  line-height:1.8;
+  color:var(--paper);
+  font-size:1rem; /* Better readability */
 }
 .chapter-content-area h3 {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.1rem;
+  font-size:1.3rem;
   color:var(--gold);
-  margin:1.5rem 0 0.5rem;
-  letter-spacing:0.2em;
+  margin:1.8rem 0 0.8rem;
+  letter-spacing:0.1em;
 }
-.chapter-content-area p { margin-bottom:0.8rem; }
-.chapter-content-area ul { padding-left:1.5rem; margin-bottom:0.8rem; }
-.chapter-content-area li { margin-bottom:0.4rem; color:rgba(245,234,216,0.75); }
+.chapter-content-area p { margin-bottom:1rem; }
+.chapter-content-area ul { padding-left:1.5rem; margin-bottom:1rem; }
+.chapter-content-area li { margin-bottom:0.5rem; color:rgba(253,246,227,0.9); }
 .chapter-content-area strong { color:var(--gold2); font-weight:600; }
-.chapter-content-area em { color:rgba(200,168,75,0.7); }
+.chapter-content-area em { color:var(--text-muted); }
 .chapter-content-area code {
-  background:rgba(200,168,75,0.08);
-  border:1px solid rgba(200,168,75,0.15);
+  background:rgba(212,184,106,0.1);
+  border:1px solid rgba(212,184,106,0.2);
   padding:0.1em 0.4em;
-  font-size:0.85em;
+  font-size:0.9em;
   color:var(--jade2);
+  border-radius: 3px;
 }
 .chapter-content-area pre {
-  background:rgba(200,168,75,0.05);
-  border:1px solid rgba(200,168,75,0.1);
-  border-left:3px solid var(--jade);
-  padding:1rem;
+  background:rgba(14,10,6,0.8);
+  border:1px solid rgba(212,184,106,0.2);
+  border-left:4px solid var(--jade);
+  padding:1.2rem;
   overflow-x:auto;
-  margin:0.8rem 0;
-  font-size:0.8rem;
+  margin:1rem 0;
+  font-size:0.85rem;
   color:var(--jade2);
 }
 
 .chapter-complete-btn {
   margin-top:2rem;
   width:100%;
-  padding:0.9rem;
-  background:linear-gradient(135deg,rgba(46,107,94,0.4),rgba(30,70,60,0.5));
+  padding:1rem;
+  background:linear-gradient(135deg,rgba(54,124,109,0.4),rgba(30,70,60,0.6));
   border:1px solid var(--jade2);
   color:var(--jade2);
   font-family:'Cinzel Decorative',serif;
-  font-size:0.8rem;
+  font-size:0.85rem;
+  font-weight: 700;
   letter-spacing:0.2em;
   cursor:pointer;
   transition:all 0.3s;
   clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
 .chapter-complete-btn:hover {
-  background:linear-gradient(135deg,rgba(46,107,94,0.6),rgba(30,70,60,0.7));
-  box-shadow:0 0 20px rgba(61,138,122,0.3);
+  background:linear-gradient(135deg,rgba(54,124,109,0.6),rgba(30,70,60,0.8));
+  box-shadow:0 0 20px rgba(76,163,145,0.4);
 }
 
 /* ═══════════════════════════════
@@ -875,39 +850,38 @@ html, body {
 #battle-modal .modal-box {
   max-width:680px;
   text-align:center;
+  display: flex;
+  flex-direction: column;
 }
 
 .battle-stage {
   position:relative;
-  height:200px;
+  height:160px; /* Reduced to avoid scrolling */
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-bottom:1.5rem;
+  margin-bottom:1rem;
   overflow:hidden;
 }
 
-.battle-boss-canvas {
-  width:160px;height:160px;
-}
+.battle-boss-canvas { width:140px;height:140px; }
 
 .damage-floater {
   position:absolute;
   font-family:'Cinzel Decorative',serif;
-  font-size:2rem;
+  font-size:2.5rem;
+  font-weight: 700;
   color:var(--red2);
   text-shadow:var(--glow-red);
   pointer-events:none;
   opacity:0;
   transform:translateY(0);
 }
-.damage-floater.show {
-  animation:damageFloat 1.2s ease forwards;
-}
+.damage-floater.show { animation:damageFloat 1.2s ease forwards; }
 @keyframes damageFloat {
   0% { opacity:1; transform:translateY(0) scale(1); }
-  50% { opacity:1; transform:translateY(-40px) scale(1.3); }
-  100% { opacity:0; transform:translateY(-80px) scale(0.8); }
+  50% { opacity:1; transform:translateY(-30px) scale(1.3); }
+  100% { opacity:0; transform:translateY(-60px) scale(0.8); }
 }
 
 .boss-shake { animation:bossShake 0.4s ease; }
@@ -919,16 +893,16 @@ html, body {
   80%{transform:translateX(5px)}
 }
 
-.quiz-section {}
 .quiz-progress {
-  font-size:0.65rem;
+  font-size:0.7rem;
   letter-spacing:0.3em;
-  color:rgba(200,168,75,0.5);
+  color:var(--text-muted);
   margin-bottom:1rem;
+  font-weight: 600;
 }
 .quiz-question {
   font-family:'Ma Shan Zheng',serif;
-  font-size:1.05rem;
+  font-size:1.15rem;
   color:var(--paper);
   line-height:1.7;
   margin-bottom:1.5rem;
@@ -937,33 +911,33 @@ html, body {
 .quiz-options {
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:0.6rem;
+  gap:0.8rem;
   margin-bottom:1.5rem;
 }
 .quiz-option {
-  padding:0.8rem;
-  background:rgba(200,168,75,0.04);
-  border:1px solid rgba(200,168,75,0.15);
+  padding:1rem;
+  background:rgba(212,184,106,0.05);
+  border:1px solid rgba(212,184,106,0.25);
   color:var(--paper2);
   font-family:'Noto Serif SC',serif;
-  font-size:0.8rem;
+  font-size:0.85rem;
   cursor:pointer;
   transition:all 0.2s;
   text-align:left;
   line-height:1.5;
 }
 .quiz-option:hover:not(:disabled) {
-  border-color:rgba(200,168,75,0.4);
-  background:rgba(200,168,75,0.08);
+  border-color:rgba(212,184,106,0.5);
+  background:rgba(212,184,106,0.1);
 }
-.quiz-option.correct { border-color:var(--jade2); background:rgba(46,107,94,0.2); color:var(--jade2); }
-.quiz-option.wrong   { border-color:var(--red2);  background:rgba(139,26,26,0.2); color:var(--red2); }
+.quiz-option.correct { border-color:var(--jade2); background:rgba(54,124,109,0.25); color:var(--jade2); font-weight:bold; }
+.quiz-option.wrong   { border-color:var(--red2);  background:rgba(158,27,27,0.25); color:var(--red2); font-weight:bold; }
 .quiz-option:disabled { cursor:not-allowed; }
 
 .quiz-feedback {
   font-style:italic;
-  font-size:0.8rem;
-  color:rgba(245,234,216,0.5);
+  font-size:0.85rem;
+  color:var(--text-muted);
   margin-bottom:1rem;
   min-height:1.5rem;
 }
@@ -972,35 +946,31 @@ html, body {
   display:none;
   flex-direction:column;
   align-items:center;
-  gap:1rem;
-  padding:1.5rem;
+  justify-content: center;
+  gap:1.5rem;
+  padding:2rem 1.5rem;
+  flex: 1; /* Take up remaining modal space */
 }
 .finishing-blow.show { display:flex; }
 .finishing-text {
   font-family:'Ma Shan Zheng',serif;
-  font-size:2rem;
+  font-size:2.5rem;
   color:var(--gold);
   text-shadow:var(--glow-gold);
   animation:finishPulse 0.5s ease infinite alternate;
 }
 @keyframes finishPulse {
-  from { text-shadow:0 0 20px rgba(200,168,75,0.5); }
-  to   { text-shadow:0 0 60px rgba(200,168,75,0.9), 0 0 100px rgba(200,168,75,0.4); }
-}
-
-/* ── Particles overlay ── */
-#particle-canvas {
-  position:fixed;inset:0;z-index:5;
-  pointer-events:none;
+  from { text-shadow:0 0 20px rgba(212,184,106,0.5); }
+  to   { text-shadow:0 0 60px rgba(212,184,106,0.9), 0 0 100px rgba(212,184,106,0.4); }
 }
 
 /* ── Toast ── */
 #toast {
   position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
   background:rgba(20,14,8,0.95);
-  border:1px solid rgba(200,168,75,0.3);
-  padding:0.8rem 1.5rem;
-  font-size:0.8rem;
+  border:1px solid rgba(212,184,106,0.4);
+  padding:1rem 2rem;
+  font-size:0.85rem;
   color:var(--gold);
   letter-spacing:0.1em;
   z-index:999;
@@ -1014,30 +984,32 @@ html, body {
   width: 90%;
   max-width: 400px;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.5;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
 }
 #toast.show { opacity:1; }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-track { background:rgba(200,168,75,0.03); }
-::-webkit-scrollbar-thumb { background:rgba(200,168,75,0.2); border-radius:2px; }
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:rgba(212,184,106,0.05); }
+::-webkit-scrollbar-thumb { background:rgba(212,184,106,0.3); border-radius:3px; }
 
 /* ── Responsive ── */
 @media(max-width:768px) {
   .hub-body { grid-template-columns:1fr; }
-  .char-panel { border-right:none; border-bottom:1px solid rgba(200,168,75,0.15); flex-direction:row; flex-wrap:wrap; }
+  .char-panel { border-right:none; border-bottom:1px solid rgba(212,184,106,0.15); flex-direction:row; flex-wrap:wrap; }
   
   /* Mobile scrolling fix for the entire quest body */
   .quest-body { grid-template-columns:1fr; overflow-y: auto; display: block; }
-  .chapters-panel { overflow-y: visible; border-right: none; border-bottom: 1px solid rgba(200,168,75,0.1); }
+  .chapters-panel { overflow-y: visible; border-right: none; border-bottom: 1px solid rgba(212,184,106,0.2); }
   
   /* Show boss panel on mobile, let it flow below chapters */
-  .boss-panel { overflow-y: visible; display: flex; }
+  .boss-panel { overflow-y: visible; display: flex; padding-bottom: 4rem; }
   
   .quiz-options { grid-template-columns:1fr; }
 }
 </style>
+
 </head>
 <body>
 
@@ -1057,11 +1029,10 @@ html, body {
     can unify the realm and ascend to the Dragon Throne.
   </p>
   
-  <div id="loading-text" style="color: var(--gold); letter-spacing: 0.2em; font-size: 0.8rem; margin-top: 1rem;">COMMUNING WITH THE SCROLLS...</div>
+  <div id="loading-text" style="color: var(--gold); letter-spacing: 0.2em; font-size: 0.8rem; margin-top: 1rem; font-weight:bold;">COMMUNING WITH THE SCROLLS...</div>
   
   <div id="auth-buttons">
     <button class="btn-primary" style="width:100%;" onclick="signInGoogle()">SIGN IN WITH GOOGLE</button>
-    <button class="btn-primary" style="width:100%; background:transparent; color:var(--paper2); border-color:var(--paper2); box-shadow: none;" onclick="signInGuest()">PLAY AS GUEST</button>
   </div>
 </div>
 
@@ -1069,7 +1040,6 @@ html, body {
   <div class="hub-header">
     <div class="hub-title">萬卷書 · Quest Board</div>
     <div style="display:flex;align-items:center;gap:1rem;">
-      <div id="header-xp" style="font-size:0.7rem;color:rgba(200,168,75,0.6);letter-spacing:0.15em;"></div>
       <button class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.7rem;" onclick="openApiModal()">⚙ SETTINGS</button>
     </div>
   </div>
@@ -1118,24 +1088,43 @@ html, body {
     </div>
 
     <div class="quest-board">
+      
       <div>
-        <div class="section-header" onclick="toggleQuestBoard()">
+        <div class="section-header" onclick="toggleQuestBoard('quest-board-content', 'quest-toggle-icon')">
           <div class="section-title">活躍任務 · Active Quests</div>
           <div class="section-line"></div>
           <div id="quest-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▼</div>
         </div>
+        
         <div id="quest-board-content" style="display: none;">
           <button class="btn-new-quest" onclick="openCreateModal()">
             <div class="plus">+</div>
             <div>
-              <div style="font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">ISSUE NEW QUEST</div>
-              <div style="font-size:0.75rem;color:rgba(245,234,216,0.4);">Seek knowledge, summon a guardian demon, earn your rank</div>
+              <div style="font-size:0.75rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;font-weight:bold;">ISSUE NEW QUEST</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">Seek knowledge, summon a guardian demon, earn your rank</div>
             </div>
           </button>
           <div id="quest-grid" class="quest-grid">
             </div>
         </div>
       </div>
+
+      <div style="margin-top: 3rem;">
+        <div class="section-header" onclick="toggleQuestBoard('library-board-content', 'library-toggle-icon')">
+          <div class="section-title">藏書閣 · Realm Library</div>
+          <div class="section-line"></div>
+          <div id="library-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▲</div>
+        </div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom: 1.5rem; font-style:italic;">
+          Quests summoned by other scholars across the realm. Click to add them to your Active Quests.
+        </div>
+        
+        <div id="library-board-content" style="display: flex; flex-direction: column; gap: 2rem;">
+          <div id="library-grid" class="quest-grid">
+            </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1144,13 +1133,13 @@ html, body {
   <div class="quest-header">
     <button class="back-btn" onclick="showHub()">← RETURN</button>
     <div style="flex:1;">
-      <div style="font-size:0.6rem;letter-spacing:0.3em;color:var(--red2);margin-bottom:0.2rem;" id="q-topic-label">TOPIC</div>
-      <div style="font-family:'Ma Shan Zheng',serif;font-size:1.1rem;color:var(--gold);letter-spacing:0.2em;" id="q-title-label">Quest Title</div>
+      <div style="font-size:0.65rem;letter-spacing:0.3em;color:var(--red2);margin-bottom:0.2rem;font-weight:bold;" id="q-topic-label">TOPIC</div>
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:1.2rem;color:var(--gold);letter-spacing:0.2em;" id="q-title-label">Quest Title</div>
     </div>
   </div>
   <div class="quest-body">
     <div class="chapters-panel">
-      <div class="section-header">
+      <div class="section-header" style="cursor:default;">
         <div class="section-title">章節 · Chapters</div>
         <div class="section-line"></div>
       </div>
@@ -1207,7 +1196,7 @@ html, body {
       </div>
       
       <div class="glass-panel" style="margin-bottom: 1rem; padding: 1.5rem;">
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">> SELECT_CORE_ENGINE:</p>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; font-weight:bold;">> SELECT_CORE_ENGINE:</p>
           <div class="model-chip-group" id="model-chip-group">
               <button type="button" class="model-chip" data-value="gemini-2.0-flash">2.0_FLASH (LEGACY)</button>
               <button type="button" class="model-chip active" data-value="gemini-2.5-flash">2.5_FLASH (STABLE)</button>
@@ -1219,14 +1208,14 @@ html, body {
 
       <div style="display:flex;gap:0.8rem;margin-top:1rem;">
         <button class="btn-primary" style="flex:1;" onclick="createQuest()">⚔ SUMMON QUEST</button>
-        <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(200,168,75,0.2);color:rgba(245,234,216,0.5);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeCreateModal()">CANCEL</button>
+        <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(212,184,106,0.3);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif;font-weight:bold;" onclick="closeCreateModal()">CANCEL</button>
       </div>
     </div>
 
     <div class="generating-state" id="generating-state">
       <div class="gen-spinner">卍</div>
       <div class="gen-text" id="gen-status-text">Binding the demon to the scroll...</div>
-      <div style="margin-top:1rem;font-size:0.65rem;color:rgba(200,168,75,0.3);letter-spacing:0.2em;" id="gen-step"></div>
+      <div style="margin-top:1rem;font-size:0.7rem;color:var(--text-muted);letter-spacing:0.2em;font-weight:bold;" id="gen-step"></div>
     </div>
   </div>
 </div>
@@ -1238,7 +1227,7 @@ html, body {
         <div class="modal-title" id="chapter-modal-title">Chapter Title</div>
         <div class="modal-subtitle" id="chapter-modal-tag">CHAPTER TAG</div>
       </div>
-      <button onclick="closeChapterModal()" style="background:none;border:none;color:rgba(200,168,75,0.4);cursor:pointer;font-size:1.2rem;padding:0.2rem;">✕</button>
+      <button onclick="closeChapterModal()" style="background:none;border:none;color:rgba(212,184,106,0.6);cursor:pointer;font-size:1.5rem;padding:0.2rem;">✕</button>
     </div>
     <div class="chapter-content-area" id="chapter-content-area">
       <div style="text-align:center;padding:2rem;">
@@ -1253,22 +1242,24 @@ html, body {
 </div>
 
 <div class="modal-overlay" id="battle-modal">
-  <div class="modal-box">
-    <div class="modal-title" style="margin-bottom:0.2rem;" id="battle-title">Final Battle</div>
-    <div class="modal-subtitle">PROVE YOUR MASTERY — DEFEAT THE DEMON</div>
+  <div class="modal-box" id="battle-modal-box">
+    <div id="battle-top-section">
+      <div class="modal-title" style="margin-bottom:0.2rem;" id="battle-title">Final Battle</div>
+      <div class="modal-subtitle">PROVE YOUR MASTERY — DEFEAT THE DEMON</div>
 
-    <div class="battle-stage">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(139,26,26,0.15) 0%, transparent 70%);"></div>
-      <canvas class="battle-boss-canvas" id="battle-boss-canvas" width="160" height="160"></canvas>
-      <div class="damage-floater" id="damage-floater">-25</div>
-    </div>
-
-    <div id="battle-boss-hp" style="margin-bottom:1.5rem;">
-      <div class="boss-hp-label" style="display:flex;justify-content:space-between;">
-        <span>DEMON HP</span><span id="battle-hp-text">100 / 100</span>
+      <div class="battle-stage">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(158,27,27,0.15) 0%, transparent 70%);"></div>
+        <canvas class="battle-boss-canvas" id="battle-boss-canvas" width="120" height="120"></canvas>
+        <div class="damage-floater" id="damage-floater">-25</div>
       </div>
-      <div class="boss-hp-bar" style="height:12px;">
-        <div class="boss-hp-fill" id="battle-hp-fill" style="width:100%"></div>
+
+      <div id="battle-boss-hp" style="margin-bottom:1.5rem;">
+        <div class="boss-hp-label">
+          <span>DEMON HP</span><span id="battle-hp-text">100 / 100</span>
+        </div>
+        <div class="boss-hp-bar">
+          <div class="boss-hp-fill" id="battle-hp-fill" style="width:100%"></div>
+        </div>
       </div>
     </div>
 
@@ -1281,8 +1272,8 @@ html, body {
 
     <div class="finishing-blow" id="finishing-blow">
       <div class="finishing-text">⚡ FINAL STRIKE ⚡</div>
-      <div style="font-size:0.9rem;color:rgba(245,234,216,0.7);font-style:italic;line-height:1.8;" id="victory-lore"></div>
-      <button class="btn-primary" style="margin-top:1rem;" onclick="claimVictory()">CLAIM VICTORY</button>
+      <div style="font-size:0.95rem;color:var(--text-muted);font-style:italic;line-height:1.8;" id="victory-lore"></div>
+      <button class="btn-primary" style="margin-top:1rem; width: 100%;" onclick="claimVictory()">CLAIM VICTORY</button>
     </div>
   </div>
 </div>
@@ -1294,7 +1285,7 @@ html, body {
     
     <div style="display:flex; flex-direction: column; gap:0.8rem; margin-top: 2rem;">
       <button class="btn-primary" style="width:100%;" onclick="signOutUser()">SIGN OUT</button>
-      <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(200,168,75,0.2);color:rgba(245,234,216,0.5);cursor:pointer;font-family:'Noto Serif SC',serif; width: 100%;" onclick="closeApiModal()">CLOSE</button>
+      <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(212,184,106,0.3);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif; width: 100%; font-weight:bold;" onclick="closeApiModal()">CLOSE</button>
     </div>
   </div>
 </div>
@@ -1306,8 +1297,8 @@ html, body {
 //  FIREBASE SETUP & STATE (MODULAR SDK)
 // ═══════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 const firebaseConfig = {
@@ -1320,7 +1311,6 @@ const firebaseConfig = {
   measurementId: "G-SFDQ0QELTE"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -1331,6 +1321,7 @@ let USER_ID = null;
 let STATE = {
   selectedModel: document.getElementById('modelSelect')?.value || 'gemini-2.5-flash',
   quests: [],
+  publicQuests: [],
   player: {
     name: "Wei Xuan",
     xp: 0, totalXp: 0, rank: 0, questsCreated: 0,
@@ -1358,6 +1349,9 @@ async function loadState() {
     } else {
       await saveState();
     }
+    
+    await loadPublicQuests();
+
   } catch (e) {
     console.error("Error loading DB state:", e);
     showToast("Database connection failed. Proceeding locally.");
@@ -1381,6 +1375,16 @@ async function saveState() {
   }
 }
 
+async function loadPublicQuests() {
+  try {
+    const q = query(collection(db, "public_quests"), orderBy("id", "desc"), limit(12));
+    const querySnapshot = await getDocs(q);
+    STATE.publicQuests = querySnapshot.docs.map(d => d.data());
+  } catch (e) {
+    console.error("Error loading public library:", e);
+  }
+}
+
 // Auth UI Functions
 window.signInGoogle = async () => {
   document.getElementById('auth-buttons').style.display = 'none';
@@ -1391,20 +1395,6 @@ window.signInGoogle = async () => {
     await signInWithPopup(auth, provider);
   } catch(e) {
     showToast("Google Sign-In failed.");
-    console.error(e);
-    document.getElementById('auth-buttons').style.display = 'flex';
-    document.getElementById('loading-text').style.display = 'none';
-  }
-};
-
-window.signInGuest = async () => {
-  document.getElementById('auth-buttons').style.display = 'none';
-  document.getElementById('loading-text').style.display = 'block';
-  document.getElementById('loading-text').textContent = 'ENTERING AS GUEST...';
-  try {
-    await signInAnonymously(auth);
-  } catch(e) {
-    showToast("Guest Sign-In failed.");
     console.error(e);
     document.getElementById('auth-buttons').style.display = 'flex';
     document.getElementById('loading-text').style.display = 'none';
@@ -1500,15 +1490,15 @@ window.renameCharacter = function() {
       ctx.globalAlpha=0.04;
       const mg = ctx.createLinearGradient(0,0,w,0);
       mg.addColorStop(0,'transparent');
-      mg.addColorStop(0.3,'rgba(200,168,75,0.3)');
-      mg.addColorStop(0.7,'rgba(200,168,75,0.3)');
+      mg.addColorStop(0.3,'rgba(212,184,106,0.2)');
+      mg.addColorStop(0.7,'rgba(212,184,106,0.2)');
       mg.addColorStop(1,'transparent');
       ctx.fillStyle=mg;
       ctx.fillRect(0,y-1,w,2+i);
     }
     ctx.globalAlpha=1;
 
-    ctx.strokeStyle='rgba(200,168,75,0.02)';
+    ctx.strokeStyle='rgba(212,184,106,0.02)';
     ctx.lineWidth=1;
     for(let x=0;x<w;x+=80) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
     for(let y=0;y<h;y+=80) { ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
@@ -1536,7 +1526,7 @@ window.renameCharacter = function() {
     life:Math.random()*200,
     maxLife:150+Math.random()*200,
     type:Math.floor(Math.random()*3),
-    color:['#c8a84b','#8b3a3a','#2e6b5e','#f5ead8'][Math.floor(Math.random()*4)],
+    color:['#d4b86a','#9e1b1b','#367c6d','#fdf6e3'][Math.floor(Math.random()*4)],
   }));
 
   function tick() {
@@ -1928,7 +1918,6 @@ function renderHub() {
   const pct = nextRank ? Math.min(100,(xpFromCur/xpNeeded)*100) : 100;
   document.getElementById('xp-fill').style.width = pct+'%';
   document.getElementById('xp-text').textContent = `${player.totalXp} / ${xpForNext} XP`;
-  document.getElementById('header-xp').textContent = `${rank.name} ${rank.en} · ${player.totalXp} XP`;
 
   document.getElementById('stat-quests').textContent = player.questsCreated;
   document.getElementById('stat-chapters').textContent = player.chaptersCompleted;
@@ -1948,6 +1937,7 @@ function renderHub() {
   document.getElementById('world-lore-text').textContent = lores[Math.min(rankIdx, lores.length-1)];
 
   renderQuestGrid();
+  renderLibraryGrid();
 }
 
 function renderQuestGrid() {
@@ -1955,7 +1945,7 @@ function renderQuestGrid() {
   grid.innerHTML = '';
 
   if(STATE.quests.length===0){
-    grid.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center;color:rgba(245,234,216,0.2);font-style:italic;font-size:0.85rem;letter-spacing:0.1em;">No active quests. Issue a new quest to begin your journey.</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center;color:rgba(253,246,227,0.3);font-style:italic;font-size:0.85rem;letter-spacing:0.1em;">No active quests. Issue a new quest to begin your journey.</div>`;
     return;
   }
 
@@ -1979,7 +1969,7 @@ function renderQuestGrid() {
       </div>
       <div class="quest-status">
         <div class="quest-hp-bar" style="flex:1;margin-right:0.5rem;">
-          <div class="quest-hp-fill" style="width:${hpRatio*100}%;height:4px;"></div>
+          <div class="quest-hp-fill" style="width:${hpRatio*100}%;height:100%;"></div>
         </div>
         <div class="quest-hp-label">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapTotal} chapters`}</div>
       </div>
@@ -1988,12 +1978,11 @@ function renderQuestGrid() {
     // Add a delete button to the card
     const delBtn = document.createElement('button');
     delBtn.innerHTML = '✕';
-    delBtn.style.cssText = 'position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:rgba(200,168,75,0.5);font-size:1rem;cursor:pointer;z-index:10;padding:0.5rem;';
+    delBtn.style.cssText = 'position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:rgba(212,184,106,0.5);font-size:1.2rem;cursor:pointer;z-index:10;padding:0.5rem;';
     delBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if(confirm('Are you sure you want to abandon this quest? This will reverse your stats and delete the scroll permanently.')) {
         
-        // Calculate stats to reverse
         let xpToDeduct = 0;
         let chaptersToDeduct = 0;
         
@@ -2016,7 +2005,6 @@ function renderQuestGrid() {
         STATE.player.xp = Math.max(0, STATE.player.xp - xpToDeduct);
         STATE.player.totalXp = Math.max(0, STATE.player.totalXp - xpToDeduct);
 
-        // Remove quest
         STATE.quests.splice(idx, 1);
         saveState();
         renderHub();
@@ -2033,9 +2021,45 @@ function renderQuestGrid() {
   });
 }
 
-window.toggleQuestBoard = function() {
-  const content = document.getElementById('quest-board-content');
-  const icon = document.getElementById('quest-toggle-icon');
+function renderLibraryGrid() {
+  const grid = document.getElementById('library-grid');
+  grid.innerHTML = '';
+
+  if(STATE.publicQuests.length===0){
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:3rem;text-align:center;color:rgba(253,246,227,0.3);font-style:italic;font-size:0.85rem;letter-spacing:0.1em;">The library is currently empty. Be the first to share a quest!</div>`;
+    return;
+  }
+
+  STATE.publicQuests.forEach((quest,idx)=>{
+    const card = document.createElement('div');
+    card.className='quest-card';
+    card.innerHTML=`
+      <div class="quest-boss-preview">
+        <canvas class="boss-mini-sprite" width="60" height="60"></canvas>
+        <div class="quest-info">
+          <div class="quest-topic">${quest.topic.toUpperCase()}</div>
+          <div class="quest-title" style="padding-right:0;">${quest.questTitle}</div>
+        </div>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-muted); margin-top: 1rem;">
+        Contains ${quest.chapters.length} Chapters of Knowledge.
+      </div>
+      <div class="quest-status" style="justify-content:flex-end;">
+        <div class="quest-hp-label" style="color:var(--jade2);font-weight:bold;">+ ADD TO ACTIVE QUESTS</div>
+      </div>
+    `;
+
+    const miniCanvas = card.querySelector('.boss-mini-sprite');
+    drawBossSprite(miniCanvas, quest, 1.0);
+
+    card.addEventListener('click',()=> window.copyPublicQuest(idx));
+    grid.appendChild(card);
+  });
+}
+
+window.toggleQuestBoard = function(contentId, iconId) {
+  const content = document.getElementById(contentId);
+  const icon = document.getElementById(iconId);
   
   if(content.style.display === 'none') {
     content.style.display = 'flex';
@@ -2047,7 +2071,7 @@ window.toggleQuestBoard = function() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  CREATE QUEST MODAL & MODEL SELECTION
+//  CREATE QUEST MODAL & PUBLIC LIBRARY
 // ═══════════════════════════════════════════════════════
 window.openCreateModal = function() {
   document.getElementById('create-modal').classList.add('open');
@@ -2069,6 +2093,35 @@ document.getElementById('model-chip-group').addEventListener('click', e => {
   }
 });
 
+window.copyPublicQuest = function(idx) {
+    const pubQuest = STATE.publicQuests[idx];
+    
+    const newQuest = {
+      ...pubQuest,
+      id: Date.now(),
+      bossMaxHp: 100,
+      bossHp: 100,
+      completed: new Array(pubQuest.chapters.length).fill(false),
+      chapterContent: {},
+      quiz: null,
+      defeated: false
+    };
+    
+    STATE.quests.unshift(newQuest);
+    STATE.player.questsCreated++;
+    saveState();
+    
+    // Ensure active board is open
+    document.getElementById('quest-board-content').style.display = 'flex';
+    document.getElementById('quest-toggle-icon').textContent = '▲';
+    
+    renderHub();
+    showToast(`Copied "${newQuest.questTitle}" to your active quests!`);
+    
+    // Scroll to top
+    document.getElementById('screen-hub').scrollTo({top: 0, behavior: 'smooth'});
+}
+
 window.createQuest = async function() {
   const topic = document.getElementById('topic-input').value.trim();
   if(!topic){ showToast('Please enter a topic.'); return; }
@@ -2086,8 +2139,7 @@ window.createQuest = async function() {
     setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
     await delay(600);
 
-    const quest = {
-      id: Date.now(),
+    const baseQuest = {
       topic,
       objective,
       questTitle: parsed.questTitle,
@@ -2095,26 +2147,40 @@ window.createQuest = async function() {
       bossName: parsed.bossName,
       bossTitle: parsed.bossTitle,
       bossLore: parsed.bossLore,
-      bossMaxHp: 100, // Fixed: Boss HP is exactly 100
-      bossHp: 100,
       chapters: parsed.chapters,
+    };
+
+    const userQuest = {
+      ...baseQuest,
+      id: Date.now(),
+      bossMaxHp: 100, 
+      bossHp: 100,
       completed: new Array(parsed.chapters.length).fill(false),
       chapterContent: {},
       quiz: null,
       defeated: false,
     };
 
-    STATE.quests.unshift(quest);
+    // Save to user stats
+    STATE.quests.unshift(userQuest);
     STATE.player.questsCreated++;
-    saveState();
+    await saveState();
+
+    // Save to public library
+    try {
+        const pubQuest = { ...baseQuest, id: Date.now() };
+        await addDoc(collection(db, "public_quests"), pubQuest);
+        STATE.publicQuests.unshift(pubQuest);
+    } catch(err) {
+        console.error("Could not save to public library (rules might be strict). Continuing locally.", err);
+    }
 
     closeCreateModal();
-    showToast(`Quest bound: "${quest.questTitle}"`);
+    showToast(`Quest bound: "${userQuest.questTitle}"`);
     
-    // Auto-expand board if it's hidden so user can see new quest
     const content = document.getElementById('quest-board-content');
     if(content.style.display === 'none') {
-        toggleQuestBoard();
+        toggleQuestBoard('quest-board-content', 'quest-toggle-icon');
     }
     
     window.showQuestScreen(0);
@@ -2176,7 +2242,6 @@ window.openChapterModal = function(chapterIdx) {
 
   const completeBtn = document.getElementById('chapter-complete-btn');
   completeBtn.style.display = done ? 'none' : 'block';
-  // Note: No longer damages demon. Just marks read.
   completeBtn.textContent = '✓ MARK CHAPTER COMPLETE';
 
   if(quest.chapterContent[chapterIdx]) {
@@ -2233,7 +2298,6 @@ window.markChapterComplete = async function() {
   if(quest.completed[chapterIdx]) return;
 
   quest.completed[chapterIdx] = true;
-  // NOTE: Boss HP is no longer reduced here. Only by quiz.
   
   STATE.player.chaptersCompleted++;
   STATE.player.xp += 20;
@@ -2267,6 +2331,9 @@ window.openBattleModal = async function() {
 
   document.getElementById('battle-title').textContent = quest.bossName;
   document.getElementById('battle-modal').classList.add('open');
+  
+  // Ensure the top section is visible
+  document.getElementById('battle-top-section').style.display = 'block';
 
   const battleCanvas = document.getElementById('battle-boss-canvas');
   battleCanvas._animFrame && cancelAnimationFrame(battleCanvas._animFrame);
@@ -2353,7 +2420,6 @@ function answerQuestion(chosen, quest) {
 
   if(isRight) STATE.quizScore++;
 
-  // Dealing damage is now exclusively done by correct quiz answers
   const dmg = isRight ? Math.ceil(100/quest.quiz.questions.length) : 0;
   if(dmg>0){
     quest.bossHp = Math.max(0, quest.bossHp - dmg);
@@ -2377,11 +2443,13 @@ function answerQuestion(chosen, quest) {
 function finishQuiz(quest) {
   const perfect = STATE.quizScore === quest.quiz.questions.length;
   quest.bossHp = perfect ? 0 : Math.max(5, quest.bossHp);
+  
+  // Hide top section to prevent scrolling
+  document.getElementById('battle-top-section').style.display = 'none';
 
   if(perfect){
     document.getElementById('quiz-container').style.display='none';
     document.getElementById('finishing-blow').classList.add('show');
-    showDamageFloat('FINAL BLOW', true);
     document.getElementById('victory-lore').textContent =
       `Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name || 'Wei Xuan'}'s enlightened mind. The knowledge sealed within the scroll surges free, adding to the power of the realm.`;
 
@@ -2407,7 +2475,6 @@ function finishQuiz(quest) {
     STATE.player.totalXp += 100;
     checkRankUp();
   } else if (quest.bossHp > 0) {
-    // Reset boss HP for a retry if failed
     quest.bossHp = 100; 
   }
 
@@ -2439,7 +2506,7 @@ function updateBattleHp(quest) {
 function showDamageFloat(val, big=false) {
   const el = document.getElementById('damage-floater');
   el.textContent = big ? val : `-${val}`;
-  el.style.fontSize = big ? '1.5rem' : '2rem';
+  el.style.fontSize = big ? '1.5rem' : '2.5rem';
   el.classList.remove('show');
   void el.offsetWidth;
   el.classList.add('show');
