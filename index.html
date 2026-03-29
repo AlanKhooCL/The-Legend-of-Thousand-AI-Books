@@ -196,13 +196,15 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 #screen-path {
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  gap:2rem;
-  padding:2rem;
+  /* Start from the top down instead of center, fixing the overflow issue */
+  justify-content:flex-start; 
+  padding: 4rem 1.5rem;
+  overflow-y: auto;
 }
 
 .path-header {
   text-align:center;
+  margin-bottom: 2rem;
 }
 .path-title {
   font-family:'ZCOOL XiaoWei',serif;
@@ -222,6 +224,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   gap:2rem;
   flex-wrap:wrap;
   justify-content:center;
+  margin-bottom: 2rem;
 }
 
 .path-card {
@@ -797,7 +800,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 <canvas id="bg-canvas"></canvas>
 <canvas id="particle-canvas"></canvas>
 
-<!-- TITLE -->
 <div id="screen-title" class="screen active">
   <div class="title-inkblot"></div>
   <div class="title-seal"><span class="title-seal-char">書</span></div>
@@ -816,7 +818,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- PATH SELECTION -->
 <div id="screen-path" class="screen">
   <div class="path-header">
     <div class="path-title">選擇命途 · Choose Your Destiny</div>
@@ -843,7 +844,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   <div style="text-align:center;font-size:0.65rem;color:var(--text-muted);letter-spacing:0.2em;margin-top:1rem;">THIS CHOICE IS PERMANENT · CHOOSE WISELY</div>
 </div>
 
-<!-- HUB -->
 <div id="screen-hub" class="screen">
   <div class="hub-header">
     <div class="hub-title">萬卷書 · Quest Board</div>
@@ -916,7 +916,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- QUEST SCREEN -->
 <div id="screen-quest" class="screen">
   <div class="quest-header">
     <button class="back-btn" onclick="showHub()">← RETURN</button>
@@ -953,7 +952,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- CREATE QUEST MODAL -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal-box">
     <div class="modal-title">召喚任務</div>
@@ -998,7 +996,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- CHAPTER MODAL -->
 <div class="modal-overlay" id="chapter-modal">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:start;">
@@ -1015,7 +1012,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- BATTLE MODAL -->
 <div class="modal-overlay" id="battle-modal">
   <div class="modal-box" id="battle-modal-box">
     <div id="battle-top-section">
@@ -1045,7 +1041,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- CELESTIAL GAMBIT MODAL (Hidden Feature #1) -->
 <div class="modal-overlay" id="gambit-modal">
   <div class="modal-box" style="max-width:420px;text-align:center;">
     <div class="modal-title">天命一擲</div>
@@ -1064,7 +1059,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- FATE SCROLL MODAL (Hidden Feature #2) -->
 <div class="modal-overlay" id="fate-modal">
   <div class="modal-box" style="max-width:380px;text-align:center;">
     <div class="modal-title">命卷</div>
@@ -1088,7 +1082,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="api-modal">
   <div class="modal-box" style="max-width:420px;text-align:center;">
     <div class="modal-title">Settings</div>
@@ -1224,7 +1217,7 @@ function startPersonalityQuotes() {
 }
 
 // ════════════════════════════════
-//  SIGIL SYSTEM (Hidden Feature #3 — collected silently on perfect runs)
+//  SIGIL SYSTEM
 // ════════════════════════════════
 const SIGILS = ['龙','凤','虎','玄','雷','火','水','木','金','土','道','德'];
 const SIGIL_TOOLTIPS = {
@@ -1287,18 +1280,18 @@ async function loadState() {
         STATE.saves = data.saves;
         STATE.activeSaveId = data.activeSaveId || data.saves[0].id;
       } else {
-        // Need path selection for new save from old data
         const oldSave = { id: Date.now().toString(), player: data.player || defaultPlayer("Wei Xuan"), quests: data.quests || [] };
         if(!oldSave.player.path) oldSave.player.path = 'warrior';
         if(!oldSave.player.sigils) oldSave.player.sigils = [];
         STATE.saves = [oldSave]; STATE.activeSaveId = oldSave.id;
       }
       syncActiveSaveToState();
-      await loadPublicQuests();
+      
+      try { await loadPublicQuests(); } catch(e) { console.error("Library load error:", e); }
+
       showScreen('screen-hub');
       renderHub();
     } else {
-      // New user — show path selection
       showScreen('screen-path');
       renderPathSprites();
     }
@@ -1326,11 +1319,9 @@ async function saveState() {
   } catch(e) { console.error("Save error:",e); }
 }
 async function loadPublicQuests() {
-  try {
-    const q = query(collection(db,"public_quests"), orderBy("id","desc"), limit(12));
-    const snap = await getDocs(q);
-    STATE.publicQuests = snap.docs.map(d=>d.data());
-  } catch(e) { console.error("Library load error:",e); }
+  const q = query(collection(db,"public_quests"), orderBy("id","desc"), limit(12));
+  const snap = await getDocs(q);
+  STATE.publicQuests = snap.docs.map(d=>d.data());
 }
 
 // ════════════════════════════════
@@ -1390,7 +1381,6 @@ window.choosePath = async function(path) {
     grd.addColorStop(0,'#050308'); grd.addColorStop(0.4,'#070510'); grd.addColorStop(1,'#080604');
     ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
 
-    // Ink-wash mountain layers
     const layers = [
       {y:0.75,rough:0.2,alpha:0.07,col:'#c8a84b'},
       {y:0.65,rough:0.15,alpha:0.05,col:'#8b3a3a'},
@@ -1410,7 +1400,6 @@ window.choosePath = async function(path) {
       ctx.globalAlpha=l.alpha; ctx.fillStyle=l.col; ctx.fill();
     });
 
-    // Mist bands
     for(let i=0;i<5;i++) {
       const y=h*(0.35+i*0.1); ctx.globalAlpha=0.04;
       const mg=ctx.createLinearGradient(0,0,w,0);
@@ -1419,7 +1408,6 @@ window.choosePath = async function(path) {
       ctx.fillStyle=mg; ctx.fillRect(0,y-1,w,3+i*0.5);
     }
 
-    // Grid
     ctx.globalAlpha=0.015; ctx.strokeStyle='rgba(200,168,75,0.5)'; ctx.lineWidth=1;
     for(let x=0;x<w;x+=90){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
     for(let y=0;y<h;y+=90){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
@@ -1469,7 +1457,7 @@ window.choosePath = async function(path) {
 })();
 
 // ════════════════════════════════
-//  CHARACTER SPRITE RENDERER (Path-aware, animated)
+//  CHARACTER SPRITE RENDERER
 // ════════════════════════════════
 function drawCharSprite(canvas, rankIdx, path, w=140, h=160) {
   const ctx = canvas.getContext('2d');
@@ -1487,22 +1475,17 @@ function drawCharSprite(canvas, rankIdx, path, w=140, h=160) {
   ctx.translate(cx, cy);
   ctx.scale(sc, sc);
 
-  // Shadow
   ctx.fillStyle='rgba(0,0,0,0.25)';
   ctx.beginPath(); ctx.ellipse(0,62,30,6,0,0,Math.PI*2); ctx.fill();
 
-  if(path === 'scholar') {
-    drawScholarSprite(ctx, rankIdx, breathe, t);
-  } else {
-    drawWarriorSprite(ctx, rankIdx, breathe, t);
-  }
+  if(path === 'scholar') { drawScholarSprite(ctx, rankIdx, breathe, t); }
+  else { drawWarriorSprite(ctx, rankIdx, breathe, t); }
 
   ctx.restore();
 }
 
 function drawWarriorSprite(ctx, rankIdx, breathe, t) {
-  const ranks = WARRIOR_RANKS;
-  const colors = [
+  const c = [
     {armor:'#3a2820',trim:'#7a5a3a',skin:'#c8986a',hair:'#160c04',weapon:'#a0a0a0'},
     {armor:'#2a3420',trim:'#6a8a3a',skin:'#c8986a',hair:'#160c04',weapon:'#c0c0c0'},
     {armor:'#3a2428',trim:'#9a4a2a',skin:'#c8986a',hair:'#160c04',weapon:'#c8843a'},
@@ -1511,63 +1494,45 @@ function drawWarriorSprite(ctx, rankIdx, breathe, t) {
     {armor:'#3a0808',trim:'#e84020',skin:'#c8986a',hair:'#400408',weapon:'#ff5030'},
     {armor:'#2a0808',trim:'#ffd040',skin:'#c8986a',hair:'#500410',weapon:'#ffd040'},
     {armor:'#1a0804',trim:'#ffe080',skin:'#c8986a',hair:'#200404',weapon:'#fff0a0'},
-  ];
-  const c = colors[Math.min(rankIdx, colors.length-1)];
+  ][Math.min(rankIdx, 7)];
   const sw = breathe*0.3;
 
-  // Body
   ctx.fillStyle=c.armor;
   ctx.beginPath(); ctx.roundRect(-22+sw,8,44-sw*2,40,[5]); ctx.fill();
-  // Chest trim
   ctx.fillStyle=c.trim; ctx.globalAlpha=0.7;
   ctx.fillRect(-14+sw,14,28-sw*2,3); ctx.fillRect(-14+sw,20,28-sw*2,2);
   ctx.globalAlpha=1;
-  // Pauldrons
   ctx.fillStyle=c.armor;
   ctx.beginPath(); ctx.roundRect(-34,5,14,12,[4]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(20,5,14,12,[4]); ctx.fill();
   ctx.fillStyle=c.trim; ctx.fillRect(-34,5,14,2); ctx.fillRect(20,5,14,2);
-  // Belt
-  ctx.fillStyle=c.trim; ctx.fillRect(-22,46,44,5);
-  // Legs
+  ctx.fillRect(-22,46,44,5);
   ctx.fillStyle=c.armor;
   ctx.fillRect(-19,51,17,18); ctx.fillRect(2,51,17,18);
   ctx.fillStyle='#160c04'; ctx.beginPath(); ctx.roundRect(-20,67,18,8,[2]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(2,67,18,8,[2]); ctx.fill();
-  // Arms
   ctx.fillStyle=c.armor;
   ctx.fillRect(-32,8,11,32); ctx.fillRect(21,8,11,32);
-  // Hands
   ctx.fillStyle=c.skin;
   ctx.beginPath(); ctx.arc(-26,42,5,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(26,42,5,0,Math.PI*2); ctx.fill();
-  // Neck
-  ctx.fillStyle=c.skin; ctx.fillRect(-5,0,10,10);
-  // Head
-  ctx.fillStyle=c.skin;
+  ctx.fillRect(-5,0,10,10);
   ctx.beginPath(); ctx.ellipse(0,-20,18,18,0,0,Math.PI*2); ctx.fill();
-  // Hair
   ctx.fillStyle=c.hair;
   ctx.beginPath(); ctx.ellipse(0,-33,15,8,0,Math.PI,Math.PI*2); ctx.fill();
-  // Helmet
   ctx.fillStyle=c.armor;
   ctx.beginPath(); ctx.arc(0,-26,17,Math.PI,0); ctx.closePath(); ctx.fill();
-  // Helmet trim
   ctx.fillStyle=c.trim;
   ctx.fillRect(-17,-26,34,2);
-  // Helmet spike (rank >= 1)
   if(rankIdx>=1) {
-    ctx.fillStyle=c.trim;
     ctx.beginPath(); ctx.moveTo(-2,-44); ctx.lineTo(2,-44); ctx.lineTo(0,-58); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.arc(0,-44,4,0,Math.PI*2); ctx.fill();
   }
-  // Face decorations (high rank)
   if(rankIdx>=3) {
     ctx.strokeStyle=c.trim; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(-17,-29); ctx.lineTo(-15,-24); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(15,-24); ctx.lineTo(17,-29); ctx.stroke();
   }
-  // Aura wings (rank >= 6)
   if(rankIdx>=6) {
     ctx.globalAlpha=0.15+Math.sin(t*2)*0.05;
     const aura=ctx.createRadialGradient(0,-10,10,0,-10,75);
@@ -1575,26 +1540,20 @@ function drawWarriorSprite(ctx, rankIdx, breathe, t) {
     ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(0,-10,75,0,Math.PI*2); ctx.fill();
     ctx.globalAlpha=1;
   }
-  // Crown at max rank
   if(rankIdx>=7) {
     ctx.fillStyle='#ffe080'; ctx.font='bold 12px serif'; ctx.textAlign='center';
     ctx.fillText('孫',0,-50);
   }
-  // Eyes
   ctx.fillStyle='#160c04';
   ctx.beginPath(); ctx.arc(-7,-21,2.5,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(7,-21,2.5,0,Math.PI*2); ctx.fill();
-  // Eyebrows (warrior — fierce)
   ctx.strokeStyle='#2a1808'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(-11,-26); ctx.lineTo(-3,-24); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(3,-24); ctx.lineTo(11,-26); ctx.stroke();
-  // Mouth
   ctx.strokeStyle='#a07050'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(-4,-15); ctx.lineTo(4,-15); ctx.stroke();
-  // Weapon — sword
   ctx.save();
-  const swingAngle = rankIdx>=3 ? Math.sin(t*2)*0.15 : 0;
-  ctx.rotate(swingAngle);
+  ctx.rotate(rankIdx>=3 ? Math.sin(t*2)*0.15 : 0);
   ctx.strokeStyle=c.weapon; ctx.lineWidth=2.5;
   ctx.beginPath(); ctx.moveTo(28,8); ctx.lineTo(42,75); ctx.stroke();
   ctx.fillStyle=c.weapon;
@@ -1605,7 +1564,7 @@ function drawWarriorSprite(ctx, rankIdx, breathe, t) {
 }
 
 function drawScholarSprite(ctx, rankIdx, breathe, t) {
-  const colors = [
+  const c = [
     {robe:'#1a2a3a',trim:'#3a6a5a',skin:'#c8986a',hair:'#160c04',fanColor:'#8aaa7a'},
     {robe:'#162030',trim:'#2a6a5a',skin:'#c8986a',hair:'#160c04',fanColor:'#aaca8a'},
     {robe:'#103040',trim:'#208060',skin:'#c8986a',hair:'#160c04',fanColor:'#c8daa8'},
@@ -1614,49 +1573,37 @@ function drawScholarSprite(ctx, rankIdx, breathe, t) {
     {robe:'#040c1c',trim:'#08d098',skin:'#c8986a',hair:'#300810',fanColor:'#f0f8e0'},
     {robe:'#020810',trim:'#20e8b0',skin:'#c8986a',hair:'#400c18',fanColor:'#f8fff0'},
     {robe:'#010408',trim:'#40f8c8',skin:'#c8986a',hair:'#500828',fanColor:'#ffffff'},
-  ];
-  const c = colors[Math.min(rankIdx, colors.length-1)];
+  ][Math.min(rankIdx, 7)];
   const sw = breathe*0.25;
 
-  // Long robe
   ctx.fillStyle=c.robe;
   ctx.beginPath(); ctx.roundRect(-20+sw,8,40-sw*2,58,[6]); ctx.fill();
-  // Robe trim
   ctx.strokeStyle=c.trim; ctx.lineWidth=1.5; ctx.globalAlpha=0.7;
   ctx.beginPath(); ctx.moveTo(-20+sw,8); ctx.lineTo(-20+sw,66); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(20-sw,8); ctx.lineTo(20-sw,66); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(-20+sw,30); ctx.lineTo(20-sw,30); ctx.stroke();
   ctx.globalAlpha=1;
-  // Wide sleeves
   ctx.fillStyle=c.robe;
   ctx.beginPath(); ctx.roundRect(-38,5,20,30,[6]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(18,5,20,30,[6]); ctx.fill();
   ctx.strokeStyle=c.trim; ctx.lineWidth=1; ctx.globalAlpha=0.5;
   ctx.strokeRect(-38,5,20,30); ctx.strokeRect(18,5,20,30); ctx.globalAlpha=1;
-  // Feet
   ctx.fillStyle='#160c04';
   ctx.beginPath(); ctx.roundRect(-14,66,13,8,[3]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(1,66,13,8,[3]); ctx.fill();
-  // Hands
   ctx.fillStyle=c.skin;
   ctx.beginPath(); ctx.arc(-28,35,5,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(28,35,5,0,Math.PI*2); ctx.fill();
-  // Neck
-  ctx.fillStyle=c.skin; ctx.fillRect(-5,0,10,10);
-  // Head
-  ctx.fillStyle=c.skin;
+  ctx.fillRect(-5,0,10,10);
   ctx.beginPath(); ctx.ellipse(0,-20,17,18,0,0,Math.PI*2); ctx.fill();
-  // Hair
   ctx.fillStyle=c.hair;
   ctx.beginPath(); ctx.ellipse(0,-34,14,7,0,Math.PI,Math.PI*2); ctx.fill();
-  // Scholar hat (guanmao)
   ctx.fillStyle=c.robe;
   ctx.beginPath(); ctx.roundRect(-20,-44,40,20,[4]); ctx.fill();
-  ctx.fillRect(-12,-44,24,4); // brim
+  ctx.fillRect(-12,-44,24,4);
   ctx.fillStyle=c.trim; ctx.globalAlpha=0.8;
   ctx.fillRect(-20,-44,40,2); ctx.fillRect(-20,-26,40,2);
   ctx.globalAlpha=1;
-  // Hat wings (rank >= 2)
   if(rankIdx>=2) {
     ctx.fillStyle=c.robe;
     ctx.beginPath(); ctx.roundRect(-34,-40,15,8,[3]); ctx.fill();
@@ -1665,7 +1612,6 @@ function drawScholarSprite(ctx, rankIdx, breathe, t) {
     ctx.fillRect(-34,-40,15,1); ctx.fillRect(19,-40,15,1);
     ctx.globalAlpha=1;
   }
-  // Celestial glow (high rank)
   if(rankIdx>=5) {
     ctx.globalAlpha=0.12+Math.sin(t*1.5)*0.06;
     const aura=ctx.createRadialGradient(0,-10,10,0,-10,70);
@@ -1673,31 +1619,24 @@ function drawScholarSprite(ctx, rankIdx, breathe, t) {
     ctx.fillStyle=aura; ctx.beginPath(); ctx.arc(0,-10,70,0,Math.PI*2); ctx.fill();
     ctx.globalAlpha=1;
   }
-  // Destiny glyph (max rank)
   if(rankIdx>=7) {
     ctx.fillStyle='#40f8c8'; ctx.font='bold 11px serif'; ctx.textAlign='center';
     ctx.fillText('龍',0,-50);
   }
-  // Eyes (scholar — calm, narrow)
   ctx.fillStyle='#160c04';
   ctx.beginPath(); ctx.ellipse(-7,-20,3,2,0,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.ellipse(7,-20,3,2,0,0,Math.PI*2); ctx.fill();
-  // Eyebrows (scholar — raised, wise)
   ctx.strokeStyle='#2a1808'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(-10,-25); ctx.lineTo(-4,-26); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(4,-26); ctx.lineTo(10,-25); ctx.stroke();
-  // Subtle smile
   ctx.strokeStyle='#a07050'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.arc(0,-14,4,0.3,Math.PI-0.3); ctx.stroke();
-  // Fan — animated
   ctx.save();
   ctx.translate(28, 35);
-  const fanAngle = Math.sin(t*1.8)*0.2;
-  ctx.rotate(-Math.PI*0.5 + fanAngle);
+  ctx.rotate(-Math.PI*0.5 + Math.sin(t*1.8)*0.2);
   ctx.fillStyle=c.fanColor; ctx.globalAlpha=0.85;
   for(let i=0;i<7;i++) {
-    const angle = (i-3)*0.18;
-    ctx.save(); ctx.rotate(angle);
+    ctx.save(); ctx.rotate((i-3)*0.18);
     ctx.fillRect(-1,-26,2,22); ctx.restore();
   }
   ctx.beginPath(); ctx.arc(0,0,26,(-3)*0.18,3*0.18); ctx.arc(0,0,4,3*0.18,(-3)*0.18,true); ctx.closePath(); ctx.fill();
@@ -1706,7 +1645,6 @@ function drawScholarSprite(ctx, rankIdx, breathe, t) {
   ctx.globalAlpha=1; ctx.restore();
 }
 
-// Animated char sprite loop
 let charAnimFrame = null;
 function startCharAnimation() {
   if(charAnimFrame) cancelAnimationFrame(charAnimFrame);
@@ -1720,7 +1658,7 @@ function startCharAnimation() {
 }
 
 // ════════════════════════════════
-//  BOSS SPRITE RENDERER (Enhanced)
+//  BOSS SPRITE RENDERER
 // ════════════════════════════════
 function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   const ctx = canvasEl.getContext('2d');
@@ -1739,67 +1677,48 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
 
   const cx=w/2, cy=h*0.52, sc=w/170;
   const t=Date.now()*0.001;
-  const breathe=Math.sin(t*1.2)*2;
   const hover=Math.sin(t*0.9)*3;
 
   ctx.save();
   ctx.translate(cx, cy+hover);
   ctx.scale(sc,sc);
 
-  // Shadow
+  const hpTint = 1-hp_ratio;
   ctx.fillStyle=`rgba(0,0,0,${0.2+((1-hp_ratio)*0.25)})`;
   ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
 
-  // HP tint overlay
-  const hpTint = 1-hp_ratio;
-
-  // ── Body ──
   const bodyStyle = Math.floor(sr(0,4));
   ctx.fillStyle=bodyColor;
-  if(bodyStyle===0) {
-    ctx.beginPath(); ctx.roundRect(-30,5,60,48,[10]); ctx.fill();
-  } else if(bodyStyle===1) {
-    ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(34,5); ctx.lineTo(28,52); ctx.lineTo(-28,52); ctx.lineTo(-34,5); ctx.closePath(); ctx.fill();
-  } else if(bodyStyle===2) {
-    ctx.beginPath(); ctx.arc(0,26,32,0,Math.PI*2); ctx.fill();
-  } else {
-    ctx.beginPath(); ctx.roundRect(-28,2,56,55,[4,16,4,16]); ctx.fill();
-  }
+  if(bodyStyle===0) { ctx.beginPath(); ctx.roundRect(-30,5,60,48,[10]); ctx.fill(); }
+  else if(bodyStyle===1) { ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(34,5); ctx.lineTo(28,52); ctx.lineTo(-28,52); ctx.lineTo(-34,5); ctx.closePath(); ctx.fill(); }
+  else if(bodyStyle===2) { ctx.beginPath(); ctx.arc(0,26,32,0,Math.PI*2); ctx.fill(); }
+  else { ctx.beginPath(); ctx.roundRect(-28,2,56,55,[4,16,4,16]); ctx.fill(); }
 
-  // Chest rune
   ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
   ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha=1;
   ctx.fillStyle='#000'; ctx.font='bold 14px Ma Shan Zheng'; ctx.textAlign='center';
   ctx.fillText(['邪','魔','鬼','煞','厉','怒'][Math.floor(sr(0,6))], 0, 30);
 
-  // ── Arms ──
   const armStyle = Math.floor(sr(0,3));
   ctx.fillStyle=bodyColor;
   if(armStyle===0) {
-    // Multiple arms!
     for(let a=0;a<4;a++) {
       const angle = (a<2?-1:1)*(a%2===0?0.5:1.1);
-      const yOff = a<2?5:25;
-      ctx.save(); ctx.translate(a<2?-30:30, yOff); ctx.rotate(angle);
+      ctx.save(); ctx.translate(a<2?-30:30, a<2?5:25); ctx.rotate(angle);
       ctx.beginPath(); ctx.roundRect(-9,-5,18,32,[6]); ctx.fill();
       ctx.fillStyle=accentColor; ctx.globalAlpha=0.4; ctx.fillRect(-9,-5,18,2); ctx.globalAlpha=1;
-      ctx.fillStyle=bodyColor;
-      ctx.restore();
+      ctx.fillStyle=bodyColor; ctx.restore();
     }
   } else {
     ctx.beginPath(); ctx.roundRect(-46,5,18,34,[7]); ctx.fill();
     ctx.beginPath(); ctx.roundRect(28,5,18,34,[7]); ctx.fill();
     if(armStyle===2) {
-      // Extra arm pair
-      ctx.save(); ctx.translate(-44,20); ctx.rotate(-0.4);
-      ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
-      ctx.save(); ctx.translate(44,20); ctx.rotate(0.4);
-      ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(-44,20); ctx.rotate(-0.4); ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(44,20); ctx.rotate(0.4); ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
     }
   }
 
-  // Claws
   ctx.fillStyle=accentColor;
   for(let side of[-1,1]) {
     const bx = side*(armStyle===0?-40:42);
@@ -1808,7 +1727,6 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     }
   }
 
-  // ── Legs ──
   ctx.fillStyle=bodyColor;
   ctx.beginPath(); ctx.roundRect(-22,52,18,20,[5]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(4,52,18,20,[5]); ctx.fill();
@@ -1816,67 +1734,51 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   ctx.beginPath(); ctx.roundRect(-24,70,22,6,[2]); ctx.fill();
   ctx.beginPath(); ctx.roundRect(2,70,22,6,[2]); ctx.fill();
 
-  // ── Head ──
   ctx.fillStyle=bodyColor;
   const headStyle=Math.floor(sr(0,3));
   if(headStyle===0) { ctx.beginPath(); ctx.arc(0,-26,28,0,Math.PI*2); ctx.fill(); }
   else if(headStyle===1) { ctx.beginPath(); ctx.roundRect(-28,-52,56,52,[10]); ctx.fill(); }
   else { ctx.beginPath(); ctx.moveTo(-26,-50); ctx.lineTo(26,-50); ctx.lineTo(34,-2); ctx.lineTo(-34,-2); ctx.closePath(); ctx.fill(); }
 
-  // ── Horns ──
   ctx.fillStyle=accentColor;
   const hornType=Math.floor(sr(0,4));
   if(hornType===0) {
-    // Curved demon horns
     ctx.beginPath(); ctx.moveTo(-18,-52); ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65); ctx.lineTo(-14,-60); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(18,-52); ctx.bezierCurveTo(30,-70,10,-80,6,-65); ctx.lineTo(14,-60); ctx.closePath(); ctx.fill();
   } else if(hornType===1) {
-    // Straight triple horns
-    for(let i=-1;i<=1;i++) {
-      ctx.beginPath(); ctx.moveTo(i*12,-52); ctx.lineTo(i*12-3,-72); ctx.lineTo(i*12+3,-72); ctx.closePath(); ctx.fill();
-    }
+    for(let i=-1;i<=1;i++) { ctx.beginPath(); ctx.moveTo(i*12,-52); ctx.lineTo(i*12-3,-72); ctx.lineTo(i*12+3,-72); ctx.closePath(); ctx.fill(); }
   } else if(hornType===2) {
-    // Crown of spikes
     for(let i=0;i<6;i++) {
       const a=(i/6)*Math.PI*2;
       ctx.beginPath(); ctx.arc(Math.cos(a)*22+0, Math.sin(a)*8-46, 6,0,Math.PI*2); ctx.fill();
     }
   } else {
-    // Dragon antlers
     ctx.strokeStyle=accentColor; ctx.lineWidth=4; ctx.lineCap='round';
     ctx.beginPath(); ctx.moveTo(-20,-50); ctx.lineTo(-28,-70); ctx.lineTo(-22,-68); ctx.moveTo(-28,-70); ctx.lineTo(-34,-62); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(20,-50); ctx.lineTo(28,-70); ctx.lineTo(22,-68); ctx.moveTo(28,-70); ctx.lineTo(34,-62); ctx.stroke();
   }
 
-  // ── Eyes (animated) ──
   const eyeGlow=0.65+Math.sin(t*3+seed)*0.35;
-  ctx.fillStyle=eyeColor;
-  ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eyeGlow;
+  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eyeGlow;
   const eyeStyle=Math.floor(sr(0,3));
   if(eyeStyle===0) {
     ctx.beginPath(); ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(11,-27,8,6,0,0,Math.PI*2); ctx.fill();
   } else if(eyeStyle===1) {
-    // Three eyes!
     ctx.beginPath(); ctx.arc(-12,-28,6,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(12,-28,6,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(0,-38,5,0,Math.PI*2); ctx.fill();
   } else {
-    // Slitted eyes
     ctx.beginPath(); ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2); ctx.fill();
   }
-  ctx.shadowBlur=0;
-  ctx.fillStyle='#000';
+  ctx.shadowBlur=0; ctx.fillStyle='#000';
   ctx.beginPath(); ctx.arc(-11,-27,3,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(11,-27,3,0,Math.PI*2); ctx.fill();
 
-  // Mouth
   ctx.strokeStyle=accentColor; ctx.lineWidth=2;
   if(hp_ratio<0.3) {
-    // Enraged mouth
     ctx.beginPath(); ctx.moveTo(-16,-14); ctx.lineTo(-8,-10); ctx.lineTo(0,-13); ctx.lineTo(8,-10); ctx.lineTo(16,-14); ctx.stroke();
-    // Fangs
     ctx.fillStyle=accentColor;
     ctx.beginPath(); ctx.moveTo(-10,-14); ctx.lineTo(-8,-8); ctx.lineTo(-6,-14); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(6,-14); ctx.lineTo(8,-8); ctx.lineTo(10,-14); ctx.closePath(); ctx.fill();
@@ -1886,14 +1788,10 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     ctx.beginPath(); ctx.moveTo(-8,-14); ctx.lineTo(-6,-8); ctx.lineTo(-4,-14); ctx.closePath(); ctx.fill();
   }
 
-  // HP damage tint
   if(hpTint>0) {
-    ctx.globalAlpha=hpTint*0.35;
-    ctx.fillStyle='#ff2020';
-    ctx.beginPath(); ctx.arc(0,0,75,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1;
+    ctx.globalAlpha=hpTint*0.35; ctx.fillStyle='#ff2020';
+    ctx.beginPath(); ctx.arc(0,0,75,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
   }
-
   ctx.restore();
 }
 
@@ -1963,7 +1861,7 @@ function renderChapterList(quest) {
       </div>
       ${done?'<div class="chapter-done-badge">✓ READ</div>':''}
     `;
-    item.addEventListener('click',()=>openChapterModal(i));
+    item.addEventListener('click',()=>window.openChapterModal(i));
     list.appendChild(item);
   });
 }
@@ -1975,7 +1873,6 @@ function renderHub() {
   const nextRank = getNextRank();
   const rankIdx = getCurrentRankIdx();
 
-  // Char aura color by path
   const auraColor = p.path==='scholar' ? 'rgba(46,138,106,0.3)' : 'rgba(122,21,21,0.3)';
   const auraEl = document.getElementById('char-aura');
   if(auraEl) auraEl.style.boxShadow=`0 0 30px ${auraColor}, 0 0 60px ${auraColor.replace('0.3','0.12')}`;
@@ -2073,6 +1970,7 @@ function renderQuestGrid() {
         let xpD=0,chD=0;
         quest.completed.forEach(d=>{if(d){chD++;xpD+=20;}});
         if(quest.defeated){STATE.player.bossesDefeated--;xpD+=100;}
+        if(quest.quiz && quest.quizScore===quest.quiz.questions?.length && quest.defeated){STATE.player.perfectRuns--;xpD+=50;}
         STATE.player.questsCreated--;
         STATE.player.chaptersCompleted-=chD;
         STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD);
@@ -2141,22 +2039,9 @@ function renderSettingsCharacters() {
   });
 }
 
-window.renameCharacter = function() {
-  const n=prompt("Character name:",STATE.player.name||"Hero");
-  if(n&&n.trim()){STATE.player.name=n.trim();saveState();renderHub();}
-};
-window.createNewCharacter = function() {
-  // New chars go through path selection
-  const p=prompt("Choose path (warrior/scholar):")?.toLowerCase()||'warrior';
-  const path=(p==='scholar')?'scholar':'warrior';
-  const n=prompt(`Name your ${path}:`)||'Hero';
-  const ns={id:Date.now().toString(),player:defaultPlayer(n.trim(),path),quests:[]};
-  STATE.saves.push(ns); STATE.activeSaveId=ns.id;
-  saveState(); syncActiveSaveToState(); renderHub(); renderSettingsCharacters();
-  showToast(`${n} begins their ${path} path!`);
-};
 window.switchCharacter = function(id) {
   STATE.activeSaveId=id; syncActiveSaveToState(); saveState();
+  STATE.activeQuestIdx=null; STATE.quizCurrent=0; // cleanup
   renderHub(); renderSettingsCharacters(); closeApiModal();
   showToast(`Switched to ${STATE.player.name}`);
 };
@@ -2266,7 +2151,6 @@ window.openChapterModal = function(chapterIdx) {
     loadChapterContent(chapterIdx);
   }
 };
-window.closeChapterModal=()=>document.getElementById('chapter-modal').classList.remove('open');
 
 async function loadChapterContent(chapterIdx) {
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -2294,7 +2178,7 @@ window.markChapterComplete = async function() {
   STATE.player.xp+=20; STATE.player.totalXp+=20;
   checkRankUp(); saveState();
   document.getElementById('chapter-complete-btn').style.display='none';
-  closeChapterModal();
+  window.closeChapterModal();
   renderChapterList(quest);
   const allDone=quest.chapters.every((_,i)=>quest.completed[i]);
   const btn=document.getElementById('boss-complete-btn');
@@ -2306,39 +2190,30 @@ window.markChapterComplete = async function() {
 // ════════════════════════════════
 //  HIDDEN FEATURE #1: CELESTIAL GAMBIT
 // ════════════════════════════════
-// Triggered when player has >=3 bosses defeated (discovered organically)
-// Also trigerred if player is an active gambler (has used it before)
-
-function shouldShowGambit() {
-  return STATE.player.bossesDefeated >= 2 || STATE.player.gambitUsed > 0;
-}
+function shouldShowGambit() { return STATE.player.bossesDefeated >= 2 || STATE.player.gambitUsed > 0; }
 
 window.tryOpenBattle = function() {
-  if(shouldShowGambit() && !STATE.quests[STATE.activeQuestIdx].defeated) {
-    openGambitModal();
-  } else {
-    openBattleModal();
-  }
+  if(shouldShowGambit() && !STATE.quests[STATE.activeQuestIdx].defeated) window.openGambitModal();
+  else window.openBattleModal();
 };
 
 window.openGambitModal = function() {
   STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false;
   document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200);
   document.getElementById('gambit-slider').value=0;
-  updateGambitWager(0);
+  window.updateGambitWager(0);
   document.getElementById('gambit-result').textContent='';
   document.getElementById('gambit-coin').classList.remove('spinning');
   document.getElementById('gambit-modal').classList.add('open');
 };
 window.closeGambitModal = function() {
   document.getElementById('gambit-modal').classList.remove('open');
-  openBattleModal();
+  window.openBattleModal();
 };
 
 window.updateGambitWager = function(val) {
   STATE.gambitWager=parseInt(val)||0;
-  document.getElementById('gambit-wager-display').textContent=
-    STATE.gambitWager===0 ? 'No Wager (Safe Path)' : `Wagering ${STATE.gambitWager} XP`;
+  document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0 ? 'No Wager (Safe Path)' : `Wagering ${STATE.gambitWager} XP`;
 };
 
 window.spinGambitCoin = function() {
@@ -2360,7 +2235,7 @@ window.proceedAfterGambit = function() {
   document.getElementById('gambit-modal').classList.remove('open');
   if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0;
   if(STATE.gambitWager>0) STATE.player.gambitUsed++;
-  openBattleModal();
+  window.openBattleModal();
 };
 
 // ════════════════════════════════
@@ -2376,7 +2251,6 @@ const FATE_EVENTS=[
   {text:'🌙 SIGIL AWARDED',bonus:'The moon marks you as worthy.',xp:0,sigil:true},
   {text:'⚔ +60 XP',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
 ];
-
 let fateScrollRevealed=false;
 let pendingFateEvent=null;
 
@@ -2397,16 +2271,11 @@ window.revealFateScroll = function() {
   document.getElementById('fate-close-btn').style.display='block';
   document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text;
   document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus;
-  // Apply
   if(pendingFateEvent.xp>0) { STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; }
-  if(pendingFateEvent.sigil) { const s=awardSigil(); if(s) showToast(`🌟 Sigil Awarded: ${s} — ${SIGIL_TOOLTIPS[s]}`); }
+  if(pendingFateEvent.sigil) { const s=awardSigil(); if(s) setTimeout(()=>showToast(`🌟 Sigil Awarded: ${s} — ${SIGIL_TOOLTIPS[s]}`),1000); }
   checkRankUp(); saveState();
 };
-
-window.closeFateModal = function() {
-  document.getElementById('fate-modal').classList.remove('open');
-  renderHub();
-};
+window.closeFateModal = function() { document.getElementById('fate-modal').classList.remove('open'); renderHub(); };
 
 // ════════════════════════════════
 //  BOSS BATTLE
@@ -2492,38 +2361,26 @@ function finishQuiz(quest) {
     document.getElementById('victory-lore').textContent=
       `Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name}'s ${STATE.player.path==='scholar'?'brilliant mind':'mighty blade'}. The knowledge sealed within surges free.`;
     STATE.player.perfectRuns++; STATE.player.xp+=50; STATE.player.totalXp+=50;
-
-    // Gambit payoff
     if(STATE.gambitActive && STATE.gambitWager>0) {
-      const bonus=STATE.gambitWager;
-      STATE.player.xp+=bonus; STATE.player.totalXp+=bonus;
-      STATE.gambitActive=false;
-      showToast(`🎰 Celestial Gambit pays off! +${bonus} bonus XP!`);
+      const bonus=STATE.gambitWager; STATE.player.xp+=bonus; STATE.player.totalXp+=bonus;
+      STATE.gambitActive=false; showToast(`🎰 Celestial Gambit pays off! +${bonus} bonus XP!`);
     }
   } else {
     document.getElementById('finishing-text').textContent='⚔ BATTLE END ⚔';
     document.getElementById('victory-lore').textContent=
       `${STATE.quizScore}/${quest.quiz.questions.length} correct. ${quest.bossName} is weakened but not defeated. Study further.`;
-
-    // Gambit loss
     if(STATE.gambitActive && STATE.gambitWager>0) {
       STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager);
       STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager);
-      STATE.gambitActive=false;
-      showToast(`⚠ Celestial Gambit lost! -${STATE.gambitWager} XP`);
+      STATE.gambitActive=false; showToast(`⚠ Celestial Gambit lost! -${STATE.gambitWager} XP`);
     }
-
     if(STATE.quizScore>=Math.ceil(quest.quiz.questions.length*0.6)) quest.bossHp=0;
   }
 
   if(quest.bossHp===0 && !quest.defeated) {
     quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100;
     checkRankUp();
-    // Award sigil on perfect
-    if(perfect) {
-      const s=awardSigil();
-      if(s) { setTimeout(()=>showToast(`✨ Secret Sigil Unlocked: ${s} — ${SIGIL_TOOLTIPS[s]}`), 2500); }
-    }
+    if(perfect) { const s=awardSigil(); if(s) { setTimeout(()=>showToast(`✨ Secret Sigil Unlocked: ${s} — ${SIGIL_TOOLTIPS[s]}`), 2500); } }
   } else if(quest.bossHp>0) { quest.bossHp=100; }
 
   updateBattleHp(quest); saveState();
@@ -2539,13 +2396,8 @@ window.claimVictory = function() {
   }
   updateBossHpDisplay(quest);
   renderHub();
-
-  // FATE SCROLL (Hidden Feature #2) — triggered after victory
-  if(quest.defeated) {
-    setTimeout(()=>openFateScrollModal(), 800);
-  } else {
-    showToast('Battle concluded. Train harder, warrior.');
-  }
+  if(quest.defeated) setTimeout(()=>openFateScrollModal(), 800);
+  else showToast('Battle concluded. Train harder, warrior.');
 };
 
 function updateBattleHp(quest) {
@@ -2559,20 +2411,6 @@ function showDamageFloat(val,big=false) {
   el.textContent=big?val:`-${val}`;
   el.style.fontSize=big?'1.5rem':'2.2rem';
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-}
-
-function checkRankUp() {
-  const before=getCurrentRankIdx();
-  setTimeout(()=>{
-    const after=getCurrentRankIdx();
-    if(after>before){
-      const rank=getRanks()[after];
-      showToast(`⚡ RANK UP: ${rank.name} · ${rank.en}!`);
-      // Special rank up messages by path
-      if(STATE.player.path==='warrior' && after===7) showToast('🐒 齊天大聖 — You have become the Great Sage Equal to Heaven!');
-      if(STATE.player.path==='scholar' && after===7) showToast('🐉 臥龍先生 — The Sleeping Dragon has awakened!');
-    }
-  },100);
 }
 
 // ════════════════════════════════
@@ -2612,7 +2450,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-// Render path selection sprites on load
 setTimeout(()=>renderPathSprites(),200);
 </script>
 </body>
