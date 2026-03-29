@@ -95,16 +95,17 @@ html, body {
   text-shadow: 0 0 40px rgba(200,168,75,0.6), 0 2px 4px rgba(0,0,0,0.8);
   margin-bottom:0.4rem;
   animation: fadeSlideUp 1s ease 0.3s both;
+  text-align: center; /* Center aligned */
 }
 .title-chinese {
   font-family:'Ma Shan Zheng',serif;
   font-size:clamp(1rem,2.5vw,1.6rem);
   color:var(--paper2);
   letter-spacing:0.8em;
-  margin-left:0.8em;
   opacity:0.7;
   animation: fadeSlideUp 1s ease 0.5s both;
   margin-bottom:2.5rem;
+  text-align: center;
 }
 @keyframes fadeSlideUp {
   from { opacity:0; transform:translateY(20px); }
@@ -437,6 +438,7 @@ html, body {
   font-size:1rem;
   color:var(--gold);
   line-height:1.4;
+  padding-right: 1.5rem; /* Room for delete button */
 }
 
 .chapter-progress {
@@ -987,7 +989,7 @@ html, body {
   position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
   background:rgba(20,14,8,0.95);
   border:1px solid rgba(200,168,75,0.3);
-  padding:0.8rem 2rem;
+  padding:0.8rem 1.5rem;
   font-size:0.8rem;
   color:var(--gold);
   letter-spacing:0.1em;
@@ -996,7 +998,13 @@ html, body {
   transition:opacity 0.4s;
   pointer-events:none;
   clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
-  white-space:nowrap;
+  
+  /* Mobile styling fixes */
+  white-space: normal;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  line-height: 1.4;
 }
 #toast.show { opacity:1; }
 
@@ -1009,8 +1017,14 @@ html, body {
 @media(max-width:768px) {
   .hub-body { grid-template-columns:1fr; }
   .char-panel { border-right:none; border-bottom:1px solid rgba(200,168,75,0.15); flex-direction:row; flex-wrap:wrap; }
-  .quest-body { grid-template-columns:1fr; }
-  .boss-panel { display:none; }
+  
+  /* Mobile scrolling fix for the entire quest body */
+  .quest-body { grid-template-columns:1fr; overflow-y: auto; display: block; }
+  .chapters-panel { overflow-y: visible; border-right: none; border-bottom: 1px solid rgba(200,168,75,0.1); }
+  
+  /* Show boss panel on mobile, let it flow below chapters */
+  .boss-panel { overflow-y: visible; display: flex; }
+  
   .quiz-options { grid-template-columns:1fr; }
 }
 </style>
@@ -1092,9 +1106,9 @@ html, body {
         <div class="section-header" onclick="toggleQuestBoard()">
           <div class="section-title">活躍任務 · Active Quests</div>
           <div class="section-line"></div>
-          <div id="quest-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▲</div>
+          <div id="quest-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▼</div>
         </div>
-        <div id="quest-board-content">
+        <div id="quest-board-content" style="display: none;">
           <button class="btn-new-quest" onclick="openCreateModal()">
             <div class="plus">+</div>
             <div>
@@ -1180,11 +1194,11 @@ html, body {
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">> SELECT_CORE_ENGINE:</p>
           <div class="model-chip-group" id="model-chip-group">
               <button type="button" class="model-chip" data-value="gemini-2.0-flash">2.0_FLASH (LEGACY)</button>
-              <button type="button" class="model-chip" data-value="gemini-2.5-flash">2.5_FLASH (STABLE)</button>
+              <button type="button" class="model-chip active" data-value="gemini-2.5-flash">2.5_FLASH (STABLE)</button>
               <button type="button" class="model-chip" data-value="gemini-2.5-pro">2.5_PRO (REASONING)</button>
-              <button type="button" class="model-chip active" data-value="gemini-3-flash-preview">3_FLASH (NEXT-GEN)</button>
+              <button type="button" class="model-chip" data-value="gemini-3-flash-preview">3_FLASH (NEXT-GEN)</button>
           </div>
-          <input type="hidden" id="modelSelect" value="gemini-3-flash-preview">
+          <input type="hidden" id="modelSelect" value="gemini-2.5-flash">
       </div>
 
       <div style="display:flex;gap:0.8rem;margin-top:1rem;">
@@ -1282,14 +1296,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-// CRITICAL FIX: Next-gen and preview models require the explicit 'global' location tag.
+// Explicitly route through global location to access preview/next-gen models
 const vertexAI = getVertexAI(app, { location: "global" });
 
 // Secure user ID handled dynamically by Firebase Auth
 let USER_ID = null; 
 
 let STATE = {
-  selectedModel: document.getElementById('modelSelect')?.value || 'gemini-3-flash-preview',
+  selectedModel: document.getElementById('modelSelect')?.value || 'gemini-2.5-flash',
   quests: [],
   player: {
     name: "Wei Xuan",
@@ -1910,6 +1924,20 @@ function renderQuestGrid() {
         <div class="quest-hp-label">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapTotal} chapters`}</div>
       </div>
     `;
+
+    // Add a delete button to the card
+    const delBtn = document.createElement('button');
+    delBtn.innerHTML = '✕';
+    delBtn.style.cssText = 'position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:rgba(200,168,75,0.5);font-size:1rem;cursor:pointer;z-index:10;padding:0.5rem;';
+    delBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(confirm('Are you sure you want to abandon this quest? This will delete the scroll permanently.')) {
+        STATE.quests.splice(idx, 1);
+        saveState();
+        renderHub();
+      }
+    });
+    card.appendChild(delBtn);
 
     const miniCanvas = card.querySelector('.boss-mini-sprite');
     drawBossSprite(miniCanvas, quest, hpRatio);
