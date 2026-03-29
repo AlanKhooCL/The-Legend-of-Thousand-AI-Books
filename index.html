@@ -1282,7 +1282,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const vertexAI = getVertexAI(app);
+// CRITICAL FIX: Next-gen and preview models require the explicit 'global' location tag.
+const vertexAI = getVertexAI(app, { location: "global" });
 
 // Secure user ID handled dynamically by Firebase Auth
 let USER_ID = null; 
