@@ -1014,249 +1014,6 @@ html, body {
   .quiz-options { grid-template-columns:1fr; }
 }
 </style>
-</head>
-<body>
-
-<canvas id="bg-canvas"></canvas>
-<canvas id="particle-canvas"></canvas>
-
-<div id="screen-title" class="screen active">
-  <div class="title-seal">
-    <span class="title-seal-char">書</span>
-  </div>
-  <div class="title-main">TEN THOUSAND SCROLLS</div>
-  <div class="title-chinese">萬卷書</div>
-  <div class="title-divider"></div>
-  <p class="title-lore">
-    The Six Kingdoms wage an endless war for dominion.<br>
-    Only one who masters all scrolls of knowledge<br>
-    can unify the realm and ascend to the Dragon Throne.
-  </p>
-  <button id="btn-enter" class="btn-primary" onclick="showHub()" disabled>LOADING REALM...</button>
-</div>
-
-<div id="screen-hub" class="screen">
-  <div class="hub-header">
-    <div class="hub-title">萬卷書 · Quest Board</div>
-    <div style="display:flex;align-items:center;gap:1rem;">
-      <div id="header-xp" style="font-size:0.7rem;color:rgba(200,168,75,0.6);letter-spacing:0.15em;"></div>
-    </div>
-  </div>
-  <div class="hub-body">
-    <div class="char-panel">
-      <div class="char-stage">
-        <div class="char-aura"></div>
-        <canvas class="char-sprite" id="char-sprite" width="140" height="140"></canvas>
-      </div>
-      <div class="char-name-container">
-        <div class="char-name" id="char-name" onclick="renameCharacter()" title="Click to rename">Wei Xuan ✎</div>
-      </div>
-      <div class="char-rank" id="char-rank">村民 · Commoner</div>
-      <div class="xp-section">
-        <div class="xp-label">
-          <span>CULTIVATION</span>
-          <span id="xp-text">0 / 100 XP</span>
-        </div>
-        <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box">
-          <div class="stat-val" id="stat-quests">0</div>
-          <div class="stat-lbl">QUESTS</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="stat-chapters">0</div>
-          <div class="stat-lbl">CHAPTERS</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="stat-bosses">0</div>
-          <div class="stat-lbl">DEFEATED</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="stat-perfect">0</div>
-          <div class="stat-lbl">PERFECT</div>
-        </div>
-      </div>
-      <div class="world-lore-box">
-        <div class="world-lore-title">◈ REALM CHRONICLES</div>
-        <div class="world-lore-text" id="world-lore-text">
-          The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. 
-          You rise from dust — armed only with an empty scroll and an iron will.
-        </div>
-      </div>
-    </div>
-
-    <div class="quest-board">
-      <div>
-        <div class="section-header" onclick="toggleQuestBoard()">
-          <div class="section-title">活躍任務 · Active Quests</div>
-          <div class="section-line"></div>
-          <div id="quest-toggle-icon" style="color:var(--gold); font-size: 0.8rem;">▲</div>
-        </div>
-        <div id="quest-board-content">
-          <button class="btn-new-quest" onclick="openCreateModal()">
-            <div class="plus">+</div>
-            <div>
-              <div style="font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">ISSUE NEW QUEST</div>
-              <div style="font-size:0.75rem;color:rgba(245,234,216,0.4);">Seek knowledge, summon a guardian demon, earn your rank</div>
-            </div>
-          </button>
-          <div id="quest-grid" class="quest-grid">
-            </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="screen-quest" class="screen">
-  <div class="quest-header">
-    <button class="back-btn" onclick="showHub()">← RETURN</button>
-    <div style="flex:1;">
-      <div style="font-size:0.6rem;letter-spacing:0.3em;color:var(--red2);margin-bottom:0.2rem;" id="q-topic-label">TOPIC</div>
-      <div style="font-family:'Ma Shan Zheng',serif;font-size:1.1rem;color:var(--gold);letter-spacing:0.2em;" id="q-title-label">Quest Title</div>
-    </div>
-  </div>
-  <div class="quest-body">
-    <div class="chapters-panel">
-      <div class="section-header">
-        <div class="section-title">章節 · Chapters</div>
-        <div class="section-line"></div>
-      </div>
-      <div class="chapter-list" id="chapter-list"></div>
-    </div>
-    <div class="boss-panel" id="boss-panel">
-      <div class="boss-stage">
-        <div class="boss-aura"></div>
-        <canvas class="boss-sprite-canvas" id="boss-sprite-canvas" width="160" height="160"></canvas>
-      </div>
-      <div class="boss-name-display" id="boss-name-display">??</div>
-      <div class="boss-title-display" id="boss-title-display">Guardian Demon</div>
-      <div class="boss-hp-section">
-        <div class="boss-hp-label">
-          <span>魔力 DEMON HP</span>
-          <span id="boss-hp-text">100 / 100</span>
-        </div>
-        <div class="boss-hp-bar">
-          <div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div>
-        </div>
-      </div>
-      <div class="boss-lore-box">
-        <div class="boss-lore-title">◈ DEMON LORE</div>
-        <div class="boss-lore-text" id="boss-lore-text">...</div>
-      </div>
-      <button class="boss-complete-btn" id="boss-complete-btn" onclick="openBattleModal()" disabled>
-        ⚔ CHALLENGE THE DEMON
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="create-modal">
-  <div class="modal-box">
-    <div class="modal-title">召喚任務</div>
-    <div class="modal-subtitle">SUMMON A NEW QUEST · BIND A DEMON TO KNOWLEDGE</div>
-
-    <div id="create-form">
-      <div class="form-group">
-        <label class="form-label">◈ TOPIC / SUBJECT TO STUDY</label>
-        <input class="form-input" id="topic-input" placeholder="e.g. Machine Learning, Ancient Rome, Python Async..." />
-      </div>
-      <div class="form-group">
-        <label class="form-label">◈ LEARNING OBJECTIVE (optional)</label>
-        <textarea class="form-textarea" id="objective-input" placeholder="What should the learner understand by the end? Any specific angle or depth?"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">◈ NUMBER OF CHAPTERS</label>
-        <select class="form-select" id="chapters-input">
-          <option value="3">3 Chapters — Swift Campaign</option>
-          <option value="5" selected>5 Chapters — Standard Siege</option>
-          <option value="7">7 Chapters — Grand Conquest</option>
-        </select>
-      </div>
-      
-      <div class="glass-panel" style="margin-bottom: 1rem; padding: 1.5rem;">
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">> SELECT_CORE_ENGINE:</p>
-          <div class="model-chip-group" id="model-chip-group">
-              <button type="button" class="model-chip" data-value="gemini-2.0-flash">2.0_FLASH (LEGACY)</button>
-              <button type="button" class="model-chip" data-value="gemini-2.5-flash">2.5_FLASH (STABLE)</button>
-              <button type="button" class="model-chip" data-value="gemini-2.5-pro">2.5_PRO (REASONING)</button>
-              <button type="button" class="model-chip active" data-value="gemini-3-flash-preview">3_FLASH (NEXT-GEN)</button>
-          </div>
-          <input type="hidden" id="modelSelect" value="gemini-3-flash-preview">
-      </div>
-
-      <div style="display:flex;gap:0.8rem;margin-top:1rem;">
-        <button class="btn-primary" style="flex:1;" onclick="createQuest()">⚔ SUMMON QUEST</button>
-        <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(200,168,75,0.2);color:rgba(245,234,216,0.5);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeCreateModal()">CANCEL</button>
-      </div>
-    </div>
-
-    <div class="generating-state" id="generating-state">
-      <div class="gen-spinner">卍</div>
-      <div class="gen-text" id="gen-status-text">Binding the demon to the scroll...</div>
-      <div style="margin-top:1rem;font-size:0.65rem;color:rgba(200,168,75,0.3);letter-spacing:0.2em;" id="gen-step"></div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="chapter-modal">
-  <div class="modal-box">
-    <div style="display:flex;justify-content:space-between;align-items:start;">
-      <div>
-        <div class="modal-title" id="chapter-modal-title">Chapter Title</div>
-        <div class="modal-subtitle" id="chapter-modal-tag">CHAPTER TAG</div>
-      </div>
-      <button onclick="closeChapterModal()" style="background:none;border:none;color:rgba(200,168,75,0.4);cursor:pointer;font-size:1.2rem;padding:0.2rem;">✕</button>
-    </div>
-    <div class="chapter-content-area" id="chapter-content-area">
-      <div style="text-align:center;padding:2rem;">
-        <div class="gen-spinner">卍</div>
-        <div class="gen-text">Unrolling the ancient scroll...</div>
-      </div>
-    </div>
-    <button class="chapter-complete-btn" id="chapter-complete-btn" onclick="markChapterComplete()" style="display:none;">
-      ✓ MARK CHAPTER COMPLETE — DAMAGE THE DEMON
-    </button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="battle-modal">
-  <div class="modal-box">
-    <div class="modal-title" style="margin-bottom:0.2rem;" id="battle-title">Final Battle</div>
-    <div class="modal-subtitle">PROVE YOUR MASTERY — DEFEAT THE DEMON</div>
-
-    <div class="battle-stage">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(139,26,26,0.15) 0%, transparent 70%);"></div>
-      <canvas class="battle-boss-canvas" id="battle-boss-canvas" width="160" height="160"></canvas>
-      <div class="damage-floater" id="damage-floater">-25</div>
-    </div>
-
-    <div id="battle-boss-hp" style="margin-bottom:1.5rem;">
-      <div class="boss-hp-label" style="display:flex;justify-content:space-between;">
-        <span>DEMON HP</span><span id="battle-hp-text">100 / 100</span>
-      </div>
-      <div class="boss-hp-bar" style="height:12px;">
-        <div class="boss-hp-fill" id="battle-hp-fill" style="width:100%"></div>
-      </div>
-    </div>
-
-    <div id="quiz-container">
-      <div class="quiz-progress" id="quiz-progress">QUESTION 1 / 5</div>
-      <div class="quiz-question" id="quiz-question">Loading question...</div>
-      <div class="quiz-options" id="quiz-options"></div>
-      <div class="quiz-feedback" id="quiz-feedback"></div>
-    </div>
-
-    <div class="finishing-blow" id="finishing-blow">
-      <div class="finishing-text">⚡ FINAL STRIKE ⚡</div>
-      <div style="font-size:0.9rem;color:rgba(245,234,216,0.7);font-style:italic;line-height:1.8;" id="victory-lore"></div>
-      <button class="btn-primary" style="margin-top:1rem;" onclick="claimVictory()">CLAIM VICTORY</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
 
 <script type="module">
 // ═══════════════════════════════════════════════════════
@@ -1265,7 +1022,7 @@ html, body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { getAI, getGenerativeModel, VertexAIBackend } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-ai.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
@@ -1281,7 +1038,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const vertexAI = getVertexAI(app);
+const firebaseAI = getAI(app, { backend: new VertexAIBackend() });
 
 // Secure user ID handled dynamically by Firebase Auth
 let USER_ID = null; 
@@ -1317,7 +1074,6 @@ async function loadState() {
       // Initialize new user in DB
       await saveState();
     }
-
   } catch (e) {
     console.error("Error loading DB state:", e);
     showToast("Database connection failed. Check your Firebase rules.");
@@ -2325,11 +2081,11 @@ function checkRankUp() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  API — Vertex AI in Firebase
+//  API — Firebase AI Logic (Vertex AI)
 // ═══════════════════════════════════════════════════════
 async function callClaude({system, user}) {
   try {
-    const generativeModel = getGenerativeModel(vertexAI, {
+    const generativeModel = getGenerativeModel(firebaseAI, {
       model: STATE.selectedModel,
       systemInstruction: system
     });
@@ -2337,7 +2093,7 @@ async function callClaude({system, user}) {
     const result = await generativeModel.generateContent(user);
     return result.response.text();
   } catch (error) {
-    console.error("Vertex AI Generation Error:", error);
+    console.error("Firebase AI Logic Generation Error:", error);
     throw new Error(error.message || "Failed to communicate with the scrolls.");
   }
 }
