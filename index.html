@@ -29,6 +29,7 @@
   --glow-red:   0 0 20px rgba(176,48,48,0.6);
   --glow-jade:  0 0 20px rgba(46,138,106,0.5);
   --text-muted: rgba(240,230,204,0.38);
+  --path-color: #c8a84b;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -40,11 +41,18 @@ html, body {
   color: var(--paper);
 }
 
+/* ═══ CUSTOM CURSOR ═══ */
 body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z' fill='%23c8a84b' opacity='0.8'/%3E%3C/svg%3E") 12 12, default; }
 
-#bg-canvas, #particle-canvas { position:fixed; inset:0; z-index:0; width:100%; height:100%; pointer-events:none; }
+/* ═══ CANVASES ═══ */
+#bg-canvas, #particle-canvas {
+  position:fixed; inset:0; z-index:0;
+  width:100%; height:100%;
+  pointer-events:none;
+}
 #particle-canvas { z-index:1; }
 
+/* ═══ SCREENS ═══ */
 .screen { position:fixed; inset:0; z-index:10; display:none; overflow:hidden; }
 .screen.active { display:flex; }
 
@@ -841,7 +849,6 @@ async function loadState() {
   if(!USER_ID) return;
   
   let dataLoaded = false;
-  let isNewUser = false;
   
   try {
     const docRef = doc(db, "users", USER_ID);
@@ -849,26 +856,26 @@ async function loadState() {
     
     if(docSnap.exists()) {
       const data = docSnap.data();
-      if(data.saves && data.saves.length > 0) {
+      if(data.saves !== undefined) {
         STATE.saves = data.saves;
-        STATE.activeSaveId = data.activeSaveId || data.saves[0].id;
+        STATE.activeSaveId = data.activeSaveId;
       } else {
         const oldSave = { id: Date.now().toString(), player: data.player || defaultPlayer("Wei Xuan"), quests: data.quests || [] };
-        STATE.saves = [oldSave]; STATE.activeSaveId = oldSave.id;
+        STATE.saves = [oldSave]; 
+        STATE.activeSaveId = oldSave.id;
       }
       dataLoaded = true;
-    } else {
-      isNewUser = true;
     }
   } catch(e) {
     console.error("DB load error:", e);
     showToast("Could not load data. Playing locally.");
-    isNewUser = true;
   }
 
   try { await loadPublicQuests(); } catch(e) { console.error("Library load error:", e); }
 
-  if (dataLoaded) {
+  const btnEnter = document.getElementById('btn-enter');
+  
+  if (dataLoaded && STATE.saves && STATE.saves.length > 0) {
       STATE.saves.forEach(s => {
          if (!s.player) s.player = defaultPlayer("Hero");
          if (!s.player.path) s.player.path = 'warrior';
@@ -876,14 +883,13 @@ async function loadState() {
       });
       syncActiveSaveToState();
       
-      const btnEnter = document.getElementById('btn-enter');
       if (btnEnter) {
         btnEnter.style.display = "block";
         btnEnter.textContent = "ENTER THE REALM";
         btnEnter.disabled = false;
       }
-  } else if (isNewUser) {
-      const btnEnter = document.getElementById('btn-enter');
+  } else {
+      STATE.player = null;
       if (btnEnter) {
         btnEnter.style.display = "block";
         btnEnter.textContent = "ENTER THE REALM";
@@ -922,6 +928,7 @@ function syncActiveSaveToState() {
 }
 
 function syncStateToActiveSave() {
+  if(!STATE.activeSaveId) return;
   const i = STATE.saves.findIndex(s=>s.id===STATE.activeSaveId);
   if(i!==-1) { STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; }
 }
@@ -1464,7 +1471,10 @@ window.showQuestScreen = function(questIdx) {
 
   document.getElementById('boss-name-display').textContent = quest.bossName || 'Demon';
   document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian';
-  document.getElementById('boss-lore-text').textContent = quest.bossLore || 'A mysterious entity.';
+  
+  const loreBox = document.getElementById('boss-lore-text');
+  if(loreBox) loreBox.textContent = quest.bossLore || 'A mysterious entity.';
+
   updateBossHpDisplay(quest);
   renderChapterList(quest);
 
@@ -1667,7 +1677,7 @@ function renderLibraryGrid() {
         <canvas class="boss-mini-sprite" width="56" height="56"></canvas>
         <div>
           <div class="quest-topic">${(quest.topic || 'Unknown').toUpperCase()}</div>
-          <div class="quest-title" style="padding-right:0;">${quest.questTitle || 'Untitled'}</div>
+          <div class="quest-title" style="padding-right:1.5rem;">${quest.questTitle || 'Untitled'}</div>
         </div>
       </div>
       <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.8rem;">${chapters.length} Chapters of Knowledge</div>
@@ -1739,11 +1749,15 @@ window.deleteCharacter = function(id, event) {
     if(!confirm("Banish this warrior to the void? This cannot be undone.")) return;
     STATE.saves = STATE.saves.filter(s => s.id !== id);
     if(STATE.saves.length === 0) {
+        STATE.activeSaveId = null;
+        STATE.player = null;
+        STATE.quests = [];
         saveState(); 
         closeApiModal();
         showScreen('screen-path');
         renderPathSprites();
-        document.getElementById('path-cancel-btn').style.display = 'none';
+        const cancelBtn = document.getElementById('path-cancel-btn');
+        if(cancelBtn) cancelBtn.style.display = 'none';
     } else {
         if(STATE.activeSaveId === id) {
             STATE.activeSaveId = STATE.saves[0].id;
@@ -1759,7 +1773,8 @@ window.createNewCharacter = function() {
     closeApiModal();
     showScreen('screen-path');
     renderPathSprites();
-    document.getElementById('path-cancel-btn').style.display = 'block';
+    const cancelBtn = document.getElementById('path-cancel-btn');
+    if(cancelBtn) cancelBtn.style.display = 'block';
 };
 
 // ════════════════════════════════
