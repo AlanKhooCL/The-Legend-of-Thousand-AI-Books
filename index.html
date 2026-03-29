@@ -976,17 +976,6 @@ html, body {
   to   { text-shadow:0 0 60px rgba(200,168,75,0.9), 0 0 100px rgba(200,168,75,0.4); }
 }
 
-/* ═══════════════════════════════
-   API KEY MODAL
-═══════════════════════════════ */
-.api-note {
-  font-size:0.72rem;
-  color:rgba(245,234,216,0.4);
-  font-style:italic;
-  margin-top:0.4rem;
-  line-height:1.6;
-}
-
 /* ── Particles overlay ── */
 #particle-canvas {
   position:fixed;inset:0;z-index:5;
@@ -1025,11 +1014,6 @@ html, body {
   .quiz-options { grid-template-columns:1fr; }
 }
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-
 </head>
 <body>
 
@@ -1056,7 +1040,6 @@ html, body {
     <div class="hub-title">萬卷書 · Quest Board</div>
     <div style="display:flex;align-items:center;gap:1rem;">
       <div id="header-xp" style="font-size:0.7rem;color:rgba(200,168,75,0.6);letter-spacing:0.15em;"></div>
-      <button class="btn-primary" style="padding:0.5rem 1.2rem;font-size:0.7rem;" onclick="openApiModal()">⚙ API KEY</button>
     </div>
   </div>
   <div class="hub-body">
@@ -1273,28 +1256,16 @@ html, body {
   </div>
 </div>
 
-<div class="modal-overlay" id="api-modal">
-  <div class="modal-box" style="max-width:440px;">
-    <div class="modal-title">API 配置</div>
-    <div class="modal-subtitle">GEMINI API CONFIGURATION</div>
-    <div class="form-group">
-      <label class="form-label">◈ GOOGLE GEMINI API KEY</label>
-      <input class="form-input" id="api-key-input" type="password" placeholder="Paste Gemini API Key here (Not your Firebase key!)..." />
-      <div class="api-note">Get your key at aistudio.google.com. Stored in this browser session only.</div>
-    </div>
-    <div style="display:flex;gap:0.8rem;">
-      <button class="btn-primary" style="flex:1;" onclick="saveApiKey()">SAVE KEY</button>
-      <button style="padding:0.9rem 1.5rem;background:transparent;border:1px solid rgba(200,168,75,0.2);color:rgba(245,234,216,0.5);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeApiModal()">CANCEL</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
 
-<script>
+<script type="module">
 // ═══════════════════════════════════════════════════════
-//  FIREBASE SETUP & STATE
+//  FIREBASE SETUP & STATE (MODULAR SDK)
 // ═══════════════════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
@@ -1307,15 +1278,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const vertexAI = getVertexAI(app);
 
-// Secure user ID handled dynamically by Firebase Auth now
+// Secure user ID handled dynamically by Firebase Auth
 let USER_ID = null; 
 
 let STATE = {
-  apiKey: sessionStorage.getItem('wuxia_api_key') || '',
   selectedModel: document.getElementById('modelSelect')?.value || 'gemini-3-flash-preview',
   quests: [],
   player: {
@@ -1335,10 +1306,10 @@ async function loadState() {
   if (!USER_ID) return; // Wait until Auth resolves
 
   try {
-    const docRef = db.collection("users").doc(USER_ID);
-    const docSnap = await docRef.get();
+    const docRef = doc(db, "users", USER_ID);
+    const docSnap = await getDoc(docRef);
     
-    if (docSnap.exists) {
+    if (docSnap.exists()) {
       const data = docSnap.data();
       STATE.quests = data.quests || [];
       STATE.player = data.player || STATE.player;
@@ -1367,7 +1338,8 @@ async function loadState() {
 async function saveState() {
   if (!USER_ID) return;
   try {
-    await db.collection("users").doc(USER_ID).set({
+    const docRef = doc(db, "users", USER_ID);
+    await setDoc(docRef, {
       quests: STATE.quests,
       player: STATE.player
     }, { merge: true });
@@ -1420,10 +1392,8 @@ function renameCharacter() {
   function resize() { c.width=window.innerWidth; c.height=window.innerHeight; }
   window.addEventListener('resize', resize); resize();
 
-  // Draw ink-wash style mountains
   function drawMountains(ctx, w, h) {
     ctx.clearRect(0,0,w,h);
-    // Deep bg
     const grd = ctx.createLinearGradient(0,0,0,h);
     grd.addColorStop(0,'#06040a');
     grd.addColorStop(0.5,'#0e0a06');
@@ -1431,7 +1401,6 @@ function renameCharacter() {
     ctx.fillStyle=grd;
     ctx.fillRect(0,0,w,h);
 
-    // Ink wash mountain layers
     const layers = [
       {y:0.7, roughness:0.18, alpha:0.08, color:'#c8a84b'},
       {y:0.62,roughness:0.14, alpha:0.06, color:'#8b3a3a'},
@@ -1455,7 +1424,6 @@ function renameCharacter() {
       ctx.fill();
     });
 
-    // Horizontal mist lines
     for(let i=0;i<6;i++) {
       const y = h*(0.3+i*0.1);
       ctx.globalAlpha=0.04;
@@ -1469,7 +1437,6 @@ function renameCharacter() {
     }
     ctx.globalAlpha=1;
 
-    // Chinese grid pattern overlay (subtle)
     ctx.strokeStyle='rgba(200,168,75,0.02)';
     ctx.lineWidth=1;
     for(let x=0;x<w;x+=80) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
@@ -1511,13 +1478,10 @@ function renameCharacter() {
       ctx.globalAlpha=a;
       ctx.fillStyle=p.color;
       if(p.type===0){
-        // dot
         ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
       } else if(p.type===1){
-        // small square
         ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
       } else {
-        // Chinese character particle
         ctx.globalAlpha=a*0.4;
         ctx.font=`${8+p.size*2}px Ma Shan Zheng`;
         ctx.fillText(['道','德','天','地','人','义','仁','礼'][Math.floor(p.x)%8],p.x,p.y);
@@ -1530,13 +1494,13 @@ function renameCharacter() {
 })();
 
 // ═══════════════════════════════════════════════════════
-//  CHARACTER SPRITE RENDERER (Chibi Chinese General)
+//  CHARACTER SPRITE RENDERER
 // ═══════════════════════════════════════════════════════
 function drawCharSprite(canvasEl, rankIdx, size=140) {
   const ctx = canvasEl.getContext('2d');
   const w=canvasEl.width, h=canvasEl.height;
   ctx.clearRect(0,0,w,h);
-  const s = w/140; // scale factor
+  const s = w/140; 
 
   const colors = [
     {armor:'#4a3a28',helmet:'#3a2a18',trim:'#8a7050',skin:'#d4a878',hair:'#1a1008'},
@@ -1555,24 +1519,20 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
   ctx.translate(w/2, h*0.5);
   ctx.scale(s,s);
 
-  // Shadow
   ctx.fillStyle='rgba(0,0,0,0.3)';
   ctx.beginPath();ctx.ellipse(0,55,28,6,0,0,Math.PI*2);ctx.fill();
 
-  // Body / Armor
   ctx.fillStyle=c.armor;
   ctx.beginPath();
   ctx.roundRect(-22,10,44,38,[4]);
   ctx.fill();
 
-  // Armor plate detail
   ctx.fillStyle=c.trim;
   ctx.fillRect(-18,14,36,3);
   ctx.fillRect(-18,21,36,2);
   ctx.fillStyle='rgba(0,0,0,0.3)';
   ctx.fillRect(-22,10,44,2);
 
-  // Pauldrons (shoulder guards)
   ctx.fillStyle=c.armor;
   ctx.beginPath();ctx.roundRect(-32,8,14,10,[3]);ctx.fill();
   ctx.beginPath();ctx.roundRect(18,8,14,10,[3]);ctx.fill();
@@ -1580,51 +1540,41 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
   ctx.fillRect(-32,8,14,2);
   ctx.fillRect(18,8,14,2);
 
-  // Belt
   ctx.fillStyle=c.trim;
   ctx.fillRect(-22,44,44,5);
 
-  // Legs
   ctx.fillStyle=c.armor;
   ctx.fillRect(-18,49,16,16);
   ctx.fillRect(2,49,16,16);
 
-  // Boots
   ctx.fillStyle='#1a1008';
   ctx.beginPath();ctx.roundRect(-19,62,17,8,[2]);ctx.fill();
   ctx.beginPath();ctx.roundRect(2,62,17,8,[2]);ctx.fill();
 
-  // Arms
   ctx.fillStyle=c.armor;
   ctx.fillRect(-30,10,10,30);
   ctx.fillRect(20,10,10,30);
 
-  // Hands
   ctx.fillStyle=c.skin;
   ctx.beginPath();ctx.arc(-25,42,5,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(25,42,5,0,Math.PI*2);ctx.fill();
 
-  // Neck
   ctx.fillStyle=c.skin;
   ctx.fillRect(-5,-2,10,14);
 
-  // Head
   ctx.fillStyle=c.skin;
   ctx.beginPath();
   ctx.ellipse(0,-20,18,18,0,0,Math.PI*2);
   ctx.fill();
 
-  // Hair
   ctx.fillStyle=c.hair;
   ctx.beginPath();ctx.ellipse(0,-33,16,8,0,Math.PI,Math.PI*2);ctx.fill();
 
-  // Helmet
   ctx.fillStyle=c.helmet;
   ctx.beginPath();
   ctx.arc(0,-26,17,Math.PI,0);
   ctx.closePath();ctx.fill();
 
-  // Helmet crest / decoration by rank
   if(rankIdx>=1){
     ctx.fillStyle=c.trim;
     ctx.fillRect(-2,-44,4,14);
@@ -1636,7 +1586,6 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
     ctx.fillRect(12,-28,4,8);
   }
   if(rankIdx>=5){
-    // Plume
     for(let i=-3;i<=3;i++){
       ctx.strokeStyle=c.trim;
       ctx.lineWidth=1.5;
@@ -1646,24 +1595,20 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
     ctx.globalAlpha=1;
   }
   if(rankIdx>=7){
-    // Dragon crown
     ctx.fillStyle='#e8c96a';
     ctx.font='bold 14px serif';
     ctx.textAlign='center';
     ctx.fillText('龙',0,-46);
   }
 
-  // Eyes
   ctx.fillStyle='#1a1008';
   ctx.beginPath();ctx.arc(-7,-21,2.5,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(7,-21,2.5,0,Math.PI*2);ctx.fill();
 
-  // Eyebrow
   ctx.strokeStyle='#2a1a08';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(-10,-25);ctx.lineTo(-4,-24);ctx.stroke();
   ctx.beginPath();ctx.moveTo(4,-24);ctx.lineTo(10,-25);ctx.stroke();
 
-  // Mouth — slight smirk at higher ranks
   ctx.strokeStyle=c.skin==='#d4a878'?'#c09060':'#c09060';
   ctx.lineWidth=1;
   ctx.beginPath();
@@ -1671,7 +1616,6 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
   else{ctx.moveTo(-3,-16);ctx.lineTo(3,-16);}
   ctx.stroke();
 
-  // Rank glow
   if(rankIdx>=6){
     ctx.globalAlpha=0.15;
     const glow=ctx.createRadialGradient(0,0,10,0,0,70);
@@ -1682,16 +1626,13 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
     ctx.globalAlpha=1;
   }
 
-  // Weapon - spear/dao depending on rank
   if(rankIdx===0){
-    // Farmer hoe
     ctx.strokeStyle='#5a3a18';ctx.lineWidth=3;
     ctx.beginPath();ctx.moveTo(28,42);ctx.lineTo(42,42);ctx.stroke();
     ctx.beginPath();ctx.moveTo(42,42);ctx.lineTo(45,30);ctx.stroke();
   } else {
     ctx.strokeStyle='#8a7050';ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(28,8);ctx.lineTo(40,70);ctx.stroke();
-    // spearhead
     ctx.fillStyle=rankIdx>=4?c.trim:'#a0a0a0';
     ctx.beginPath();ctx.moveTo(35,2);ctx.lineTo(32,12);ctx.lineTo(38,12);ctx.closePath();ctx.fill();
   }
@@ -1700,14 +1641,13 @@ function drawCharSprite(canvasEl, rankIdx, size=140) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  BOSS SPRITE RENDERER (Chibi Demon)
+//  BOSS SPRITE RENDERER
 // ═══════════════════════════════════════════════════════
 function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   const ctx = canvasEl.getContext('2d');
   const w=canvasEl.width, h=canvasEl.height;
   ctx.clearRect(0,0,w,h);
 
-  // Seed random from boss name
   let seed = 0;
   for(let i=0;i<(bossData.name||'').length;i++) seed+=(bossData.name.charCodeAt(i)*(i+1));
 
@@ -1724,14 +1664,11 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   ctx.translate(cx,cy);
   ctx.scale(sc,sc);
 
-  // HP tint — more red as HP drops
   const hpTint = 1-hp_ratio;
 
-  // Shadow
   ctx.fillStyle=`rgba(0,0,0,${0.2+hpTint*0.2})`;
   ctx.beginPath();ctx.ellipse(0,58,34,7,0,0,Math.PI*2);ctx.fill();
 
-  // Body
   const bodyH = sr(0,1)>0.5;
   ctx.fillStyle=bodyColor;
   if(bodyH){
@@ -1743,30 +1680,25 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     ctx.fill();
   }
 
-  // Belly mark
   ctx.fillStyle=accentColor;
   ctx.globalAlpha=0.5;
   ctx.beginPath();ctx.ellipse(0,24,12,16,0,0,Math.PI*2);ctx.fill();
   ctx.globalAlpha=1;
 
-  // Arms
   ctx.fillStyle=bodyColor;
   ctx.beginPath();ctx.roundRect(-42,6,18,28,[6]);ctx.fill();
   ctx.beginPath();ctx.roundRect(24,6,18,28,[6]);ctx.fill();
 
-  // Claws
   ctx.strokeStyle=accentColor;ctx.lineWidth=2;
   for(let i=-1;i<=1;i++){
     ctx.beginPath();ctx.moveTo(-34+i*4,34);ctx.lineTo(-34+i*4,42);ctx.stroke();
     ctx.beginPath();ctx.moveTo(34+i*4,34);ctx.lineTo(34+i*4,42);ctx.stroke();
   }
 
-  // Legs
   ctx.fillStyle=bodyColor;
   ctx.beginPath();ctx.roundRect(-20,48,16,18,[4]);ctx.fill();
   ctx.beginPath();ctx.roundRect(4,48,16,18,[4]);ctx.fill();
 
-  // Head
   ctx.fillStyle=bodyColor;
   const headShape = sr(0,1);
   if(headShape>0.6){
@@ -1775,7 +1707,6 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     ctx.beginPath();ctx.roundRect(-26,-46,52,50,[10]);ctx.fill();
   }
 
-  // Horns
   const hornType = Math.floor(sr(0,3));
   ctx.fillStyle=accentColor;
   if(hornType===0){
@@ -1790,7 +1721,6 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     }
   }
 
-  // Eyes
   const eyeGlow = 0.6+Math.sin(Date.now()*0.003+seed)*0.4;
   ctx.fillStyle=eyeColor;
   ctx.shadowColor=eyeColor;
@@ -1799,23 +1729,19 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   ctx.beginPath();ctx.ellipse(10,-22,7,6,0,0,Math.PI*2);ctx.fill();
   ctx.shadowBlur=0;
 
-  // Pupils
   ctx.fillStyle='#000';
   ctx.beginPath();ctx.arc(-10,-22,3,0,Math.PI*2);ctx.fill();
   ctx.beginPath();ctx.arc(10,-22,3,0,Math.PI*2);ctx.fill();
 
-  // Mouth
   ctx.strokeStyle=accentColor;ctx.lineWidth=2;
   ctx.beginPath();
   if(hp_ratio<0.3){
-    // Angry mouth
     ctx.arc(0,-12,12,0.3,Math.PI-0.3,true);
   } else {
     ctx.arc(0,-8,10,0.2,Math.PI-0.2);
   }
   ctx.stroke();
 
-  // HP damage indicator
   if(hpTint>0){
     ctx.globalAlpha=hpTint*0.3;
     ctx.fillStyle='#ff0000';
@@ -1826,7 +1752,6 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   ctx.restore();
 }
 
-// Animate boss continuously
 function animateBossCanvas(canvasEl, bossData, hpRatio=1.0) {
   if(!canvasEl._animFrame) {
     function frame() {
@@ -1838,7 +1763,7 @@ function animateBossCanvas(canvasEl, bossData, hpRatio=1.0) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  NAVIGATION
+//  NAVIGATION & GLOBALS
 // ═══════════════════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1857,7 +1782,6 @@ function showQuestScreen(questIdx) {
   document.getElementById('q-topic-label').textContent = quest.topic.toUpperCase();
   document.getElementById('q-title-label').textContent = quest.questTitle;
 
-  // Boss panel
   const bossCanvas = document.getElementById('boss-sprite-canvas');
   bossCanvas._animFrame && cancelAnimationFrame(bossCanvas._animFrame);
   bossCanvas._animFrame = null;
@@ -1869,10 +1793,8 @@ function showQuestScreen(questIdx) {
   document.getElementById('boss-lore-text').textContent = quest.bossLore;
   updateBossHpDisplay(quest);
 
-  // Chapters
   renderChapterList(quest);
 
-  // Enable battle if all chapters done
   const allDone = quest.chapters.every((c,i)=>quest.completed[i]);
   const btn = document.getElementById('boss-complete-btn');
   btn.disabled = !allDone;
@@ -1913,23 +1835,18 @@ function renderChapterList(quest) {
   });
 }
 
-// ═══════════════════════════════════════════════════════
-//  HUB RENDER & UI TOGGLES
-// ═══════════════════════════════════════════════════════
 function renderHub() {
   const player = STATE.player;
   const rank = getCurrentRank();
   const nextRank = getNextRank();
   const rankIdx = RANKS.indexOf(rank);
 
-  // Character sprite
   const charCanvas = document.getElementById('char-sprite');
   drawCharSprite(charCanvas, rankIdx);
 
   document.getElementById('char-name').innerHTML = `${player.name || 'Wei Xuan'} <span style="font-size:0.8em;opacity:0.5;">✎</span>`;
   document.getElementById('char-rank').textContent = `${rank.name} · ${rank.en}`;
 
-  // XP
   const xpForNext = nextRank ? nextRank.xp : rank.xp;
   const xpFromCur = player.totalXp - rank.xp;
   const xpNeeded = xpForNext - rank.xp;
@@ -1938,13 +1855,11 @@ function renderHub() {
   document.getElementById('xp-text').textContent = `${player.totalXp} / ${xpForNext} XP`;
   document.getElementById('header-xp').textContent = `${rank.name} ${rank.en} · ${player.totalXp} XP`;
 
-  // Stats
   document.getElementById('stat-quests').textContent = player.questsCreated;
   document.getElementById('stat-chapters').textContent = player.chaptersCompleted;
   document.getElementById('stat-bosses').textContent = player.bossesDefeated;
   document.getElementById('stat-perfect').textContent = player.perfectRuns;
 
-  // World lore
   const lores = [
     `The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. You, ${player.name}, rise from dust — armed only with an empty scroll and an iron will.`,
     `Word spreads through the eastern provinces — a scholar-warrior walks the land, binding demon knowledge to scroll and sword. The warlords take notice.`,
@@ -1957,7 +1872,6 @@ function renderHub() {
   ];
   document.getElementById('world-lore-text').textContent = lores[Math.min(rankIdx, lores.length-1)];
 
-  // Quest grid
   renderQuestGrid();
 }
 
@@ -1996,7 +1910,6 @@ function renderQuestGrid() {
       </div>
     `;
 
-    // Draw mini boss
     const miniCanvas = card.querySelector('.boss-mini-sprite');
     drawBossSprite(miniCanvas, quest, hpRatio);
 
@@ -2022,11 +1935,6 @@ function toggleQuestBoard() {
 //  CREATE QUEST MODAL & MODEL SELECTION
 // ═══════════════════════════════════════════════════════
 function openCreateModal() {
-  if(!STATE.apiKey){
-    openApiModal();
-    showToast('Please set your API key first.');
-    return;
-  }
   document.getElementById('create-modal').classList.add('open');
   document.getElementById('create-form').style.display='block';
   document.getElementById('generating-state').classList.remove('active');
@@ -2061,7 +1969,6 @@ async function createQuest() {
     const parsed = parseJSON(questData);
 
     setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
-    // small delay for dramatic effect
     await delay(600);
 
     const quest = {
@@ -2203,7 +2110,6 @@ async function markChapterComplete() {
   if(quest.completed[chapterIdx]) return;
 
   quest.completed[chapterIdx] = true;
-  // Damage boss
   const dmg = 25;
   quest.bossHp = Math.max(0, quest.bossHp - dmg);
 
@@ -2216,12 +2122,10 @@ async function markChapterComplete() {
   document.getElementById('chapter-complete-btn').style.display='none';
   closeChapterModal();
 
-  // Update quest screen
   renderChapterList(quest);
   updateBossHpDisplay(quest);
   animateBossCanvas(document.getElementById('boss-sprite-canvas'), quest, quest.bossHp/quest.bossMaxHp);
 
-  // Check if all done
   const allDone = quest.chapters.every((_,i)=>quest.completed[i]);
   const btn = document.getElementById('boss-complete-btn');
   btn.disabled = !allDone;
@@ -2323,7 +2227,6 @@ function answerQuestion(chosen, quest) {
 
   if(isRight) STATE.quizScore++;
 
-  // Damage boss
   const dmg = isRight ? Math.floor(100/quest.quiz.questions.length) : 0;
   if(dmg>0){
     quest.bossHp = Math.max(0, quest.bossHp - dmg);
@@ -2349,7 +2252,6 @@ function finishQuiz(quest) {
   quest.bossHp = perfect ? 0 : Math.max(5, quest.bossHp);
 
   if(perfect){
-    // Finishing blow
     document.getElementById('quiz-container').style.display='none';
     document.getElementById('finishing-blow').classList.add('show');
     showDamageFloat('FINAL BLOW', true);
@@ -2367,7 +2269,6 @@ function finishQuiz(quest) {
       `${STATE.quizScore}/${quest.quiz.questions.length} correct. ${quest.bossName} is weakened but not defeated. Study further to achieve perfect mastery.`;
 
     if(STATE.quizScore >= Math.ceil(quest.quiz.questions.length*0.6)){
-      // Passing score — defeat boss
       quest.bossHp = 0;
     }
   }
@@ -2414,12 +2315,8 @@ function showDamageFloat(val, big=false) {
   el.classList.add('show');
 }
 
-// ═══════════════════════════════════════════════════════
-//  RANK CHECK
-// ═══════════════════════════════════════════════════════
 function checkRankUp() {
   const before = RANKS.indexOf(getCurrentRank());
-  // recalculate
   const after = RANKS.indexOf(getCurrentRank());
   if(after > before){
     const rank = RANKS[after];
@@ -2428,45 +2325,21 @@ function checkRankUp() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  API — Gemini
+//  API — Vertex AI in Firebase
 // ═══════════════════════════════════════════════════════
 async function callClaude({system, user}) {
-  if(!STATE.apiKey) throw new Error('No API key set. Click API KEY to configure.');
-
-  const model = STATE.selectedModel;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${STATE.apiKey}`;
-
-  let res;
   try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: system }] },
-        contents: [{ role: 'user', parts: [{ text: user }] }],
-        generationConfig: { maxOutputTokens: 2048, temperature: 0.7 }
-      })
+    const generativeModel = getGenerativeModel(vertexAI, {
+      model: STATE.selectedModel,
+      systemInstruction: system
     });
-  } catch(netErr) {
-    throw new Error('Network error — check your internet connection. (' + netErr.message + ')');
+    
+    const result = await generativeModel.generateContent(user);
+    return result.response.text();
+  } catch (error) {
+    console.error("Vertex AI Generation Error:", error);
+    throw new Error(error.message || "Failed to communicate with the scrolls.");
   }
-
-  if(!res.ok) {
-    let errMsg = 'Gemini API error ' + res.status;
-    try { const e = await res.json(); errMsg = e.error?.message || errMsg; } catch(_) {}
-    if(res.status === 400) throw new Error('Bad request — check model name. ' + errMsg);
-    if(res.status === 403) throw new Error('API key invalid or Gemini API not enabled. Visit aistudio.google.com to get a key.');
-    if(res.status === 429) throw new Error('Rate limit hit — wait a moment and try again.');
-    throw new Error(errMsg);
-  }
-
-  const data = await res.json();
-  const candidate = data.candidates?.[0];
-  if(!candidate) {
-    const reason = data.promptFeedback?.blockReason;
-    throw new Error(reason ? 'Blocked: ' + reason : 'Empty response from Gemini.');
-  }
-  return candidate.content?.parts?.map(p => p.text || '').join('') || '';
 }
 
 function parseJSON(text) {
@@ -2477,22 +2350,6 @@ function parseJSON(text) {
     if(match) return JSON.parse(match[0]);
     throw new Error('Failed to parse JSON response');
   }
-}
-
-// ═══════════════════════════════════════════════════════
-//  API KEY MODAL
-// ═══════════════════════════════════════════════════════
-function openApiModal(){
-  document.getElementById('api-key-input').value=STATE.apiKey||'';
-  document.getElementById('api-modal').classList.add('open');
-}
-function closeApiModal(){ document.getElementById('api-modal').classList.remove('open'); }
-function saveApiKey(){
-  const key=document.getElementById('api-key-input').value.trim();
-  STATE.apiKey=key;
-  sessionStorage.setItem('wuxia_api_key',key);
-  closeApiModal();
-  showToast('API key saved.');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2508,7 +2365,6 @@ function showToast(msg) {
 
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-// Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay=>{
   overlay.addEventListener('click', e=>{
     if(e.target===overlay) {
@@ -2517,19 +2373,28 @@ document.querySelectorAll('.modal-overlay').forEach(overlay=>{
   });
 });
 
+// Bind UI functions to window so they are globally accessible to HTML onclick attributes
+window.showHub = showHub;
+window.openCreateModal = openCreateModal;
+window.closeCreateModal = closeCreateModal;
+window.createQuest = createQuest;
+window.closeChapterModal = closeChapterModal;
+window.markChapterComplete = markChapterComplete;
+window.openBattleModal = openBattleModal;
+window.claimVictory = claimVictory;
+window.renameCharacter = renameCharacter;
+window.toggleQuestBoard = toggleQuestBoard;
+
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
-// Wait for auth state to resolve before loading data
 window.addEventListener('DOMContentLoaded', () => {
-  auth.onAuthStateChanged((user) => {
+  onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is securely signed in invisibly
       USER_ID = user.uid;
       loadState();
     } else {
-      // Not signed in? Generate a secure anonymous session
-      auth.signInAnonymously().catch((error) => {
+      signInAnonymously(auth).catch((error) => {
         console.error("Auth error:", error);
         showToast("Authentication failed. Cannot connect to database.");
       });
@@ -2537,7 +2402,6 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Pre-draw char sprite on title (invisible but warms up)
 setTimeout(()=>{
   const canvas = document.getElementById('char-sprite');
   if(canvas) drawCharSprite(canvas, 0);
