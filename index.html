@@ -29,6 +29,7 @@
   --glow-red:   0 0 20px rgba(176,48,48,0.6);
   --glow-jade:  0 0 20px rgba(46,138,106,0.5);
   --text-muted: rgba(240,230,204,0.38);
+  --path-color: #c8a84b;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -273,7 +274,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 }
 .chapter-item:hover { border-color:rgba(200,168,75,0.35); background:rgba(200,168,75,0.07); }
 .chapter-item.completed { border-left:3px solid var(--jade2); }
-
 .chapter-num {
   width:32px; height:32px; border:1px solid rgba(200,168,75,0.35); display:flex; align-items:center; justify-content:center;
   font-family:'Cinzel Decorative',serif; font-size:0.7rem; color:var(--gold); flex-shrink:0;
@@ -400,8 +400,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   .chapters-panel { overflow-y:visible; border-right:none; border-bottom:1px solid rgba(200,168,75,0.1); }
   .boss-panel { overflow-y:visible; display:flex; padding-bottom:4rem; }
   .quiz-options { grid-template-columns:1fr; }
-  .path-cards { flex-direction:column; }
-  .path-card { width:100%; max-width:300px; }
 }
 </style>
 </head>
@@ -547,12 +545,10 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
         <div class="boss-hp-label"><span>魔力 DEMON HP</span><span id="boss-hp-text">100 / 100</span></div>
         <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div></div>
       </div>
-      
       <div class="boss-lore-box">
         <div class="boss-lore-title">◈ DEMON LORE</div>
         <div class="boss-lore-text" id="boss-lore-text">...</div>
       </div>
-      
       <button class="boss-complete-btn" id="boss-complete-btn" onclick="tryOpenBattle()" disabled>⚔ CHALLENGE THE DEMON</button>
     </div>
   </div>
@@ -698,6 +694,8 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
       <button class="btn-primary" style="width:100%;padding:0.55rem;" onclick="createNewCharacter()">+ NEW ADVENTURE</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:0.7rem;margin-top:1.2rem;">
+      <button class="btn-primary" style="width:100%; background:linear-gradient(135deg,var(--red3),var(--red));" onclick="nukeLibrary()">NUKE REALM LIBRARY</button>
+      
       <button class="btn-primary" style="width:100%;" onclick="signOutUser()">SIGN OUT</button>
       <button style="padding:0.85rem;background:transparent;border:1px solid rgba(200,168,75,0.18);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif;width:100%;" onclick="closeApiModal()">CLOSE</button>
     </div>
@@ -846,7 +844,7 @@ function renderSigils() {
 }
 
 // ════════════════════════════════
-//  FIREBASE / STATE (HEALER)
+//  FIREBASE / STATE
 // ════════════════════════════════
 async function loadState() {
   if(!USER_ID) return;
@@ -872,13 +870,11 @@ async function loadState() {
       isNewUser = true;
     }
   } catch(e) {
-    alert("🔥 DB LOAD ERROR:\n" + (e.message || e));
     console.error("DB load error:", e);
     showToast("Could not load data. Playing locally.");
     isNewUser = true;
   }
 
-  // Load public quests separately so it doesn't crash the main load
   try { await loadPublicQuests(); } catch(e) { console.error("Library load error:", e); }
 
   if (dataLoaded) {
@@ -920,8 +916,6 @@ function syncActiveSaveToState() {
   const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
   if(s) { 
     STATE.player = s.player; 
-    
-    // Auto-heal corrupted quest data
     STATE.quests = (s.quests || []).filter(q => q != null).map(q => ({
         ...q,
         topic: q.topic || 'Unknown Discipline',
@@ -932,7 +926,6 @@ function syncActiveSaveToState() {
         bossHp: typeof q.bossHp === 'number' ? q.bossHp : 100,
         bossMaxHp: typeof q.bossMaxHp === 'number' ? q.bossMaxHp : 100
     }));
-    
     STATE.player.questsCreated = STATE.quests.length;
   }
 }
@@ -953,9 +946,28 @@ async function saveState() {
 async function loadPublicQuests() {
   const q = query(collection(db,"public_quests"), orderBy("id","desc"), limit(12));
   const snap = await getDocs(q);
-  // Store doc.id so we can delete it later
   STATE.publicQuests = snap.docs.map(d=>({ ...d.data(), docId: d.id }));
 }
+
+// ════════════════════════════════
+//  ADMIN TOOL: NUKE PUBLIC LIBRARY
+// ════════════════════════════════
+window.nukeLibrary = async function() {
+    if(!confirm("Are you absolutely sure you want to delete ALL quests in the Realm Library from the database?")) return;
+    let count = 0;
+    for (const q of STATE.publicQuests) {
+        try {
+            await deleteDoc(doc(db, "public_quests", q.docId));
+            count++;
+        } catch(e) {
+            console.error("Failed to delete", q.docId, e);
+        }
+    }
+    STATE.publicQuests = [];
+    renderLibraryGrid();
+    window.closeApiModal();
+    showToast(`Nuked ${count} scrolls from the library.`);
+};
 
 // ════════════════════════════════
 //  AUTH
@@ -1475,7 +1487,11 @@ window.showQuestScreen = function(questIdx) {
 
   document.getElementById('boss-name-display').textContent = quest.bossName || 'Demon';
   document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian';
-  document.getElementById('boss-lore-text').textContent = quest.bossLore || 'A mysterious entity.';
+  
+  // RESTORED THE LORE BOX TEXT UPDATE!
+  const loreBox = document.getElementById('boss-lore-text');
+  if(loreBox) loreBox.textContent = quest.bossLore || 'A mysterious entity.';
+
   updateBossHpDisplay(quest);
   renderChapterList(quest);
 
@@ -1678,7 +1694,7 @@ function renderLibraryGrid() {
         <canvas class="boss-mini-sprite" width="56" height="56"></canvas>
         <div>
           <div class="quest-topic">${(quest.topic || 'Unknown').toUpperCase()}</div>
-          <div class="quest-title" style="padding-right:0;">${quest.questTitle || 'Untitled'}</div>
+          <div class="quest-title" style="padding-right:1.5rem;">${quest.questTitle || 'Untitled'}</div>
         </div>
       </div>
       <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.8rem;">${chapters.length} Chapters of Knowledge</div>
@@ -1718,6 +1734,12 @@ window.deletePublicQuest = async function(docId, idx) {
         console.error(e);
         showToast("Failed to remove scroll.");
     }
+};
+
+window.toggleSection = function(contentId, iconId) {
+  const c=document.getElementById(contentId), ic=document.getElementById(iconId);
+  if(c.style.display==='none'||c.style.display==='') { c.style.display=contentId.includes('library')?'flex':'flex'; ic.textContent='▲'; }
+  else { c.style.display='none'; ic.textContent='▼'; }
 };
 
 function renderSettingsCharacters() {
