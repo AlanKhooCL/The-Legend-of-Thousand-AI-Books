@@ -29,7 +29,6 @@
   --glow-red:   0 0 20px rgba(176,48,48,0.6);
   --glow-jade:  0 0 20px rgba(46,138,106,0.5);
   --text-muted: rgba(240,230,204,0.38);
-  --path-color: #c8a84b;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -41,175 +40,46 @@ html, body {
   color: var(--paper);
 }
 
-/* ═══ CUSTOM CURSOR ═══ */
 body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z' fill='%23c8a84b' opacity='0.8'/%3E%3C/svg%3E") 12 12, default; }
 
-/* ═══ CANVASES ═══ */
-#bg-canvas, #particle-canvas {
-  position:fixed; inset:0; z-index:0;
-  width:100%; height:100%;
-  pointer-events:none;
-}
+#bg-canvas, #particle-canvas { position:fixed; inset:0; z-index:0; width:100%; height:100%; pointer-events:none; }
 #particle-canvas { z-index:1; }
 
-/* ═══ SCREENS ═══ */
 .screen { position:fixed; inset:0; z-index:10; display:none; overflow:hidden; }
 .screen.active { display:flex; }
 
 /* ═══════════════════════════════
    TITLE SCREEN
 ═══════════════════════════════ */
-#screen-title {
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:0;
-}
-
-.title-inkblot {
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  width:600px; height:600px;
-  background:radial-gradient(ellipse, rgba(7,5,10,0) 0%, rgba(7,5,10,0) 40%, rgba(200,168,75,0.03) 60%, rgba(200,168,75,0.08) 75%, rgba(7,5,10,0) 100%);
-  pointer-events:none;
-  animation: breatheRing 6s ease-in-out infinite;
-}
-@keyframes breatheRing {
-  0%,100% { transform:translate(-50%,-50%) scale(1); opacity:0.6; }
-  50% { transform:translate(-50%,-50%) scale(1.15); opacity:1; }
-}
-
-.title-seal {
-  width:150px; height:150px;
-  border-radius:50%;
-  border:2px solid var(--gold);
-  display:flex; align-items:center; justify-content:center;
-  position:relative;
-  margin-bottom:2rem;
-  box-shadow: var(--glow-gold), inset 0 0 40px rgba(200,168,75,0.08);
-  animation: sealFloat 4s ease-in-out infinite;
-}
-.title-seal::before {
-  content:''; position:absolute; inset:7px;
-  border-radius:50%;
-  border:1px solid rgba(200,168,75,0.25);
-}
-.title-seal::after {
-  content:''; position:absolute; inset:14px;
-  border-radius:50%;
-  border:1px dashed rgba(200,168,75,0.12);
-}
-@keyframes sealFloat {
-  0%,100% { transform:translateY(0) rotate(0deg); }
-  50% { transform:translateY(-8px) rotate(3deg); }
-}
-.title-seal-char {
-  font-family:'Ma Shan Zheng',serif;
-  font-size:3.8rem;
-  color:var(--gold);
-  text-shadow: var(--glow-gold);
-  position:relative;z-index:1;
-}
-
-.title-main {
-  font-family:'Cinzel Decorative',serif;
-  font-size:clamp(1.6rem,3.5vw,2.8rem);
-  font-weight:700;
-  letter-spacing:0.25em;
-  color:var(--gold);
-  text-shadow: 0 0 60px rgba(200,168,75,0.5), 0 2px 4px rgba(0,0,0,0.9);
-  margin-bottom:0.4rem;
-  animation: fadeSlideUp 1s ease 0.3s both;
-  text-align:center;
-}
-.title-chinese {
-  font-family:'ZCOOL XiaoWei',serif;
-  font-size:clamp(0.9rem,2vw,1.4rem);
-  color:var(--paper2);
-  letter-spacing:1em;
-  opacity:0.6;
-  animation: fadeSlideUp 1s ease 0.5s both;
-  margin-bottom:2.5rem;
-  text-align:center;
-}
-@keyframes fadeSlideUp {
-  from { opacity:0; transform:translateY(24px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-.title-brushstroke {
-  width:340px; height:8px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 8'%3E%3Cpath d='M0 4 Q85 1 170 4 Q255 7 340 4' stroke='%23c8a84b' stroke-width='1.5' fill='none' opacity='0.5'/%3E%3Cpath d='M20 4 Q100 2 170 4 Q240 6 320 4' stroke='%23c8a84b' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E") center/contain no-repeat;
-  margin:0 auto 2.5rem;
-  animation: fadeSlideUp 1s ease 0.7s both;
-}
-
-.title-lore {
-  max-width:440px;
-  text-align:center;
-  font-size:0.85rem;
-  line-height:2;
-  color:var(--text-muted);
-  font-style:italic;
-  animation: fadeSlideUp 1s ease 0.9s both;
-  margin-bottom:3rem;
-  padding:0 2rem;
-  font-family:'ZCOOL XiaoWei',serif;
-}
-
-.btn-primary {
-  padding:0.9rem 3rem;
-  background:linear-gradient(135deg,#7a1515,#501010);
-  border:1px solid var(--gold);
-  color:var(--gold);
-  font-family:'Cinzel Decorative',serif;
-  font-size:0.8rem;
-  letter-spacing:0.3em;
-  cursor:pointer;
-  transition:all 0.3s;
-  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-  box-shadow: var(--glow-red);
-  animation: fadeSlideUp 1s ease 1.1s both;
-  position:relative;
-  overflow:hidden;
-}
-.btn-primary::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(90deg,transparent,rgba(200,168,75,0.1),transparent);
-  transform:translateX(-100%);
-  transition:transform 0.5s;
-}
+#screen-title { flex-direction:column; align-items:center; justify-content:center; gap:0; }
+.title-inkblot { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(ellipse, rgba(7,5,10,0) 0%, rgba(7,5,10,0) 40%, rgba(200,168,75,0.03) 60%, rgba(200,168,75,0.08) 75%, rgba(7,5,10,0) 100%); pointer-events:none; animation: breatheRing 6s ease-in-out infinite; }
+@keyframes breatheRing { 0%,100% { transform:translate(-50%,-50%) scale(1); opacity:0.6; } 50% { transform:translate(-50%,-50%) scale(1.15); opacity:1; } }
+.title-seal { width:150px; height:150px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:2rem; box-shadow: var(--glow-gold), inset 0 0 40px rgba(200,168,75,0.08); animation: sealFloat 4s ease-in-out infinite; }
+.title-seal::before { content:''; position:absolute; inset:7px; border-radius:50%; border:1px solid rgba(200,168,75,0.25); }
+.title-seal::after { content:''; position:absolute; inset:14px; border-radius:50%; border:1px dashed rgba(200,168,75,0.12); }
+@keyframes sealFloat { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-8px) rotate(3deg); } }
+.title-seal-char { font-family:'Ma Shan Zheng',serif; font-size:3.8rem; color:var(--gold); text-shadow: var(--glow-gold); position:relative;z-index:1; }
+.title-main { font-family:'Cinzel Decorative',serif; font-size:clamp(1.6rem,3.5vw,2.8rem); font-weight:700; letter-spacing:0.25em; color:var(--gold); text-shadow: 0 0 60px rgba(200,168,75,0.5), 0 2px 4px rgba(0,0,0,0.9); margin-bottom:0.4rem; animation: fadeSlideUp 1s ease 0.3s both; text-align:center; }
+.title-chinese { font-family:'ZCOOL XiaoWei',serif; font-size:clamp(0.9rem,2vw,1.4rem); color:var(--paper2); letter-spacing:1em; opacity:0.6; animation: fadeSlideUp 1s ease 0.5s both; margin-bottom:2.5rem; text-align:center; }
+@keyframes fadeSlideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+.title-brushstroke { width:340px; height:8px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 8'%3E%3Cpath d='M0 4 Q85 1 170 4 Q255 7 340 4' stroke='%23c8a84b' stroke-width='1.5' fill='none' opacity='0.5'/%3E%3Cpath d='M20 4 Q100 2 170 4 Q240 6 320 4' stroke='%23c8a84b' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E") center/contain no-repeat; margin:0 auto 2.5rem; animation: fadeSlideUp 1s ease 0.7s both; }
+.title-lore { max-width:440px; text-align:center; font-size:0.85rem; line-height:2; color:var(--text-muted); font-style:italic; animation: fadeSlideUp 1s ease 0.9s both; margin-bottom:3rem; padding:0 2rem; font-family:'ZCOOL XiaoWei',serif; }
+.btn-primary { padding:0.9rem 3rem; background:linear-gradient(135deg,#7a1515,#501010); border:1px solid var(--gold); color:var(--gold); font-family:'Cinzel Decorative',serif; font-size:0.8rem; letter-spacing:0.3em; cursor:pointer; transition:all 0.3s; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); box-shadow: var(--glow-red); animation: fadeSlideUp 1s ease 1.1s both; position:relative; overflow:hidden; }
+.btn-primary::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(200,168,75,0.1),transparent); transform:translateX(-100%); transition:transform 0.5s; }
 .btn-primary:hover::before { transform:translateX(100%); }
-.btn-primary:hover {
-  background:linear-gradient(135deg,#9a1a1a,#7a1515);
-  box-shadow: var(--glow-red), 0 0 50px rgba(139,26,26,0.3);
-  transform:translateY(-2px);
-}
+.btn-primary:hover { background:linear-gradient(135deg,#9a1a1a,#7a1515); box-shadow: var(--glow-red), 0 0 50px rgba(139,26,26,0.3); transform:translateY(-2px); }
 .btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
-
 #auth-buttons { display:none; flex-direction:column; width:100%; max-width:300px; animation: fadeSlideUp 1s ease 1.1s both; }
 
 /* ═══════════════════════════════
    PATH SELECTION SCREEN
 ═══════════════════════════════ */
-#screen-path {
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start; 
-  padding: 4rem 1.5rem;
-  overflow-y: auto;
-}
+#screen-path { flex-direction:column; align-items:center; justify-content:flex-start; padding: 4rem 1.5rem; overflow-y: auto; }
 .path-header { text-align:center; margin-bottom: 2rem; }
-.path-title { font-family:'Ma Shan Zheng',serif; font-size:clamp(1.4rem,3vw,2rem); color:var(--gold); letter-spacing:0.3em; margin-bottom:0.5rem; }
+.path-title { font-family:'ZCOOL XiaoWei',serif; font-size:clamp(1.4rem,3vw,2rem); color:var(--gold); letter-spacing:0.3em; margin-bottom:0.5rem; }
 .path-subtitle { font-size:0.75rem; color:var(--text-muted); letter-spacing:0.25em; }
-
 .path-cards { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; margin-bottom: 2rem; }
-.path-card {
-  width:240px; background:linear-gradient(160deg,rgba(14,10,15,0.95),rgba(7,5,10,0.98));
-  border:1px solid rgba(200,168,75,0.2); padding:2rem 1.5rem; cursor:pointer; transition:all 0.4s;
-  position:relative; overflow:hidden; text-align:center; clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
-}
+.path-card { width:240px; background:linear-gradient(160deg,rgba(14,10,15,0.95),rgba(7,5,10,0.98)); border:1px solid rgba(200,168,75,0.2); padding:2rem 1.5rem; cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden; text-align:center; clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
 .path-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; transition:opacity 0.3s; opacity:0; }
 .path-card.warrior::before { background:linear-gradient(90deg,var(--red),var(--gold),var(--red)); }
 .path-card.scholar::before { background:linear-gradient(90deg,var(--jade),var(--gold),var(--jade)); }
@@ -217,7 +87,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .path-card:hover::before { opacity:1; }
 .path-card.warrior:hover { box-shadow:var(--glow-red), 0 20px 60px rgba(122,21,21,0.3); }
 .path-card.scholar:hover { box-shadow:var(--glow-jade), 0 20px 60px rgba(30,92,74,0.3); }
-
 .path-card-icon { width:120px; height:120px; margin:0 auto 1.2rem; }
 .path-card-name { font-family:'Ma Shan Zheng',serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:0.3rem; }
 .path-card-en { font-size:0.65rem; letter-spacing:0.4em; color:var(--text-muted); margin-bottom:0.8rem; }
@@ -225,71 +94,69 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .path-card-destiny { font-size:0.62rem; color:var(--gold2); letter-spacing:0.2em; padding:0.4rem 0.8rem; border:1px solid rgba(200,168,75,0.25); }
 .path-card.warrior .path-card-destiny { border-color:rgba(176,48,48,0.4); color:var(--red2); }
 .path-card.scholar .path-card-destiny { border-color:rgba(46,138,106,0.4); color:var(--jade2); }
-
-.personality-float {
-  position:absolute; top:0.6rem; right:0.6rem; font-size:0.55rem; letter-spacing:0.15em;
-  padding:0.2rem 0.5rem; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.2); color:var(--text-muted);
-}
+.personality-float { position:absolute; top:0.6rem; right:0.6rem; font-size:0.55rem; letter-spacing:0.15em; padding:0.2rem 0.5rem; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.2); color:var(--text-muted); }
 
 /* ═══════════════════════════════
-   MAIN HUB
+   HUB UI (TABBED NAVIGATION)
 ═══════════════════════════════ */
-#screen-hub { flex-direction:column; overflow-y:auto; }
+#screen-hub { flex-direction:column; overflow:hidden; }
 
 .hub-header {
   display:flex; align-items:center; justify-content:space-between;
-  padding:1rem 2rem; border-bottom:1px solid rgba(200,168,75,0.15);
+  padding:1rem 1.5rem; border-bottom:1px solid rgba(200,168,75,0.15);
   background:linear-gradient(180deg,rgba(7,5,10,0.97),rgba(7,5,10,0.85));
-  backdrop-filter:blur(12px); position:sticky; top:0; z-index:20; flex-shrink:0;
+  backdrop-filter:blur(12px); position:relative; z-index:20; flex-shrink:0;
 }
+.hub-title { font-family:'Ma Shan Zheng',serif; font-size:1.3rem; color:var(--gold); letter-spacing:0.3em; }
 
-.hub-title { font-family:'Ma Shan Zheng',serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.35em; }
+.hub-tabs {
+  display: flex;
+  background: rgba(7,5,10,0.98);
+  border-bottom: 1px solid rgba(200,168,75,0.2);
+  position: relative; z-index: 15;
+  flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1; padding: 1rem 0; text-align: center;
+  color: var(--text-muted); font-family: 'Cinzel Decorative', serif;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+  cursor: pointer; transition: all 0.3s;
+  border-bottom: 2px solid transparent;
+}
+.tab-btn.active {
+  color: var(--gold); border-bottom-color: var(--gold);
+  background: rgba(200,168,75,0.05);
+}
 
 .hub-body {
-  display:grid; grid-template-columns:270px 1fr; gap:0; flex:1; min-height:0; overflow:hidden;
+  display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;
 }
 
-/* ── Character Panel ── */
-.char-panel {
-  border-right:1px solid rgba(200,168,75,0.12); padding:1.8rem 1.2rem;
+.tab-pane {
+  display: none; flex: 1; overflow-y: auto; padding: 1.5rem;
+}
+.tab-pane.active {
+  display: block;
+}
+
+/* ── Tab 1: Character Profile ── */
+.char-panel-inner {
+  max-width: 400px; margin: 0 auto;
   display:flex; flex-direction:column; align-items:center; gap:1.2rem;
-  background:linear-gradient(180deg,rgba(7,5,10,0.9),rgba(14,10,15,0.95)); overflow-y:auto;
 }
-
-.char-stage {
-  width:160px; height:170px;
-  position:relative;
-  display:flex; align-items:center; justify-content:center;
-}
-
-.char-aura {
-  position:absolute; inset:-15px; border-radius:50%;
-  animation: auraPulse 4s ease-in-out infinite;
-}
-@keyframes auraPulse {
-  0%,100% { opacity:0.5; transform:scale(1); }
-  50% { opacity:1; transform:scale(1.05); }
-}
-
+.char-stage { width:160px; height:170px; position:relative; display:flex; align-items:center; justify-content:center; }
+.char-aura { position:absolute; inset:-15px; border-radius:50%; animation: auraPulse 4s ease-in-out infinite; }
+@keyframes auraPulse { 0%,100% { opacity:0.5; transform:scale(1); } 50% { opacity:1; transform:scale(1.05); } }
 .char-sprite { width:140px; height:160px; position:relative; z-index:1; image-rendering:pixelated; }
-
-.personality-bubble {
-  position:absolute; top:-10px; right:-20px; background:rgba(14,10,15,0.95); border:1px solid rgba(200,168,75,0.3);
-  border-radius:12px 12px 12px 0; padding:0.25rem 0.6rem; font-size:0.6rem; color:var(--gold2); letter-spacing:0.1em;
-  white-space:nowrap; animation:bubbleFade 4s ease-in-out infinite; z-index:5;
-}
+.personality-bubble { position:absolute; top:-10px; right:-20px; background:rgba(14,10,15,0.95); border:1px solid rgba(200,168,75,0.3); border-radius:12px 12px 12px 0; padding:0.25rem 0.6rem; font-size:0.6rem; color:var(--gold2); letter-spacing:0.1em; white-space:nowrap; animation:bubbleFade 4s ease-in-out infinite; z-index:5; }
 @keyframes bubbleFade { 0%,100%{opacity:0;transform:translateY(4px);} 15%,85%{opacity:1;transform:translateY(0);} }
-
 .char-name-row { display:flex; align-items:center; gap:0.5rem; }
 .char-name { font-family:'Ma Shan Zheng',serif; font-size:1.25rem; color:var(--gold); letter-spacing:0.2em; cursor:pointer; transition:opacity 0.2s; }
 .char-name:hover { opacity:0.75; }
-
 .char-path-badge { font-size:0.55rem; letter-spacing:0.2em; padding:0.15rem 0.5rem; border:1px solid currentColor; opacity:0.7; }
 .char-path-badge.warrior { color:var(--red2); }
 .char-path-badge.scholar { color:var(--jade2); }
-
 .char-rank { font-size:0.65rem; color:var(--text-muted); letter-spacing:0.3em; text-align:center; margin-top:-0.5rem; }
-
 .xp-section { width:100%; }
 .xp-label { display:flex; justify-content:space-between; font-size:0.6rem; color:var(--text-muted); letter-spacing:0.12em; margin-bottom:0.35rem; }
 .xp-bar { height:5px; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.15); overflow:hidden; }
@@ -299,42 +166,33 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .xp-fill.warrior::after { background:var(--gold2); box-shadow:0 0 8px var(--gold); }
 .xp-fill.scholar { background:linear-gradient(90deg,var(--jade),var(--jade3)); }
 .xp-fill.scholar::after { background:var(--jade3); box-shadow:0 0 8px var(--jade2); }
-
 .stat-grid { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
 .stat-box { background:rgba(200,168,75,0.04); border:1px solid rgba(200,168,75,0.08); padding:0.55rem; text-align:center; transition:all 0.3s; }
 .stat-box:hover { background:rgba(200,168,75,0.08); border-color:rgba(200,168,75,0.2); }
 .stat-val { font-family:'Cinzel Decorative',serif; font-size:1.05rem; color:var(--gold); }
 .stat-lbl { font-size:0.5rem; color:var(--text-muted); letter-spacing:0.2em; margin-top:0.15rem; }
-
 .sigil-row { width:100%; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.08); border-left:3px solid var(--violet2); padding:0.8rem; }
 .sigil-title { font-size:0.55rem; letter-spacing:0.3em; color:var(--violet2); margin-bottom:0.5rem; }
-.sigil-slots { display:flex; gap:0.4rem; flex-wrap:wrap; }
+.sigil-slots { display:flex; gap:0.4rem; flex-wrap:wrap; justify-content: center; }
 .sigil-slot { width:28px; height:28px; border:1px solid rgba(112,64,176,0.3); display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:all 0.3s; cursor:help; }
 .sigil-slot.empty { opacity:0.2; }
 .sigil-slot.filled { border-color:var(--violet2); box-shadow:0 0 8px rgba(112,64,176,0.4); }
-
 .world-lore-box { width:100%; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.08); border-left:3px solid var(--red); padding:0.9rem; }
 .world-lore-title { font-size:0.55rem; letter-spacing:0.3em; color:var(--red2); margin-bottom:0.4rem; }
 .world-lore-text { font-size:0.68rem; line-height:1.9; color:var(--text-muted); font-style:italic; }
 
-/* ── Quest Board ── */
-.quest-board { padding:1.8rem; overflow-y:auto; display:flex; flex-direction:column; }
-.section-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.2rem; padding-bottom:0.4rem; cursor:pointer; user-select:none; }
-.section-title { font-family:'Ma Shan Zheng',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.3em; white-space:nowrap; }
-.section-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(200,168,75,0.25),transparent); }
-
+/* ── Tab 2 & 3: Boards ── */
 .btn-new-quest {
   display:flex; align-items:center; gap:1rem; padding:1.1rem 1.4rem;
   background:linear-gradient(135deg,rgba(122,21,21,0.12),rgba(122,21,21,0.04));
-  border:1px dashed rgba(200,168,75,0.25); cursor:pointer; transition:all 0.3s; color:var(--paper2); font-family:'Noto Serif SC',serif; margin-bottom:1rem;
+  border:1px dashed rgba(200,168,75,0.25); cursor:pointer; transition:all 0.3s; color:var(--paper2); font-family:'Noto Serif SC',serif; margin-bottom:1.5rem;
 }
 .btn-new-quest:hover { background:linear-gradient(135deg,rgba(122,21,21,0.28),rgba(122,21,21,0.1)); border-color:var(--gold); box-shadow:var(--glow-red); }
 .btn-new-quest .plus {
   width:38px; height:38px; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center;
   font-size:1.4rem; color:var(--gold); flex-shrink:0; clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
 }
-
-.quest-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:0.9rem; }
+.quest-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:1rem; align-items:start; align-content: start; }
 .quest-card {
   background:linear-gradient(135deg,rgba(14,10,15,0.92),rgba(7,5,10,0.97)); border:1px solid rgba(200,168,75,0.12);
   padding:1.3rem; cursor:pointer; transition:all 0.35s; position:relative; overflow:hidden;
@@ -342,18 +200,15 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .quest-card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,var(--red),var(--gold),var(--red)); opacity:0; transition:opacity 0.3s; }
 .quest-card:hover { border-color:rgba(200,168,75,0.35); transform:translateY(-4px); }
 .quest-card:hover::before { opacity:1; }
-
 .quest-boss-preview { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.8rem; }
 .boss-mini-sprite { width:56px; height:56px; flex-shrink:0; }
 .quest-topic { font-size:0.58rem; color:var(--red2); letter-spacing:0.3em; margin-bottom:0.25rem; }
 .quest-title { font-family:'Ma Shan Zheng',serif; font-size:0.95rem; color:var(--gold); line-height:1.4; padding-right:1.5rem; }
-
 .chapter-progress { display:flex; gap:3px; margin-top:0.7rem; }
 .chapter-pip { flex:1; height:3px; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.12); transition:all 0.5s; }
 .chapter-pip.done { background:var(--gold); border-color:var(--gold); }
 .chapter-pip.active { background:var(--red2); border-color:var(--red2); animation:pipPulse 1s ease-in-out infinite; }
 @keyframes pipPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-
 .quest-status { margin-top:0.7rem; display:flex; justify-content:space-between; align-items:center; }
 .quest-hp-bar { flex:1; height:3px; background:rgba(122,21,21,0.2); margin-right:0.5rem; }
 .quest-hp-fill { height:100%; background:linear-gradient(90deg,var(--red2),var(--red3)); transition:width 0.5s; }
@@ -377,7 +232,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 
 .modal-title { font-family:'Ma Shan Zheng',serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:0.25rem; }
 .modal-subtitle { font-size:0.62rem; color:var(--text-muted); letter-spacing:0.2em; margin-bottom:1.8rem; }
-
 .form-group { margin-bottom:1.4rem; }
 .form-label { display:block; font-size:0.6rem; letter-spacing:0.3em; color:var(--gold); margin-bottom:0.5rem; }
 .form-input, .form-textarea, .form-select {
@@ -416,7 +270,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   cursor:pointer; font-family:'Noto Serif SC',serif; font-size:0.7rem; letter-spacing:0.1em; transition:all 0.2s;
 }
 .back-btn:hover { border-color:var(--gold); color:var(--gold); }
-
 .quest-body { display:grid; grid-template-columns:1fr 320px; flex:1; overflow:hidden; }
 .chapters-panel { padding:1.8rem; overflow-y:auto; border-right:1px solid rgba(200,168,75,0.12); }
 .chapter-list { display:flex; flex-direction:column; gap:0.7rem; }
@@ -427,7 +280,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 }
 .chapter-item:hover { border-color:rgba(200,168,75,0.35); background:rgba(200,168,75,0.07); }
 .chapter-item.completed { border-left:3px solid var(--jade2); }
-
 .chapter-num {
   width:32px; height:32px; border:1px solid rgba(200,168,75,0.35); display:flex; align-items:center; justify-content:center;
   font-family:'Cinzel Decorative',serif; font-size:0.7rem; color:var(--gold); flex-shrink:0;
@@ -445,10 +297,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 }
 .boss-stage { width:180px; height:190px; position:relative; display:flex; align-items:center; justify-content:center; }
 .boss-aura { position:absolute; inset:0; border-radius:50%; animation:bossAura 2.5s ease-in-out infinite; }
-@keyframes bossAura {
-  0%,100% { box-shadow:0 0 30px rgba(122,21,21,0.35), 0 0 70px rgba(122,21,21,0.12); }
-  50% { box-shadow:0 0 70px rgba(122,21,21,0.6), 0 0 130px rgba(122,21,21,0.2); }
-}
+@keyframes bossAura { 0%,100% { box-shadow:0 0 30px rgba(122,21,21,0.35), 0 0 70px rgba(122,21,21,0.12); } 50% { box-shadow:0 0 70px rgba(122,21,21,0.6), 0 0 130px rgba(122,21,21,0.2); } }
 .boss-sprite-canvas { width:170px; height:170px; position:relative; z-index:1; }
 .boss-name-display { font-family:'Ma Shan Zheng',serif; font-size:1.2rem; color:var(--red2); text-align:center; letter-spacing:0.2em; text-shadow:var(--glow-red); }
 .boss-title-display { font-size:0.6rem; color:var(--text-muted); letter-spacing:0.3em; text-align:center; margin-top:-0.7rem; }
@@ -456,11 +305,9 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .boss-hp-label { display:flex; justify-content:space-between; font-size:0.58rem; color:var(--text-muted); letter-spacing:0.12em; margin-bottom:0.35rem; }
 .boss-hp-bar { height:9px; background:rgba(122,21,21,0.18); border:1px solid rgba(122,21,21,0.35); overflow:hidden; position:relative; }
 .boss-hp-fill { height:100%; background:linear-gradient(90deg,#3a0a0a,var(--red2),var(--red3)); transition:width 1.2s ease; }
-
 .boss-lore-box { width:100%; background:rgba(122,21,21,0.06); border:1px solid rgba(122,21,21,0.2); border-left:3px solid var(--red); padding:0.8rem; }
 .boss-lore-title { font-size:0.55rem; letter-spacing:0.3em; color:var(--red2); margin-bottom:0.35rem; }
 .boss-lore-text { font-size:0.68rem; line-height:1.8; color:var(--text-muted); font-style:italic; }
-
 .boss-complete-btn {
   width:100%; padding:0.85rem; background:linear-gradient(135deg,rgba(122,21,21,0.28),rgba(80,10,10,0.45));
   border:1px solid var(--red); color:var(--gold); font-family:'Cinzel Decorative',serif; font-size:0.7rem;
@@ -514,13 +361,12 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .quiz-option.wrong   { border-color:var(--red2);  background:rgba(122,21,21,0.2); color:var(--red2); }
 .quiz-option:disabled { cursor:not-allowed; }
 .quiz-feedback { font-style:italic; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.8rem; min-height:1.4rem; }
-
 .finishing-blow { display:none; flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:1.5rem; flex:1; }
 .finishing-blow.show { display:flex; }
 .finishing-text { font-family:'Ma Shan Zheng',serif; font-size:2rem; color:var(--gold); text-shadow:var(--glow-gold); animation:finishPulse 0.5s ease infinite alternate; }
 
 /* ═══════════════════════════════
-   CELESTIAL GAMBIT & FATE SCROLL MODALS
+   GAMBIT & FATE & SETTINGS MODALS
 ═══════════════════════════════ */
 #gambit-modal .modal-box, #fate-modal .modal-box, #api-modal .modal-box { max-width:420px; text-align:center; }
 .gambit-coin {
@@ -543,8 +389,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   padding:0.75rem 1.4rem; font-size:0.78rem; color:var(--gold);
   letter-spacing:0.1em; z-index:999; opacity:0; transition:opacity 0.4s;
   pointer-events:none; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
-  white-space:normal; width:90%; max-width:400px; text-align:center; line-height:1.4;
-  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  white-space:normal; width:90%; max-width:380px; text-align:center; line-height:1.5; box-shadow:0 8px 30px rgba(0,0,0,0.6);
 }
 #toast.show { opacity:1; }
 
@@ -554,14 +399,10 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 
 /* ─── Responsive ─── */
 @media(max-width:768px) {
-  .hub-body { grid-template-columns:1fr; }
-  .char-panel { border-right:none; border-bottom:1px solid rgba(200,168,75,0.12); flex-direction:row; flex-wrap:wrap; }
   .quest-body { grid-template-columns:1fr; overflow-y:auto; display:block; }
   .chapters-panel { overflow-y:visible; border-right:none; border-bottom:1px solid rgba(200,168,75,0.1); }
   .boss-panel { overflow-y:visible; display:flex; padding-bottom:4rem; }
   .quiz-options { grid-template-columns:1fr; }
-  .path-cards { flex-direction:column; }
-  .path-card { width:100%; max-width:300px; }
 }
 </style>
 </head>
@@ -612,78 +453,74 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
       <div class="path-card-destiny">📜 DESTINED TO BECOME: Zhuge Liang — 臥龍先生</div>
     </div>
   </div>
-  <div style="text-align:center;font-size:0.65rem;color:var(--text-muted);letter-spacing:0.2em;margin-top:1rem;margin-bottom:2rem;">THIS CHOICE IS PERMANENT · CHOOSE WISELY</div>
+  <div style="text-align:center;font-size:0.65rem;color:var(--text-muted);letter-spacing:0.2em;margin-top:1rem;margin-bottom:2rem;">
+      <button id="path-cancel-btn" style="display:none; background:none; border:1px solid rgba(200,168,75,0.4); color:var(--text-muted); padding: 0.5rem 1.5rem; cursor:pointer; font-family:'Noto Serif SC',serif; margin: 0 auto 1rem;" onclick="cancelPathSelection()">CANCEL</button>
+      THIS CHOICE IS PERMANENT · CHOOSE WISELY
+  </div>
 </div>
 
 <div id="screen-hub" class="screen">
   <div class="hub-header">
-    <div class="hub-title">萬卷書 · Quest Board</div>
-    <div style="display:flex;align-items:center;gap:0.8rem;">
-      <button class="btn-primary" style="padding:0.45rem 1rem;font-size:0.65rem;" onclick="openApiModal()">⚙ SETTINGS</button>
-    </div>
+    <div class="hub-title">萬卷書 · Hub</div>
+    <button class="btn-primary" style="padding:0.45rem 1rem;font-size:0.65rem;" onclick="openApiModal()">⚙ SETTINGS</button>
   </div>
+  
+  <div class="hub-tabs">
+    <div class="tab-btn active" onclick="switchTab('tab-profile')" data-target="tab-profile">SPIRIT</div>
+    <div class="tab-btn" onclick="switchTab('tab-quests')" data-target="tab-quests">SCROLLS</div>
+    <div class="tab-btn" onclick="switchTab('tab-library')" data-target="tab-library">LIBRARY</div>
+  </div>
+
   <div class="hub-body">
-    <div class="char-panel">
-      <div class="char-stage">
-        <div class="char-aura" id="char-aura"></div>
-        <canvas class="char-sprite" id="char-sprite" width="140" height="160"></canvas>
-        <div class="personality-bubble" id="personality-bubble">...</div>
-      </div>
-      <div class="char-name-row">
-        <div class="char-name" id="char-name" onclick="renameCharacter()">Wei Xuan ✎</div>
-      </div>
-      <div class="char-path-badge" id="char-path-badge" style="margin-top:-0.5rem; margin-bottom: 0.5rem;">WARRIOR</div>
-      <div class="char-rank" id="char-rank">凡人 · Mortal</div>
-      <div class="xp-section">
-        <div class="xp-label"><span>CULTIVATION</span><span id="xp-text">0 / 100 XP</span></div>
-        <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-val" id="stat-quests">0</div><div class="stat-lbl">QUESTS</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-chapters">0</div><div class="stat-lbl">CHAPTERS</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-bosses">0</div><div class="stat-lbl">DEFEATED</div></div>
-        <div class="stat-box"><div class="stat-val" id="stat-perfect">0</div><div class="stat-lbl">PERFECT</div></div>
-      </div>
-      <div class="sigil-row">
-        <div class="sigil-title">◈ CELESTIAL SIGILS</div>
-        <div class="sigil-slots" id="sigil-slots"></div>
-      </div>
-      <div class="world-lore-box">
-        <div class="world-lore-title">◈ REALM CHRONICLES</div>
-        <div class="world-lore-text" id="world-lore-text">The fractured realm of Jiuzhou trembles. Six warlords claim the mandate of heaven. You rise from dust — armed only with an empty scroll and an iron will.</div>
+    <div id="tab-profile" class="tab-pane active">
+      <div class="char-panel-inner">
+          <div class="char-stage">
+            <div class="char-aura" id="char-aura"></div>
+            <canvas class="char-sprite" id="char-sprite" width="140" height="160"></canvas>
+            <div class="personality-bubble" id="personality-bubble">...</div>
+          </div>
+          <div class="char-name-row">
+            <div class="char-name" id="char-name" onclick="renameCharacter()">Wei Xuan ✎</div>
+          </div>
+          <div class="char-path-badge" id="char-path-badge" style="margin-top:-0.5rem; margin-bottom: 0.5rem;">WARRIOR</div>
+          <div class="char-rank" id="char-rank">凡人 · Mortal</div>
+          <div class="xp-section">
+            <div class="xp-label"><span>CULTIVATION</span><span id="xp-text">0 / 100 XP</span></div>
+            <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-box"><div class="stat-val" id="stat-quests">0</div><div class="stat-lbl">QUESTS</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-chapters">0</div><div class="stat-lbl">CHAPTERS</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-bosses">0</div><div class="stat-lbl">DEFEATED</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-perfect">0</div><div class="stat-lbl">PERFECT</div></div>
+          </div>
+          <div class="sigil-row">
+            <div class="sigil-title">◈ CELESTIAL SIGILS</div>
+            <div class="sigil-slots" id="sigil-slots"></div>
+          </div>
+          <div class="world-lore-box">
+            <div class="world-lore-title">◈ REALM CHRONICLES</div>
+            <div class="world-lore-text" id="world-lore-text">The fractured realm of Jiuzhou trembles...</div>
+          </div>
       </div>
     </div>
 
-    <div class="quest-board">
-      <div>
-        <div class="section-header" onclick="toggleSection('quest-board-content','quest-toggle-icon')">
-          <div class="section-title">活躍任務 · Active Quests</div>
-          <div class="section-line"></div>
-          <div id="quest-toggle-icon" style="color:var(--gold);font-size:0.75rem;">▼</div>
-        </div>
-        <div id="quest-board-content" style="display:none;flex-direction:column;gap:1.5rem;">
-          <button class="btn-new-quest" onclick="openCreateModal()">
-            <div class="plus">+</div>
-            <div>
-              <div style="font-size:0.68rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.25rem;">ISSUE NEW QUEST</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);">Seek knowledge, summon a guardian demon, earn your rank</div>
-            </div>
-          </button>
-          <div id="quest-grid" class="quest-grid"></div>
-        </div>
-      </div>
-      <div style="margin-top:2.5rem;">
-        <div class="section-header" onclick="toggleSection('library-board-content','library-toggle-icon')">
-          <div class="section-title">藏書閣 · Realm Library</div>
-          <div class="section-line"></div>
-          <div id="library-toggle-icon" style="color:var(--gold);font-size:0.75rem;">▲</div>
-        </div>
-        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:1.2rem;font-style:italic;">Quests summoned by scholars across the realm. Click to add to your Active Quests.</div>
-        <div id="library-board-content" style="display:flex;flex-direction:column;gap:1.5rem;">
-          <div id="library-grid" class="quest-grid"></div>
-        </div>
-      </div>
+    <div id="tab-quests" class="tab-pane">
+        <button class="btn-new-quest" onclick="openCreateModal()">
+          <div class="plus">+</div>
+          <div>
+            <div style="font-size:0.68rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.25rem;">ISSUE NEW QUEST</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Seek knowledge, summon a guardian demon</div>
+          </div>
+        </button>
+        <div id="quest-grid" class="quest-grid"></div>
     </div>
+
+    <div id="tab-library" class="tab-pane">
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:1.5rem;font-style:italic;text-align:center;">Quests summoned by scholars across the realm. Click to add to your Active Quests.</div>
+        <div id="library-grid" class="quest-grid"></div>
+    </div>
+
   </div>
 </div>
 
@@ -697,10 +534,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
   <div class="quest-body">
     <div class="chapters-panel">
-      <div class="section-header" style="cursor:default;">
-        <div class="section-title">章節 · Chapters</div>
-        <div class="section-line"></div>
-      </div>
+      <div style="font-family:'Ma Shan Zheng',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1rem;">章節 · Chapters</div>
       <div class="chapter-list" id="chapter-list"></div>
     </div>
     <div class="boss-panel" id="boss-panel">
@@ -714,10 +548,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
         <div class="boss-hp-label"><span>魔力 DEMON HP</span><span id="boss-hp-text">100 / 100</span></div>
         <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div></div>
       </div>
-      <div class="boss-lore-box">
-        <div class="boss-lore-title">◈ DEMON LORE</div>
-        <div class="boss-lore-text" id="boss-lore-text">...</div>
-      </div>
       <button class="boss-complete-btn" id="boss-complete-btn" onclick="tryOpenBattle()" disabled>⚔ CHALLENGE THE DEMON</button>
     </div>
   </div>
@@ -726,15 +556,15 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 <div class="modal-overlay" id="create-modal">
   <div class="modal-box">
     <div class="modal-title">召喚任務</div>
-    <div class="modal-subtitle">SUMMON A NEW QUEST · BIND A DEMON TO KNOWLEDGE</div>
+    <div class="modal-subtitle">SUMMON A NEW QUEST · BIND A DEMON</div>
     <div id="create-form">
       <div class="form-group">
         <label class="form-label">◈ TOPIC / SUBJECT TO STUDY</label>
-        <input class="form-input" id="topic-input" placeholder="e.g. Machine Learning, Ancient Rome, Python Async..." />
+        <input class="form-input" id="topic-input" placeholder="e.g. Machine Learning, Ancient Rome..." />
       </div>
       <div class="form-group">
         <label class="form-label">◈ LEARNING OBJECTIVE (optional)</label>
-        <textarea class="form-textarea" id="objective-input" placeholder="What should the learner understand? Any specific angle?"></textarea>
+        <textarea class="form-textarea" id="objective-input" placeholder="What should the learner understand?"></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">◈ NUMBER OF CHAPTERS</label>
@@ -874,7 +704,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 const firebaseConfig = {
@@ -955,20 +785,9 @@ function getNextRank() {
   return idx < ranks.length-1 ? ranks[idx+1] : null;
 }
 
-const WARRIOR_QUOTES = [
-  "I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.",
-  "They said I couldn't. Watch me.","Pain is just weakness leaving the body.","DRAW YOUR SWORD!",
-  "Knowledge AND strength!","The strongest earn the right to know."
-];
-const SCHOLAR_QUOTES = [
-  "Fascinating. Completely predictable.","I had calculated this outcome.","Knowledge is the sharpest blade.",
-  "Patience is a weapon, fool.","Three steps ahead. Always.","Your demon is already defeated.",
-  "I've read this scroll before.","The wise man bends the wind."
-];
-function getRandomQuote() {
-  const quotes = STATE.player?.path==='scholar' ? SCHOLAR_QUOTES : WARRIOR_QUOTES;
-  return quotes[Math.floor(Math.random()*quotes.length)];
-}
+const WARRIOR_QUOTES = ["I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.","They said I couldn't. Watch me.","Pain is just weakness leaving the body.","DRAW YOUR SWORD!","Knowledge AND strength!","The strongest earn the right to know."];
+const SCHOLAR_QUOTES = ["Fascinating. Completely predictable.","I had calculated this outcome.","Knowledge is the sharpest blade.","Patience is a weapon, fool.","Three steps ahead. Always.","Your demon is already defeated.","I've read this scroll before.","The wise man bends the wind."];
+function getRandomQuote() { return (STATE.player?.path==='scholar' ? SCHOLAR_QUOTES : WARRIOR_QUOTES)[Math.floor(Math.random()*8)]; }
 
 let personalityInterval = null;
 function startPersonalityQuotes() {
@@ -982,18 +801,10 @@ function startPersonalityQuotes() {
 
 const SIGILS = ['龙','凤','虎','玄','雷','火','水','木','金','土','道','德'];
 const SIGIL_TOOLTIPS = {
-  '龙':'Dragon Sigil — A perfect mind conquers all',
-  '凤':'Phoenix Sigil — Risen from ash of failure',
-  '虎':'Tiger Sigil — Ferocity of absolute mastery',
-  '玄':'Mystic Sigil — Knowledge beyond the mortal realm',
-  '雷':'Thunder Sigil — Swift and decisive learning',
-  '火':'Flame Sigil — Burning passion for wisdom',
-  '水':'Water Sigil — Adapts to all knowledge',
-  '木':'Wood Sigil — Rooted and ever-growing',
-  '金':'Gold Sigil — Refined through many battles',
-  '土':'Earth Sigil — Foundation of all understanding',
-  '道':'Dao Sigil — On the path of enlightenment',
-  '德':'Virtue Sigil — Knowledge wielded with righteousness',
+  '龙':'Dragon Sigil — A perfect mind conquers all', '凤':'Phoenix Sigil — Risen from ash of failure', '虎':'Tiger Sigil — Ferocity of absolute mastery',
+  '玄':'Mystic Sigil — Knowledge beyond the mortal realm', '雷':'Thunder Sigil — Swift and decisive learning', '火':'Flame Sigil — Burning passion for wisdom',
+  '水':'Water Sigil — Adapts to all knowledge', '木':'Wood Sigil — Rooted and ever-growing', '金':'Gold Sigil — Refined through many battles',
+  '土':'Earth Sigil — Foundation of all understanding', '道':'Dao Sigil — On the path of enlightenment', '德':'Virtue Sigil — Knowledge wielded with righteousness',
 };
 
 function awardSigil() {
@@ -1030,7 +841,7 @@ function renderSigils() {
 }
 
 // ════════════════════════════════
-//  FIREBASE / STATE (HEALER)
+//  FIREBASE / STATE
 // ════════════════════════════════
 async function loadState() {
   if(!USER_ID) return;
@@ -1056,7 +867,6 @@ async function loadState() {
       isNewUser = true;
     }
   } catch(e) {
-    alert("🔥 DB LOAD ERROR:\n" + (e.message || e));
     console.error("DB load error:", e);
     showToast("Could not load data. Playing locally.");
     isNewUser = true;
@@ -1090,12 +900,13 @@ async function loadState() {
 }
 
 window.enterRealm = function() {
-  if (!STATE.player) {
+  if (!STATE.player || !STATE.saves || STATE.saves.length === 0) {
     showScreen('screen-path');
-    try { renderPathSprites(); } catch(e) { console.error("Render path error:", e); }
+    try { renderPathSprites(); } catch(e) {}
   } else {
     showScreen('screen-hub');
-    try { renderHub(); } catch(e) { console.error("Render error:", e); }
+    window.switchTab('tab-profile');
+    try { renderHub(); } catch(e) {}
   }
 };
 
@@ -1103,8 +914,6 @@ function syncActiveSaveToState() {
   const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
   if(s) { 
     STATE.player = s.player; 
-    
-    // Auto-heal corrupted quest data
     STATE.quests = (s.quests || []).filter(q => q != null).map(q => ({
         ...q,
         topic: q.topic || 'Unknown Discipline',
@@ -1115,7 +924,6 @@ function syncActiveSaveToState() {
         bossHp: typeof q.bossHp === 'number' ? q.bossHp : 100,
         bossMaxHp: typeof q.bossMaxHp === 'number' ? q.bossMaxHp : 100
     }));
-    
     STATE.player.questsCreated = STATE.quests.length;
   }
 }
@@ -1136,7 +944,8 @@ async function saveState() {
 async function loadPublicQuests() {
   const q = query(collection(db,"public_quests"), orderBy("id","desc"), limit(12));
   const snap = await getDocs(q);
-  STATE.publicQuests = snap.docs.map(d=>d.data());
+  // Store doc.id so we can delete it later
+  STATE.publicQuests = snap.docs.map(d=>({ ...d.data(), docId: d.id }));
 }
 
 // ════════════════════════════════
@@ -1162,6 +971,19 @@ window.signOutUser = async () => {
 };
 
 // ════════════════════════════════
+//  UI TABS
+// ════════════════════════════════
+window.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`.tab-btn[data-target="${tabId}"]`).classList.add('active');
+    
+    if (tabId === 'tab-library') loadPublicQuests().then(() => renderLibraryGrid());
+};
+
+// ════════════════════════════════
 //  PATH SELECTION
 // ════════════════════════════════
 function renderPathSprites() {
@@ -1174,12 +996,18 @@ function renderPathSprites() {
 window.choosePath = async function(path) {
   const name = prompt(`Name your ${path === 'warrior' ? 'Warrior' : 'Scholar'}:`) || (path==='warrior'?'Wei Xuan':'Wen Ru');
   const newSave = { id: Date.now().toString(), player: defaultPlayer(name.trim()||'Hero', path), quests: [] };
-  STATE.saves = [newSave]; STATE.activeSaveId = newSave.id;
+  STATE.saves.push(newSave); 
+  STATE.activeSaveId = newSave.id;
   syncActiveSaveToState();
   await saveState();
   showScreen('screen-hub');
+  window.switchTab('tab-profile');
   renderHub();
-  showToast(`Your legend begins, ${STATE.player.name}. The scrolls await.`);
+  showToast(`Your legend begins, ${STATE.player.name}.`);
+};
+
+window.cancelPathSelection = function() {
+    showScreen('screen-hub');
 };
 
 // ════════════════════════════════
@@ -1195,18 +1023,11 @@ window.choosePath = async function(path) {
     const grd = ctx.createLinearGradient(0,0,0,h);
     grd.addColorStop(0,'#050308'); grd.addColorStop(0.4,'#070510'); grd.addColorStop(1,'#080604');
     ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
-    const layers = [
-      {y:0.75,rough:0.2,alpha:0.07,col:'#c8a84b'},
-      {y:0.65,rough:0.15,alpha:0.05,col:'#8b3a3a'},
-      {y:0.57,rough:0.11,alpha:0.13,col:'#1a1008'},
-      {y:0.50,rough:0.08,alpha:0.2,col:'#0a0608'},
-    ];
+    const layers = [{y:0.75,rough:0.2,alpha:0.07,col:'#c8a84b'},{y:0.65,rough:0.15,alpha:0.05,col:'#8b3a3a'},{y:0.57,rough:0.11,alpha:0.13,col:'#1a1008'},{y:0.50,rough:0.08,alpha:0.2,col:'#0a0608'}];
     layers.forEach(l => {
       ctx.beginPath(); let x=0;
       while(x<=w) {
-        const y = h*l.y - Math.abs(Math.sin(x*0.0048+l.rough*80))*h*l.rough
-                  - Math.abs(Math.sin(x*0.011+30))*h*l.rough*0.45
-                  - Math.abs(Math.sin(x*0.022+60))*h*l.rough*0.2;
+        const y = h*l.y - Math.abs(Math.sin(x*0.0048+l.rough*80))*h*l.rough - Math.abs(Math.sin(x*0.011+30))*h*l.rough*0.45 - Math.abs(Math.sin(x*0.022+60))*h*l.rough*0.2;
         if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         x+=4;
       }
@@ -1216,8 +1037,7 @@ window.choosePath = async function(path) {
     for(let i=0;i<5;i++) {
       const y=h*(0.35+i*0.1); ctx.globalAlpha=0.04;
       const mg=ctx.createLinearGradient(0,0,w,0);
-      mg.addColorStop(0,'transparent'); mg.addColorStop(0.3,'rgba(200,168,75,0.15)');
-      mg.addColorStop(0.7,'rgba(200,168,75,0.15)'); mg.addColorStop(1,'transparent');
+      mg.addColorStop(0,'transparent'); mg.addColorStop(0.3,'rgba(200,168,75,0.15)'); mg.addColorStop(0.7,'rgba(200,168,75,0.15)'); mg.addColorStop(1,'transparent');
       ctx.fillStyle=mg; ctx.fillRect(0,y-1,w,3+i*0.5);
     }
     ctx.globalAlpha=0.015; ctx.strokeStyle='rgba(200,168,75,0.5)'; ctx.lineWidth=1;
@@ -1616,6 +1436,7 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+
 window.showHub = function() { showScreen('screen-hub'); renderHub(); };
 
 window.showQuestScreen = function(questIdx) {
@@ -1837,7 +1658,7 @@ function renderLibraryGrid() {
         <canvas class="boss-mini-sprite" width="56" height="56"></canvas>
         <div>
           <div class="quest-topic">${(quest.topic || 'Unknown').toUpperCase()}</div>
-          <div class="quest-title" style="padding-right:0;">${quest.questTitle || 'Untitled'}</div>
+          <div class="quest-title" style="padding-right:1.5rem;">${quest.questTitle || 'Untitled'}</div>
         </div>
       </div>
       <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.8rem;">${chapters.length} Chapters of Knowledge</div>
@@ -1845,6 +1666,21 @@ function renderLibraryGrid() {
         <div class="quest-hp-label" style="color:var(--jade2);font-weight:bold;">+ ADD TO QUESTS</div>
       </div>
     `;
+    
+    // Add delete button for Public Quests if the user authored it
+    if (quest.authorId && quest.authorId === USER_ID) {
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = '✕';
+        delBtn.style.cssText = 'position:absolute;top:0.4rem;right:0.4rem;background:none;border:none;color:rgba(200,168,75,0.4);font-size:1.1rem;cursor:pointer;z-index:10;padding:0.4rem;';
+        delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(confirm('Remove this scroll from the Realm Library?')) {
+                window.deletePublicQuest(quest.docId, idx);
+            }
+        });
+        card.appendChild(delBtn);
+    }
+    
     const mini=card.querySelector('.boss-mini-sprite');
     drawBossSprite(mini,quest,1.0);
     card.addEventListener('click',()=>window.copyPublicQuest(idx));
@@ -1852,10 +1688,16 @@ function renderLibraryGrid() {
   });
 }
 
-window.toggleSection = function(contentId, iconId) {
-  const c=document.getElementById(contentId), ic=document.getElementById(iconId);
-  if(c.style.display==='none'||c.style.display==='') { c.style.display=contentId.includes('library')?'flex':'flex'; ic.textContent='▲'; }
-  else { c.style.display='none'; ic.textContent='▼'; }
+window.deletePublicQuest = async function(docId, idx) {
+    try {
+        await deleteDoc(doc(db, "public_quests", docId));
+        STATE.publicQuests.splice(idx, 1);
+        renderLibraryGrid();
+        showToast("Scroll removed from the library.");
+    } catch(e) {
+        console.error(e);
+        showToast("Failed to remove scroll.");
+    }
 };
 
 function renderSettingsCharacters() {
@@ -1869,8 +1711,16 @@ function renderSettingsCharacters() {
     let r=ranks[0]; for(const rank of ranks){if(s.player.totalXp>=rank.xp)r=rank;}
     const div=document.createElement('div');
     div.style.cssText=`padding:0.75rem;border:${isActive?'1px solid var(--gold)':'1px solid rgba(200,168,75,0.18)'};margin-bottom:0.45rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:${isActive?'rgba(200,168,75,0.08)':'transparent'};transition:all 0.2s;`;
-    div.innerHTML=`<div><div style="color:var(--gold);font-family:'Ma Shan Zheng',serif;font-size:1.05rem;">${s.player.name}</div><div style="color:var(--text-muted);font-size:0.58rem;letter-spacing:0.1em;">${r.name} · ${s.player.path||'warrior'} · ${s.player.totalXp} XP</div></div><div style="color:var(--text-muted);font-size:0.65rem;">${isActive?'ACTIVE':'SWITCH'}</div>`;
-    if(!isActive) div.onclick=()=>window.switchCharacter(s.id);
+    div.innerHTML=`
+      <div style="flex:1; display:flex; flex-direction:column;" onclick="switchCharacter('${s.id}')">
+        <div style="color:var(--gold);font-family:'Ma Shan Zheng',serif;font-size:1.05rem;">${s.player.name}</div>
+        <div style="color:var(--text-muted);font-size:0.58rem;letter-spacing:0.1em;">${r.name} · ${s.player.path||'warrior'} · ${s.player.totalXp} XP</div>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <div style="color:var(--text-muted);font-size:0.65rem;">${isActive?'ACTIVE':''}</div>
+        <button onclick="deleteCharacter('${s.id}', event)" style="background:none;border:none;color:var(--red2);font-size:1.2rem;cursor:pointer;padding:0 0.5rem;">✕</button>
+      </div>
+    `;
     list.appendChild(div);
   });
 }
@@ -1880,6 +1730,34 @@ window.switchCharacter = function(id) {
   STATE.activeQuestIdx=null; STATE.quizCurrent=0;
   renderHub(); renderSettingsCharacters(); closeApiModal();
   showToast(`Switched to ${STATE.player.name}`);
+};
+
+window.deleteCharacter = function(id, event) {
+    event.stopPropagation();
+    if(!confirm("Banish this warrior to the void? This cannot be undone.")) return;
+    STATE.saves = STATE.saves.filter(s => s.id !== id);
+    if(STATE.saves.length === 0) {
+        saveState(); 
+        closeApiModal();
+        showScreen('screen-path');
+        renderPathSprites();
+        document.getElementById('path-cancel-btn').style.display = 'none';
+    } else {
+        if(STATE.activeSaveId === id) {
+            STATE.activeSaveId = STATE.saves[0].id;
+            syncActiveSaveToState();
+            renderHub();
+        }
+        saveState();
+        renderSettingsCharacters();
+    }
+};
+
+window.createNewCharacter = function() {
+    closeApiModal();
+    showScreen('screen-path');
+    renderPathSprites();
+    document.getElementById('path-cancel-btn').style.display = 'block';
 };
 
 // ════════════════════════════════
@@ -1925,10 +1803,8 @@ window.copyPublicQuest = function(idx) {
   };
   STATE.quests.unshift(nq); STATE.player.questsCreated++;
   saveState();
-  document.getElementById('quest-board-content').style.display='flex';
-  document.getElementById('quest-toggle-icon').textContent='▲';
+  window.switchTab('tab-quests');
   renderHub(); showToast(`Copied "${nq.questTitle}" to your quests!`);
-  document.getElementById('screen-hub').scrollTo({top:0,behavior:'smooth'});
 };
 
 window.createQuest = async function() {
@@ -1996,8 +1872,9 @@ window.createQuest = async function() {
       }
       
       try {
-        const pubQ={...baseQuest,id:Date.now()};
-        await addDoc(collection(db,"public_quests"),pubQ);
+        const pubQ={...baseQuest,id:Date.now(), authorId: USER_ID };
+        const docRef = await addDoc(collection(db,"public_quests"),pubQ);
+        pubQ.docId = docRef.id;
         STATE.publicQuests.unshift(pubQ);
       } catch(e) { 
         // Silent fail for public library 
@@ -2005,8 +1882,7 @@ window.createQuest = async function() {
       
       closeCreateModal();
       showToast(`Quest summoned: "${userQuest.questTitle}"`);
-      const qbc=document.getElementById('quest-board-content');
-      if(qbc.style.display==='none'||qbc.style.display==='') { qbc.style.display='flex'; document.getElementById('quest-toggle-icon').textContent='▲'; }
+      window.switchTab('tab-quests');
       window.showQuestScreen(0);
       
   } catch(e) {
