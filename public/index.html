@@ -8,28 +8,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Cinzel+Decorative:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
 
 :root {
-  --ink:        #07050a;
-  --ink2:       #0e0a0f;
-  --paper:      #f0e6cc;
-  --paper2:     #e2d4b0;
-  --gold:       #c8a84b;
-  --gold2:      #e8c96a;
-  --gold3:      #f5dfa0;
-  --red:        #7a1515;
-  --red2:       #b03030;
-  --red3:       #e84040;
-  --jade:       #1e5c4a;
-  --jade2:      #2e8a6a;
-  --jade3:      #40c090;
-  --violet:     #3a1a5a;
-  --violet2:    #7040b0;
-  --mist:       rgba(240,230,204,0.05);
-  --shadow:     rgba(7,5,10,0.85);
-  --glow-gold:  0 0 20px rgba(200,168,75,0.5);
-  --glow-red:   0 0 20px rgba(176,48,48,0.6);
-  --glow-jade:  0 0 20px rgba(46,138,106,0.5);
-  --text-muted: rgba(240,230,204,0.38);
-  --path-color: #c8a84b;
+  --ink:        #0a0710;
+  --ink2:       #120d1c;
+  --paper:      #f5ebd8;
+  --paper2:     #e8d9b8;
+  --gold:       #d4a843;
+  --gold2:      #f0c84a;
+  --gold3:      #fae090;
+  --red:        #8a1a1a;
+  --red2:       #cc3535;
+  --red3:       #ff5555;
+  --jade:       #1a6650;
+  --jade2:      #28a070;
+  --jade3:      #3dd8a0;
+  --violet:     #3c1a60;
+  --violet2:    #8855cc;
+  --mist:       rgba(245,235,216,0.05);
+  --shadow:     rgba(10,7,16,0.88);
+  --glow-gold:  0 0 28px rgba(212,168,67,0.7);
+  --glow-red:   0 0 28px rgba(204,53,53,0.75);
+  --glow-jade:  0 0 28px rgba(40,160,112,0.65);
+  --text-muted: rgba(245,235,216,0.5);
+  --text-dim:   rgba(245,235,216,0.72);
+  --path-color: #d4a843;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -468,6 +469,287 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   .quiz-options { grid-template-columns:1fr; }
   .sigil-tooltip { width: 160px; font-size: 0.9em; }
 }
+
+/* ══════════════════════════════════════════
+   SPIRIT TAB — IMMERSIVE ANIMATED SCENE
+══════════════════════════════════════════ */
+
+/* Make spirit pane fill the hub body without inner scroll */
+.spirit-pane {
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ── Animated scene area (top ~52%) ── */
+.spirit-scene-wrap {
+  position: relative;
+  width: 100%;
+  flex: 0 0 52%;
+  min-height: 0;
+  overflow: hidden;
+}
+.spirit-scene-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Bottom-of-scene gradient fade */
+.spirit-scene-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: linear-gradient(transparent, var(--ink));
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Corner ornaments */
+.scene-orn {
+  position: absolute;
+  width: 20px; height: 20px;
+  z-index: 8;
+  opacity: 0.7;
+}
+.scene-orn.tl { top:0;left:0;  border-top:2px solid var(--gold);border-left:2px solid var(--gold); }
+.scene-orn.tr { top:0;right:0; border-top:2px solid var(--gold);border-right:2px solid var(--gold); }
+.scene-orn.bl { bottom:0;left:0; border-bottom:2px solid var(--gold);border-left:2px solid var(--gold); }
+.scene-orn.br { bottom:0;right:0; border-bottom:2px solid var(--gold);border-right:2px solid var(--gold); }
+
+/* ── Speech bubble top-left ── */
+.spirit-bubble {
+  position: absolute;
+  top: 12px; left: 14px;
+  z-index: 10;
+  background: rgba(10,7,16,0.90);
+  border: 1px solid rgba(212,168,67,0.5);
+  border-radius: 10px 10px 10px 2px;
+  padding: 5px 11px;
+  font-size: 0.6rem;
+  color: var(--gold3);
+  max-width: 175px;
+  line-height: 1.5;
+  backdrop-filter: blur(6px);
+  animation: spiritBubble 5s ease-in-out infinite;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+@keyframes spiritBubble {
+  0%,100%{opacity:0;transform:translateY(4px);}
+  10%,85%{opacity:1;transform:translateY(0);}
+}
+
+/* ── Activity tag top-right ── */
+.spirit-activity-tag {
+  position: absolute;
+  top: 12px; right: 14px;
+  z-index: 10;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  padding: 4px 10px;
+  background: rgba(10,7,16,0.82);
+  border: 1px solid rgba(212,168,67,0.4);
+  backdrop-filter: blur(6px);
+  animation: actTagPulse 3s ease-in-out infinite;
+}
+.spirit-activity-tag.warrior { color: #ff9060; border-color: rgba(204,53,53,0.5); }
+.spirit-activity-tag.scholar { color: #60e8b0; border-color: rgba(40,160,112,0.5); }
+@keyframes actTagPulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
+
+/* ── Nameplate overlay (bottom of scene) ── */
+.spirit-nameplate {
+  position: absolute;
+  bottom: 10px; left: 14px; right: 14px;
+  z-index: 10;
+  pointer-events: none;
+}
+.spirit-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.spirit-name {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 1.55rem;
+  color: #fff;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 22px rgba(212,168,67,0.95), 0 2px 10px rgba(0,0,0,0.95);
+  cursor: pointer;
+  pointer-events: all;
+  line-height: 1.05;
+}
+.spirit-path-badge {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  padding: 2px 7px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  white-space: nowrap;
+  opacity: 0.95;
+}
+.spirit-path-badge.warrior { color: #ff8070; background: rgba(138,26,26,0.4); border-color: rgba(204,53,53,0.6); }
+.spirit-path-badge.scholar { color: #60e8a8; background: rgba(26,102,80,0.4); border-color: rgba(40,160,112,0.6); }
+.spirit-rank {
+  font-size: 0.55rem;
+  color: var(--gold2);
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px rgba(212,168,67,0.7), 0 1px 6px rgba(0,0,0,0.9);
+  margin-bottom: 6px;
+}
+/* XP bar inside scene overlay */
+.spirit-xp-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.spirit-xp-bar {
+  flex: 1;
+  height: 7px;
+  background: rgba(212,168,67,0.1);
+  border: 1px solid rgba(212,168,67,0.28);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+.spirit-xp-fill {
+  height: 100%;
+  transition: width 1.4s cubic-bezier(0.34,1.56,0.64,1);
+  border-radius: 2px;
+  position: relative;
+}
+.spirit-xp-fill.warrior { background: linear-gradient(90deg,var(--red),#e05030,var(--gold2)); }
+.spirit-xp-fill.scholar { background: linear-gradient(90deg,var(--jade),#28c888,var(--jade3)); }
+.spirit-xp-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: inherit;
+  filter: brightness(1.8);
+  box-shadow: 0 0 8px 3px rgba(255,255,255,0.4);
+  border-radius: 2px;
+}
+.spirit-xp-label {
+  font-size: 0.52rem;
+  color: var(--gold3);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+/* ── Stat ribbon below scene ── */
+.spirit-stat-ribbon {
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(180deg, rgba(10,7,16,0) 0%, rgba(18,12,28,0.98) 25%);
+  flex: 0 0 auto;
+  margin-top: -2px;
+  position: relative;
+  z-index: 6;
+  padding: 10px 14px 8px;
+  gap: 0;
+}
+.ssr-cell {
+  flex: 1;
+  text-align: center;
+  padding: 6px 4px;
+}
+.ssr-divider {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(212,168,67,0.25), transparent);
+  flex: 0 0 1px;
+  margin: 4px 0;
+}
+.ssr-val {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.15rem;
+  color: var(--gold2);
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(212,168,67,0.5);
+}
+.ssr-lbl {
+  font-size: 0.43rem;
+  color: rgba(245,235,216,0.65);
+  letter-spacing: 0.2em;
+  margin-top: 4px;
+}
+
+/* ── Lower: sigils + lore ── */
+.spirit-lower {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(10,7,16,0.96);
+}
+
+/* ── Global visibility improvements ── */
+/* Brighter card borders and text throughout */
+.stat-box { background:rgba(212,168,67,0.05); border:1px solid rgba(212,168,67,0.15); }
+.stat-box:hover { background:rgba(212,168,67,0.1); border-color:rgba(212,168,67,0.3); }
+.stat-val { color: var(--gold2); }
+.stat-lbl { color: rgba(245,235,216,0.62); letter-spacing:0.2em; }
+
+.quest-card { background:linear-gradient(135deg,rgba(22,16,30,0.97),rgba(12,8,18,0.99)); border:1px solid rgba(212,168,67,0.2); }
+.quest-card:hover { border-color:rgba(212,168,67,0.48); }
+.quest-title { color: var(--gold2); }
+.quest-topic { color: var(--red2); }
+.quest-hp-label { color: rgba(245,235,216,0.65); }
+
+.chapter-item { background:rgba(212,168,67,0.04); border:1px solid rgba(212,168,67,0.15); }
+.chapter-item:hover { border-color:rgba(212,168,67,0.4); background:rgba(212,168,67,0.09); }
+.chapter-title-text { color: var(--paper); }
+.chapter-desc { color: rgba(245,235,216,0.62); }
+.chapter-tag { color: var(--red2); }
+
+.tab-btn { color: rgba(245,235,216,0.55); }
+.tab-btn.active { color: var(--gold2); }
+
+.modal-box { background: linear-gradient(160deg,rgba(20,14,30,0.99),rgba(10,7,18,1)); border-color:rgba(212,168,67,0.32); }
+.modal-title { color: var(--gold2); }
+.modal-subtitle { color: rgba(245,235,216,0.65); }
+.form-input, .form-textarea, .form-select { background:rgba(212,168,67,0.04); border-color:rgba(212,168,67,0.25); color:var(--paper); }
+.form-input:focus,.form-textarea:focus,.form-select:focus { border-color:rgba(212,168,67,0.55); }
+.form-label { color: var(--gold); }
+
+.boss-hp-label,.boss-lore-text,.chapter-desc { color: rgba(245,235,216,0.65); }
+.boss-name-display { color: var(--red2); }
+.boss-lore-title { color: var(--red2); }
+
+.world-lore-box { background:rgba(212,168,67,0.04); border-color:rgba(212,168,67,0.15); }
+.world-lore-text { color: rgba(245,235,216,0.7); font-size:0.72rem; }
+.world-lore-title { color: var(--red2); }
+
+.sigil-row { background:rgba(136,85,204,0.05); border-color:rgba(136,85,204,0.2); }
+
+#toast { color: var(--gold2); border-color:rgba(212,168,67,0.42); }
+
+/* ── Hub header & tab bar ── */
+.hub-header { background:linear-gradient(180deg,rgba(16,10,24,0.98),rgba(12,8,20,0.92)); border-bottom-color:rgba(212,168,67,0.2); }
+.hub-tabs { background:rgba(10,7,16,0.99); border-bottom-color:rgba(212,168,67,0.25); }
+.hub-title { color: var(--gold2); text-shadow: 0 0 20px rgba(212,168,67,0.5); }
+
+/* Title screen improvements */
+.title-main { color: var(--gold2); }
+.btn-primary { border-color: var(--gold); color: var(--gold2); }
+
+/* Quest screen */
+.quest-header { background:rgba(10,7,16,0.98); border-bottom-color:rgba(212,168,67,0.18); }
+.boss-panel { background:linear-gradient(180deg,rgba(10,7,16,0.97),rgba(18,4,4,0.99)); }
+
+::-webkit-scrollbar-thumb { background:rgba(212,168,67,0.22); }
+
 </style>
 </head>
 <body>
@@ -534,37 +816,67 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
     <div class="tab-btn" onclick="switchTab('tab-library')" data-target="tab-library">LIBRARY</div>
   </div>
   <div class="hub-body">
-    <div id="tab-profile" class="tab-pane active">
-      <div class="char-panel-inner">
-          <div class="char-stage">
-            <div class="char-aura" id="char-aura"></div>
-            <canvas class="char-sprite" id="char-sprite" width="140" height="180"></canvas>
-            <div class="personality-bubble" id="personality-bubble">...</div>
+    <div id="tab-profile" class="tab-pane spirit-pane active">
+
+      <div class="spirit-scene-wrap" id="spirit-scene-wrap">
+        <canvas id="scene-canvas" class="spirit-scene-canvas"></canvas>
+
+        <div class="spirit-bubble" id="personality-bubble">...</div>
+
+        <div class="spirit-activity-tag" id="spirit-activity-tag">⚔ TRAINING</div>
+
+        <div class="spirit-nameplate">
+          <div class="spirit-name-row">
+            <span class="spirit-name" id="char-name" onclick="renameCharacter()">Wei Xuan <span style="opacity:.35;font-size:.75em;">✎</span></span>
+            <span class="spirit-path-badge" id="char-path-badge">WARRIOR</span>
           </div>
-          <div class="char-name-row">
-            <div class="char-name" id="char-name" onclick="renameCharacter()">Wei Xuan ✎</div>
+          <div class="spirit-rank" id="char-rank">凡人 · Mortal</div>
+          <div class="spirit-xp-wrap">
+            <div class="spirit-xp-bar">
+              <div class="spirit-xp-fill" id="xp-fill" style="width:0%"></div>
+              <div class="spirit-xp-shine" id="xp-shine"></div>
+            </div>
+            <span class="spirit-xp-label" id="xp-text">0 / 100 XP</span>
           </div>
-          <div class="char-path-badge" id="char-path-badge" style="margin-top:-0.5rem; margin-bottom: 0.5rem;">WARRIOR</div>
-          <div class="char-rank" id="char-rank">凡人 · Mortal</div>
-          <div class="xp-section">
-            <div class="xp-label"><span>CULTIVATION</span><span id="xp-text">0 / 100 XP</span></div>
-            <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
-          </div>
-          <div class="stat-grid">
-            <div class="stat-box"><div class="stat-val" id="stat-quests">0</div><div class="stat-lbl">QUESTS</div></div>
-            <div class="stat-box"><div class="stat-val" id="stat-chapters">0</div><div class="stat-lbl">CHAPTERS</div></div>
-            <div class="stat-box"><div class="stat-val" id="stat-bosses">0</div><div class="stat-lbl">DEFEATED</div></div>
-            <div class="stat-box"><div class="stat-val" id="stat-perfect">0</div><div class="stat-lbl">PERFECT</div></div>
-          </div>
-          <div class="sigil-row">
-            <div class="sigil-title">◈ CELESTIAL SIGILS</div>
-            <div class="sigil-slots" id="sigil-slots"></div>
-          </div>
-          <div class="world-lore-box">
-            <div class="world-lore-title">◈ REALM CHRONICLES</div>
-            <div class="world-lore-text" id="world-lore-text">The fractured realm of Jiuzhou trembles...</div>
-          </div>
+        </div>
+
+        <div class="scene-orn tl"></div><div class="scene-orn tr"></div>
+        <div class="scene-orn bl"></div><div class="scene-orn br"></div>
       </div>
+
+      <div class="spirit-stat-ribbon">
+        <div class="ssr-cell">
+          <div class="ssr-val" id="stat-quests">0</div>
+          <div class="ssr-lbl">SCROLLS</div>
+        </div>
+        <div class="ssr-divider"></div>
+        <div class="ssr-cell">
+          <div class="ssr-val" id="stat-chapters">0</div>
+          <div class="ssr-lbl">CHAPTERS</div>
+        </div>
+        <div class="ssr-divider"></div>
+        <div class="ssr-cell">
+          <div class="ssr-val" id="stat-bosses">0</div>
+          <div class="ssr-lbl">SLAIN</div>
+        </div>
+        <div class="ssr-divider"></div>
+        <div class="ssr-cell">
+          <div class="ssr-val" id="stat-perfect">0</div>
+          <div class="ssr-lbl">PERFECT</div>
+        </div>
+      </div>
+
+      <div class="spirit-lower">
+        <div class="sigil-row">
+          <div class="sigil-title">◈ CELESTIAL SIGILS</div>
+          <div class="sigil-slots" id="sigil-slots"></div>
+        </div>
+        <div class="world-lore-box">
+          <div class="world-lore-title">◈ REALM CHRONICLES</div>
+          <div class="world-lore-text" id="world-lore-text">The fractured realm of Jiuzhou trembles...</div>
+        </div>
+      </div>
+
     </div>
 
     <div id="tab-quests" class="tab-pane">
@@ -618,7 +930,6 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
   </div>
 </div>
 
-<!-- Modals -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal-box">
     <div class="modal-title">召喚任務</div>
@@ -767,9 +1078,9 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 </div>
 
 <div id="toast"></div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
@@ -785,6 +1096,13 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase App Check with reCAPTCHA v3
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6LdjNqEsAAAAAEI2m37oYKa3iluG5Mbx_Ge3VImh'),
+  isTokenAutoRefreshEnabled: true
+});
+
 const db = getFirestore(app);
 const auth = getAuth(app);
 const vertexAI = getVertexAI(app, { location: "global" });
@@ -1688,16 +2006,547 @@ function drawCharSprite(canvas, rankIdx, path, w=140, h=180) {
   ctx.restore();
 }
 
-let charAnimFrame = null;
-function startCharAnimation() {
-  if(charAnimFrame) cancelAnimationFrame(charAnimFrame);
-  const canvas = document.getElementById('char-sprite');
+// ════════════════════════════════
+//  SPIRIT SCENE ENGINE
+// ════════════════════════════════
+let sceneRAF = null;
+let sceneT = 0;
+let scenePath = 'warrior';
+let sceneRankIdx = 0;
+
+function startCharAnimation() { startSpiritScene(); }
+
+function startSpiritScene() {
+  if(sceneRAF) cancelAnimationFrame(sceneRAF);
+  const canvas = document.getElementById('scene-canvas');
   if(!canvas || !STATE.player) return;
+  const parent = canvas.parentElement;
+  scenePath = STATE.player.path || 'warrior';
+  sceneRankIdx = getCurrentRankIdx();
+
+  function resize() {
+    const r = parent.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(r.width));
+    canvas.height = Math.max(1, Math.round(r.height));
+  }
+  resize();
+  if(!canvas._resizeListened) {
+    window.addEventListener('resize', resize);
+    canvas._resizeListened = true;
+  }
+
+  const ctx = canvas.getContext('2d');
   function frame() {
-    drawCharSprite(canvas, getCurrentRankIdx(), STATE.player.path, 140, 180);
-    charAnimFrame = requestAnimationFrame(frame);
+    sceneT += 0.016;
+    if(canvas.width > 1) {
+      if(scenePath === 'scholar') drawScholarScene(ctx, canvas.width, canvas.height, sceneRankIdx, sceneT);
+      else drawWarriorScene(ctx, canvas.width, canvas.height, sceneRankIdx, sceneT);
+    }
+    sceneRAF = requestAnimationFrame(frame);
   }
   frame();
+}
+
+// ── Warrior Scene: ember-lit dojo / mountain courtyard ──
+function drawWarriorScene(ctx, W, H, ri, t) {
+  ctx.clearRect(0,0,W,H);
+  // Sky – warm cinnabar dusk
+  const sky = ctx.createLinearGradient(0,0,0,H*0.6);
+  sky.addColorStop(0,'#180810'); sky.addColorStop(.5,'#2a1018'); sky.addColorStop(1,'#3a1a10');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,H*0.6);
+
+  // Ember glow source top-right
+  const eg = ctx.createRadialGradient(W*.85,H*.1,0,W*.85,H*.1,H*.5);
+  eg.addColorStop(0,'rgba(255,130,30,.22)'); eg.addColorStop(.5,'rgba(180,60,10,.07)'); eg.addColorStop(1,'transparent');
+  ctx.fillStyle=eg; ctx.fillRect(0,0,W,H);
+
+  // Moon disc
+  ctx.save();
+  ctx.globalAlpha = .6+Math.sin(t*.4)*.06;
+  ctx.fillStyle='#d06020';
+  ctx.beginPath(); ctx.arc(W*.85, H*.1, H*.07, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.restore();
+
+  // Distant mountain silhouettes
+  _mountains(ctx,W,H*.55,W,H*.22,'#1a0a14');
+  _mountains(ctx,W,H*.5,W,H*.15,'#230e1c',7);
+
+  // Drifting embers
+  for(let i=0;i<14;i++){
+    const ex = (W*.08+i*W*.065+Math.sin(t*.9+i)*20)%W;
+    const ey = ((H*.55 - (t*9+i*20)%(H*.45)+H*.55)%H);
+    ctx.globalAlpha = (.25+.4*Math.abs(Math.sin(t+i)));
+    ctx.fillStyle = ['#ff8030','#ffb040','#ff5020'][i%3];
+    ctx.beginPath(); ctx.arc(ex,ey,1+.7*Math.sin(i),0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // Floor – worn stone
+  const fl = ctx.createLinearGradient(0,H*.57,0,H);
+  fl.addColorStop(0,'#2c1a0e'); fl.addColorStop(.4,'#1e1006'); fl.addColorStop(1,'#0e0804');
+  ctx.fillStyle=fl; ctx.fillRect(0,H*.57,W,H*.43);
+
+  // Stone tile grid
+  ctx.strokeStyle='rgba(180,110,50,.07)'; ctx.lineWidth=1;
+  for(let r=0;r<5;r++){ const ty=H*.58+r*H*.085; ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke(); }
+  for(let c=0;c<8;c++){ const tx=c*(W/7); ctx.beginPath(); ctx.moveTo(tx,H*.57); ctx.lineTo(tx,H); ctx.stroke(); }
+
+  // Left training prop: wooden dummy
+  if(ri>=0) _woodenDummy(ctx,W*.13,H*.75,H*.22,t);
+  // Right: weight rack
+  if(ri>=2) _weightRack(ctx,W*.87,H*.77,H*.15);
+  // Rank 4+: flame torches
+  if(ri>=4){ _torch(ctx,W*.04,H*.6,H*.18,t,0); _torch(ctx,W*.96,H*.6,H*.18,t,1); }
+  // Rank 6+: dragon battle banner centre
+  if(ri>=6) _banner(ctx,W*.5,H*.04,H*.44,t);
+
+  // Foot glow
+  const fg = ctx.createRadialGradient(W*.5,H*.82,0,W*.5,H*.82,W*.24);
+  fg.addColorStop(0,'rgba(255,110,30,.2)'); fg.addColorStop(1,'transparent');
+  ctx.fillStyle=fg; ctx.fillRect(0,H*.6,W,H*.4);
+
+  // ── CHIBI WARRIOR CHARACTER ──
+  _sceneWarrior(ctx, W*.5, H*.79, H*.44, ri, t);
+
+  // Foreground vignette
+  const vg = ctx.createLinearGradient(0,H*.87,0,H);
+  vg.addColorStop(0,'transparent'); vg.addColorStop(1,'rgba(6,3,2,.75)');
+  ctx.fillStyle=vg; ctx.fillRect(0,H*.87,W,H*.13);
+}
+
+// ── Scholar Scene: moonlit study pavilion ──
+function drawScholarScene(ctx, W, H, ri, t) {
+  ctx.clearRect(0,0,W,H);
+  // Sky – deep indigo night
+  const sky = ctx.createLinearGradient(0,0,0,H*.65);
+  sky.addColorStop(0,'#03071a'); sky.addColorStop(.5,'#080f28'); sky.addColorStop(1,'#0c1530');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H*.65);
+
+  // Stars
+  for(let i=0;i<32;i++){
+    const sx=(i*W*.038+12)%W, sy=(i*H*.033+8)%(H*.52);
+    ctx.globalAlpha=(.35+.6*Math.abs(Math.sin(t*.45+i*.7)))*.85;
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(sx,sy,.7+(i%3)*.4,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // Jade moon top-left
+  const mx=W*.16,my=H*.14;
+  const mg=ctx.createRadialGradient(mx,my,0,mx,my,H*.3);
+  mg.addColorStop(0,'rgba(60,210,150,.18)'); mg.addColorStop(.5,'rgba(20,120,80,.06)'); mg.addColorStop(1,'transparent');
+  ctx.fillStyle=mg; ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=.78+Math.sin(t*.35)*.05;
+  ctx.fillStyle='#aaeedd'; ctx.beginPath(); ctx.arc(mx,my,H*.065,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+
+  // Pagoda silhouette right
+  _pagoda(ctx,W*.84,H*.46,H*.3);
+
+  // Bamboo grove
+  for(let b=0;b<5;b++){
+    const bx=W*.74+b*W*.055;
+    const sw=Math.sin(t*.7+b*.9)*3;
+    ctx.strokeStyle=`rgba(25,75,40,${.25+b*.1})`; ctx.lineWidth=3+b;
+    ctx.beginPath(); ctx.moveTo(bx,H*.65); ctx.quadraticCurveTo(bx+sw,H*.38,bx+sw*1.6,H*.06); ctx.stroke();
+    ctx.strokeStyle=`rgba(35,95,50,${.18+b*.07})`; ctx.lineWidth=1;
+    for(let s=0;s<5;s++){
+      const sy=H*.1+s*H*.11;
+      ctx.beginPath(); ctx.moveTo(bx+sw*(sy/H),sy); ctx.lineTo(bx+sw*(sy/H)+18,sy-11); ctx.stroke();
+    }
+  }
+
+  // Floor – lacquered jade wood
+  const fl2=ctx.createLinearGradient(0,H*.6,0,H);
+  fl2.addColorStop(0,'#0c1a12'); fl2.addColorStop(.3,'#09100d'); fl2.addColorStop(1,'#050908');
+  ctx.fillStyle=fl2; ctx.fillRect(0,H*.6,W,H*.4);
+  ctx.strokeStyle='rgba(40,120,65,.09)'; ctx.lineWidth=1;
+  for(let c=0;c<8;c++){ const cx2=c*(W/7); ctx.beginPath(); ctx.moveTo(cx2,H*.6); ctx.lineTo(cx2,H); ctx.stroke(); }
+
+  // Scholar's desk
+  _scholarsDesk(ctx, W*.5, H*.74, W*.55, H*.28, t, ri);
+
+  // Paper lanterns
+  _lantern(ctx,W*.18,H*.36,H*.11,t,0);
+  _lantern(ctx,W*.82,H*.33,H*.1,t,1.4);
+
+  // Desk ambient glow
+  const dg=ctx.createRadialGradient(W*.5,H*.71,0,W*.5,H*.71,W*.32);
+  dg.addColorStop(0,'rgba(55,180,110,.14)'); dg.addColorStop(1,'transparent');
+  ctx.fillStyle=dg; ctx.fillRect(0,H*.45,W,H*.55);
+
+  // Floating knowledge glyphs
+  const glySet=['智','慧','道','學','文','理','思','知'];
+  for(let g=0;g<5;g++){
+    const gx=W*.18+g*W*.17+Math.sin(t*.55+g)*18;
+    const gy=H*.52-((t*11+g*25)%(H*.38));
+    ctx.globalAlpha=.12+.1*Math.sin(t+g);
+    ctx.fillStyle='#44d898'; ctx.font=`${12+g%3*2}px Ma Shan Zheng`;
+    ctx.textAlign='center'; ctx.fillText(glySet[g%glySet.length],gx,gy);
+  }
+  ctx.globalAlpha=1;
+
+  // ── CHIBI SCHOLAR CHARACTER ──
+  _sceneScholar(ctx, W*.5, H*.77, H*.4, ri, t);
+
+  const vg2=ctx.createLinearGradient(0,H*.88,0,H);
+  vg2.addColorStop(0,'transparent'); vg2.addColorStop(1,'rgba(3,5,4,.75)');
+  ctx.fillStyle=vg2; ctx.fillRect(0,H*.88,W,H*.12);
+}
+
+// ────── SCENE PROPS ──────
+function _mountains(ctx,W,baseY,w,h,col,peaks=5){
+  ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(0,baseY);
+  for(let i=0;i<=peaks;i++){ const px=(i/peaks)*w,py=baseY-h*(.4+.6*Math.abs(Math.sin(i*2.1+1))); ctx.lineTo(px,py); }
+  ctx.lineTo(w,baseY); ctx.closePath(); ctx.fill();
+}
+function _torch(ctx,x,y,h,t,off){
+  ctx.fillStyle='#3a1e0a'; ctx.fillRect(x-4,y,8,h); ctx.fillStyle='#5a3012'; ctx.fillRect(x-6,y-8,12,10);
+  for(let f=0;f<3;f++){
+    const g=ctx.createRadialGradient(x,y-8,0,x,y-8,14+f*5);
+    g.addColorStop(0,'rgba(255,248,180,1)'); g.addColorStop(.4,'rgba(255,130,20,.9)'); g.addColorStop(1,'transparent');
+    ctx.globalAlpha=.85+Math.sin(t*7+off+f)*.12;
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x+Math.sin(t*5+f)*2,y-8-f*4,9+f*3,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+function _woodenDummy(ctx,x,y,size,t){
+  const s=size/100; ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
+  const wb=Math.sin(t*12)*(Math.abs(Math.sin(t*2))>.7?.4:0);
+  ctx.fillStyle='#523010'; ctx.fillRect(-5,-65,10,65);
+  ctx.fillStyle='#6a4018'; ctx.beginPath(); ctx.arc(0,-75,17,0,Math.PI*2); ctx.fill();
+  ctx.save(); ctx.rotate(wb); ctx.fillStyle='#523010';
+  ctx.fillRect(-40,-78,24,7); ctx.fillRect(16,-78,24,7); ctx.restore();
+  ctx.strokeStyle='#c07838'; ctx.lineWidth=1.8; ctx.globalAlpha=.5;
+  ctx.beginPath(); ctx.moveTo(-9,-80); ctx.lineTo(9,-68); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-7,-68); ctx.lineTo(11,-80); ctx.stroke();
+  ctx.globalAlpha=1; ctx.restore();
+}
+function _weightRack(ctx,x,y,size){
+  const s=size/60; ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
+  ctx.fillStyle='#3a2610'; ctx.fillRect(-32,-8,64,10); ctx.fillRect(-34,-38,10,38); ctx.fillRect(24,-38,10,38);
+  for(let i=0;i<3;i++){
+    ctx.fillStyle=['#4a4a4a','#5c5c5c','#3a3a3a'][i];
+    ctx.beginPath(); ctx.ellipse(-18+i*18,-20,9,13,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#777'; ctx.lineWidth=1; ctx.stroke();
+  }
+  ctx.restore();
+}
+function _banner(ctx,x,y,h,t){
+  const s=h/120; ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
+  const w2=Math.sin(t*1.3)*7;
+  ctx.fillStyle='#700808';
+  ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(-3,105); ctx.lineTo(30+w2,110); ctx.lineTo(30+w2*.6,62); ctx.lineTo(30+w2*.2,28); ctx.lineTo(-3,0); ctx.fill();
+  ctx.strokeStyle='#d4a843'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='#d4a843'; ctx.font='bold 24px Ma Shan Zheng'; ctx.textAlign='center'; ctx.fillText('武',14+w2*.25,68);
+  ctx.restore();
+}
+function _pagoda(ctx,x,baseY,h){
+  ctx.fillStyle='rgba(6,16,12,.9)';
+  for(let l=0;l<5;l++){
+    const ly=baseY-l*(h/5),lw=(5-l)*(h/5)*.42;
+    ctx.fillRect(x-lw/2,ly-h/5,lw,h/5*.72);
+    ctx.beginPath(); ctx.moveTo(x-lw/2-5,ly-h/5); ctx.lineTo(x,ly-h/5-9); ctx.lineTo(x+lw/2+5,ly-h/5); ctx.fill();
+  }
+}
+function _lantern(ctx,x,y,size,t,off){
+  const fl=Math.sin(t*4.2+off)*.09;
+  const lg=ctx.createRadialGradient(x,y,0,x,y,size*1.9);
+  lg.addColorStop(0,`rgba(80,195,130,${.28+fl})`); lg.addColorStop(1,'transparent');
+  ctx.fillStyle=lg; ctx.fillRect(x-size*2,y-size*2,size*4,size*4);
+  ctx.fillStyle=`rgba(15,55,28,${.88+fl})`;
+  ctx.beginPath(); ctx.roundRect(x-size*.38,y-size*.52,size*.76,size,[3]); ctx.fill();
+  ctx.strokeStyle=`rgba(70,195,115,${.65+fl})`; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle=`rgba(100,230,155,${.32+fl*2.5})`;
+  ctx.beginPath(); ctx.ellipse(x,y,size*.22,size*.38,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(70,175,100,.38)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(x,y-size*.52); ctx.lineTo(x,y-size); ctx.stroke();
+}
+function _scholarsDesk(ctx,cx,cy,deskW,deskH,t,ri){
+  const s=deskH/80; ctx.save(); ctx.translate(cx,cy); ctx.scale(s,s);
+  const dw=deskW/s;
+  // Surface
+  ctx.fillStyle='#152818'; ctx.beginPath(); ctx.roundRect(-dw/2,-28,dw,40,[4]); ctx.fill();
+  ctx.strokeStyle='rgba(55,160,90,.22)'; ctx.lineWidth=1; ctx.stroke();
+  // Legs
+  ctx.fillStyle='#0c1c10';
+  ctx.fillRect(-dw/2+12,12,12,32); ctx.fillRect(dw/2-24,12,12,32);
+  // Scroll / book left
+  ctx.fillStyle='#c8a870'; ctx.beginPath(); ctx.roundRect(-dw/2+20,-42,58,13,[3]); ctx.fill();
+  ctx.fillStyle='#a08040'; ctx.fillRect(-dw/2+22,-42,4,13); ctx.fillRect(-dw/2+72,-42,4,13);
+  // Glowing screen (laptop/tablet)
+  if(ri>=1){
+    const scfl=Math.sin(t*2.1)*.04;
+    ctx.fillStyle='#0a1a10'; ctx.beginPath(); ctx.roundRect(-22,-58,52,37,[3]); ctx.fill();
+    ctx.fillStyle=`rgba(35,175,110,${.72+scfl})`; ctx.beginPath(); ctx.roundRect(-19,-55,46,29,[2]); ctx.fill();
+    for(let l=0;l<4;l++){ ctx.fillStyle='rgba(70,220,140,.38)'; ctx.fillRect(-16,-51+l*6,18+(l%3)*12,2); }
+    if(Math.floor(t*2)%2===0){ ctx.fillStyle='#80ffcc'; ctx.fillRect(-16+(t*18%30),(-51+18),2,11); }
+  }
+  // Inkstone + brush
+  ctx.fillStyle='#1c0a08'; ctx.beginPath(); ctx.ellipse(dw/2-28,-20,15,9,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#080404'; ctx.beginPath(); ctx.ellipse(dw/2-28,-20,10,5.5,0,0,Math.PI*2); ctx.fill();
+  ctx.save(); ctx.translate(dw/2-10,-32); ctx.rotate(-.4);
+  ctx.strokeStyle='#8a6030'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,42); ctx.stroke();
+  ctx.fillStyle='#180a04'; ctx.beginPath(); ctx.moveTo(-4,40); ctx.lineTo(4,40); ctx.lineTo(0,52); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  // Tea cup
+  ctx.fillStyle='#243828'; ctx.beginPath(); ctx.ellipse(dw/2-58,-18,11,7.5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(45,170,90,.35)'; ctx.beginPath(); ctx.ellipse(dw/2-58,-22,7.5,4.5,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(80,190,115,.28)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+  const sw2=Math.sin(t*2.2)*3.5;
+  ctx.beginPath(); ctx.moveTo(dw/2-58,-28); ctx.quadraticCurveTo(dw/2-58+sw2,-38,dw/2-58,-48); ctx.stroke();
+  ctx.restore();
+}
+
+// ────── SCENE CHARACTERS ──────
+const WP = [ // warrior palettes by rank
+  {body:'#3c2010',armor:'#5a3818',trim:'#8a5828',skin:'#eba870',hair:'#180c04',eye:'#3a1a0a',blush:'#e06060',weapon:'#909090'},
+  {body:'#2a3218',armor:'#425228',trim:'#7aa030',skin:'#eba870',hair:'#180c04',eye:'#182808',blush:'#e06060',weapon:'#c0c0c0'},
+  {body:'#3a1a10',armor:'#622818',trim:'#c06828',skin:'#eba870',hair:'#1a0804',eye:'#3a1606',blush:'#e06060',weapon:'#d07828'},
+  {body:'#481808',armor:'#882210',trim:'#e07828',skin:'#eba870',hair:'#200804',eye:'#400a06',blush:'#f07050',weapon:'#e89830'},
+  {body:'#580808',armor:'#a01818',trim:'#ff4020',skin:'#eba870',hair:'#300404',eye:'#500806',blush:'#f06040',weapon:'#f8a830'},
+  {body:'#3a0408',armor:'#800010',trim:'#ff2010',skin:'#eba870',hair:'#400408',eye:'#600408',blush:'#ff5030',weapon:'#ffc030'},
+  {body:'#1c0404',armor:'#500008',trim:'#ffc020',skin:'#eba870',hair:'#500410',eye:'#700408',blush:'#ff9050',weapon:'#ffe050'},
+  {body:'#100204',armor:'#300006',trim:'#ffe060',skin:'#f8c890',hair:'#600420',eye:'#800410',blush:'#ffb870',weapon:'#fff090'},
+];
+const SP = [ // scholar palettes by rank
+  {body:'#182838',armor:'#284858',trim:'#488878',skin:'#eba870',hair:'#180c04',eye:'#102030',blush:'#c06888',fan:'#88aa78'},
+  {body:'#102038',armor:'#203060',trim:'#2a7a68',skin:'#eba870',hair:'#180c04',eye:'#082028',blush:'#c06888',fan:'#aac888'},
+  {body:'#082030',armor:'#183858',trim:'#189060',skin:'#eba870',hair:'#170a04',eye:'#062028',blush:'#b06078',fan:'#c8d8a8'},
+  {body:'#041828',armor:'#103050',trim:'#10a870',skin:'#eba870',hair:'#150804',eye:'#041820',blush:'#b06078',fan:'#d8e8c0'},
+  {body:'#020c18',armor:'#082040',trim:'#08c880',skin:'#eba870',hair:'#200804',eye:'#020c18',blush:'#a05070',fan:'#e8f0d0'},
+  {body:'#010818',armor:'#041830',trim:'#06e098',skin:'#eba870',hair:'#300808',eye:'#010808',blush:'#a05070',fan:'#f0f8e0'},
+  {body:'#010410',armor:'#031020',trim:'#20f0b0',skin:'#eba870',hair:'#400c18',eye:'#010408',blush:'#9040a0',fan:'#f8fff0'},
+  {body:'#010208',armor:'#020810',trim:'#40f8c8',skin:'#f8c890',hair:'#500820',eye:'#010208',blush:'#c060c0',fan:'#ffffff'},
+];
+
+function _sceneWarrior(ctx, cx, baseY, size, ri, t) {
+  const s = size/180; ctx.save(); ctx.translate(cx, baseY); ctx.scale(s,s);
+  const p = WP[Math.min(ri,7)];
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,.32)'; ctx.beginPath(); ctx.ellipse(0,2,32,7,0,0,Math.PI*2); ctx.fill();
+
+  const exercise = ['pushup','squat','punch','punch','sword','sword','levitate','levitate'][ri];
+
+  if(exercise==='pushup') {
+    const ph = Math.abs(Math.sin(t*2.2));
+    const by = -18 - ph*14;
+    // arms
+    ctx.fillStyle=p.armor;
+    ctx.fillRect(-32,by-4,12,16+ph*7); ctx.fillRect(20,by-4,12,16+ph*7);
+    // body
+    ctx.beginPath(); ctx.roundRect(-24,by-8,48,18,[5]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.fillRect(-24,by-8,48,3);
+    // legs
+    ctx.fillStyle=p.body; ctx.fillRect(-20,by+10,40,15); ctx.fillRect(-18,by+25,15,12); ctx.fillRect(3,by+25,15,12);
+    ctx.fillStyle='#180a04'; ctx.beginPath(); ctx.ellipse(-10,by+38,11,7,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(10,by+38,11,7,0,0,Math.PI*2); ctx.fill();
+    // head
+    ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,by-28,26,0,Math.PI*2); ctx.fill();
+    _chibiFace(ctx,0,by-28,p,t,true); _chibiBangs(ctx,0,by-28,p,ri);
+  }
+  else if(exercise==='squat') {
+    const sq=(1+Math.sin(t*2))/2;
+    const legH=15+sq*18;
+    ctx.fillStyle=p.armor;
+    ctx.save(); ctx.translate(-28,-42); ctx.rotate(-.45+sq*.3); ctx.beginPath(); ctx.roundRect(-5,0,10,24,[4]); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(28,-42); ctx.rotate(.45-sq*.3); ctx.beginPath(); ctx.roundRect(-5,0,10,24,[4]); ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.roundRect(-22,-60,44,28,[5]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.fillRect(-22,-60,44,3);
+    ctx.fillStyle=p.body;
+    ctx.save(); ctx.translate(-12,-32); ctx.rotate(.28+sq*.5); ctx.fillRect(-6,0,12,legH); ctx.restore();
+    ctx.save(); ctx.translate(12,-32); ctx.rotate(-.28-sq*.5); ctx.fillRect(-6,0,12,legH); ctx.restore();
+    ctx.fillStyle='#180a04';
+    ctx.beginPath(); ctx.ellipse(-16+sq*4,-2+sq*8,11,6.5,.28,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16-sq*4,-2+sq*8,11,6.5,-.28,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,-74,26,0,Math.PI*2); ctx.fill();
+    _chibiFace(ctx,0,-74,p,t,true); _chibiBangs(ctx,0,-74,p,ri);
+  }
+  else if(exercise==='punch') {
+    const pch=Math.abs(Math.sin(t*3.2));
+    const by=-40;
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-22,by-18,44,32,[5]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.fillRect(-22,by-18,44,3);
+    // punch arm
+    ctx.save(); ctx.translate(22,by-10); ctx.rotate(-.3-pch*.55);
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-5,-5,10,30,[4]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.beginPath(); ctx.ellipse(0,26,8.5,6,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    // back arm
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-34,by-14,12,26,[4]); ctx.fill();
+    ctx.fillStyle=p.body; ctx.fillRect(-20,by+14,16,24); ctx.fillRect(4,by+14,16,24);
+    ctx.fillStyle='#180a04';
+    ctx.beginPath(); ctx.ellipse(-11,by+40,11,6.5,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,by+40,11,6.5,0,0,Math.PI*2); ctx.fill();
+    // impact sparks
+    if(pch>.72){ ctx.strokeStyle='#ffb840'; ctx.lineWidth=2; ctx.globalAlpha=(pch-.72)*3.2;
+      for(let sp=0;sp<6;sp++){ const a=(sp/6)*Math.PI*2;
+        ctx.beginPath(); ctx.moveTo(38,by-4); ctx.lineTo(38+Math.cos(a)*17,by-4+Math.sin(a)*13); ctx.stroke(); }
+      ctx.globalAlpha=1; }
+    ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,by-36,26,0,Math.PI*2); ctx.fill();
+    _chibiFace(ctx,0,by-36,p,t,true); _chibiBangs(ctx,0,by-36,p,ri);
+  }
+  else if(exercise==='sword') {
+    const sw=Math.sin(t*2.2);
+    const by=-40;
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-22,by-18,44,34,[5]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.fillRect(-22,by-18,44,3);
+    ctx.save(); ctx.translate(24,by-10); ctx.rotate(-.85+sw*.65);
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-5,-5,10,28,[4]); ctx.fill();
+    ctx.strokeStyle=p.weapon; ctx.lineWidth=3; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(0,22); ctx.lineTo(2,65); ctx.stroke();
+    ctx.fillStyle=p.weapon; ctx.beginPath(); ctx.moveTo(-4,60); ctx.lineTo(6,60); ctx.lineTo(1,70); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=p.trim; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(-9,24); ctx.lineTo(9,20); ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.translate(-26,by-8); ctx.rotate(.4);
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-5,-4,10,24,[4]); ctx.fill(); ctx.restore();
+    ctx.fillStyle=p.body;
+    ctx.save(); ctx.translate(-14,by+16); ctx.rotate(.2); ctx.fillRect(-6,0,12,26); ctx.restore();
+    ctx.save(); ctx.translate(14,by+16); ctx.rotate(-.2); ctx.fillRect(-6,0,12,26); ctx.restore();
+    ctx.fillStyle='#180a04';
+    ctx.beginPath(); ctx.ellipse(-16,by+44,12,7,.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16,by+44,12,7,-.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,by-36,26,0,Math.PI*2); ctx.fill();
+    _chibiFace(ctx,0,by-36,p,t,false); _chibiBangs(ctx,0,by-36,p,ri);
+  }
+  else { // levitate
+    const lv=Math.sin(t*1.3)*10;
+    const by=-52+lv;
+    ctx.globalAlpha=.18+Math.sin(t*2)*.08;
+    const ag=ctx.createRadialGradient(0,by,0,0,by,72);
+    ag.addColorStop(0,'#ffe080'); ag.addColorStop(1,'transparent');
+    ctx.fillStyle=ag; ctx.beginPath(); ctx.arc(0,by,72,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    for(let r=0;r<3;r++){ ctx.strokeStyle='#ffc030'; ctx.lineWidth=1.5; ctx.globalAlpha=.28+r*.14;
+      ctx.beginPath(); ctx.ellipse(0,by+34,22+r*16,6+r*3,0,0,Math.PI*2); ctx.stroke(); }
+    ctx.globalAlpha=1;
+    ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-22,by-18,44,32,[5]); ctx.fill();
+    ctx.fillStyle=p.trim; ctx.fillRect(-22,by-18,44,3);
+    ctx.fillStyle=p.armor;
+    ctx.save(); ctx.translate(-30,by-6); ctx.rotate(-Math.PI*.28+Math.sin(t)*.1); ctx.beginPath(); ctx.roundRect(-5,-4,10,24,[4]); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(30,by-6); ctx.rotate(Math.PI*.28-Math.sin(t)*.1); ctx.beginPath(); ctx.roundRect(-5,-4,10,24,[4]); ctx.fill(); ctx.restore();
+    ctx.fillStyle=p.body;
+    ctx.save(); ctx.translate(-12,by+14); ctx.rotate(.2+Math.sin(t*1.6)*.1); ctx.fillRect(-6,0,12,24); ctx.restore();
+    ctx.save(); ctx.translate(12,by+14); ctx.rotate(-.2-Math.sin(t*1.6)*.1); ctx.fillRect(-6,0,12,24); ctx.restore();
+    ctx.fillStyle='#180a04';
+    ctx.beginPath(); ctx.ellipse(-14,by+42,11,6.5,.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(14,by+42,11,6.5,-.2,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#ffd040'; ctx.lineWidth=1.5;
+    for(let pk=0;pk<9;pk++){
+      const pa=(pk/9)*Math.PI*2+t*.8; const pr=48+Math.sin(t*2.5+pk)*9;
+      ctx.globalAlpha=.35+Math.sin(t*3+pk)*.3;
+      ctx.beginPath(); ctx.moveTo(Math.cos(pa)*pr,by+Math.sin(pa)*pr*.38); ctx.lineTo(Math.cos(pa-.32)*(pr-12),by+Math.sin(pa-.32)*(pr-12)*.38); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,by-36,26,0,Math.PI*2); ctx.fill();
+    _chibiFace(ctx,0,by-36,p,t,false); _chibiBangs(ctx,0,by-36,p,ri);
+  }
+  ctx.restore();
+}
+
+function _sceneScholar(ctx, cx, baseY, size, ri, t) {
+  const s=size/155; ctx.save(); ctx.translate(cx,baseY); ctx.scale(s,s);
+  const p=SP[Math.min(ri,7)];
+  ctx.fillStyle='rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(0,4,26,6,0,0,Math.PI*2); ctx.fill();
+  const by=-28;
+  // Seated robe base
+  ctx.fillStyle=p.body; ctx.beginPath(); ctx.moveTo(-26,by+38); ctx.lineTo(26,by+38); ctx.lineTo(34,by+55); ctx.lineTo(-34,by+55); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-20,by-12,40,52,[5,5,0,0]); ctx.fill();
+  ctx.strokeStyle=p.trim; ctx.lineWidth=1.3; ctx.globalAlpha=.65;
+  ctx.beginPath(); ctx.moveTo(-20,by-12); ctx.lineTo(-20,by+40); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(20,by-12); ctx.lineTo(20,by+40); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-20,by+12); ctx.lineTo(20,by+12); ctx.stroke();
+  ctx.globalAlpha=1;
+  // left arm typing
+  const tb=Math.sin(t*5.8)*3.2;
+  ctx.save(); ctx.translate(-26,by-2); ctx.rotate(-.18);
+  ctx.fillStyle=p.body; ctx.beginPath(); ctx.roundRect(-6,0,12,24,[4]); ctx.fill();
+  ctx.fillStyle=p.skin; ctx.beginPath(); ctx.ellipse(-2,26+tb,7.5,5.5,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+  // right arm writing
+  const wb2=Math.sin(t*5.2+1)*3;
+  ctx.save(); ctx.translate(26,by-2); ctx.rotate(.16);
+  ctx.fillStyle=p.body; ctx.beginPath(); ctx.roundRect(-6,0,12,24,[4]); ctx.fill();
+  ctx.fillStyle=p.skin; ctx.beginPath(); ctx.ellipse(2,26+wb2,7.5,5.5,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#8a6030'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(4,24+wb2); ctx.lineTo(10,42+wb2); ctx.stroke(); ctx.restore();
+  // Head
+  ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,by-38,28,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.blush; ctx.globalAlpha=.28;
+  ctx.beginPath(); ctx.ellipse(-15,by-32,9.5,6.5,-.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(15,by-32,9.5,6.5,.2,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  // Eyes – focused squint
+  const bl2=Math.sin(t*2.8+.6)>.93;
+  ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.ellipse(-10,by-38,7.5,bl2?1:8.5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,by-38,7.5,bl2?1:8.5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.eye;
+  ctx.beginPath(); ctx.ellipse(-10,by-37,5,bl2?.5:7.5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,by-37,5,bl2?.5:7.5,0,0,Math.PI*2); ctx.fill();
+  if(!bl2){
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(-11.5,by-41,2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(8.5,by-41,2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-9,by-34.5,1,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(11,by-34.5,1,0,Math.PI*2); ctx.fill();
+  }
+  // Focused brows
+  ctx.strokeStyle=p.hair; ctx.lineWidth=1.6; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-17,by-48); ctx.lineTo(-3,by-50); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(3,by-50); ctx.lineTo(17,by-48); ctx.stroke();
+  // Mouth
+  ctx.strokeStyle='#c07060'; ctx.lineWidth=1.4;
+  ctx.beginPath(); ctx.arc(0,by-26,3.5,.25,Math.PI-.25); ctx.stroke();
+  ctx.fillStyle='#c09060'; ctx.beginPath(); ctx.arc(0,by-30,1.4,0,Math.PI*2); ctx.fill();
+  _chibiBangs(ctx,0,by-38,p,ri);
+  // Rank cosmetics
+  if(ri>=1){ ctx.fillStyle=p.trim; ctx.fillRect(-2,by-72,4,16); ctx.beginPath(); ctx.ellipse(0,by-73,5.5,4.5,0,0,Math.PI*2); ctx.fill(); }
+  if(ri>=3){ ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-20,by-46,40,8,[2]); ctx.fill(); ctx.strokeStyle=p.trim; ctx.lineWidth=1; ctx.stroke(); }
+  if(ri>=6){ ctx.globalAlpha=.45+Math.sin(t*2)*.2; ctx.strokeStyle=p.trim; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(0,by-38,35,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
+  if(ri>=7){ ctx.fillStyle='#40f8c8'; ctx.globalAlpha=.92; ctx.beginPath(); ctx.arc(0,by-74,7.5,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
+  ctx.restore();
+}
+
+function _chibiFace(ctx,x,y,p,t,effort){
+  const bl=Math.sin(t*3.8)>.93;
+  ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.ellipse(x-10,y,7.5,bl?1:9,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+10,y,7.5,bl?1:9,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.eye;
+  ctx.beginPath(); ctx.ellipse(x-10,y+1,5,bl?.5:8,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+10,y+1,5,bl?.5:8,0,0,Math.PI*2); ctx.fill();
+  if(!bl){
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x-12,y-3,2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+8,y-3,2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x-8.5,y+3,1,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+11.5,y+3,1,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle=p.blush; ctx.globalAlpha=.35;
+  ctx.beginPath(); ctx.ellipse(x-14,y+4,9,6,-.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+14,y+4,9,6,.2,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  if(effort){
+    ctx.strokeStyle='#be6040'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.arc(x,y+11,7,0,Math.PI); ctx.stroke();
+    ctx.fillStyle='#be6040'; ctx.globalAlpha=.5; ctx.beginPath(); ctx.arc(x,y+15,4.5,0,Math.PI); ctx.fill(); ctx.globalAlpha=1;
+    ctx.fillStyle='#80b8ff'; ctx.globalAlpha=.72; ctx.beginPath(); ctx.arc(x+19,y-8,2.8,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle=p.hair; ctx.lineWidth=2; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x-17,y-14); ctx.lineTo(x-2,y-10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2,y-10); ctx.lineTo(x+17,y-14); ctx.stroke();
+  } else {
+    ctx.strokeStyle='#be7050'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(x,y+8,4.5,.2,Math.PI-.2); ctx.stroke();
+    ctx.strokeStyle=p.hair; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x-16,y-15); ctx.quadraticCurveTo(x-9,y-19,x-2,y-15); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2,y-15); ctx.quadraticCurveTo(x+9,y-19,x+16,y-15); ctx.stroke();
+  }
+  ctx.fillStyle='#c0906a'; ctx.beginPath(); ctx.arc(x,y+3,1.6,0,Math.PI*2); ctx.fill();
+}
+
+function _chibiBangs(ctx,x,y,p,ri){
+  ctx.fillStyle=p.hair;
+  ctx.beginPath(); ctx.arc(x,y,29,Math.PI*.65,Math.PI*2.35); ctx.lineTo(x,y); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x-15,y-26,10,8,-.35,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x-2,y-32,9,8,-.1,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+11,y-31,9.5,8,.1,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+21,y-25,8.5,7,.35,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.07)';
+  ctx.beginPath(); ctx.ellipse(x-5,y-20,8,5,-.4,0,Math.PI*2); ctx.fill();
+  if(ri>=4){ ctx.fillStyle=p.trim; ctx.beginPath(); ctx.arc(x,y-40,4.5,0,Math.PI*2); ctx.fill(); }
+  if(ri>=7){ ctx.fillStyle='#ffe080'; ctx.font='bold 11px serif'; ctx.textAlign='center'; ctx.fillText('✦',x,y-46); }
 }
 
 function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
@@ -1922,32 +2771,45 @@ function renderHub() {
   const nextRank = getNextRank();
   const rankIdx = getCurrentRankIdx();
 
-  const auraColor = p.path==='scholar' ? 'rgba(46,138,106,0.3)' : 'rgba(122,21,21,0.3)';
-  const auraEl = document.getElementById('char-aura');
-  if(auraEl) auraEl.style.boxShadow=`0 0 30px ${auraColor}, 0 0 60px ${auraColor.replace('0.3','0.12')}`;
-
+  // ── Scene ──
+  scenePath  = p.path || 'warrior';
+  sceneRankIdx = rankIdx;
   startCharAnimation();
-  if(document.getElementById('personality-bubble')) startPersonalityQuotes();
+  startPersonalityQuotes();
 
-  document.getElementById('char-name').innerHTML = `${p.name||'Hero'} <span style="font-size:0.75em;opacity:0.45;">✎</span>`;
-  const pathBadge = document.getElementById('char-path-badge');
-  pathBadge.textContent = p.path==='scholar'?'SCHOLAR':'WARRIOR';
-  pathBadge.className = 'char-path-badge '+(p.path||'warrior');
-  document.getElementById('char-rank').textContent = `${rank.name} · ${rank.en}`;
+  // ── Nameplate ──
+  const nm = document.getElementById('char-name');
+  if(nm) nm.innerHTML = `${p.name||'Hero'} <span style="opacity:.35;font-size:.75em;">✎</span>`;
+  const pb = document.getElementById('char-path-badge');
+  if(pb){ pb.textContent = p.path==='scholar'?'SCHOLAR':'WARRIOR'; pb.className='spirit-path-badge '+(p.path||'warrior'); }
+  const rk = document.getElementById('char-rank');
+  if(rk) rk.textContent = `${rank.name} · ${rank.en}`;
 
+  // ── XP bar ──
   const xpFill = document.getElementById('xp-fill');
-  xpFill.className = 'xp-fill '+(p.path||'warrior');
-  const xpForNext = nextRank ? nextRank.xp : rank.xp;
-  const xpFromCur = p.totalXp - rank.xp;
-  const xpNeeded = xpForNext - rank.xp;
-  const pct = nextRank ? Math.min(100,(xpFromCur/xpNeeded)*100) : 100;
-  xpFill.style.width = pct+'%';
-  document.getElementById('xp-text').textContent = `${p.totalXp} / ${xpForNext} XP`;
+  if(xpFill){
+    const xpForNext = nextRank ? nextRank.xp : rank.xp;
+    const pct = nextRank ? Math.min(100,((p.totalXp-rank.xp)/(xpForNext-rank.xp))*100) : 100;
+    xpFill.style.width = pct+'%';
+    xpFill.className = 'spirit-xp-fill '+(p.path==='scholar'?'scholar':'warrior');
+  }
+  const xt = document.getElementById('xp-text');
+  if(xt) xt.textContent = `${p.totalXp} / ${nextRank?nextRank.xp:rank.xp} XP`;
 
-  document.getElementById('stat-quests').textContent = p.questsCreated;
-  document.getElementById('stat-chapters').textContent = p.chaptersCompleted;
-  document.getElementById('stat-bosses').textContent = p.bossesDefeated;
-  document.getElementById('stat-perfect').textContent = p.perfectRuns;
+  // ── Activity tag ──
+  const actTag = document.getElementById('spirit-activity-tag');
+  if(actTag){
+    const wActs = ['⚔ TRAINING','⚔ SPARRING','⚔ DRILLING','⚔ BATTLE FORM','⚔ SWORD FORM','⚔ WAR FORM','☀ ASCENDING','☉ HEAVEN REALM'];
+    const sActs = ['📖 STUDYING','📖 READING','💻 COMPUTING','📜 STRATEGISING','💡 FORMULATING','🌙 MEDITATING','✨ ENLIGHTENED','🐉 DRAGON STATE'];
+    const acts = p.path==='scholar'?sActs:wActs;
+    actTag.textContent = acts[Math.min(rankIdx,acts.length-1)];
+    actTag.className = 'spirit-activity-tag '+(p.path||'warrior');
+  }
+
+  // ── Stats ──
+  const sv = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  sv('stat-quests',p.questsCreated); sv('stat-chapters',p.chaptersCompleted);
+  sv('stat-bosses',p.bossesDefeated); sv('stat-perfect',p.perfectRuns);
 
   renderSigils();
 
@@ -1972,7 +2834,7 @@ function renderHub() {
     `臥龍 — Sleeping Dragon — awakens. ${p.name} has unified Jiuzhou not with swords but with wisdom.`,
   ];
   const lores = p.path==='scholar' ? scholarLores : warriorLores;
-  document.getElementById('world-lore-text').textContent = lores[Math.min(rankIdx, lores.length-1)];
+  sv('world-lore-text', lores[Math.min(rankIdx, lores.length-1)]);
 
   renderQuestGrid();
   renderLibraryGrid();
