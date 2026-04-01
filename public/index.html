@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>萬卷書 — Ten Thousand Scrolls</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Cinzel+Decorative:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+
+:root {
+  --ink:        #07050a;
+  --ink2:       #0e0a0f;
+  --paper:      #f0e6cc;
+  --paper2:     #e2d4b0;
+  --gold:       #c8a84b;
+  --gold2:      #e8c96a;
+  --gold3:      #f5dfa0;
+  --red:        #7a1515;
+  --red2:       #b03030;
+  --red3:       #e84040;
+  --jade:       #1e5c4a;
+  --jade2:      #2e8a6a;
+  --jade3:      #40c090;
+  --violet:     #3a1a5a;
+  --violet2:    #7040b0;
+  --mist:       rgba(240,230,204,0.05);
+  --shadow:     rgba(7,5,10,0.85);
+  --glow-gold:  0 0 20px rgba(200,168,75,0.5);
+  --glow-red:   0 0 20px rgba(176,48,48,0.6);
+  --glow-jade:  0 0 20px rgba(46,138,106,0.5);
+  --text-muted: rgba(240,230,204,0.38);
+  --path-color: #c8a84b;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%; overflow:hidden;
+  background: var(--ink);
+  font-family: 'Noto Serif SC', serif;
+  color: var(--paper);
+}
+
+body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z' fill='%23c8a84b' opacity='0.8'/%3E%3C/svg%3E") 12 12, default; }
+
+#bg-canvas, #particle-canvas {
+  position:fixed; inset:0; z-index:0;
+  width:100%; height:100%;
+  pointer-events:none;
+}
+#particle-canvas { z-index:1; }
+
+.screen { position:fixed; inset:0; z-index:10; display:none; overflow:hidden; }
+.screen.active { display:flex; }
+
+/* ═══ TITLE SCREEN ═══ */
+#screen-title { flex-direction:column; align-items:center; justify-content:center; gap:0; }
+.title-inkblot { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(ellipse, rgba(7,5,10,0) 0%, rgba(7,5,10,0) 40%, rgba(200,168,75,0.03) 60%, rgba(200,168,75,0.08) 75%, rgba(7,5,10,0) 100%); pointer-events:none; animation: breatheRing 6s ease-in-out infinite; }
+@keyframes breatheRing { 0%,100% { transform:translate(-50%,-50%) scale(1); opacity:0.6; } 50% { transform:translate(-50%,-50%) scale(1.15); opacity:1; } }
+.title-seal { width:150px; height:150px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:2rem; box-shadow: var(--glow-gold), inset 0 0 40px rgba(200,168,75,0.08); animation: sealFloat 4s ease-in-out infinite; }
+.title-seal::before { content:''; position:absolute; inset:7px; border-radius:50%; border:1px solid rgba(200,168,75,0.25); }
+.title-seal::after { content:''; position:absolute; inset:14px; border-radius:50%; border:1px dashed rgba(200,168,75,0.12); }
+@keyframes sealFloat { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-8px) rotate(3deg); } }
+.title-seal-char { font-family:'Ma Shan Zheng',serif; font-size:3.8rem; color:var(--gold); text-shadow: var(--glow-gold); position:relative;z-index:1; }
+.title-main { font-family:'Cinzel Decorative',serif; font-size:clamp(1.6rem,3.5vw,2.8rem); font-weight:700; letter-spacing:0.25em; color:var(--gold); text-shadow: 0 0 60px rgba(200,168,75,0.5), 0 2px 4px rgba(0,0,0,0.9); margin-bottom:0.4rem; animation: fadeSlideUp 1s ease 0.3s both; text-align:center; }
+.title-chinese { font-family:'ZCOOL XiaoWei',serif; font-size:clamp(0.9rem,2vw,1.4rem); color:var(--paper2); letter-spacing:1em; opacity:0.6; animation: fadeSlideUp 1s ease 0.5s both; margin-bottom:2.5rem; text-align:center; }
+@keyframes fadeSlideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+.title-brushstroke { width:340px; height:8px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 8'%3E%3Cpath d='M0 4 Q85 1 170 4 Q255 7 340 4' stroke='%23c8a84b' stroke-width='1.5' fill='none' opacity='0.5'/%3E%3Cpath d='M20 4 Q100 2 170 4 Q240 6 320 4' stroke='%23c8a84b' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E") center/contain no-repeat; margin:0 auto 2.5rem; animation: fadeSlideUp 1s ease 0.7s both; }
+.title-lore { max-width:440px; text-align:center; font-size:0.85rem; line-height:2; color:var(--text-muted); font-style:italic; animation: fadeSlideUp 1s ease 0.9s both; margin-bottom:3rem; padding:0 2rem; font-family:'ZCOOL XiaoWei',serif; }
+.btn-primary { padding:0.9rem 3rem; background:linear-gradient(135deg,#7a1515,#501010); border:1px solid var(--gold); color:var(--gold); font-family:'Cinzel Decorative',serif; font-size:0.8rem; letter-spacing:0.3em; cursor:pointer; transition:all 0.3s; clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%); box-shadow: var(--glow-red); animation: fadeSlideUp 1s ease 1.1s both; position:relative; overflow:hidden; }
+.btn-primary::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(200,168,75,0.1),transparent); transform:translateX(-100%); transition:transform 0.5s; }
+.btn-primary:hover::before { transform:translateX(100%); }
+.btn-primary:hover { background:linear-gradient(135deg,#9a1a1a,#7a1515); box-shadow: var(--glow-red), 0 0 50px rgba(139,26,26,0.3); transform:translateY(-2px); }
+.btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+#auth-buttons { display:none; flex-direction:column; width:100%; max-width:300px; animation: fadeSlideUp 1s ease 1.1s both; }
+
+/* ═══ PATH SCREEN ═══ */
+#screen-path { flex-direction:column; align-items:center; justify-content:flex-start; padding: 4rem 1.5rem; overflow-y: auto; }
+.path-header { text-align:center; margin-bottom: 2rem; }
+.path-title { font-family:'ZCOOL XiaoWei',serif; font-size:clamp(1.4rem,3vw,2rem); color:var(--gold); letter-spacing:0.3em; margin-bottom:0.5rem; }
+.path-subtitle { font-size:0.75rem; color:var(--text-muted); letter-spacing:0.25em; }
+.path-cards { display:flex; gap:2rem; flex-wrap:wrap; justify-content:center; margin-bottom: 2rem; }
+.path-card { width:240px; background:linear-gradient(160deg,rgba(14,10,15,0.95),rgba(7,5,10,0.98)); border:1px solid rgba(200,168,75,0.2); padding:2rem 1.5rem; cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden; text-align:center; clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%); }
+.path-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; transition:opacity 0.3s; opacity:0; }
+.path-card.warrior::before { background:linear-gradient(90deg,var(--red),var(--gold),var(--red)); }
+.path-card.scholar::before { background:linear-gradient(90deg,var(--jade),var(--gold),var(--jade)); }
+.path-card:hover { transform:translateY(-6px); border-color:rgba(200,168,75,0.5); }
+.path-card:hover::before { opacity:1; }
+.path-card.warrior:hover { box-shadow:var(--glow-red), 0 20px 60px rgba(122,21,21,0.3); }
+.path-card.scholar:hover { box-shadow:var(--glow-jade), 0 20px 60px rgba(30,92,74,0.3); }
+.path-card-icon { width:120px; height:120px; margin:0 auto 1.2rem; image-rendering:pixelated; }
+.path-card-name { font-family:'Ma Shan Zheng',serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:0.3rem; }
+.path-card-en { font-size:0.65rem; letter-spacing:0.4em; color:var(--text-muted); margin-bottom:0.8rem; }
+.path-card-desc { font-size:0.75rem; line-height:1.8; color:rgba(240,230,204,0.6); margin-bottom:1rem; }
+.path-card-destiny { font-size:0.62rem; color:var(--gold2); letter-spacing:0.2em; padding:0.4rem 0.8rem; border:1px solid rgba(200,168,75,0.25); }
+.path-card.warrior .path-card-destiny { border-color:rgba(176,48,48,0.4); color:var(--red2); }
+.path-card.scholar .path-card-destiny { border-color:rgba(46,138,106,0.4); color:var(--jade2); }
+.personality-float { position:absolute; top:0.6rem; right:0.6rem; font-size:0.55rem; letter-spacing:0.15em; padding:0.2rem 0.5rem; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.2); color:var(--text-muted); }
+
+/* ═══ HUB ═══ */
+#screen-hub { flex-direction:column; overflow:hidden; }
+.hub-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; border-bottom:1px solid rgba(200,168,75,0.15); background:linear-gradient(180deg,rgba(7,5,10,0.97),rgba(7,5,10,0.85)); backdrop-filter:blur(12px); position:relative; z-index:20; flex-shrink:0; }
+.hub-title { font-family:'Ma Shan Zheng',serif; font-size:1.3rem; color:var(--gold); letter-spacing:0.3em; }
+.hub-tabs { display: flex; background: rgba(7,5,10,0.98); border-bottom: 1px solid rgba(200,168,75,0.2); position: relative; z-index: 15; flex-shrink: 0; }
+.tab-btn { flex: 1; padding: 1rem 0; text-align: center; color: var(--text-muted); font-family: 'Cinzel Decorative', serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; cursor: pointer; transition: all 0.3s; border-bottom: 2px solid transparent; }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(200,168,75,0.05); }
+.hub-body { display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+.tab-pane { display: none; flex: 1; overflow-y: auto; padding: 1.5rem; }
+.tab-pane.active { display: block; }
+
+/* ═══ CHARACTER PANEL ═══ */
+.char-panel-inner { max-width: 400px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; gap:1.2rem; }
+.char-stage { width:160px; height:190px; position:relative; display:flex; align-items:center; justify-content:center; }
+.char-aura { position:absolute; inset:-15px; border-radius:50%; animation: auraPulse 4s ease-in-out infinite; }
+@keyframes auraPulse { 0%,100% { opacity:0.5; transform:scale(1); } 50% { opacity:1; transform:scale(1.05); } }
+.char-sprite { width:140px; height:180px; position:relative; z-index:1; image-rendering:pixelated; }
+.personality-bubble { position:absolute; top:-10px; right:-20px; background:rgba(14,10,15,0.95); border:1px solid rgba(200,168,75,0.3); border-radius:12px 12px 12px 0; padding:0.25rem 0.6rem; font-size:0.6rem; color:var(--gold2); letter-spacing:0.1em; white-space:nowrap; animation:bubbleFade 4s ease-in-out infinite; z-index:5; }
+@keyframes bubbleFade { 0%,100%{opacity:0;transform:translateY(4px);} 15%,85%{opacity:1;transform:translateY(0);} }
+.char-name-row { display:flex; align-items:center; gap:0.5rem; }
+.char-name { font-family:'Ma Shan Zheng',serif; font-size:1.25rem; color:var(--gold); letter-spacing:0.2em; cursor:pointer; transition:opacity 0.2s; }
+.char-name:hover { opacity:0.75; }
+.char-path-badge { font-size:0.55rem; letter-spacing:0.2em; padding:0.15rem 0.5rem; border:1px solid currentColor; opacity:0.7; }
+.char-path-badge.warrior { color:var(--red2); }
+.char-path-badge.scholar { color:var(--jade2); }
+.char-rank { font-size:0.65rem; color:var(--text-muted); letter-spacing:0.3em; text-align:center; margin-top:-0.5rem; }
+.xp-section { width:100%; }
+.xp-label { display:flex; justify-content:space-between; font-size:0.6rem; color:var(--text-muted); letter-spacing:0.12em; margin-bottom:0.35rem; }
+.xp-bar { height:5px; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.15); overflow:hidden; }
+.xp-fill { height:100%; transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1); position:relative; }
+.xp-fill::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; box-shadow:0 0 8px currentColor; background:currentColor; }
+.xp-fill.warrior { background:linear-gradient(90deg,var(--red),var(--gold)); }
+.xp-fill.warrior::after { background:var(--gold2); box-shadow:0 0 8px var(--gold); }
+.xp-fill.scholar { background:linear-gradient(90deg,var(--jade),var(--jade3)); }
+.xp-fill.scholar::after { background:var(--jade3); box-shadow:0 0 8px var(--jade2); }
+.stat-grid { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+.stat-box { background:rgba(200,168,75,0.04); border:1px solid rgba(200,168,75,0.08); padding:0.55rem; text-align:center; transition:all 0.3s; }
+.stat-box:hover { background:rgba(200,168,75,0.08); border-color:rgba(200,168,75,0.2); }
+.stat-val { font-family:'Cinzel Decorative',serif; font-size:1.05rem; color:var(--gold); }
+.stat-lbl { font-size:0.5rem; color:var(--text-muted); letter-spacing:0.2em; margin-top:0.15rem; }
+
+/* ═══════════════════════════════
+   ENHANCED SIGIL SYSTEM
+═══════════════════════════════ */
+.sigil-row {
+  width:100%;
+  background:rgba(200,168,75,0.03);
+  border:1px solid rgba(200,168,75,0.08);
+  border-left:3px solid var(--violet2);
+  padding:0.8rem;
+}
+.sigil-title {
+  font-size:0.55rem; letter-spacing:0.3em;
+  color:var(--violet2); margin-bottom:0.6rem;
+  display:flex; align-items:center; gap:0.5rem;
+}
+.sigil-title::after {
+  content:'HOVER TO INSPECT';
+  font-size:0.45rem; color:var(--text-muted);
+  letter-spacing:0.15em; opacity:0.6;
+}
+.sigil-slots {
+  display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;
+}
+
+/* Each sigil slot is a tooltip parent */
+.sigil-slot {
+  position: relative;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(112,64,176,0.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+  cursor: default;
+  border-radius: 3px;
+}
+
+.sigil-slot.empty {
+  opacity: 0.35;
+  cursor: default;
+  background: rgba(255,255,255,0.02);
+}
+
+.sigil-slot.empty .sigil-char {
+  font-size: 0.75rem;
+  color: rgba(200,168,75,0.2);
+  font-family: 'Ma Shan Zheng', serif;
+}
+
+.sigil-slot.filled {
+  border-color: var(--violet2);
+  background: linear-gradient(135deg, rgba(58,26,90,0.4), rgba(112,64,176,0.15));
+  box-shadow: 0 0 10px rgba(112,64,176,0.35), inset 0 0 8px rgba(112,64,176,0.1);
+  cursor: help;
+  animation: sigilPulse 3s ease-in-out infinite;
+}
+
+@keyframes sigilPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(112,64,176,0.35), inset 0 0 8px rgba(112,64,176,0.1); }
+  50% { box-shadow: 0 0 18px rgba(112,64,176,0.6), inset 0 0 12px rgba(112,64,176,0.2); }
+}
+
+.sigil-slot.filled .sigil-char {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 1.15rem;
+  color: var(--gold2);
+  text-shadow: 0 0 8px rgba(200,168,75,0.6);
+  z-index: 1;
+}
+
+/* Lock icon for empty slots */
+.sigil-slot.empty::after {
+  content: '🔒';
+  position: absolute;
+  font-size: 0.55rem;
+  bottom: -1px;
+  right: -1px;
+  opacity: 0.35;
+}
+
+/* Tooltip card */
+.sigil-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: 180px;
+  background: linear-gradient(160deg, rgba(22,12,35,0.99), rgba(10,6,18,1));
+  border: 1px solid rgba(112,64,176,0.5);
+  border-top: 2px solid var(--violet2);
+  padding: 0.75rem 0.85rem;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 20px rgba(112,64,176,0.2);
+  white-space: normal;
+}
+
+/* Arrow */
+.sigil-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(112,64,176,0.5);
+}
+
+.sigil-slot.filled:hover .sigil-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Prevent clipping on edges */
+.sigil-slot:nth-child(1) .sigil-tooltip,
+.sigil-slot:nth-child(2) .sigil-tooltip {
+  left: 0; transform: translateX(0) translateY(6px);
+}
+.sigil-slot:nth-child(1):hover .sigil-tooltip,
+.sigil-slot:nth-child(2):hover .sigil-tooltip {
+  transform: translateX(0) translateY(0);
+}
+.sigil-slot:nth-child(7) .sigil-tooltip,
+.sigil-slot:nth-child(8) .sigil-tooltip {
+  left: auto; right: 0; transform: translateX(0) translateY(6px);
+}
+.sigil-slot:nth-child(7):hover .sigil-tooltip,
+.sigil-slot:nth-child(8):hover .sigil-tooltip {
+  transform: translateX(0) translateY(0);
+}
+
+.sigil-tooltip-header {
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(112,64,176,0.25);
+}
+
+.sigil-tooltip-glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 1.4rem;
+  color: var(--gold2);
+  text-shadow: 0 0 10px rgba(200,168,75,0.5);
+  line-height: 1;
+  width: 28px;
+  text-align: center;
+}
+
+.sigil-tooltip-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.58rem;
+  color: var(--violet2);
+  letter-spacing: 0.15em;
+  line-height: 1.3;
+}
+
+.sigil-tooltip-element {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-top: 0.1rem;
+}
+
+.sigil-tooltip-effect {
+  font-size: 0.62rem;
+  line-height: 1.6;
+  color: rgba(240,230,204,0.75);
+  margin-bottom: 0.4rem;
+}
+
+.sigil-tooltip-bonus {
+  font-size: 0.58rem;
+  color: var(--gold2);
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.4rem;
+  background: rgba(200,168,75,0.08);
+  border-left: 2px solid var(--gold);
+  font-family: 'Cinzel Decorative', serif;
+}
+
+/* ═══ WORLD LORE ═══ */
+.world-lore-box { width:100%; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.08); border-left:3px solid var(--red); padding:0.9rem; }
+.world-lore-title { font-size:0.55rem; letter-spacing:0.3em; color:var(--red2); margin-bottom:0.4rem; }
+.world-lore-text { font-size:0.68rem; line-height:1.9; color:var(--text-muted); font-style:italic; }
+
+/* ═══ QUEST BOARD ═══ */
+.btn-new-quest { display:flex; align-items:center; gap:1rem; padding:1.1rem 1.4rem; background:linear-gradient(135deg,rgba(122,21,21,0.12),rgba(122,21,21,0.04)); border:1px dashed rgba(200,168,75,0.25); cursor:pointer; transition:all 0.3s; color:var(--paper2); font-family:'Noto Serif SC',serif; margin-bottom:1.5rem; }
+.btn-new-quest:hover { background:linear-gradient(135deg,rgba(122,21,21,0.28),rgba(122,21,21,0.1)); border-color:var(--gold); box-shadow:var(--glow-red); }
+.btn-new-quest .plus { width:38px; height:38px; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--gold); flex-shrink:0; clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+.quest-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:1rem; align-items:start; align-content:start; }
+.quest-card { background:linear-gradient(135deg,rgba(14,10,15,0.92),rgba(7,5,10,0.97)); border:1px solid rgba(200,168,75,0.12); padding:1.3rem; cursor:pointer; transition:all 0.35s; position:relative; overflow:hidden; }
+.quest-card::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,var(--red),var(--gold),var(--red)); opacity:0; transition:opacity 0.3s; }
+.quest-card:hover { border-color:rgba(200,168,75,0.35); transform:translateY(-4px); }
+.quest-card:hover::before { opacity:1; }
+.quest-boss-preview { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.8rem; }
+.boss-mini-sprite { width:56px; height:56px; flex-shrink:0; image-rendering:pixelated; }
+.quest-topic { font-size:0.58rem; color:var(--red2); letter-spacing:0.3em; margin-bottom:0.25rem; }
+.quest-title { font-family:'Ma Shan Zheng',serif; font-size:0.95rem; color:var(--gold); line-height:1.4; padding-right:1.5rem; }
+.chapter-progress { display:flex; gap:3px; margin-top:0.7rem; }
+.chapter-pip { flex:1; height:3px; background:rgba(200,168,75,0.08); border:1px solid rgba(200,168,75,0.12); transition:all 0.5s; }
+.chapter-pip.done { background:var(--gold); border-color:var(--gold); }
+.chapter-pip.active { background:var(--red2); border-color:var(--red2); animation:pipPulse 1s ease-in-out infinite; }
+@keyframes pipPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+.quest-status { margin-top:0.7rem; display:flex; justify-content:space-between; align-items:center; }
+.quest-hp-bar { flex:1; height:3px; background:rgba(122,21,21,0.2); margin-right:0.5rem; }
+.quest-hp-fill { height:100%; background:linear-gradient(90deg,var(--red2),var(--red3)); transition:width 0.5s; }
+.quest-hp-label { font-size:0.55rem; color:var(--text-muted); letter-spacing:0.08em; white-space:nowrap; }
+
+/* ═══ MODALS ═══ */
+.modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(7,5,10,0.93); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:linear-gradient(160deg,rgba(14,10,15,0.99),rgba(7,5,10,1)); border:1px solid rgba(200,168,75,0.22); max-width:560px; width:90%; max-height:90vh; overflow-y:auto; position:relative; padding:2.2rem; box-shadow:0 0 80px rgba(122,21,21,0.25), 0 0 160px rgba(7,5,10,0.9); }
+.modal-box::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,transparent,var(--gold),var(--red2),var(--gold),transparent); }
+.modal-box::after { content:''; position:absolute; bottom:0;left:0;right:0;height:1px; background:linear-gradient(90deg,transparent,rgba(200,168,75,0.2),transparent); }
+.modal-title { font-family:'Ma Shan Zheng',serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:0.25rem; }
+.modal-subtitle { font-size:0.62rem; color:var(--text-muted); letter-spacing:0.2em; margin-bottom:1.8rem; }
+.form-group { margin-bottom:1.4rem; }
+.form-label { display:block; font-size:0.6rem; letter-spacing:0.3em; color:var(--gold); margin-bottom:0.5rem; }
+.form-input, .form-textarea, .form-select { width:100%; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.18); color:var(--paper); font-family:'Noto Serif SC',serif; font-size:0.85rem; padding:0.75rem 0.9rem; outline:none; transition:border-color 0.25s; -webkit-appearance:none; }
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color:rgba(200,168,75,0.45); box-shadow:0 0 12px rgba(200,168,75,0.08); }
+.form-textarea { resize:vertical; min-height:72px; }
+.form-select option { background:#0e0a0f; color:var(--paper); }
+.glass-panel { background:rgba(200,168,75,0.04); border:1px solid rgba(200,168,75,0.18); padding:1.2rem; margin-bottom:1rem; }
+.model-chip-group { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.model-chip { padding:0.35rem 0.9rem; border:1px solid rgba(200,168,75,0.22); background:transparent; color:var(--text-muted); font-family:'Noto Serif SC',serif; font-size:0.68rem; cursor:pointer; transition:all 0.2s; clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%); }
+.model-chip.active { border-color:var(--gold); color:var(--gold); background:rgba(200,168,75,0.12); }
+.generating-state { text-align:center; padding:2rem 0; display:none; }
+.generating-state.active { display:block; }
+.gen-spinner { font-family:'Ma Shan Zheng',serif; font-size:3rem; color:var(--gold); animation:sealSpin 1.8s linear infinite; display:inline-block; margin-bottom:1rem; }
+@keyframes sealSpin { to { transform:rotate(360deg); } }
+.gen-text { font-style:italic; color:var(--text-muted); font-size:0.82rem; }
+
+/* ═══ QUEST SCREEN ═══ */
+#screen-quest { flex-direction:column; overflow:hidden; }
+.quest-header { padding:1rem 1.8rem; border-bottom:1px solid rgba(200,168,75,0.15); background:rgba(7,5,10,0.97); backdrop-filter:blur(12px); display:flex; align-items:center; gap:1rem; flex-shrink:0; }
+.back-btn { background:none; border:1px solid rgba(200,168,75,0.25); color:var(--text-muted); padding:0.35rem 0.75rem; cursor:pointer; font-family:'Noto Serif SC',serif; font-size:0.7rem; letter-spacing:0.1em; transition:all 0.2s; }
+.back-btn:hover { border-color:var(--gold); color:var(--gold); }
+.quest-body { display:grid; grid-template-columns:1fr 320px; flex:1; overflow:hidden; }
+.chapters-panel { padding:1.8rem; overflow-y:auto; border-right:1px solid rgba(200,168,75,0.12); }
+.chapter-list { display:flex; flex-direction:column; gap:0.7rem; }
+.chapter-item { display:flex; align-items:flex-start; gap:0.9rem; padding:1.1rem; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.12); cursor:pointer; transition:all 0.3s; position:relative; }
+.chapter-item:hover { border-color:rgba(200,168,75,0.35); background:rgba(200,168,75,0.07); }
+.chapter-item.completed { border-left:3px solid var(--jade2); }
+.chapter-num { width:32px; height:32px; border:1px solid rgba(200,168,75,0.35); display:flex; align-items:center; justify-content:center; font-family:'Cinzel Decorative',serif; font-size:0.7rem; color:var(--gold); flex-shrink:0; clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%); }
+.chapter-item.completed .chapter-num { background:var(--jade); border-color:var(--jade2); color:#fff; }
+.chapter-tag { font-size:0.55rem; letter-spacing:0.25em; color:var(--red2); margin-bottom:0.25rem; }
+.chapter-title-text { font-family:'Ma Shan Zheng',serif; font-size:0.9rem; color:var(--paper); line-height:1.4; }
+.chapter-desc { font-size:0.68rem; color:var(--text-muted); margin-top:0.25rem; line-height:1.6; }
+.chapter-done-badge { position:absolute; top:0.5rem; right:0.5rem; font-size:0.55rem; color:var(--jade2); letter-spacing:0.2em; }
+.boss-panel { padding:1.8rem 1.3rem; display:flex; flex-direction:column; align-items:center; gap:1.2rem; background:linear-gradient(180deg,rgba(7,5,10,0.95),rgba(20,5,5,0.98)); overflow-y:auto; }
+.boss-stage { width:180px; height:190px; position:relative; display:flex; align-items:center; justify-content:center; }
+.boss-aura { position:absolute; inset:0; border-radius:50%; animation:bossAura 2.5s ease-in-out infinite; }
+@keyframes bossAura { 0%,100% { box-shadow:0 0 30px rgba(122,21,21,0.35), 0 0 70px rgba(122,21,21,0.12); } 50% { box-shadow:0 0 70px rgba(122,21,21,0.6), 0 0 130px rgba(122,21,21,0.2); } }
+.boss-sprite-canvas { width:170px; height:170px; position:relative; z-index:1; image-rendering:pixelated; }
+.boss-name-display { font-family:'Ma Shan Zheng',serif; font-size:1.2rem; color:var(--red2); text-align:center; letter-spacing:0.2em; text-shadow:var(--glow-red); }
+.boss-title-display { font-size:0.6rem; color:var(--text-muted); letter-spacing:0.3em; text-align:center; margin-top:-0.7rem; }
+.boss-hp-section { width:100%; }
+.boss-hp-label { display:flex; justify-content:space-between; font-size:0.58rem; color:var(--text-muted); letter-spacing:0.12em; margin-bottom:0.35rem; }
+.boss-hp-bar { height:9px; background:rgba(122,21,21,0.18); border:1px solid rgba(122,21,21,0.35); overflow:hidden; position:relative; }
+.boss-hp-fill { height:100%; background:linear-gradient(90deg,#3a0a0a,var(--red2),var(--red3)); transition:width 1.2s ease; }
+.boss-lore-box { width:100%; background:rgba(122,21,21,0.06); border:1px solid rgba(122,21,21,0.2); border-left:3px solid var(--red); padding:0.8rem; }
+.boss-lore-title { font-size:0.55rem; letter-spacing:0.3em; color:var(--red2); margin-bottom:0.35rem; }
+.boss-lore-text { font-size:0.68rem; line-height:1.8; color:var(--text-muted); font-style:italic; }
+.boss-complete-btn { width:100%; padding:0.85rem; background:linear-gradient(135deg,rgba(122,21,21,0.28),rgba(80,10,10,0.45)); border:1px solid var(--red); color:var(--gold); font-family:'Cinzel Decorative',serif; font-size:0.7rem; letter-spacing:0.2em; cursor:pointer; transition:all 0.3s; clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+.boss-complete-btn:hover:not(:disabled) { background:linear-gradient(135deg,rgba(122,21,21,0.5),rgba(80,10,10,0.7)); box-shadow:var(--glow-red); }
+.boss-complete-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+/* ═══ CHAPTER CONTENT MODAL ═══ */
+#chapter-modal .modal-box { max-width:680px; }
+.chapter-content-area { margin-top:1.3rem; line-height:2; color:var(--paper); font-size:0.85rem; }
+.chapter-content-area h3 { font-family:'Ma Shan Zheng',serif; font-size:1.05rem; color:var(--gold); margin:1.4rem 0 0.5rem; letter-spacing:0.1em; }
+.chapter-content-area p { margin-bottom:0.75rem; }
+.chapter-content-area ul { padding-left:1.4rem; margin-bottom:0.75rem; }
+.chapter-content-area li { margin-bottom:0.35rem; color:rgba(240,230,204,0.8); }
+.chapter-content-area strong { color:var(--gold2); }
+.chapter-content-area em { color:var(--text-muted); }
+.chapter-content-area code { background:rgba(200,168,75,0.09); border:1px solid rgba(200,168,75,0.18); padding:0.1em 0.4em; font-size:0.82em; color:var(--jade2); border-radius:2px; }
+.chapter-content-area pre { background:rgba(7,5,10,0.85); border:1px solid rgba(200,168,75,0.18); border-left:3px solid var(--jade); padding:0.9rem; overflow-x:auto; margin:0.75rem 0; font-size:0.78rem; color:var(--jade2); }
+.chapter-complete-btn { margin-top:1.8rem; width:100%; padding:0.85rem; background:linear-gradient(135deg,rgba(30,92,74,0.35),rgba(18,60,46,0.45)); border:1px solid var(--jade2); color:var(--jade2); font-family:'Cinzel Decorative',serif; font-size:0.75rem; letter-spacing:0.2em; cursor:pointer; transition:all 0.3s; clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%); }
+.chapter-complete-btn:hover { background:linear-gradient(135deg,rgba(30,92,74,0.55),rgba(18,60,46,0.65)); box-shadow:var(--glow-jade); }
+
+/* ═══ BATTLE MODAL ═══ */
+#battle-modal .modal-box { max-width:660px; text-align:center; display:flex; flex-direction:column; }
+.battle-stage { position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin-bottom:0.8rem; overflow:hidden; }
+.battle-boss-canvas { width:130px; height:130px; image-rendering:pixelated; }
+.damage-floater { position:absolute; font-family:'Cinzel Decorative',serif; font-size:2.2rem; color:var(--red3); text-shadow:var(--glow-red); pointer-events:none; opacity:0; }
+.damage-floater.show { animation:damageFloat 1.2s ease forwards; }
+@keyframes damageFloat { 0%{opacity:1;transform:translateY(0) scale(1);} 50%{opacity:1;transform:translateY(-30px) scale(1.4);} 100%{opacity:0;transform:translateY(-65px) scale(0.7);} }
+.boss-shake { animation:bossShake 0.4s ease; }
+@keyframes bossShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)} 40%{transform:translateX(10px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+.quiz-progress { font-size:0.6rem; letter-spacing:0.3em; color:var(--text-muted); margin-bottom:0.9rem; }
+.quiz-question { font-family:'Ma Shan Zheng',serif; font-size:1rem; color:var(--paper); line-height:1.7; margin-bottom:1.3rem; min-height:56px; }
+.quiz-options { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:1.3rem; }
+.quiz-option { padding:0.75rem; background:rgba(200,168,75,0.03); border:1px solid rgba(200,168,75,0.12); color:var(--paper2); font-family:'Noto Serif SC',serif; font-size:0.78rem; cursor:pointer; transition:all 0.2s; text-align:left; line-height:1.5; }
+.quiz-option:hover:not(:disabled) { border-color:rgba(200,168,75,0.35); background:rgba(200,168,75,0.07); }
+.quiz-option.correct { border-color:var(--jade2); background:rgba(30,92,74,0.2); color:var(--jade3); }
+.quiz-option.wrong { border-color:var(--red2); background:rgba(122,21,21,0.2); color:var(--red2); }
+.quiz-option:disabled { cursor:not-allowed; }
+.quiz-feedback { font-style:italic; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.8rem; min-height:1.4rem; }
+.finishing-blow { display:none; flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:1.5rem; flex:1; }
+.finishing-blow.show { display:flex; }
+.finishing-text { font-family:'Ma Shan Zheng',serif; font-size:2rem; color:var(--gold); text-shadow:var(--glow-gold); animation:finishPulse 0.5s ease infinite alternate; }
+
+/* ═══ GAMBIT & FATE & SETTINGS ═══ */
+#gambit-modal .modal-box, #fate-modal .modal-box, #api-modal .modal-box { max-width:420px; text-align:center; }
+.gambit-coin { width:100px; height:100px; margin:1.5rem auto; border:3px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Ma Shan Zheng',serif; font-size:2.5rem; color:var(--gold); position:relative; cursor:pointer; box-shadow:var(--glow-gold), inset 0 0 30px rgba(200,168,75,0.1); transition:all 0.3s; }
+.gambit-coin:hover { transform:rotateY(30deg) scale(1.05); box-shadow:0 0 40px rgba(200,168,75,0.6); }
+.gambit-coin.spinning { animation:coinSpin 0.8s ease infinite; }
+@keyframes coinSpin { 0%{transform:rotateY(0)} 50%{transform:rotateY(90deg) scaleX(0.1)} 100%{transform:rotateY(180deg)} }
+.fate-scroll { margin:1.5rem auto; width:80px; height:100px; position:relative; cursor:pointer; animation:scrollBob 2s ease-in-out infinite; }
+@keyframes scrollBob { 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-8px) rotate(3deg);} }
+.fate-reveal { font-family:'Ma Shan Zheng',serif; font-size:1.5rem; color:var(--gold); text-shadow:var(--glow-gold); animation:fadeSlideUp 0.5s ease; }
+
+/* ═══ TOAST ═══ */
+#toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%); background:rgba(14,10,15,0.97); border:1px solid rgba(200,168,75,0.28); padding:0.75rem 1.4rem; font-size:0.78rem; color:var(--gold); letter-spacing:0.1em; z-index:999; opacity:0; transition:opacity 0.4s; pointer-events:none; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); white-space:normal; width:90%; max-width:380px; text-align:center; line-height:1.5; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+#toast.show { opacity:1; }
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:rgba(200,168,75,0.02); }
+::-webkit-scrollbar-thumb { background:rgba(200,168,75,0.18); border-radius:2px; }
+
+@media(max-width:768px) {
+  .hub-body { grid-template-columns:1fr; }
+  .quest-body { grid-template-columns:1fr; overflow-y:auto; display:block; }
+  .chapters-panel { overflow-y:visible; border-right:none; border-bottom:1px solid rgba(200,168,75,0.1); }
+  .boss-panel { overflow-y:visible; display:flex; padding-bottom:4rem; }
+  .quiz-options { grid-template-columns:1fr; }
+  .sigil-tooltip { width: 160px; font-size: 0.9em; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="particle-canvas"></canvas>
+
+<div id="screen-title" class="screen active">
+  <div class="title-inkblot"></div>
+  <div class="title-seal"><span class="title-seal-char">書</span></div>
+  <div class="title-main">TEN THOUSAND SCROLLS</div>
+  <div class="title-chinese">萬卷書</div>
+  <div class="title-brushstroke"></div>
+  <p class="title-lore">
+    The Six Kingdoms wage an endless war for dominion.<br>
+    Only one who masters all scrolls of knowledge<br>
+    can unify the realm and ascend to the Dragon Throne.
+  </p>
+  <div id="loading-text" style="color:var(--gold);letter-spacing:0.2em;font-size:0.75rem;margin-top:0.5rem;">COMMUNING WITH THE SCROLLS...</div>
+  <div id="auth-buttons">
+    <button class="btn-primary" style="width:100%;margin-bottom:0.8rem;" onclick="signInGoogle()">SIGN IN WITH GOOGLE</button>
+    <button class="btn-primary" style="width:100%;background:transparent;color:var(--paper2);border-color:var(--gold);box-shadow:none;" onclick="signInGuest()">PLAY AS GUEST</button>
+  </div>
+  <button id="btn-enter" class="btn-primary" style="display:none; margin-top: 1.5rem;" onclick="enterRealm()">ENTER THE REALM</button>
+</div>
+
+<div id="screen-path" class="screen">
+  <div class="path-header">
+    <div class="path-title">選擇命途 · Choose Your Destiny</div>
+    <div class="path-subtitle">YOUR PATH SHALL SHAPE YOUR SOUL AND YOUR LEGEND</div>
+  </div>
+  <div class="path-cards">
+    <div class="path-card warrior" onclick="choosePath('warrior')">
+      <div class="personality-float">HOT-BLOODED</div>
+      <canvas class="path-card-icon" id="path-warrior-canvas" width="120" height="120"></canvas>
+      <div class="path-card-name">武者</div>
+      <div class="path-card-en">THE WARRIOR PATH</div>
+      <div class="path-card-desc">Forge your body and mind in the fires of battle. Each lesson is a blade sharpened, each chapter a wound survived. You learn through conquest — reckless, fierce, unstoppable.</div>
+      <div class="path-card-destiny">⚔ DESTINED TO BECOME: Sun Wukong — 齊天大聖</div>
+    </div>
+    <div class="path-card scholar" onclick="choosePath('scholar')">
+      <div class="personality-float">CALCULATING</div>
+      <canvas class="path-card-icon" id="path-scholar-canvas" width="120" height="120"></canvas>
+      <div class="path-card-name">謀士</div>
+      <div class="path-card-en">THE SCHOLAR PATH</div>
+      <div class="path-card-desc">The pen that writes the battle plan conquers the sword that strikes. You dissect knowledge like a general dissects terrain — patient, methodical, lethal in precision.</div>
+      <div class="path-card-destiny">📜 DESTINED TO BECOME: Zhuge Liang — 臥龍先生</div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:0.65rem;color:var(--text-muted);letter-spacing:0.2em;margin-top:1rem;margin-bottom:2rem;">
+      <button id="path-cancel-btn" style="display:none; background:none; border:1px solid rgba(200,168,75,0.4); color:var(--text-muted); padding: 0.5rem 1.5rem; cursor:pointer; font-family:'Noto Serif SC',serif; margin: 0 auto 1rem;" onclick="cancelPathSelection()">CANCEL</button>
+      THIS CHOICE IS PERMANENT · CHOOSE WISELY
+  </div>
+</div>
+
+<div id="screen-hub" class="screen">
+  <div class="hub-header">
+    <div class="hub-title">萬卷書 · Hub</div>
+    <button class="btn-primary" style="padding:0.45rem 1rem;font-size:0.65rem;" onclick="openApiModal()">⚙ SETTINGS</button>
+  </div>
+  <div class="hub-tabs">
+    <div class="tab-btn active" onclick="switchTab('tab-profile')" data-target="tab-profile">SPIRIT</div>
+    <div class="tab-btn" onclick="switchTab('tab-quests')" data-target="tab-quests">SCROLLS</div>
+    <div class="tab-btn" onclick="switchTab('tab-library')" data-target="tab-library">LIBRARY</div>
+  </div>
+  <div class="hub-body">
+    <div id="tab-profile" class="tab-pane active">
+      <div class="char-panel-inner">
+          <div class="char-stage">
+            <div class="char-aura" id="char-aura"></div>
+            <canvas class="char-sprite" id="char-sprite" width="140" height="180"></canvas>
+            <div class="personality-bubble" id="personality-bubble">...</div>
+          </div>
+          <div class="char-name-row">
+            <div class="char-name" id="char-name" onclick="renameCharacter()">Wei Xuan ✎</div>
+          </div>
+          <div class="char-path-badge" id="char-path-badge" style="margin-top:-0.5rem; margin-bottom: 0.5rem;">WARRIOR</div>
+          <div class="char-rank" id="char-rank">凡人 · Mortal</div>
+          <div class="xp-section">
+            <div class="xp-label"><span>CULTIVATION</span><span id="xp-text">0 / 100 XP</span></div>
+            <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-box"><div class="stat-val" id="stat-quests">0</div><div class="stat-lbl">QUESTS</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-chapters">0</div><div class="stat-lbl">CHAPTERS</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-bosses">0</div><div class="stat-lbl">DEFEATED</div></div>
+            <div class="stat-box"><div class="stat-val" id="stat-perfect">0</div><div class="stat-lbl">PERFECT</div></div>
+          </div>
+          <div class="sigil-row">
+            <div class="sigil-title">◈ CELESTIAL SIGILS</div>
+            <div class="sigil-slots" id="sigil-slots"></div>
+          </div>
+          <div class="world-lore-box">
+            <div class="world-lore-title">◈ REALM CHRONICLES</div>
+            <div class="world-lore-text" id="world-lore-text">The fractured realm of Jiuzhou trembles...</div>
+          </div>
+      </div>
+    </div>
+
+    <div id="tab-quests" class="tab-pane">
+        <button class="btn-new-quest" onclick="openCreateModal()">
+          <div class="plus">+</div>
+          <div>
+            <div style="font-size:0.68rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.25rem;">ISSUE NEW QUEST</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Seek knowledge, summon a guardian demon</div>
+          </div>
+        </button>
+        <div id="quest-grid" class="quest-grid"></div>
+    </div>
+
+    <div id="tab-library" class="tab-pane">
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:1.5rem;font-style:italic;text-align:center;">Quests summoned by scholars across the realm. Click to add to your Active Quests.</div>
+        <div id="library-grid" class="quest-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-quest" class="screen">
+  <div class="quest-header">
+    <button class="back-btn" onclick="showHub()">← RETURN</button>
+    <div style="flex:1;">
+      <div style="font-size:0.55rem;letter-spacing:0.3em;color:var(--red2);margin-bottom:0.15rem;" id="q-topic-label">TOPIC</div>
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:0.95rem;color:var(--gold);letter-spacing:0.2em;" id="q-title-label">Quest Title</div>
+    </div>
+  </div>
+  <div class="quest-body">
+    <div class="chapters-panel">
+      <div style="font-family:'Ma Shan Zheng',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1rem;">章節 · Chapters</div>
+      <div class="chapter-list" id="chapter-list"></div>
+    </div>
+    <div class="boss-panel" id="boss-panel">
+      <div class="boss-stage">
+        <div class="boss-aura"></div>
+        <canvas class="boss-sprite-canvas" id="boss-sprite-canvas" width="170" height="170"></canvas>
+      </div>
+      <div class="boss-name-display" id="boss-name-display">??</div>
+      <div class="boss-title-display" id="boss-title-display">Guardian Demon</div>
+      <div class="boss-hp-section">
+        <div class="boss-hp-label"><span>魔力 DEMON HP</span><span id="boss-hp-text">100 / 100</span></div>
+        <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div></div>
+      </div>
+      <div class="boss-lore-box">
+        <div class="boss-lore-title">◈ DEMON LORE</div>
+        <div class="boss-lore-text" id="boss-lore-text">...</div>
+      </div>
+      <button class="boss-complete-btn" id="boss-complete-btn" onclick="tryOpenBattle()" disabled>⚔ CHALLENGE THE DEMON</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-box">
+    <div class="modal-title">召喚任務</div>
+    <div class="modal-subtitle">SUMMON A NEW QUEST · BIND A DEMON</div>
+    <div id="create-form">
+      <div class="form-group">
+        <label class="form-label">◈ TOPIC / SUBJECT TO STUDY</label>
+        <input class="form-input" id="topic-input" placeholder="e.g. Machine Learning, Ancient Rome..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">◈ LEARNING OBJECTIVE (optional)</label>
+        <textarea class="form-textarea" id="objective-input" placeholder="What should the learner understand?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">◈ NUMBER OF CHAPTERS</label>
+        <select class="form-select" id="chapters-input">
+          <option value="3">3 Chapters — Swift Campaign</option>
+          <option value="5" selected>5 Chapters — Standard Siege</option>
+          <option value="7">7 Chapters — Grand Conquest</option>
+        </select>
+      </div>
+      <div class="glass-panel" style="margin-bottom:0.8rem;">
+        <p style="color:var(--text-muted);font-size:0.6rem;letter-spacing:0.2em;margin-bottom:0.7rem;">> SELECT_CORE_ENGINE:</p>
+        <div class="model-chip-group" id="model-chip-group">
+          <button type="button" class="model-chip" data-value="gemini-2.0-flash">2.0_FLASH</button>
+          <button type="button" class="model-chip active" data-value="gemini-2.5-flash">2.5_FLASH</button>
+          <button type="button" class="model-chip" data-value="gemini-2.5-pro">2.5_PRO</button>
+          <button type="button" class="model-chip" data-value="gemini-3-flash-preview">3_FLASH</button>
+        </div>
+        <input type="hidden" id="modelSelect" value="gemini-2.5-flash">
+      </div>
+      <div style="display:flex;gap:0.7rem;margin-top:0.8rem;">
+        <button class="btn-primary" style="flex:1;" onclick="createQuest()">⚔ SUMMON QUEST</button>
+        <button style="padding:0.85rem 1.3rem;background:transparent;border:1px solid rgba(200,168,75,0.18);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeCreateModal()">CANCEL</button>
+      </div>
+    </div>
+    <div class="generating-state" id="generating-state">
+      <div class="gen-spinner">卍</div>
+      <div class="gen-text" id="gen-status-text">Binding the demon to the scroll...</div>
+      <div style="margin-top:0.8rem;font-size:0.6rem;color:var(--text-muted);letter-spacing:0.2em;" id="gen-step"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="chapter-modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:start;">
+      <div>
+        <div class="modal-title" id="chapter-modal-title">Chapter Title</div>
+        <div class="modal-subtitle" id="chapter-modal-tag">CHAPTER TAG</div>
+      </div>
+      <button onclick="closeChapterModal()" style="background:none;border:none;color:rgba(200,168,75,0.35);cursor:pointer;font-size:1.4rem;padding:0.2rem;">✕</button>
+    </div>
+    <div class="chapter-content-area" id="chapter-content-area">
+      <div style="text-align:center;padding:2rem;"><div class="gen-spinner">卍</div><div class="gen-text">Unrolling the ancient scroll...</div></div>
+    </div>
+    <button class="chapter-complete-btn" id="chapter-complete-btn" onclick="markChapterComplete()" style="display:none;">✓ MARK CHAPTER COMPLETE</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="battle-modal">
+  <div class="modal-box" id="battle-modal-box">
+    <div id="battle-top-section">
+      <div class="modal-title" style="margin-bottom:0.15rem;" id="battle-title">Final Battle</div>
+      <div class="modal-subtitle">PROVE YOUR MASTERY — DEFEAT THE DEMON</div>
+      <div class="battle-stage">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(122,21,21,0.12) 0%,transparent 70%);"></div>
+        <canvas class="battle-boss-canvas" id="battle-boss-canvas" width="120" height="120"></canvas>
+        <div class="damage-floater" id="damage-floater">-25</div>
+      </div>
+      <div id="battle-boss-hp" style="margin-bottom:1.2rem;">
+        <div class="boss-hp-label"><span>DEMON HP</span><span id="battle-hp-text">100 / 100</span></div>
+        <div class="boss-hp-bar"><div class="boss-hp-fill" id="battle-hp-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div id="quiz-container">
+      <div class="quiz-progress" id="quiz-progress">QUESTION 1 / 5</div>
+      <div class="quiz-question" id="quiz-question">Loading question...</div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+    </div>
+    <div class="finishing-blow" id="finishing-blow">
+      <div class="finishing-text" id="finishing-text">⚡ FINAL STRIKE ⚡</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;line-height:1.9;" id="victory-lore"></div>
+      <button class="btn-primary" style="margin-top:0.8rem;width:100%;" onclick="claimVictory()">CLAIM VICTORY</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="gambit-modal">
+  <div class="modal-box" style="max-width:420px;text-align:center;">
+    <div class="modal-title">天命一擲</div>
+    <div class="modal-subtitle">CELESTIAL GAMBIT · WAGER YOUR FATE</div>
+    <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.9;margin-bottom:0.5rem;">The stars whisper of fortune and ruin. Before you challenge the demon — do you dare wager your accumulated XP?</p>
+    <p style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.5rem;">Win the battle perfectly → <strong style="color:var(--gold2);">DOUBLE XP</strong></p>
+    <p style="font-size:0.7rem;color:var(--red2);letter-spacing:0.1em;margin-bottom:1rem;">Fail to win perfectly → <strong style="color:var(--red3);">LOSE THE WAGERED XP</strong></p>
+    <div id="gambit-wager-display" style="font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--gold);margin-bottom:0.5rem;"></div>
+    <input type="range" id="gambit-slider" min="0" max="100" value="0" style="width:100%;margin-bottom:1rem;accent-color:var(--gold);" oninput="updateGambitWager(this.value)">
+    <div class="gambit-coin" id="gambit-coin" onclick="spinGambitCoin()">賭</div>
+    <div id="gambit-result" style="font-size:0.85rem;color:var(--gold);margin-top:1rem;min-height:1.5rem;"></div>
+    <div style="display:flex;gap:0.7rem;margin-top:1.5rem;">
+      <button class="btn-primary" style="flex:1;" id="gambit-proceed-btn" onclick="proceedAfterGambit()">PROCEED TO BATTLE</button>
+      <button style="padding:0.85rem 1.3rem;background:transparent;border:1px solid rgba(200,168,75,0.18);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif;" onclick="closeGambitModal()">RETREAT</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="fate-modal">
+  <div class="modal-box" style="max-width:380px;text-align:center;">
+    <div class="modal-title">命卷</div>
+    <div class="modal-subtitle">THE FATE SCROLL REVEALS ITSELF</div>
+    <p style="font-size:0.75rem;color:var(--text-muted);line-height:1.9;margin-bottom:0.5rem;">After defeating a demon, the heavens bestow a hidden gift upon the worthy...</p>
+    <div class="fate-scroll" id="fate-scroll-icon" onclick="revealFateScroll()">
+      <svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+        <rect x="5" y="8" width="70" height="84" rx="4" fill="#1a0e08" stroke="#c8a84b" stroke-width="1.5"/>
+        <rect x="0" y="6" width="80" height="10" rx="3" fill="#2a1a10" stroke="#c8a84b" stroke-width="1"/>
+        <rect x="0" y="84" width="80" height="10" rx="3" fill="#2a1a10" stroke="#c8a84b" stroke-width="1"/>
+        <text x="40" y="55" text-anchor="middle" font-family="Ma Shan Zheng" font-size="28" fill="#c8a84b" opacity="0.8">?</text>
+        <line x1="15" y1="35" x2="65" y2="35" stroke="#c8a84b" stroke-width="0.5" opacity="0.3"/>
+        <line x1="15" y1="65" x2="65" y2="65" stroke="#c8a84b" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+    </div>
+    <div id="fate-reveal-area" style="display:none;">
+      <div class="fate-reveal" id="fate-reveal-text">⚡ +50 XP</div>
+      <div class="fate-bonus" id="fate-bonus-text">The scrolls of heaven smile upon you.</div>
+    </div>
+    <button class="btn-primary" id="fate-close-btn" style="margin-top:1.5rem;display:none;width:100%;" onclick="closeFateModal()">RECEIVE BLESSING</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="api-modal">
+  <div class="modal-box" style="max-width:420px;text-align:center;">
+    <div class="modal-title">Settings</div>
+    <div class="modal-subtitle">MANAGE YOUR DESTINY</div>
+    <div style="text-align:left;margin-bottom:0.8rem;margin-top:0.8rem;">
+      <label class="form-label">◈ YOUR WARRIORS</label>
+      <div id="character-list" style="margin-bottom:0.8rem;max-height:150px;overflow-y:auto;"></div>
+      <button class="btn-primary" style="width:100%;padding:0.55rem;" onclick="createNewCharacter()">+ NEW ADVENTURE</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem;margin-top:1.2rem;">
+      <button class="btn-primary" style="width:100%; background:linear-gradient(135deg,var(--red3),var(--red));" onclick="nukeLibrary()">NUKE REALM LIBRARY</button>
+      <button class="btn-primary" style="width:100%;" onclick="signOutUser()">SIGN OUT</button>
+      <button style="padding:0.85rem;background:transparent;border:1px solid rgba(200,168,75,0.18);color:var(--text-muted);cursor:pointer;font-family:'Noto Serif SC',serif;width:100%;" onclick="closeApiModal()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
+  authDomain: "ai-study-party.firebaseapp.com",
+  projectId: "ai-study-party",
+  storageBucket: "ai-study-party.firebasestorage.app",
+  messagingSenderId: "583546365173",
+  appId: "1:583546365173:web:dd2fbec4ec4d20380951bc",
+  measurementId: "G-SFDQ0QELTE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const vertexAI = getVertexAI(app, { location: "global" });
+
+let USER_ID = null;
+let STATE = {
+  selectedModel: 'gemini-2.5-flash',
+  saves: [],
+  activeSaveId: null,
+  publicQuests: [],
+  quests: [],
+  player: null,
+  activeQuestIdx: null,
+  activeChapterIdx: null,
+  quizData: null,
+  quizCurrent: 0,
+  quizScore: 0,
+  gambitWager: 0,
+  gambitActive: false,
+  gambitRevealed: false,
+};
+
+function defaultPlayer(name, path='warrior') {
+  return {
+    name, path, xp:0, totalXp:0, rank:0,
+    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0,
+    sigils:[],
+  };
+}
+
+const WARRIOR_RANKS = [
+  {name:'凡人', en:'Mortal',         xp:0,    color:'#6a5a4a'},
+  {name:'武者', en:'Warrior',        xp:100,  color:'#9a4a2a'},
+  {name:'刀客', en:'Blade Wanderer', xp:250,  color:'#c87a3a'},
+  {name:'猛将', en:'Fierce General', xp:500,  color:'#e8a040'},
+  {name:'虎将', en:'Tiger Lord',     xp:900,  color:'#d04020'},
+  {name:'战神', en:'God of War',     xp:1400, color:'#ff5030'},
+  {name:'大圣', en:'Great Sage',     xp:2000, color:'#ffd040'},
+  {name:'齐天大圣',en:'Equal of Heaven',xp:3000,color:'#ffe080'},
+];
+const SCHOLAR_RANKS = [
+  {name:'凡人', en:'Mortal',          xp:0,    color:'#6a5a4a'},
+  {name:'书童', en:'Apprentice',      xp:100,  color:'#4a7a6a'},
+  {name:'秀才', en:'Gifted Scholar',  xp:250,  color:'#3a9a7a'},
+  {name:'谋士', en:'Strategist',      xp:500,  color:'#60b090'},
+  {name:'军师', en:'Grand Strategist',xp:900,  color:'#50c0a0'},
+  {name:'国士', en:'Master of State', xp:1400, color:'#40d0b0'},
+  {name:'圣贤', en:'Sage Counselor',  xp:2000, color:'#30e0c0'},
+  {name:'卧龙', en:'Sleeping Dragon', xp:3000, color:'#60f0d8'},
+];
+
+function getRanks() { return (STATE.player?.path==='scholar') ? SCHOLAR_RANKS : WARRIOR_RANKS; }
+function getCurrentRank() {
+  const ranks = getRanks(); let r = ranks[0];
+  if(STATE.player){ for(const rank of ranks) { if(STATE.player.totalXp >= rank.xp) r = rank; } }
+  return r;
+}
+function getCurrentRankIdx() {
+  const ranks = getRanks(); let idx = 0;
+  if(STATE.player){ for(let i=0;i<ranks.length;i++) { if(STATE.player.totalXp >= ranks[i].xp) idx=i; } }
+  return idx;
+}
+function getNextRank() {
+  const ranks = getRanks(); const cur = getCurrentRank(); const idx = ranks.indexOf(cur);
+  return idx < ranks.length-1 ? ranks[idx+1] : null;
+}
+
+const WARRIOR_QUOTES = ["I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.","They said I couldn't. Watch me.","Pain is just weakness leaving the body.","DRAW YOUR SWORD!","Knowledge AND strength!","The strongest earn the right to know."];
+const SCHOLAR_QUOTES = ["Fascinating. Completely predictable.","I had calculated this outcome.","Knowledge is the sharpest blade.","Patience is a weapon, fool.","Three steps ahead. Always.","Your demon is already defeated.","I've read this scroll before.","The wise man bends the wind."];
+function getRandomQuote() { return (STATE.player?.path==='scholar' ? SCHOLAR_QUOTES : WARRIOR_QUOTES)[Math.floor(Math.random()*8)]; }
+
+let personalityInterval = null;
+function startPersonalityQuotes() {
+  if(personalityInterval) clearInterval(personalityInterval);
+  const bubble = document.getElementById('personality-bubble');
+  if(!bubble) return;
+  const updateQuote = () => { if(bubble) bubble.textContent = getRandomQuote(); };
+  updateQuote();
+  personalityInterval = setInterval(updateQuote, 5000);
+}
+
+// ════════════════════════════════
+//  ENHANCED SIGIL DATA
+// ════════════════════════════════
+const SIGILS = ['龙','凤','虎','玄','雷','火','水','木','金','土','道','德'];
+
+const SIGIL_DATA = {
+  '龙': {
+    name: 'Dragon Sigil',
+    element: '★ HEAVENLY TIER',
+    elementColor: '#ffd040',
+    effect: 'Your mind moves like a celestial dragon — vast, unbound. Perfect battle victories grant +20 bonus XP on top of all other rewards.',
+    bonus: '+20 XP ON PERFECT RUNS',
+    bonusColor: '#ffd040'
+  },
+  '凤': {
+    name: 'Phoenix Sigil',
+    element: '★ REBIRTH TIER',
+    elementColor: '#ff8040',
+    effect: 'You rise from the ash of failure. When you fail a quiz question, the next correct answer deals double damage to the demon.',
+    bonus: 'DOUBLE DAMAGE AFTER MISS',
+    bonusColor: '#ff8040'
+  },
+  '虎': {
+    name: 'Tiger Sigil',
+    element: '★ FEROCITY TIER',
+    elementColor: '#e84020',
+    effect: 'Ferocity of absolute mastery. Every boss defeated in a single session increases XP gain by 10% (stacks up to 3x per session).',
+    bonus: '+10% XP PER SESSION WIN',
+    bonusColor: '#e84020'
+  },
+  '玄': {
+    name: 'Mystic Sigil',
+    element: '★ ARCANE TIER',
+    elementColor: '#a040ff',
+    effect: 'Knowledge beyond the mortal realm. Chapter content unlocked while holding this sigil is 25% richer and more detailed.',
+    bonus: 'RICHER CHAPTER CONTENT',
+    bonusColor: '#a040ff'
+  },
+  '雷': {
+    name: 'Thunder Sigil',
+    element: '◆ SWIFT TIER',
+    elementColor: '#40c0ff',
+    effect: 'Swift and decisive. Every chapter you complete earns +5 bonus XP, rewarding consistent daily study.',
+    bonus: '+5 XP PER CHAPTER READ',
+    bonusColor: '#40c0ff'
+  },
+  '火': {
+    name: 'Flame Sigil',
+    element: '◆ PASSION TIER',
+    elementColor: '#ff5020',
+    effect: 'Burning passion for wisdom. Streak bonus: completing 3+ chapters in a row grants a hidden Fate Scroll chance.',
+    bonus: 'STREAK → BONUS SCROLL',
+    bonusColor: '#ff5020'
+  },
+  '水': {
+    name: 'Water Sigil',
+    element: '◆ FLOW TIER',
+    elementColor: '#40a0e0',
+    effect: 'Adapts to all knowledge. Any topic you study earns +10% XP — even unfamiliar disciplines bend to your will.',
+    bonus: '+10% XP ANY TOPIC',
+    bonusColor: '#40a0e0'
+  },
+  '木': {
+    name: 'Wood Sigil',
+    element: '◆ GROWTH TIER',
+    elementColor: '#60c040',
+    effect: 'Rooted and ever-growing. Every new quest you create generates 1 additional study chapter automatically.',
+    bonus: '+1 BONUS CHAPTER',
+    bonusColor: '#60c040'
+  },
+  '金': {
+    name: 'Gold Sigil',
+    element: '◆ REFINED TIER',
+    elementColor: '#e8c040',
+    effect: 'Refined through many battles. Boss defeat XP is increased by 25 for each demon you have previously vanquished.',
+    bonus: '+25 XP PER PAST VICTORY',
+    bonusColor: '#e8c040'
+  },
+  '土': {
+    name: 'Earth Sigil',
+    element: '◆ FOUNDATION TIER',
+    elementColor: '#c08040',
+    effect: 'Foundation of all understanding. XP can never drop below half its current value — the earth holds you steady.',
+    bonus: 'XP FLOOR PROTECTION',
+    bonusColor: '#c08040'
+  },
+  '道': {
+    name: 'Dao Sigil',
+    element: '✦ ENLIGHTENMENT TIER',
+    elementColor: '#80e0c0',
+    effect: 'On the path of enlightenment. The Celestial Gambit always favors you — coin flips have a hidden 60% win rate.',
+    bonus: 'GAMBIT FAVOR +60%',
+    bonusColor: '#80e0c0'
+  },
+  '德': {
+    name: 'Virtue Sigil',
+    element: '✦ DIVINE TIER',
+    elementColor: '#c0c0ff',
+    effect: 'Knowledge wielded with righteousness. Your quests appear in the Realm Library and earn you 5 XP each time another scholar copies them.',
+    bonus: '+5 XP WHEN COPIED',
+    bonusColor: '#c0c0ff'
+  },
+};
+
+function awardSigil() {
+  const player = STATE.player;
+  if (!player.sigils) player.sigils = [];
+  const available = SIGILS.filter(s => !player.sigils.includes(s));
+  if(available.length === 0) return null;
+  const sigil = available[Math.floor(Math.random()*available.length)];
+  player.sigils.push(sigil);
+  return sigil;
+}
+
+function renderSigils() {
+  const container = document.getElementById('sigil-slots');
+  if(!container || !STATE.player) return;
+  container.innerHTML = '';
+  const playerSigils = STATE.player.sigils || [];
+  const allSigils = SIGILS.slice(0, 8);
+
+  allSigils.forEach((s, i) => {
+    const owned = playerSigils.includes(s);
+    const slot = document.createElement('div');
+    slot.className = 'sigil-slot ' + (owned ? 'filled' : 'empty');
+
+    const charEl = document.createElement('span');
+    charEl.className = 'sigil-char';
+    charEl.textContent = owned ? s : '·';
+    slot.appendChild(charEl);
+
+    if (owned) {
+      const data = SIGIL_DATA[s] || { name: s + ' Sigil', element: 'UNKNOWN', elementColor: '#c8a84b', effect: 'A mysterious power stirs within.', bonus: '???', bonusColor: '#c8a84b' };
+
+      const tooltip = document.createElement('div');
+      tooltip.className = 'sigil-tooltip';
+      tooltip.innerHTML = `
+        <div class="sigil-tooltip-header">
+          <div class="sigil-tooltip-glyph">${s}</div>
+          <div>
+            <div class="sigil-tooltip-name">${data.name}</div>
+            <div class="sigil-tooltip-element" style="color:${data.elementColor}">${data.element}</div>
+          </div>
+        </div>
+        <div class="sigil-tooltip-effect">${data.effect}</div>
+        <div class="sigil-tooltip-bonus" style="border-color:${data.bonusColor};color:${data.bonusColor}">${data.bonus}</div>
+      `;
+      slot.appendChild(tooltip);
+    }
+
+    container.appendChild(slot);
+  });
+}
+
+// ════════════════════════════════
+//  FIREBASE / STATE
+// ════════════════════════════════
+async function loadState() {
+  if(!USER_ID) return;
+  let dataLoaded = false;
+  try {
+    const docRef = doc(db, "users", USER_ID);
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists()) {
+      const data = docSnap.data();
+      if(data.saves !== undefined) {
+        STATE.saves = data.saves;
+        STATE.activeSaveId = data.activeSaveId;
+      } else {
+        const oldSave = { id: Date.now().toString(), player: data.player || defaultPlayer("Wei Xuan"), quests: data.quests || [] };
+        STATE.saves = [oldSave];
+        STATE.activeSaveId = oldSave.id;
+      }
+      dataLoaded = true;
+    }
+  } catch(e) {
+    console.error("DB load error:", e);
+    showToast("Could not load data. Playing locally.");
+  }
+  try { await loadPublicQuests(); } catch(e) { console.error("Library load error:", e); }
+
+  const btnEnter = document.getElementById('btn-enter');
+  if (dataLoaded && STATE.saves && STATE.saves.length > 0) {
+    STATE.saves.forEach(s => {
+      if (!s.player) s.player = defaultPlayer("Hero");
+      if (!s.player.path) s.player.path = 'warrior';
+      if (!s.player.sigils) s.player.sigils = [];
+    });
+    syncActiveSaveToState();
+    if (btnEnter) { btnEnter.style.display = "block"; btnEnter.textContent = "ENTER THE REALM"; btnEnter.disabled = false; }
+  } else {
+    STATE.player = null;
+    if (btnEnter) { btnEnter.style.display = "block"; btnEnter.textContent = "ENTER THE REALM"; btnEnter.disabled = false; }
+  }
+}
+
+window.enterRealm = function() {
+  if (!STATE.player || !STATE.saves || STATE.saves.length === 0) {
+    showScreen('screen-path');
+    try { renderPathSprites(); } catch(e) {}
+  } else {
+    showScreen('screen-hub');
+    window.switchTab('tab-profile');
+    try { renderHub(); } catch(e) {}
+  }
+};
+
+function syncActiveSaveToState() {
+  const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
+  if(s) {
+    STATE.player = s.player;
+    STATE.quests = (s.quests || []).filter(q => q != null).map(q => ({
+      ...q,
+      topic: q.topic || 'Unknown Discipline',
+      questTitle: q.questTitle || 'Forgotten Scroll',
+      bossName: q.bossName || 'Unknown Demon',
+      chapters: q.chapters || [],
+      completed: q.completed || [],
+      bossHp: typeof q.bossHp === 'number' ? q.bossHp : 100,
+      bossMaxHp: typeof q.bossMaxHp === 'number' ? q.bossMaxHp : 100
+    }));
+    STATE.player.questsCreated = STATE.quests.length;
+  }
+}
+
+function syncStateToActiveSave() {
+  if(!STATE.activeSaveId) return;
+  const i = STATE.saves.findIndex(s=>s.id===STATE.activeSaveId);
+  if(i!==-1) { STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; }
+}
+
+async function saveState() {
+  if(!USER_ID) return;
+  syncStateToActiveSave();
+  try {
+    await setDoc(doc(db,"users",USER_ID), { saves:STATE.saves, activeSaveId:STATE.activeSaveId }, { merge:true });
+  } catch(e) { console.error("Save error:",e); }
+}
+
+async function loadPublicQuests() {
+  const q = query(collection(db,"public_quests"), orderBy("id","desc"), limit(12));
+  const snap = await getDocs(q);
+  STATE.publicQuests = snap.docs.map(d=>({ ...d.data(), docId: d.id }));
+}
+
+window.nukeLibrary = async function() {
+  if(!confirm("Are you absolutely sure you want to delete ALL quests in the Realm Library from the database?")) return;
+  let count = 0;
+  for (const q of STATE.publicQuests) {
+    try { await deleteDoc(doc(db, "public_quests", q.docId)); count++; } catch(e) { console.error("Failed to delete", q.docId, e); }
+  }
+  STATE.publicQuests = [];
+  renderLibraryGrid();
+  window.closeApiModal();
+  showToast(`Nuked ${count} scrolls from the library.`);
+};
+
+// ════════════════════════════════
+//  AUTH
+// ════════════════════════════════
+window.signInGoogle = async () => {
+  document.getElementById('auth-buttons').style.display='none';
+  document.getElementById('loading-text').style.display='block';
+  document.getElementById('loading-text').textContent='AUTHENTICATING...';
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch(e) { showToast("Google Sign-In failed."); document.getElementById('auth-buttons').style.display='flex'; document.getElementById('loading-text').style.display='none'; }
+};
+window.signInGuest = async () => {
+  document.getElementById('auth-buttons').style.display='none';
+  document.getElementById('loading-text').style.display='block';
+  document.getElementById('loading-text').textContent='ENTERING AS GUEST...';
+  try { await signInAnonymously(auth); }
+  catch(e) { showToast("Guest Sign-In failed."); document.getElementById('auth-buttons').style.display='flex'; document.getElementById('loading-text').style.display='none'; }
+};
+window.signOutUser = async () => {
+  try { await signOut(auth); window.location.reload(); }
+  catch(e) { showToast("Failed to sign out."); }
+};
+
+// ════════════════════════════════
+//  TABS
+// ════════════════════════════════
+window.switchTab = function(tabId) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab-btn[data-target="${tabId}"]`).classList.add('active');
+  if (tabId === 'tab-library') loadPublicQuests().then(() => renderLibraryGrid());
+};
+
+// ════════════════════════════════
+//  PATH SELECTION
+// ════════════════════════════════
+function renderPathSprites() {
+  const wc = document.getElementById('path-warrior-canvas');
+  const sc = document.getElementById('path-scholar-canvas');
+  if(wc) drawChibiSprite(wc.getContext('2d'), 'warrior', 1, 120, 120, 0);
+  if(sc) drawChibiSprite(sc.getContext('2d'), 'scholar', 1, 120, 120, 0);
+}
+
+window.choosePath = async function(path) {
+  const name = prompt(`Name your ${path === 'warrior' ? 'Warrior' : 'Scholar'}:`) || (path==='warrior'?'Wei Xuan':'Wen Ru');
+  const newSave = { id: Date.now().toString(), player: defaultPlayer(name.trim()||'Hero', path), quests: [] };
+  STATE.saves.push(newSave);
+  STATE.activeSaveId = newSave.id;
+  syncActiveSaveToState();
+  await saveState();
+  showScreen('screen-hub');
+  window.switchTab('tab-profile');
+  renderHub();
+  showToast(`Your legend begins, ${STATE.player.name}.`);
+};
+
+window.cancelPathSelection = function() { showScreen('screen-hub'); };
+
+// ════════════════════════════════
+//  BACKGROUND & PARTICLES
+// ════════════════════════════════
+(function initBg() {
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  function resize() { c.width=window.innerWidth; c.height=window.innerHeight; redraw(); }
+  function redraw() {
+    const w=c.width, h=c.height;
+    ctx.clearRect(0,0,w,h);
+    const grd = ctx.createLinearGradient(0,0,0,h);
+    grd.addColorStop(0,'#050308'); grd.addColorStop(0.4,'#070510'); grd.addColorStop(1,'#080604');
+    ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
+    const layers = [{y:0.75,rough:0.2,alpha:0.07,col:'#c8a84b'},{y:0.65,rough:0.15,alpha:0.05,col:'#8b3a3a'},{y:0.57,rough:0.11,alpha:0.13,col:'#1a1008'},{y:0.50,rough:0.08,alpha:0.2,col:'#0a0608'}];
+    layers.forEach(l => {
+      ctx.beginPath(); let x=0;
+      while(x<=w) {
+        const y = h*l.y - Math.abs(Math.sin(x*0.0048+l.rough*80))*h*l.rough - Math.abs(Math.sin(x*0.011+30))*h*l.rough*0.45 - Math.abs(Math.sin(x*0.022+60))*h*l.rough*0.2;
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        x+=4;
+      }
+      ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+      ctx.globalAlpha=l.alpha; ctx.fillStyle=l.col; ctx.fill();
+    });
+    for(let i=0;i<5;i++) {
+      const y=h*(0.35+i*0.1); ctx.globalAlpha=0.04;
+      const mg=ctx.createLinearGradient(0,0,w,0);
+      mg.addColorStop(0,'transparent'); mg.addColorStop(0.3,'rgba(200,168,75,0.15)'); mg.addColorStop(0.7,'rgba(200,168,75,0.15)'); mg.addColorStop(1,'transparent');
+      ctx.fillStyle=mg; ctx.fillRect(0,y-1,w,3+i*0.5);
+    }
+    ctx.globalAlpha=0.015; ctx.strokeStyle='rgba(200,168,75,0.5)'; ctx.lineWidth=1;
+    for(let x=0;x<w;x+=90){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
+    for(let y=0;y<h;y+=90){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
+    ctx.globalAlpha=1;
+  }
+  window.addEventListener('resize',resize); resize();
+})();
+
+(function initParticles() {
+  const c = document.getElementById('particle-canvas');
+  const ctx = c.getContext('2d');
+  function resize() { c.width=window.innerWidth; c.height=window.innerHeight; }
+  window.addEventListener('resize',resize); resize();
+  const glyphs=['道','德','天','地','人','义','仁','礼','智','信','忠','勇'];
+  const particles = Array.from({length:50},()=>({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    vy:-Math.random()*0.28-0.04, vx:(Math.random()-0.5)*0.12,
+    size:Math.random()*1.4+0.3, life:Math.random()*200, maxLife:150+Math.random()*200,
+    type:Math.floor(Math.random()*4),
+    color:['#c8a84b','#8b3a3a','#2e6b5e','#f0e6cc','#7040b0'][Math.floor(Math.random()*5)],
+    glyph:glyphs[Math.floor(Math.random()*glyphs.length)],
+  }));
+  function tick() {
+    ctx.clearRect(0,0,c.width,c.height);
+    particles.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.life++;
+      if(p.life>p.maxLife){p.y=c.height+5;p.x=Math.random()*c.width;p.life=0;}
+      const lr=p.life/p.maxLife;
+      const a=(lr<0.2?lr/0.2:lr>0.8?(1-lr)/0.2:1)*0.3;
+      ctx.globalAlpha=a; ctx.fillStyle=p.color;
+      if(p.type===0){ ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill(); }
+      else if(p.type===1){ ctx.fillRect(p.x,p.y,p.size,p.size); }
+      else if(p.type===2){
+        ctx.globalAlpha=a*0.5; ctx.font=`${8+p.size*3}px Ma Shan Zheng`;
+        ctx.fillText(p.glyph,p.x,p.y);
+      } else {
+        ctx.beginPath(); ctx.moveTo(p.x,p.y-p.size*2); ctx.lineTo(p.x+p.size,p.y+p.size);
+        ctx.lineTo(p.x-p.size,p.y+p.size); ctx.closePath(); ctx.fill();
+      }
+    });
+    ctx.globalAlpha=1; requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// ════════════════════════════════
+//  CHIBI SPRITE RENDERER (MapleStory-style)
+// ════════════════════════════════
+
+function drawChibiSprite(ctx, path, rankIdx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.save();
+
+  const scale = w / 100;
+  const cx = w / 2;
+  // Bob animation
+  const bob = t ? Math.sin(t * 1.8) * 1.5 : 0;
+
+  ctx.translate(cx, h * 0.1 + bob * scale);
+  ctx.scale(scale, scale);
+
+  if (path === 'warrior') {
+    drawChibiWarrior(ctx, rankIdx, t);
+  } else {
+    drawChibiScholar(ctx, rankIdx, t);
+  }
+
+  ctx.restore();
+}
+
+// ── Colour palettes per rank ──
+const WARRIOR_PALETTES = [
+  { body:'#5c3a1e', armor:'#7a4a28', trim:'#a06030', hair:'#1a0a04', skin:'#f0b878', eye:'#3a1a0a', blush:'#e87070', weapon:'#888888', shadow:'#3a1808' },
+  { body:'#2a3820', armor:'#4a6030', trim:'#80a040', hair:'#1a0a04', skin:'#f0b878', eye:'#1a3010', blush:'#e87070', weapon:'#c0c0c0', shadow:'#182010' },
+  { body:'#3a1a10', armor:'#6a2a18', trim:'#c07030', skin:'#f0b878', hair:'#1a0804', eye:'#3a1808', blush:'#e87070', weapon:'#d08030', shadow:'#200808' },
+  { body:'#4a1808', armor:'#8a2810', trim:'#e88030', skin:'#f0b878', hair:'#200804', eye:'#400a08', blush:'#ff8060', weapon:'#e8a040', shadow:'#280808' },
+  { body:'#5a0808', armor:'#a01818', trim:'#ff4020', skin:'#f0b878', hair:'#300404', eye:'#500808', blush:'#ff6040', weapon:'#f8b040', shadow:'#300404' },
+  { body:'#3a0408', armor:'#800010', trim:'#ff2010', skin:'#f0b878', hair:'#400408', eye:'#600408', blush:'#ff5030', weapon:'#ffc030', shadow:'#380208' },
+  { body:'#1a0404', armor:'#500008', trim:'#ffc020', skin:'#f0b878', hair:'#500410', eye:'#700408', blush:'#ff9050', weapon:'#ffe050', shadow:'#280204' },
+  { body:'#100204', armor:'#300006', trim:'#ffe060', skin:'#f8c890', hair:'#600420', eye:'#800410', blush:'#ffb070', weapon:'#fff090', shadow:'#180102' },
+];
+
+const SCHOLAR_PALETTES = [
+  { body:'#1a2a3a', armor:'#2a4a5a', trim:'#4a8a7a', hair:'#1a0a04', skin:'#f0b878', eye:'#102030', blush:'#c07090', fan:'#8aaa7a', shadow:'#0a1820' },
+  { body:'#102038', armor:'#203060', trim:'#2a7a6a', hair:'#1a0a04', skin:'#f0b878', eye:'#082028', blush:'#c07090', fan:'#aaca8a', shadow:'#081018' },
+  { body:'#082030', armor:'#183858', trim:'#189060', skin:'#f0b878', hair:'#180a04', eye:'#062028', blush:'#b06080', fan:'#c8daa8', shadow:'#040810' },
+  { body:'#041828', armor:'#103050', trim:'#10a870', skin:'#f0b878', hair:'#160804', eye:'#041820', blush:'#b06080', fan:'#d8e8c0', shadow:'#020808' },
+  { body:'#020c18', armor:'#082040', trim:'#08c880', skin:'#f0b878', hair:'#200804', eye:'#020c18', blush:'#a05070', fan:'#e8f0d0', shadow:'#010408' },
+  { body:'#010818', armor:'#041830', trim:'#06e098', skin:'#f0b878', hair:'#300808', eye:'#010808', blush:'#a05070', fan:'#f0f8e0', shadow:'#010208' },
+  { body:'#010410', armor:'#031020', trim:'#20f0b0', skin:'#f0b878', hair:'#400c18', eye:'#010408', blush:'#9040a0', fan:'#f8fff0', shadow:'#010108' },
+  { body:'#010208', armor:'#020810', trim:'#40f8c8', skin:'#f8c890', hair:'#500820', eye:'#010208', blush:'#c060c0', fan:'#ffffff', shadow:'#010104' },
+];
+
+function drawChibiWarrior(ctx, rankIdx, t) {
+  const ri = Math.min(rankIdx, 7);
+  const p = WARRIOR_PALETTES[ri];
+  const blink = t && Math.sin(t * 3.7) > 0.92;
+  const arm_swing = t ? Math.sin(t * 1.8) * 5 : 0;
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.beginPath(); ctx.ellipse(0, 82, 22, 5, 0, 0, Math.PI*2); ctx.fill();
+
+  // ── LEGS (stubby, chibi) ──
+  ctx.fillStyle = p.body;
+  // Left leg
+  ctx.beginPath(); ctx.roundRect(-16, 56, 13, 20, [4,4,6,6]); ctx.fill();
+  // Right leg
+  ctx.beginPath(); ctx.roundRect(3, 56, 13, 20, [4,4,6,6]); ctx.fill();
+
+  // Big chibi boots
+  ctx.fillStyle = '#1a0a04';
+  ctx.beginPath(); ctx.ellipse(-10, 77, 10, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, 77, 10, 6, 0, 0, Math.PI*2); ctx.fill();
+  // Boot highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.ellipse(-12, 74, 5, 3, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(8, 74, 5, 3, 0.3, 0, Math.PI*2); ctx.fill();
+
+  // ── BODY (armored torso) ──
+  ctx.fillStyle = p.armor;
+  ctx.beginPath(); ctx.roundRect(-18, 30, 36, 30, [5,5,8,8]); ctx.fill();
+  // Armor detail - trim lines
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(-18, 30, 36, 3); // shoulder plate
+  ctx.fillRect(-16, 34, 6, 20); // left chest plate
+  ctx.fillRect(10, 34, 6, 20); // right chest plate
+  // Center emblem
+  ctx.fillStyle = p.trim;
+  ctx.beginPath(); ctx.arc(0, 43, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = p.body;
+  ctx.beginPath(); ctx.arc(0, 43, 3, 0, Math.PI*2); ctx.fill();
+
+  // ── ARMS ──
+  // Left arm (swings forward/back)
+  ctx.save();
+  ctx.translate(-22, 36);
+  ctx.rotate((-arm_swing * Math.PI) / 180);
+  ctx.fillStyle = p.armor;
+  ctx.beginPath(); ctx.roundRect(-7, 0, 12, 22, [4]); ctx.fill();
+  // Gauntlet
+  ctx.fillStyle = p.trim;
+  ctx.beginPath(); ctx.ellipse(-2, 22, 7, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // Right arm + weapon
+  ctx.save();
+  ctx.translate(22, 36);
+  ctx.rotate((arm_swing * Math.PI) / 180);
+  ctx.fillStyle = p.armor;
+  ctx.beginPath(); ctx.roundRect(-5, 0, 12, 22, [4]); ctx.fill();
+  ctx.fillStyle = p.trim;
+  ctx.beginPath(); ctx.ellipse(3, 22, 7, 5, 0, 0, Math.PI*2); ctx.fill();
+  // Sword
+  ctx.strokeStyle = p.weapon; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(3, 22); ctx.lineTo(8, 55); ctx.stroke();
+  // Sword tip
+  ctx.fillStyle = p.weapon;
+  ctx.beginPath(); ctx.moveTo(5, 52); ctx.lineTo(11, 58); ctx.lineTo(4, 60); ctx.closePath(); ctx.fill();
+  // Guard
+  ctx.strokeStyle = p.trim; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(-1, 25); ctx.lineTo(7, 21); ctx.stroke();
+  ctx.restore();
+
+  // ── BIG CHIBI HEAD (oversized = 55% of height) ──
+  // Head base
+  ctx.fillStyle = p.skin;
+  ctx.beginPath(); ctx.arc(0, -5, 28, 0, Math.PI*2); ctx.fill();
+
+  // Cheeks (blush)
+  ctx.fillStyle = p.blush; ctx.globalAlpha = 0.35;
+  ctx.beginPath(); ctx.ellipse(-15, 2, 9, 6, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(15, 2, 9, 6, 0.2, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // ── HAIR ──
+  ctx.fillStyle = p.hair;
+  // Back hair
+  ctx.beginPath(); ctx.arc(0, -5, 29, Math.PI*0.7, Math.PI*2.3); ctx.lineTo(0, -5); ctx.closePath(); ctx.fill();
+  // Fringe/bangs
+  ctx.beginPath(); ctx.ellipse(-16, -28, 10, 8, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-4, -33, 8, 7, -0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(8, -33, 9, 7, 0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(19, -28, 9, 8, 0.3, 0, Math.PI*2); ctx.fill();
+  // Hair highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.beginPath(); ctx.ellipse(-6, -20, 8, 5, -0.4, 0, Math.PI*2); ctx.fill();
+
+  // Rank accessories
+  if (ri >= 2) {
+    // Hair band/headband
+    ctx.fillStyle = p.trim;
+    ctx.fillRect(-20, -15, 40, 4);
+  }
+  if (ri >= 4) {
+    // Mini horns / spikes
+    ctx.fillStyle = p.trim;
+    ctx.beginPath(); ctx.moveTo(-10, -34); ctx.lineTo(-6, -48); ctx.lineTo(-2, -34); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(2, -34); ctx.lineTo(6, -48); ctx.lineTo(10, -34); ctx.closePath(); ctx.fill();
+  }
+  if (ri >= 6) {
+    // Halo / golden crown glow
+    ctx.strokeStyle = '#ffd040'; ctx.lineWidth = 2; ctx.globalAlpha = 0.7;
+    ctx.beginPath(); ctx.arc(0, -36, 18, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (ri >= 7) {
+    // Crown
+    ctx.fillStyle = '#ffe060';
+    ctx.beginPath();
+    ctx.moveTo(-14, -34); ctx.lineTo(-14, -44); ctx.lineTo(-7, -38);
+    ctx.lineTo(0, -46); ctx.lineTo(7, -38); ctx.lineTo(14, -44); ctx.lineTo(14, -34);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ff4040';
+    ctx.beginPath(); ctx.arc(0, -44, 3, 0, Math.PI*2); ctx.fill();
+  }
+
+  // ── EYES (big sparkly chibi eyes) ──
+  const eyeY = blink ? -2 : -6;
+  const eyeH = blink ? 1 : 9;
+  // Eye whites
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.ellipse(-10, -6, 8, 9, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, -6, 8, 9, 0, 0, Math.PI*2); ctx.fill();
+  // Iris
+  ctx.fillStyle = p.eye;
+  ctx.beginPath(); ctx.ellipse(-10, eyeY, 5, eyeH, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, eyeY, 5, eyeH, 0, 0, Math.PI*2); ctx.fill();
+  // Pupil shine
+  if (!blink) {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-12, -9, 2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(8, -9, 2, 0, Math.PI*2); ctx.fill();
+    // Mini sparkle
+    ctx.beginPath(); ctx.arc(-8, -3, 1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(12, -3, 1, 0, Math.PI*2); ctx.fill();
+  }
+  // Eyelashes (top)
+  ctx.strokeStyle = '#1a0a04'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(-18, -10); ctx.lineTo(-14, -15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-10, -15); ctx.lineTo(-10, -20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-2, -10); ctx.lineTo(-4, -15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(2, -10); ctx.lineTo(4, -15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(10, -15); ctx.lineTo(10, -20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(18, -10); ctx.lineTo(14, -15); ctx.stroke();
+
+  // Eyebrows
+  ctx.strokeStyle = p.hair; ctx.lineWidth = 2; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-18, -18); ctx.quadraticCurveTo(-10, -22, -2, -18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(2, -18); ctx.quadraticCurveTo(10, -22, 18, -18); ctx.stroke();
+
+  // ── MOUTH ──
+  ctx.strokeStyle = '#c07050'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(0, 6, 5, 0.2, Math.PI-0.2); ctx.stroke();
+  // Mouth corners
+  ctx.beginPath(); ctx.arc(-5, 7, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c07050';
+  ctx.beginPath(); ctx.arc(5, 7, 1.5, 0, Math.PI*2); ctx.fill();
+
+  // Nose (tiny dot)
+  ctx.fillStyle = '#c09060';
+  ctx.beginPath(); ctx.arc(0, 2, 1.5, 0, Math.PI*2); ctx.fill();
+}
+
+function drawChibiScholar(ctx, rankIdx, t) {
+  const ri = Math.min(rankIdx, 7);
+  const p = SCHOLAR_PALETTES[ri];
+  const blink = t && Math.sin(t * 3.3 + 1) > 0.93;
+  const arm_swing = t ? Math.sin(t * 1.8) * 4 : 0;
+  const fan_rot = t ? Math.sin(t * 1.4) * 0.2 : 0;
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.beginPath(); ctx.ellipse(0, 82, 20, 4, 0, 0, Math.PI*2); ctx.fill();
+
+  // ── ROBES (wide flowing) ──
+  // Robe base
+  ctx.fillStyle = p.body;
+  ctx.beginPath();
+  ctx.moveTo(-22, 28);
+  ctx.lineTo(-28, 80);
+  ctx.lineTo(28, 80);
+  ctx.lineTo(22, 28);
+  ctx.closePath(); ctx.fill();
+
+  // Robe layers
+  ctx.fillStyle = p.armor;
+  ctx.beginPath(); ctx.roundRect(-16, 28, 32, 30, [4,4,0,0]); ctx.fill();
+
+  // Robe trim / collar
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(-16, 28, 32, 3);
+  // Center robe split
+  ctx.fillStyle = p.body;
+  ctx.fillRect(-2, 36, 4, 24);
+  // Robe decorative lines
+  ctx.strokeStyle = p.trim; ctx.lineWidth = 1; ctx.globalAlpha = 0.5;
+  ctx.beginPath(); ctx.moveTo(-12, 34); ctx.lineTo(-12, 58); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(12, 34); ctx.lineTo(12, 58); ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // Wide robe sleeves
+  ctx.fillStyle = p.body;
+  // Left sleeve (wide, flared)
+  ctx.beginPath();
+  ctx.moveTo(-16, 32); ctx.lineTo(-36, 50); ctx.lineTo(-30, 56); ctx.lineTo(-12, 42);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = p.trim;
+  ctx.beginPath(); ctx.moveTo(-36, 50); ctx.lineTo(-30, 56); ctx.lineTo(-28, 52); ctx.closePath(); ctx.fill();
+
+  // Right sleeve (fan hand)
+  ctx.fillStyle = p.body;
+  ctx.save();
+  ctx.translate(22, 38);
+  ctx.rotate((arm_swing * Math.PI) / 180);
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(16, 14); ctx.lineTo(12, 20); ctx.lineTo(-4, 8);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = p.trim;
+  ctx.beginPath(); ctx.moveTo(16, 14); ctx.lineTo(12, 20); ctx.lineTo(10, 16); ctx.closePath(); ctx.fill();
+
+  // Fan
+  ctx.save();
+  ctx.translate(14, 18);
+  ctx.rotate(fan_rot);
+  // Fan ribs
+  ctx.strokeStyle = p.fan; ctx.lineWidth = 1.2;
+  for (let i = -3; i <= 3; i++) {
+    ctx.save();
+    ctx.rotate(i * 0.22);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -22); ctx.stroke();
+    ctx.restore();
+  }
+  // Fan face
+  ctx.fillStyle = p.fan; ctx.globalAlpha = 0.75;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.arc(0, 0, 22, -Math.PI/2 - 0.66, -Math.PI/2 + 0.66);
+  ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = 1;
+  // Fan pattern (tiny dots)
+  ctx.fillStyle = p.trim; ctx.globalAlpha = 0.5;
+  ctx.beginPath(); ctx.arc(-6, -16, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, -19, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(6, -16, 2, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  ctx.restore();
+
+  // Feet / shoes (dainty)
+  ctx.fillStyle = '#1a0a04';
+  ctx.beginPath(); ctx.ellipse(-8, 78, 8, 5, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(8, 78, 8, 5, 0.2, 0, Math.PI*2); ctx.fill();
+
+  // ── BIG CHIBI HEAD ──
+  ctx.fillStyle = p.skin;
+  ctx.beginPath(); ctx.arc(0, -5, 27, 0, Math.PI*2); ctx.fill();
+
+  // Cheeks
+  ctx.fillStyle = p.blush; ctx.globalAlpha = 0.3;
+  ctx.beginPath(); ctx.ellipse(-14, 2, 8, 5, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(14, 2, 8, 5, 0.2, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // ── HAIR (long, elegant) ──
+  ctx.fillStyle = p.hair;
+  // Back long hair
+  ctx.beginPath();
+  ctx.moveTo(-20, -20); ctx.lineTo(-26, 40); ctx.lineTo(-16, 40);
+  ctx.lineTo(-10, -25); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(20, -20); ctx.lineTo(26, 40); ctx.lineTo(16, 40);
+  ctx.lineTo(10, -25); ctx.closePath(); ctx.fill();
+  // Hair top
+  ctx.beginPath(); ctx.arc(0, -5, 28, Math.PI*0.65, Math.PI*2.35); ctx.lineTo(0, -5); ctx.closePath(); ctx.fill();
+  // Fringe
+  ctx.beginPath(); ctx.ellipse(-12, -28, 9, 7, -0.4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, -32, 8, 7, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(12, -28, 9, 7, 0.4, 0, Math.PI*2); ctx.fill();
+  // Hair highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  ctx.beginPath(); ctx.ellipse(-4, -20, 7, 4, -0.4, 0, Math.PI*2); ctx.fill();
+
+  // Rank accessories
+  if (ri >= 1) {
+    // Jade hairpin
+    ctx.fillStyle = p.trim;
+    ctx.fillRect(-2, -38, 4, 18);
+    ctx.beginPath(); ctx.ellipse(0, -40, 5, 4, 0, 0, Math.PI*2); ctx.fill();
+  }
+  if (ri >= 3) {
+    // Scholar cap / guan
+    ctx.fillStyle = p.armor;
+    ctx.beginPath(); ctx.roundRect(-18, -32, 36, 8, [3]); ctx.fill();
+    ctx.fillStyle = p.trim;
+    ctx.fillRect(-18, -32, 36, 2);
+    // Cap wings
+    ctx.beginPath(); ctx.roundRect(-26, -32, 9, 14, [2]); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(17, -32, 9, 14, [2]); ctx.fill();
+  }
+  if (ri >= 6) {
+    // Mystic aura wisps
+    ctx.strokeStyle = p.trim; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.moveTo(-28, -10); ctx.quadraticCurveTo(-38, -25, -30, -38); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(28, -10); ctx.quadraticCurveTo(38, -25, 30, -38); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  if (ri >= 7) {
+    // Dragon jade orb
+    ctx.fillStyle = '#40f8c8'; ctx.globalAlpha = 0.9;
+    ctx.beginPath(); ctx.arc(0, -46, 7, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.arc(-2, -49, 3, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // ── EYES (big, gentle) ──
+  const eyeH2 = blink ? 1 : 8;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.ellipse(-10, -6, 7, 8, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, -6, 7, 8, 0, 0, Math.PI*2); ctx.fill();
+  // Iris (subtle, scholar color)
+  ctx.fillStyle = p.eye || '#1a3050';
+  ctx.beginPath(); ctx.ellipse(-10, blink ? -2 : -5, 4.5, eyeH2, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, blink ? -2 : -5, 4.5, eyeH2, 0, 0, Math.PI*2); ctx.fill();
+  // Sparkles
+  if (!blink) {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-11, -8, 1.8, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(9, -8, 1.8, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-9, -3, 1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(11, -3, 1, 0, Math.PI*2); ctx.fill();
+  }
+  // Gentle upper lashes
+  ctx.strokeStyle = '#1a0a04'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(-17, -10); ctx.lineTo(-14, -14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-10, -14); ctx.lineTo(-9, -18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-3, -10); ctx.lineTo(-5, -14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(3, -10); ctx.lineTo(5, -14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(10, -14); ctx.lineTo(9, -18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(17, -10); ctx.lineTo(14, -14); ctx.stroke();
+
+  // Eyebrows (elegant, thin)
+  ctx.strokeStyle = p.hair; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-16, -20); ctx.quadraticCurveTo(-10, -23, -3, -20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(3, -20); ctx.quadraticCurveTo(10, -23, 16, -20); ctx.stroke();
+
+  // Mouth (serene smile)
+  ctx.strokeStyle = '#c07060'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(0, 5, 4, 0.3, Math.PI-0.3); ctx.stroke();
+  ctx.fillStyle = '#c07060';
+  ctx.beginPath(); ctx.arc(-4, 6, 1.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4, 6, 1.2, 0, Math.PI*2); ctx.fill();
+
+  // Nose
+  ctx.fillStyle = '#c09060';
+  ctx.beginPath(); ctx.arc(0, 1, 1.2, 0, Math.PI*2); ctx.fill();
+}
+
+function drawCharSprite(canvas, rankIdx, path, w=140, h=180) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = w; canvas.height = h;
+  ctx.clearRect(0,0,w,h);
+  const t = Date.now()*0.001;
+  // Center and scale for the canvas
+  const scale = w / 100;
+  const cx = w / 2;
+  const bob = Math.sin(t * 1.8) * 1.5;
+
+  ctx.save();
+  ctx.translate(cx, h * 0.08 + bob);
+  ctx.scale(scale, scale);
+  if(path === 'scholar') drawChibiScholar(ctx, rankIdx, t);
+  else drawChibiWarrior(ctx, rankIdx, t);
+  ctx.restore();
+}
+
+let charAnimFrame = null;
+function startCharAnimation() {
+  if(charAnimFrame) cancelAnimationFrame(charAnimFrame);
+  const canvas = document.getElementById('char-sprite');
+  if(!canvas || !STATE.player) return;
+  function frame() {
+    drawCharSprite(canvas, getCurrentRankIdx(), STATE.player.path, 140, 180);
+    charAnimFrame = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
+  const ctx = canvasEl.getContext('2d');
+  const w=canvasEl.width, h=canvasEl.height;
+  ctx.clearRect(0,0,w,h);
+
+  let seed = 0;
+  for(let i=0;i<(bossData.bossName||'Boss').length;i++) seed+=((bossData.bossName||'Boss').charCodeAt(i)*(i+1));
+  function sr(min,max){ const x=Math.sin(seed++)*10000; return min+(x-Math.floor(x))*(max-min); }
+
+  const hue1=sr(0,360), hue2=(hue1+sr(120,180))%360;
+  const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(15,30)}%)`;
+  const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
+  const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
+
+  const cx=w/2, cy=h*0.52, sc=w/170;
+  const t=Date.now()*0.001;
+  const hover=Math.sin(t*0.9)*3;
+
+  ctx.save();
+  ctx.translate(cx, cy+hover);
+  ctx.scale(sc,sc);
+
+  const hpTint = 1-hp_ratio;
+  ctx.fillStyle=`rgba(0,0,0,${0.2+((1-hp_ratio)*0.25)})`;
+  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
+
+  const bodyStyle = Math.floor(sr(0,4));
+  ctx.fillStyle=bodyColor;
+  if(bodyStyle===0) { ctx.beginPath(); ctx.roundRect(-30,5,60,48,[10]); ctx.fill(); }
+  else if(bodyStyle===1) { ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(34,5); ctx.lineTo(28,52); ctx.lineTo(-28,52); ctx.lineTo(-34,5); ctx.closePath(); ctx.fill(); }
+  else if(bodyStyle===2) { ctx.beginPath(); ctx.arc(0,26,32,0,Math.PI*2); ctx.fill(); }
+  else { ctx.beginPath(); ctx.roundRect(-28,2,56,55,[4,16,4,16]); ctx.fill(); }
+
+  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
+  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.fillStyle='#000'; ctx.font='bold 14px Ma Shan Zheng'; ctx.textAlign='center';
+  ctx.fillText(['邪','魔','鬼','煞','厉','怒'][Math.floor(sr(0,6))], 0, 30);
+
+  const armStyle = Math.floor(sr(0,3));
+  ctx.fillStyle=bodyColor;
+  if(armStyle===0) {
+    for(let a=0;a<4;a++) {
+      const angle = (a<2?-1:1)*(a%2===0?0.5:1.1);
+      ctx.save(); ctx.translate(a<2?-30:30, a<2?5:25); ctx.rotate(angle);
+      ctx.beginPath(); ctx.roundRect(-9,-5,18,32,[6]); ctx.fill();
+      ctx.fillStyle=accentColor; ctx.globalAlpha=0.4; ctx.fillRect(-9,-5,18,2); ctx.globalAlpha=1;
+      ctx.fillStyle=bodyColor; ctx.restore();
+    }
+  } else {
+    ctx.beginPath(); ctx.roundRect(-46,5,18,34,[7]); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(28,5,18,34,[7]); ctx.fill();
+    if(armStyle===2) {
+      ctx.save(); ctx.translate(-44,20); ctx.rotate(-0.4); ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(44,20); ctx.rotate(0.4); ctx.beginPath(); ctx.roundRect(-8,-3,16,28,[5]); ctx.fill(); ctx.restore();
+    }
+  }
+
+  ctx.fillStyle=accentColor;
+  for(let side of[-1,1]) {
+    const bx = side*(armStyle===0?-40:42);
+    for(let i=-1;i<=1;i++) {
+      ctx.beginPath(); ctx.moveTo(bx+i*4,40); ctx.lineTo(bx+i*4-2,52); ctx.lineTo(bx+i*4+2,52); ctx.closePath(); ctx.fill();
+    }
+  }
+
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath(); ctx.roundRect(-22,52,18,20,[5]); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(4,52,18,20,[5]); ctx.fill();
+  ctx.fillStyle=accentColor;
+  ctx.beginPath(); ctx.roundRect(-24,70,22,6,[2]); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(2,70,22,6,[2]); ctx.fill();
+
+  ctx.fillStyle=bodyColor;
+  const headStyle=Math.floor(sr(0,3));
+  if(headStyle===0) { ctx.beginPath(); ctx.arc(0,-26,28,0,Math.PI*2); ctx.fill(); }
+  else if(headStyle===1) { ctx.beginPath(); ctx.roundRect(-28,-52,56,52,[10]); ctx.fill(); }
+  else { ctx.beginPath(); ctx.moveTo(-26,-50); ctx.lineTo(26,-50); ctx.lineTo(34,-2); ctx.lineTo(-34,-2); ctx.closePath(); ctx.fill(); }
+
+  ctx.fillStyle=accentColor;
+  const hornType=Math.floor(sr(0,4));
+  if(hornType===0) {
+    ctx.beginPath(); ctx.moveTo(-18,-52); ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65); ctx.lineTo(-14,-60); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(18,-52); ctx.bezierCurveTo(30,-70,10,-80,6,-65); ctx.lineTo(14,-60); ctx.closePath(); ctx.fill();
+  } else if(hornType===1) {
+    for(let i=-1;i<=1;i++) { ctx.beginPath(); ctx.moveTo(i*12,-52); ctx.lineTo(i*12-3,-72); ctx.lineTo(i*12+3,-72); ctx.closePath(); ctx.fill(); }
+  } else if(hornType===2) {
+    for(let i=0;i<6;i++) {
+      const a=(i/6)*Math.PI*2;
+      ctx.beginPath(); ctx.arc(Math.cos(a)*22+0, Math.sin(a)*8-46, 6,0,Math.PI*2); ctx.fill();
+    }
+  } else {
+    ctx.strokeStyle=accentColor; ctx.lineWidth=4; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(-20,-50); ctx.lineTo(-28,-70); ctx.lineTo(-22,-68); ctx.moveTo(-28,-70); ctx.lineTo(-34,-62); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20,-50); ctx.lineTo(28,-70); ctx.lineTo(22,-68); ctx.moveTo(28,-70); ctx.lineTo(34,-62); ctx.stroke();
+  }
+
+  const eyeGlow=0.65+Math.sin(t*3+seed)*0.35;
+  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eyeGlow;
+  const eyeStyle=Math.floor(sr(0,3));
+  if(eyeStyle===0) {
+    ctx.beginPath(); ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,-27,8,6,0,0,Math.PI*2); ctx.fill();
+  } else if(eyeStyle===1) {
+    ctx.beginPath(); ctx.arc(-12,-28,6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(12,-28,6,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,-38,5,0,Math.PI*2); ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2); ctx.fill();
+  }
+  ctx.shadowBlur=0; ctx.fillStyle='#000';
+  ctx.beginPath(); ctx.arc(-11,-27,3,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(11,-27,3,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
+  ctx.beginPath();
+  if(hp_ratio<0.3){ ctx.arc(0,-12,12,0.3,Math.PI-0.3,true); }
+  else { ctx.arc(0,-8,10,0.2,Math.PI-0.2); }
+  ctx.stroke();
+
+  if(hpTint>0){
+    ctx.globalAlpha=hpTint*0.3;
+    ctx.fillStyle='#ff0000';
+    ctx.beginPath(); ctx.arc(0,0,60,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+  ctx.restore();
+}
+
+let bossAnimFrames = {};
+function animateBossCanvas(canvasEl, bossData, hpRatio=1.0, key='main') {
+  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
+  function frame() {
+    drawBossSprite(canvasEl, bossData, hpRatio);
+    bossAnimFrames[key] = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ════════════════════════════════
+//  NAV
+// ════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+window.showHub = function() { showScreen('screen-hub'); renderHub(); };
+
+window.showQuestScreen = function(questIdx) {
+  STATE.activeQuestIdx = questIdx;
+  const quest = STATE.quests[questIdx];
+  if(!quest) return;
+
+  document.getElementById('q-topic-label').textContent = (quest.topic || 'Unknown').toUpperCase();
+  document.getElementById('q-title-label').textContent = quest.questTitle || 'Untitled Quest';
+
+  const bossCanvas = document.getElementById('boss-sprite-canvas');
+  bossCanvas._animFrame && cancelAnimationFrame(bossCanvas._animFrame);
+  bossCanvas._animFrame = null;
+  const hpRatio = quest.bossHp / quest.bossMaxHp;
+  animateBossCanvas(bossCanvas, quest, hpRatio, 'quest');
+
+  document.getElementById('boss-name-display').textContent = quest.bossName || 'Demon';
+  document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian';
+  const loreBox = document.getElementById('boss-lore-text');
+  if(loreBox) loreBox.textContent = quest.bossLore || 'A mysterious entity.';
+
+  updateBossHpDisplay(quest);
+  renderChapterList(quest);
+
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  const allDone = chapters.length > 0 && chapters.every((_,i) => completed[i]);
+  const btn = document.getElementById('boss-complete-btn');
+  btn.disabled = !allDone;
+  if(quest.defeated) {
+    btn.textContent='✓ DEMON DEFEATED'; btn.disabled=true;
+    btn.style.borderColor='var(--jade2)'; btn.style.color='var(--jade2)';
+  } else if(allDone) {
+    btn.textContent='⚔ CHALLENGE THE DEMON';
+    btn.style.borderColor='var(--red)'; btn.style.color='var(--gold)';
+  }
+  showScreen('screen-quest');
+};
+
+function updateBossHpDisplay(quest) {
+  const ratio = quest.bossHp/quest.bossMaxHp;
+  document.getElementById('boss-hp-fill').style.width=(ratio*100)+'%';
+  document.getElementById('boss-hp-text').textContent=`${quest.bossHp} / ${quest.bossMaxHp}`;
+}
+
+function renderChapterList(quest) {
+  const list = document.getElementById('chapter-list');
+  list.innerHTML='';
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  chapters.forEach((ch,i)=>{
+    const done=completed[i];
+    const item=document.createElement('div');
+    item.className='chapter-item'+(done?' completed':'');
+    item.innerHTML=`
+      <div class="chapter-num">${i+1}</div>
+      <div>
+        <div class="chapter-tag">${ch.tag||'CHAPTER '+(i+1)}</div>
+        <div class="chapter-title-text">${ch.title}</div>
+        <div class="chapter-desc">${ch.summary}</div>
+      </div>
+      ${done?'<div class="chapter-done-badge">✓ READ</div>':''}
+    `;
+    item.addEventListener('click',()=>window.openChapterModal(i));
+    list.appendChild(item);
+  });
+}
+
+function renderHub() {
+  if(!STATE.player) return;
+  const p = STATE.player;
+  const rank = getCurrentRank();
+  const nextRank = getNextRank();
+  const rankIdx = getCurrentRankIdx();
+
+  const auraColor = p.path==='scholar' ? 'rgba(46,138,106,0.3)' : 'rgba(122,21,21,0.3)';
+  const auraEl = document.getElementById('char-aura');
+  if(auraEl) auraEl.style.boxShadow=`0 0 30px ${auraColor}, 0 0 60px ${auraColor.replace('0.3','0.12')}`;
+
+  startCharAnimation();
+  if(document.getElementById('personality-bubble')) startPersonalityQuotes();
+
+  document.getElementById('char-name').innerHTML = `${p.name||'Hero'} <span style="font-size:0.75em;opacity:0.45;">✎</span>`;
+  const pathBadge = document.getElementById('char-path-badge');
+  pathBadge.textContent = p.path==='scholar'?'SCHOLAR':'WARRIOR';
+  pathBadge.className = 'char-path-badge '+(p.path||'warrior');
+  document.getElementById('char-rank').textContent = `${rank.name} · ${rank.en}`;
+
+  const xpFill = document.getElementById('xp-fill');
+  xpFill.className = 'xp-fill '+(p.path||'warrior');
+  const xpForNext = nextRank ? nextRank.xp : rank.xp;
+  const xpFromCur = p.totalXp - rank.xp;
+  const xpNeeded = xpForNext - rank.xp;
+  const pct = nextRank ? Math.min(100,(xpFromCur/xpNeeded)*100) : 100;
+  xpFill.style.width = pct+'%';
+  document.getElementById('xp-text').textContent = `${p.totalXp} / ${xpForNext} XP`;
+
+  document.getElementById('stat-quests').textContent = p.questsCreated;
+  document.getElementById('stat-chapters').textContent = p.chaptersCompleted;
+  document.getElementById('stat-bosses').textContent = p.bossesDefeated;
+  document.getElementById('stat-perfect').textContent = p.perfectRuns;
+
+  renderSigils();
+
+  const warriorLores = [
+    `The realm trembles. ${p.name} sharpens their blade. The warlords laugh — for now.`,
+    `Three border skirmishes won. The demon-generals grow uneasy. ${p.name} is no ordinary warrior.`,
+    `The Iron Fortress fell. ${p.name}'s war-cry echoes from the northern mountains to the southern sea.`,
+    `Five kingdoms send tribute. They fear the blade of ${p.name}, tempered by knowledge and trial.`,
+    `The Grand Battle of Longmen. ${p.name} stood alone against a thousand — and the thousand broke.`,
+    `Legends are carved into stone now. The children in every province know the name ${p.name}.`,
+    `The Dragon Throne is within reach. One final demon stands between ${p.name} and eternity.`,
+    `The Heavenly Court bows. 齊天大聖 — Equal of Heaven. ${p.name}'s legend shall never fade.`,
+  ];
+  const scholarLores = [
+    `The realm is a puzzle, and ${p.name} has begun to see its patterns. The warlords remain blind.`,
+    `Word reaches the capital: a scholar who defeats demon-generals with thought alone. Impossible. True.`,
+    `${p.name}'s Seven Star Formation shattered three armies without a single blade drawn. The realm whispers.`,
+    `Four of the Six Kingdoms now seek ${p.name}'s counsel. The remaining two seek their assassins.`,
+    `The Strategist of Ten Thousand Scrolls. History will name ${p.name} the architect of a new age.`,
+    `Kings bow their heads. ${p.name} bows to no one — only to knowledge itself.`,
+    `One final mind-demon remains: the keeper of forbidden truths. ${p.name} walks calmly to face it.`,
+    `臥龍 — Sleeping Dragon — awakens. ${p.name} has unified Jiuzhou not with swords but with wisdom.`,
+  ];
+  const lores = p.path==='scholar' ? scholarLores : warriorLores;
+  document.getElementById('world-lore-text').textContent = lores[Math.min(rankIdx, lores.length-1)];
+
+  renderQuestGrid();
+  renderLibraryGrid();
+}
+
+function renderQuestGrid() {
+  const grid = document.getElementById('quest-grid');
+  grid.innerHTML='';
+  if(!STATE.quests || STATE.quests.length===0) {
+    grid.innerHTML=`<div style="grid-column:1/-1;padding:2.5rem;text-align:center;color:rgba(240,230,204,0.28);font-style:italic;font-size:0.82rem;letter-spacing:0.1em;">No active quests. Issue a new quest to begin your journey.</div>`;
+    return;
+  }
+  STATE.quests.forEach((quest,idx)=>{
+    if(!quest) return;
+    const completed = quest.completed || [];
+    const chapters = quest.chapters || [];
+    const chapDone = completed.filter(Boolean).length;
+    const chapTotal = chapters.length;
+    const bossMax = typeof quest.bossMaxHp === 'number' ? quest.bossMaxHp : 100;
+    const bossCur = typeof quest.bossHp === 'number' ? quest.bossHp : 100;
+    const hpRatio = bossMax > 0 ? bossCur/bossMax : 1;
+
+    const card = document.createElement('div');
+    card.className='quest-card';
+    card.innerHTML=`
+      <div class="quest-boss-preview">
+        <canvas class="boss-mini-sprite" width="56" height="56"></canvas>
+        <div>
+          <div class="quest-topic">${(quest.topic || 'Unknown').toUpperCase()}</div>
+          <div class="quest-title">${quest.questTitle || 'Untitled Quest'}</div>
+        </div>
+      </div>
+      <div class="chapter-progress">
+        ${chapters.map((_,i)=>`<div class="chapter-pip ${completed[i]?'done':i===chapDone?'active':''}"></div>`).join('')}
+      </div>
+      <div class="quest-status">
+        <div class="quest-hp-bar"><div class="quest-hp-fill" style="width:${hpRatio*100}%;height:100%;"></div></div>
+        <div class="quest-hp-label">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapTotal}`}</div>
+      </div>
+    `;
+
+    const delBtn=document.createElement('button');
+    delBtn.innerHTML='✕';
+    delBtn.style.cssText='position:absolute;top:0.4rem;right:0.4rem;background:none;border:none;color:rgba(200,168,75,0.4);font-size:1.1rem;cursor:pointer;z-index:10;padding:0.4rem;';
+    delBtn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(confirm('Abandon this quest? Stats will be reversed.')) {
+        let xpD=0,chD=0;
+        completed.forEach(d=>{if(d){chD++;xpD+=20;}});
+        if(quest.defeated){STATE.player.bossesDefeated--;xpD+=100;}
+        if(quest.quiz && quest.quizScore===(quest.quiz.questions||[]).length && quest.defeated){STATE.player.perfectRuns--;xpD+=50;}
+        STATE.player.questsCreated--;
+        STATE.player.chaptersCompleted = Math.max(0, STATE.player.chaptersCompleted - chD);
+        STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD);
+        STATE.player.xp=Math.max(0,STATE.player.xp-xpD);
+        STATE.quests.splice(idx,1);
+        saveState(); renderHub(); showToast("Quest abandoned.");
+      }
+    });
+    card.appendChild(delBtn);
+    const mini=card.querySelector('.boss-mini-sprite');
+    drawBossSprite(mini,quest,hpRatio);
+    card.addEventListener('click',()=>window.showQuestScreen(idx));
+    grid.appendChild(card);
+  });
+}
+
+function renderLibraryGrid() {
+  const grid=document.getElementById('library-grid');
+  grid.innerHTML='';
+  if(!STATE.publicQuests || STATE.publicQuests.length===0) {
+    grid.innerHTML=`<div style="grid-column:1/-1;padding:2.5rem;text-align:center;color:rgba(240,230,204,0.28);font-style:italic;font-size:0.82rem;">The library is empty. Be the first to share a quest!</div>`;
+    return;
+  }
+  STATE.publicQuests.forEach((quest,idx)=>{
+    if(!quest) return;
+    const chapters = quest.chapters || [];
+    const card=document.createElement('div');
+    card.className='quest-card';
+    card.innerHTML=`
+      <div class="quest-boss-preview">
+        <canvas class="boss-mini-sprite" width="56" height="56"></canvas>
+        <div>
+          <div class="quest-topic">${(quest.topic || 'Unknown').toUpperCase()}</div>
+          <div class="quest-title" style="padding-right:1.5rem;">${quest.questTitle || 'Untitled'}</div>
+        </div>
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.8rem;">${chapters.length} Chapters of Knowledge</div>
+      <div class="quest-status" style="justify-content:flex-end;">
+        <div class="quest-hp-label" style="color:var(--jade2);font-weight:bold;">+ ADD TO QUESTS</div>
+      </div>
+    `;
+    if (quest.authorId && quest.authorId === USER_ID) {
+      const delBtn = document.createElement('button');
+      delBtn.innerHTML = '✕';
+      delBtn.style.cssText = 'position:absolute;top:0.4rem;right:0.4rem;background:none;border:none;color:rgba(200,168,75,0.4);font-size:1.1rem;cursor:pointer;z-index:10;padding:0.4rem;';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if(confirm('Remove this scroll from the Realm Library?')) {
+          window.deletePublicQuest(quest.docId, idx);
+        }
+      });
+      card.appendChild(delBtn);
+    }
+    const mini=card.querySelector('.boss-mini-sprite');
+    drawBossSprite(mini,quest,1.0);
+    card.addEventListener('click',()=>window.copyPublicQuest(idx));
+    grid.appendChild(card);
+  });
+}
+
+function renderSettingsCharacters() {
+  const list=document.getElementById('character-list');
+  if(!list) return;
+  list.innerHTML='';
+  STATE.saves.forEach(s=>{
+    if(!s || !s.player) return;
+    const isActive=s.id===STATE.activeSaveId;
+    const ranks=(s.player.path==='scholar')?SCHOLAR_RANKS:WARRIOR_RANKS;
+    let r=ranks[0]; for(const rank of ranks){if(s.player.totalXp>=rank.xp)r=rank;}
+    const div=document.createElement('div');
+    div.style.cssText=`padding:0.75rem;border:${isActive?'1px solid var(--gold)':'1px solid rgba(200,168,75,0.18)'};margin-bottom:0.45rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:${isActive?'rgba(200,168,75,0.08)':'transparent'};transition:all 0.2s;`;
+    div.innerHTML=`
+      <div style="flex:1; display:flex; flex-direction:column;" onclick="switchCharacter('${s.id}')">
+        <div style="color:var(--gold);font-family:'Ma Shan Zheng',serif;font-size:1.05rem;">${s.player.name}</div>
+        <div style="color:var(--text-muted);font-size:0.58rem;letter-spacing:0.1em;">${r.name} · ${s.player.path||'warrior'} · ${s.player.totalXp} XP</div>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <div style="color:var(--text-muted);font-size:0.65rem;">${isActive?'ACTIVE':''}</div>
+        <button onclick="deleteCharacter('${s.id}', event)" style="background:none;border:none;color:var(--red2);font-size:1.2rem;cursor:pointer;padding:0 0.5rem;">✕</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+window.switchCharacter = function(id) {
+  STATE.activeSaveId=id; syncActiveSaveToState(); saveState();
+  STATE.activeQuestIdx=null; STATE.quizCurrent=0;
+  renderHub(); renderSettingsCharacters(); closeApiModal();
+  showToast(`Switched to ${STATE.player.name}`);
+};
+
+window.deleteCharacter = function(id, event) {
+  event.stopPropagation();
+  if(!confirm("Banish this warrior to the void? This cannot be undone.")) return;
+  STATE.saves = STATE.saves.filter(s => s.id !== id);
+  if(STATE.saves.length === 0) {
+    STATE.activeSaveId = null; STATE.player = null; STATE.quests = [];
+    saveState(); closeApiModal(); showScreen('screen-path'); renderPathSprites();
+    const cancelBtn = document.getElementById('path-cancel-btn');
+    if(cancelBtn) cancelBtn.style.display = 'none';
+  } else {
+    if(STATE.activeSaveId === id) { STATE.activeSaveId = STATE.saves[0].id; syncActiveSaveToState(); renderHub(); }
+    saveState(); renderSettingsCharacters();
+  }
+};
+
+window.createNewCharacter = function() {
+  closeApiModal(); showScreen('screen-path'); renderPathSprites();
+  const cancelBtn = document.getElementById('path-cancel-btn');
+  if(cancelBtn) cancelBtn.style.display = 'block';
+};
+
+// ════════════════════════════════
+//  MODALS
+// ════════════════════════════════
+window.openCreateModal=()=>{
+  document.getElementById('create-modal').classList.add('open');
+  document.getElementById('create-form').style.display='block';
+  document.getElementById('generating-state').classList.remove('active');
+};
+window.closeCreateModal=()=>document.getElementById('create-modal').classList.remove('open');
+window.openApiModal=()=>{ renderSettingsCharacters(); document.getElementById('api-modal').classList.add('open'); };
+window.closeApiModal=()=>document.getElementById('api-modal').classList.remove('open');
+
+document.getElementById('model-chip-group').addEventListener('click',e=>{
+  if(e.target.classList.contains('model-chip')){
+    document.querySelectorAll('.model-chip').forEach(c=>c.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('modelSelect').value=e.target.dataset.value;
+    STATE.selectedModel=e.target.dataset.value;
+  }
+});
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+// ════════════════════════════════
+//  CREATE QUEST
+// ════════════════════════════════
+window.copyPublicQuest = function(idx) {
+  const pub=STATE.publicQuests[idx];
+  const chapters = pub.chapters || [];
+  const nq={
+    ...pub, id:Date.now(), bossMaxHp:100, bossHp:100,
+    completed:new Array(chapters.length).fill(false),
+    chapterContent:{}, quiz:null, defeated:false
+  };
+  STATE.quests.unshift(nq); STATE.player.questsCreated++;
+  saveState(); window.switchTab('tab-quests'); renderHub();
+  showToast(`Copied "${nq.questTitle}" to your quests!`);
+};
+
+window.createQuest = async function() {
+  try {
+    const topic=document.getElementById('topic-input').value.trim();
+    if(!topic){showToast('Please enter a topic.');return;}
+    const objective=document.getElementById('objective-input').value.trim();
+    const numChapters=parseInt(document.getElementById('chapters-input').value);
+    document.getElementById('create-form').style.display='none';
+    document.getElementById('generating-state').classList.add('active');
+    setGenStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
+    let questData;
+    try { questData=await callAI({ ...buildQuestPrompt(topic,objective,numChapters), isJSON: true }); }
+    catch (aiErr) { throw new Error("AI Error: " + (aiErr.message || "Could not fetch scrolls.")); }
+    let parsed=parseJSON(questData);
+    if (!parsed || typeof parsed !== 'object') parsed = {};
+    setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
+    await delay(500);
+    const chapters = parsed.chapters || parsed.chapterList || [];
+    if(chapters.length === 0) {
+      for(let i=0; i<numChapters; i++) chapters.push({ title: `Chapter ${i+1}`, tag: `PART ${i+1}`, summary: `Learning about ${topic}`});
+    }
+    const baseQuest={
+      topic: topic || "Unknown", objective: objective || "",
+      questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
+      questNarrative: parsed.questNarrative || parsed.narrative || "A newly discovered scroll.",
+      bossName: parsed.bossName || parsed.boss || "Mo Wang",
+      bossTitle: parsed.bossTitle || "The Unknown",
+      bossLore: parsed.bossLore || parsed.lore || "A mysterious entity.",
+      chapters: chapters
+    };
+    const userQuest={
+      ...baseQuest, id: Date.now(), bossMaxHp: 100, bossHp: 100,
+      completed: new Array(chapters.length).fill(false),
+      chapterContent: {}, quiz: null, defeated: false
+    };
+    if (!STATE.quests) STATE.quests = [];
+    if (!STATE.player) throw new Error("STATE.player is undefined!");
+    STATE.quests.unshift(userQuest);
+    STATE.player.questsCreated = (STATE.player.questsCreated || 0) + 1;
+    try { await saveState(); } catch(dbErr) { alert("Failed to save to Firestore: " + dbErr.message); }
+    try {
+      const pubQ={...baseQuest,id:Date.now(), authorId: USER_ID };
+      const docRef = await addDoc(collection(db,"public_quests"),pubQ);
+      pubQ.docId = docRef.id;
+      STATE.publicQuests.unshift(pubQ);
+    } catch(e) {}
+    closeCreateModal();
+    showToast(`Quest summoned: "${userQuest.questTitle}"`);
+    window.switchTab('tab-quests');
+    window.showQuestScreen(0);
+  } catch(e) {
+    alert("🔥 CRASH LOG:\n" + (e.stack || e.message || e));
+    document.getElementById('create-form').style.display='block';
+    document.getElementById('generating-state').classList.remove('active');
+    showToast('Error: '+ (e.message ? e.message.substring(0,60) : 'Unknown'));
+  }
+};
+
+function setGenStatus(t,s=''){document.getElementById('gen-status-text').textContent=t;document.getElementById('gen-step').textContent=s;}
+
+function buildQuestPrompt(topic,objective,numChapters){
+  return {
+    system:`You are the Loremaster of Ten Thousand Scrolls, an ancient Chinese fantasy realm. You generate structured learning quests. ALWAYS respond with ONLY valid JSON, no markdown.`,
+    user:`Create a learning quest for topic: "${topic}". ${objective?`Objective: ${objective}`:''}
+Number of chapters: ${numChapters}
+Return this exact JSON:
+{"questTitle":"dramatic wuxia-themed quest title in English","questNarrative":"2-3 sentence wuxia lore intro","bossName":"Chinese demon name (2-3 chars transliterated + translation)","bossTitle":"demon epithet","bossLore":"2 sentence demon background","chapters":[{"title":"clear modern educational title","tag":"SUBTOPIC TAG","summary":"one sentence chapter description"}]}
+Make exactly ${numChapters} chapters.`
+  };
+}
+
+// ════════════════════════════════
+//  CHAPTER MODAL
+// ════════════════════════════════
+window.openChapterModal = function(chapterIdx) {
+  STATE.activeChapterIdx=chapterIdx;
+  const quest=STATE.quests[STATE.activeQuestIdx];
+  const chapters = quest.chapters || [];
+  const ch = chapters[chapterIdx];
+  if(!quest.completed) quest.completed = new Array(chapters.length).fill(false);
+  const done=quest.completed[chapterIdx];
+  document.getElementById('chapter-modal-title').textContent=ch?.title || "Chapter";
+  document.getElementById('chapter-modal-tag').textContent=(ch?.tag || 'PART')+' · CHAPTER '+(chapterIdx+1);
+  document.getElementById('chapter-modal').classList.add('open');
+  const btn=document.getElementById('chapter-complete-btn');
+  btn.style.display=done?'none':'block';
+  if(!quest.chapterContent) quest.chapterContent = {};
+  if(quest.chapterContent[chapterIdx]) {
+    renderChapterContent(quest.chapterContent[chapterIdx]);
+  } else {
+    document.getElementById('chapter-content-area').innerHTML=`<div style="text-align:center;padding:2rem;"><div class="gen-spinner">卍</div><div class="gen-text">Unrolling the ancient scroll...</div></div>`;
+    loadChapterContent(chapterIdx);
+  }
+};
+window.closeChapterModal=()=>document.getElementById('chapter-modal').classList.remove('open');
+
+async function loadChapterContent(chapterIdx) {
+  const quest=STATE.quests[STATE.activeQuestIdx];
+  const chapters=quest.chapters||[];
+  const ch=chapters[chapterIdx];
+  if(!ch) return;
+  try {
+    const content=await callAI({
+      system:`You are an expert educator. Write clear, modern, engaging HTML learning material. RESPOND WITH ONLY AN HTML FRAGMENT. Use <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`,
+      user:`Topic: ${quest.topic}\nChapter: ${ch.title} (${ch.tag})\nSummary: ${ch.summary}\n\nWrite a comprehensive educational chapter (400-600 words). Include practical examples. End with a "Scroll Mastery" summary <h3>.`,
+      isJSON: false
+    });
+    quest.chapterContent[chapterIdx]=content;
+    saveState();
+    renderChapterContent(content);
+  } catch(e) {
+    document.getElementById('chapter-content-area').innerHTML=`<p style="color:var(--red2);">Failed to load: ${e.message}</p>`;
+  }
+}
+function renderChapterContent(html){document.getElementById('chapter-content-area').innerHTML=html;}
+
+window.markChapterComplete = async function() {
+  const quest=STATE.quests[STATE.activeQuestIdx];
+  const ci=STATE.activeChapterIdx;
+  if(quest.completed[ci]) return;
+  quest.completed[ci]=true;
+  STATE.player.chaptersCompleted++;
+  STATE.player.xp+=20; STATE.player.totalXp+=20;
+  checkRankUp(); saveState();
+  document.getElementById('chapter-complete-btn').style.display='none';
+  window.closeChapterModal();
+  renderChapterList(quest);
+  const chapters=quest.chapters||[];
+  const allDone = chapters.length > 0 && chapters.every((_,i)=>quest.completed[i]);
+  const btn=document.getElementById('boss-complete-btn');
+  btn.disabled=!allDone;
+  if(allDone){btn.textContent='⚔ CHALLENGE THE DEMON';btn.style.borderColor='var(--red)';btn.style.color='var(--gold)';}
+  showToast('Chapter mastered! Knowledge gained.');
+};
+
+// ════════════════════════════════
+//  CELESTIAL GAMBIT
+// ════════════════════════════════
+function shouldShowGambit() { return STATE.player.bossesDefeated >= 2 || STATE.player.gambitUsed > 0; }
+
+window.tryOpenBattle = function() {
+  if(shouldShowGambit() && !STATE.quests[STATE.activeQuestIdx].defeated) window.openGambitModal();
+  else window.openBattleModal();
+};
+
+window.openGambitModal = function() {
+  STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false;
+  document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200);
+  document.getElementById('gambit-slider').value=0;
+  window.updateGambitWager(0);
+  document.getElementById('gambit-result').textContent='';
+  document.getElementById('gambit-coin').classList.remove('spinning');
+  document.getElementById('gambit-modal').classList.add('open');
+};
+window.closeGambitModal = function() {
+  document.getElementById('gambit-modal').classList.remove('open');
+  window.openBattleModal();
+};
+window.updateGambitWager = function(val) {
+  STATE.gambitWager=parseInt(val)||0;
+  document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0 ? 'No Wager (Safe Path)' : `Wagering ${STATE.gambitWager} XP`;
+};
+window.spinGambitCoin = function() {
+  if(STATE.gambitRevealed) return;
+  STATE.gambitRevealed=true;
+  const coin=document.getElementById('gambit-coin');
+  coin.classList.add('spinning');
+  setTimeout(()=>{
+    coin.classList.remove('spinning');
+    const lucky=Math.random()<0.5;
+    coin.textContent=lucky?'天':'地';
+    coin.style.color=lucky?'var(--gold2)':'var(--red3)';
+    document.getElementById('gambit-result').textContent=lucky?'Heaven smiles ☉ — Double XP if you win perfectly!':'The earth is indifferent. Win or lose the wager fairly.';
+    STATE.gambitActive = STATE.gambitWager>0;
+  },1500);
+};
+window.proceedAfterGambit = function() {
+  document.getElementById('gambit-modal').classList.remove('open');
+  if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0;
+  if(STATE.gambitWager>0) STATE.player.gambitUsed++;
+  window.openBattleModal();
+};
+
+// ════════════════════════════════
+//  FATE SCROLL
+// ════════════════════════════════
+const FATE_EVENTS=[
+  {text:'⚡ +50 XP',bonus:'The ancestors nod in approval.',xp:50,sigil:false},
+  {text:'🌟 +80 XP',bonus:'A celestial storm of knowledge!',xp:80,sigil:false},
+  {text:'🎋 +30 XP + SIGIL',bonus:'A rare sigil manifests from the void.',xp:30,sigil:true},
+  {text:'☯ +100 XP',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
+  {text:'🏮 +20 XP',bonus:'A humble blessing, but a blessing nonetheless.',xp:20,sigil:false},
+  {text:'🐉 +150 XP!',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
+  {text:'🌙 SIGIL AWARDED',bonus:'The moon marks you as worthy.',xp:0,sigil:true},
+  {text:'⚔ +60 XP',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
+];
+let fateScrollRevealed=false;
+let pendingFateEvent=null;
+
+function openFateScrollModal() {
+  fateScrollRevealed=false;
+  pendingFateEvent=FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
+  document.getElementById('fate-reveal-area').style.display='none';
+  document.getElementById('fate-close-btn').style.display='none';
+  document.getElementById('fate-scroll-icon').style.display='block';
+  document.getElementById('fate-modal').classList.add('open');
+}
+window.revealFateScroll = function() {
+  if(fateScrollRevealed) return;
+  fateScrollRevealed=true;
+  document.getElementById('fate-scroll-icon').style.display='none';
+  document.getElementById('fate-reveal-area').style.display='block';
+  document.getElementById('fate-close-btn').style.display='block';
+  document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text;
+  document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus;
+  if(pendingFateEvent.xp>0) { STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; }
+  if(pendingFateEvent.sigil) {
+    const s=awardSigil();
+    if(s) {
+      const data = SIGIL_DATA[s];
+      setTimeout(()=>showToast(`✨ Sigil Unlocked: ${s} ${data.name} — ${data.bonus}`), 1000);
+    }
+  }
+  checkRankUp(); saveState();
+};
+window.closeFateModal = function() { document.getElementById('fate-modal').classList.remove('open'); renderHub(); };
+
+// ════════════════════════════════
+//  BOSS BATTLE
+// ════════════════════════════════
+window.openBattleModal = async function() {
+  const quest=STATE.quests[STATE.activeQuestIdx];
+  document.getElementById('battle-title').textContent=quest.bossName;
+  document.getElementById('battle-modal').classList.add('open');
+  document.getElementById('battle-top-section').style.display='block';
+  const bc=document.getElementById('battle-boss-canvas');
+  animateBossCanvas(bc,quest,quest.bossHp/quest.bossMaxHp,'battle');
+  updateBattleHp(quest);
+  document.getElementById('quiz-container').style.display='block';
+  document.getElementById('finishing-blow').classList.remove('show');
+
+  if(!quest.quiz || !quest.quiz.questions) {
+    document.getElementById('quiz-question').textContent='Preparing the trial...';
+    document.getElementById('quiz-options').innerHTML='';
+    try {
+      const qd=await callAI({ ...buildQuizPrompt(quest), isJSON: true });
+      let parsed = parseJSON(qd);
+      if(!parsed || typeof parsed !== 'object') parsed = {};
+      quest.quiz=parsed;
+      if (!quest.quiz.questions) quest.quiz.questions = [];
+      saveState();
+    } catch(e) { document.getElementById('quiz-question').textContent='Error: '+e.message; return; }
+  }
+
+  if((quest.quiz.questions||[]).length === 0) {
+    document.getElementById('quiz-question').textContent='The demon cowers. There are no questions. You win by default!';
+    STATE.quizScore = 5; quest.quiz.questions = new Array(5);
+    finishQuiz(quest); return;
+  }
+
+  STATE.quizCurrent=0; STATE.quizScore=0;
+  renderQuizQuestion(quest);
+};
+
+function buildQuizPrompt(quest){
+  const chapters = quest.chapters || [];
+  return {
+    system:`You are an expert educator generating quiz questions. ALWAYS respond with ONLY valid JSON. Use clear modern language.`,
+    user:`Topic: ${quest.topic}\nChapters: ${chapters.map(c=>c.title).join(', ')}\n\nCreate exactly 5 multiple-choice questions.\nReturn JSON: {"questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}]}\ncorrect is 0-indexed.`
+  };
+}
+
+function renderQuizQuestion(quest) {
+  const questions = quest.quiz.questions || [];
+  const q=questions[STATE.quizCurrent];
+  if(!q) return;
+  document.getElementById('quiz-progress').textContent=`QUESTION ${STATE.quizCurrent+1} / ${questions.length}`;
+  document.getElementById('quiz-question').textContent=q.question || '...';
+  document.getElementById('quiz-feedback').textContent='';
+  const opts=document.getElementById('quiz-options');
+  opts.innerHTML='';
+  (q.options||[]).forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-option'; btn.textContent=opt;
+    btn.addEventListener('click',()=>answerQuestion(i,quest));
+    opts.appendChild(btn);
+  });
+  updateBattleHp(quest);
+}
+
+function answerQuestion(chosen,quest) {
+  const questions = quest.quiz.questions || [];
+  const q=questions[STATE.quizCurrent];
+  const correct=q.correct;
+  document.querySelectorAll('.quiz-option').forEach(o=>o.disabled=true);
+  const optNodes = document.querySelectorAll('.quiz-option');
+  if(optNodes[correct]) optNodes[correct].classList.add('correct');
+  const isRight=chosen===correct;
+  if(!isRight && optNodes[chosen]) optNodes[chosen].classList.add('wrong');
+  document.getElementById('quiz-feedback').textContent=isRight?'✓ Correct — '+(q.explanation||''):'✗ Incorrect — '+(q.explanation||'');
+  if(isRight) STATE.quizScore++;
+  const dmg=isRight?Math.ceil(100/questions.length):0;
+  if(dmg>0){
+    quest.bossHp=Math.max(0,quest.bossHp-dmg);
+    showDamageFloat(dmg);
+    document.getElementById('battle-boss-canvas').classList.add('boss-shake');
+    setTimeout(()=>document.getElementById('battle-boss-canvas').classList.remove('boss-shake'),400);
+  }
+  updateBattleHp(quest); saveState();
+  setTimeout(()=>{
+    STATE.quizCurrent++;
+    if(STATE.quizCurrent>=questions.length) finishQuiz(quest);
+    else renderQuizQuestion(quest);
+  },1600);
+}
+
+function finishQuiz(quest) {
+  const qLen = (quest.quiz.questions||[]).length;
+  const perfect=STATE.quizScore===qLen && qLen>0;
+  quest.bossHp=perfect?0:Math.max(5,quest.bossHp);
+  document.getElementById('battle-top-section').style.display='none';
+  document.getElementById('quiz-container').style.display='none';
+  document.getElementById('finishing-blow').classList.add('show');
+
+  if(perfect) {
+    document.getElementById('finishing-text').textContent='⚡ FINAL STRIKE ⚡';
+    document.getElementById('victory-lore').textContent=`Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name}'s ${STATE.player.path==='scholar'?'brilliant mind':'mighty blade'}. The knowledge sealed within surges free.`;
+    STATE.player.perfectRuns++; STATE.player.xp+=50; STATE.player.totalXp+=50;
+    if(STATE.gambitActive && STATE.gambitWager>0) {
+      const bonus=STATE.gambitWager; STATE.player.xp+=bonus; STATE.player.totalXp+=bonus;
+      STATE.gambitActive=false; showToast(`🎰 Celestial Gambit pays off! +${bonus} bonus XP!`);
+    }
+  } else {
+    document.getElementById('finishing-text').textContent='⚔ BATTLE END ⚔';
+    document.getElementById('victory-lore').textContent=`${STATE.quizScore}/${qLen} correct. ${quest.bossName} is weakened but not defeated. Study further.`;
+    if(STATE.gambitActive && STATE.gambitWager>0) {
+      STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager);
+      STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager);
+      STATE.gambitActive=false; showToast(`⚠ Celestial Gambit lost! -${STATE.gambitWager} XP`);
+    }
+    if(STATE.quizScore>=Math.ceil(qLen*0.6)) quest.bossHp=0;
+  }
+
+  if(quest.bossHp===0 && !quest.defeated) {
+    quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100;
+    checkRankUp();
+    if(perfect) {
+      const s=awardSigil();
+      if(s) {
+        const data = SIGIL_DATA[s];
+        setTimeout(()=>showToast(`✨ Secret Sigil Unlocked: ${s} ${data.name} — ${data.bonus}`), 2500);
+      }
+    }
+  } else if(quest.bossHp>0) { quest.bossHp=100; }
+
+  updateBattleHp(quest); saveState();
+}
+
+window.claimVictory = function() {
+  const quest=STATE.quests[STATE.activeQuestIdx];
+  document.getElementById('battle-modal').classList.remove('open');
+  const btn=document.getElementById('boss-complete-btn');
+  if(quest.defeated) {
+    btn.textContent='✓ DEMON DEFEATED'; btn.disabled=true;
+    btn.style.borderColor='var(--jade2)'; btn.style.color='var(--jade2)';
+  }
+  updateBossHpDisplay(quest);
+  renderHub();
+  if(quest.defeated) setTimeout(()=>openFateScrollModal(), 800);
+  else showToast('Battle concluded. Train harder, warrior.');
+};
+
+function updateBattleHp(quest) {
+  const ratio = quest.bossHp/quest.bossMaxHp;
+  document.getElementById('battle-hp-fill').style.width=(ratio*100)+'%';
+  document.getElementById('battle-hp-text').textContent=`${quest.bossHp} / ${quest.bossMaxHp}`;
+}
+
+function showDamageFloat(val,big=false) {
+  const el=document.getElementById('damage-floater');
+  el.textContent=big?val:`-${val}`;
+  el.style.fontSize=big?'1.5rem':'2.2rem';
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+function checkRankUp() {
+  const before=getCurrentRankIdx();
+  setTimeout(()=>{
+    const after=getCurrentRankIdx();
+    if(after>before){
+      const rank=getRanks()[after];
+      showToast(`⚡ RANK UP: ${rank.name} · ${rank.en}!`);
+      if(STATE.player.path==='warrior' && after===7) showToast('🐒 齊天大聖 — You have become the Great Sage Equal to Heaven!');
+      if(STATE.player.path==='scholar' && after===7) showToast('🐉 臥龍先生 — The Sleeping Dragon has awakened!');
+    }
+  },100);
+}
+
+// ════════════════════════════════
+//  AI CALL
+// ════════════════════════════════
+async function callAI({system, user, isJSON = false}) {
+  try {
+    const config = { model: STATE.selectedModel, systemInstruction: system };
+    if (isJSON) { config.generationConfig = { responseMimeType: "application/json" }; }
+    const model=getGenerativeModel(vertexAI, config);
+    const result=await model.generateContent(user);
+    const text = result?.response?.text ? result.response.text() : "";
+    if (!text) throw new Error("The scrolls returned empty. Try again.");
+    return text;
+  } catch(e) {
+    alert("🔥 AI API ERROR:\n" + (e.message || e));
+    throw new Error(e.message||"Failed to communicate with the scrolls.");
+  }
+}
+
+function parseJSON(text) {
+  if (!text) return {};
+  if (typeof text !== 'string') return {};
+  try { return JSON.parse(text); } catch(e) {}
+  const clean = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+  try { return JSON.parse(clean); } catch(e) {}
+  const m = clean.match(/\{[\s\S]*\}/);
+  if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
+  return {};
+}
+
+// ════════════════════════════════
+//  UTILS
+// ════════════════════════════════
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._timeout); t._timeout=setTimeout(()=>t.classList.remove('show'),3500);
+}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// ════════════════════════════════
+//  INIT
+// ════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  onAuthStateChanged(auth,user=>{
+    if(user){ USER_ID=user.uid; loadState(); }
+    else { document.getElementById('loading-text').style.display='none'; document.getElementById('auth-buttons').style.display='flex'; }
+  });
+});
+
+setTimeout(()=>renderPathSprites(),200);
+</script>
+</body>
+</html>
