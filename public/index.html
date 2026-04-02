@@ -1083,17 +1083,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
-  authDomain: "ai-study-party.firebaseapp.com",
-  projectId: "ai-study-party",
-  storageBucket: "ai-study-party.firebasestorage.app",
-  messagingSenderId: "583546365173",
-  appId: "1:583546365173:web:dd2fbec4ec4d20380951bc",
-  measurementId: "G-SFDQ0QELTE"
-};
+// Initialize Functions
+const functions = getFunctions(app);
 
 const app = initializeApp(firebaseConfig);
 
@@ -1105,7 +1098,6 @@ const appCheck = initializeAppCheck(app, {
 
 const db = getFirestore(app);
 const auth = getAuth(app);
-const vertexAI = getVertexAI(app, { location: "global" });
 
 let USER_ID = null;
 let STATE = {
@@ -3042,25 +3034,47 @@ window.copyPublicQuest = function(idx) {
 
 window.createQuest = async function() {
   try {
-    const topic=document.getElementById('topic-input').value.trim();
-    if(!topic){showToast('Please enter a topic.');return;}
-    const objective=document.getElementById('objective-input').value.trim();
-    const numChapters=parseInt(document.getElementById('chapters-input').value);
-    document.getElementById('create-form').style.display='none';
+    const topic = document.getElementById('topic-input').value.trim();
+    if (!topic) { showToast('Please enter a topic.'); return; }
+    
+    const objective = document.getElementById('objective-input').value.trim();
+    const numChapters = parseInt(document.getElementById('chapters-input').value);
+    
+    document.getElementById('create-form').style.display = 'none';
     document.getElementById('generating-state').classList.add('active');
-    setGenStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
-    let questData;
-    try { questData=await callAI({ ...buildQuestPrompt(topic,objective,numChapters), isJSON: true }); }
-    catch (aiErr) { throw new Error("AI Error: " + (aiErr.message || "Could not fetch scrolls.")); }
-    let parsed=parseJSON(questData);
-    if (!parsed || typeof parsed !== 'object') parsed = {};
-    setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
-    await delay(500);
-    const chapters = parsed.chapters || parsed.chapterList || [];
-    if(chapters.length === 0) {
-      for(let i=0; i<numChapters; i++) chapters.push({ title: `Chapter ${i+1}`, tag: `PART ${i+1}`, summary: `Learning about ${topic}`});
+    setGenStatus('Communing with the ancient scrolls...', 'CRAFTING QUEST NARRATIVE');
+
+    // 1. Point to your new Cloud Function
+    const summonQuestFunction = httpsCallable(functions, 'summonQuest');
+    
+    let questDataText;
+    try {
+      // 2. Call the backend, passing only the user parameters
+      const response = await summonQuestFunction({ 
+          topic: topic, 
+          objective: objective, 
+          numChapters: numChapters,
+          modelId: STATE.selectedModel
+      });
+      
+      questDataText = response.data.result;
+      
+    } catch (aiErr) {
+      throw new Error("Cloud Function Error: " + (aiErr.message || "Could not fetch scrolls."));
     }
-    const baseQuest={
+
+    let parsed = parseJSON(questDataText);
+    if (!parsed || typeof parsed !== 'object') parsed = {};
+    
+    setGenStatus('Summoning the guardian demon...', 'BINDING DEMON ESSENCE');
+    await delay(500);
+    
+    const chapters = parsed.chapters || parsed.chapterList || [];
+    if (chapters.length === 0) {
+      for (let i = 0; i < numChapters; i++) chapters.push({ title: `Chapter ${i+1}`, tag: `PART ${i+1}`, summary: `Learning about ${topic}` });
+    }
+    
+    const baseQuest = {
       topic: topic || "Unknown", objective: objective || "",
       questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
       questNarrative: parsed.questNarrative || parsed.narrative || "A newly discovered scroll.",
@@ -3069,31 +3083,40 @@ window.createQuest = async function() {
       bossLore: parsed.bossLore || parsed.lore || "A mysterious entity.",
       chapters: chapters
     };
-    const userQuest={
+    
+    const userQuest = {
       ...baseQuest, id: Date.now(), bossMaxHp: 100, bossHp: 100,
       completed: new Array(chapters.length).fill(false),
       chapterContent: {}, quiz: null, defeated: false
     };
+    
     if (!STATE.quests) STATE.quests = [];
     if (!STATE.player) throw new Error("STATE.player is undefined!");
+    
     STATE.quests.unshift(userQuest);
     STATE.player.questsCreated = (STATE.player.questsCreated || 0) + 1;
-    try { await saveState(); } catch(dbErr) { alert("Failed to save to Firestore: " + dbErr.message); }
+    
+    try { await saveState(); } catch (dbErr) { alert("Failed to save to Firestore: " + dbErr.message); }
+    
     try {
-      const pubQ={...baseQuest,id:Date.now(), authorId: USER_ID };
-      const docRef = await addDoc(collection(db,"public_quests"),pubQ);
+      const pubQ = { ...baseQuest, id: Date.now(), authorId: USER_ID };
+      const docRef = await addDoc(collection(db, "public_quests"), pubQ);
       pubQ.docId = docRef.id;
       STATE.publicQuests.unshift(pubQ);
-    } catch(e) {}
+    } catch (e) {
+      console.error("Public Quest save error", e);
+    }
+    
     closeCreateModal();
     showToast(`Quest summoned: "${userQuest.questTitle}"`);
     window.switchTab('tab-quests');
     window.showQuestScreen(0);
-  } catch(e) {
-    alert("🔥 CRASH LOG:\n" + (e.stack || e.message || e));
-    document.getElementById('create-form').style.display='block';
+    
+  } catch (e) {
+    console.error(e);
+    document.getElementById('create-form').style.display = 'block';
     document.getElementById('generating-state').classList.remove('active');
-    showToast('Error: '+ (e.message ? e.message.substring(0,60) : 'Unknown'));
+    showToast('Error: ' + (e.message ? e.message.substring(0, 60) : 'Unknown'));
   }
 };
 
@@ -3440,21 +3463,27 @@ function checkRankUp() {
 // ════════════════════════════════
 //  AI CALL
 // ════════════════════════════════
+// ════════════════════════════════
+//  AI CALL (SECURED VIA CLOUD FUNCTIONS)
+// ════════════════════════════════
 async function callAI({system, user, isJSON = false}) {
   try {
-    const config = { model: STATE.selectedModel, systemInstruction: system };
-    if (isJSON) { config.generationConfig = { responseMimeType: "application/json" }; }
-    const model=getGenerativeModel(vertexAI, config);
-    const result=await model.generateContent(user);
-    const text = result?.response?.text ? result.response.text() : "";
+    const communeFunction = httpsCallable(functions, 'communeWithScrolls');
+    const response = await communeFunction({ 
+        system: system, 
+        user: user, 
+        isJSON: isJSON,
+        modelId: STATE.selectedModel 
+    });
+    
+    const text = response.data.result;
     if (!text) throw new Error("The scrolls returned empty. Try again.");
     return text;
   } catch(e) {
     alert("🔥 AI API ERROR:\n" + (e.message || e));
-    throw new Error(e.message||"Failed to communicate with the scrolls.");
+    throw new Error(e.message || "Failed to communicate with the scrolls.");
   }
 }
-
 function parseJSON(text) {
   if (!text) return {};
   if (typeof text !== 'string') return {};
