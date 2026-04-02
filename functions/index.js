@@ -60,3 +60,42 @@ Make exactly ${numChapters} chapters.`;
         throw new HttpsError('internal', 'Failed to commune with the scrolls.', error.message);
     }
 });
+
+exports.communeWithScrolls = onCall({ 
+    enforceAppCheck: true, 
+    cors: true 
+}, async (request) => {
+    
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'You must be logged in.');
+    }
+
+    const { system, user, isJSON, modelId } = request.data;
+
+    if (!user) {
+        throw new HttpsError('invalid-argument', 'A prompt is required.');
+    }
+
+    try {
+        const response = await ai.models.generateContent({
+            model: modelId || 'gemini-2.5-flash',
+            contents: user,
+            config: {
+                systemInstruction: system || '',
+                responseMimeType: isJSON ? "application/json" : "text/plain",
+            }
+        });
+
+        const text = response.text;
+        
+        if (!text) {
+             throw new HttpsError('internal', 'The scrolls returned empty.');
+        }
+
+        return { result: text };
+
+    } catch (error) {
+        console.error("AI Generation Error:", error);
+        throw new HttpsError('internal', 'Failed to commune with the scrolls.', error.message);
+    }
+});
