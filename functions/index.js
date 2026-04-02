@@ -70,18 +70,39 @@ exports.communeWithScrolls = onCall({
         throw new HttpsError('unauthenticated', 'You must be logged in.');
     }
 
-    const { system, user, isJSON, modelId } = request.data;
+    const { action, payload, modelId } = request.data;
 
-    if (!user) {
-        throw new HttpsError('invalid-argument', 'A prompt is required.');
+    if (!action || !payload) {
+        throw new HttpsError('invalid-argument', 'Action and payload are required.');
+    }
+
+    let systemInstruction = '';
+    let prompt = '';
+    let isJSON = false;
+
+    // 🛡️ THE VAULT: Hardcoded prompts live securely on the server!
+    if (action === 'generateChapter') {
+        const { topic, chapterTitle, chapterTag, chapterSummary } = payload;
+        systemInstruction = `You are an expert educator. Write clear, modern, engaging HTML learning material. RESPOND WITH ONLY AN HTML FRAGMENT. Use <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`;
+        prompt = `Topic: ${topic}\nChapter: ${chapterTitle} (${chapterTag})\nSummary: ${chapterSummary}\n\nWrite a comprehensive educational chapter (400-600 words). Include practical examples. End with a "Scroll Mastery" summary <h3>.`;
+        isJSON = false;
+
+    } else if (action === 'generateQuiz') {
+        const { topic, chapterTitles } = payload;
+        systemInstruction = `You are an expert educator generating quiz questions. ALWAYS respond with ONLY valid JSON. Use clear modern language.`;
+        prompt = `Topic: ${topic}\nChapters: ${chapterTitles}\n\nCreate exactly 5 multiple-choice questions.\nReturn JSON: {"questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}]}\ncorrect is 0-indexed.`;
+        isJSON = true;
+
+    } else {
+        throw new HttpsError('invalid-argument', 'Unknown action requested.');
     }
 
     try {
         const response = await ai.models.generateContent({
             model: modelId || 'gemini-2.5-flash',
-            contents: user,
+            contents: prompt,
             config: {
-                systemInstruction: system || '',
+                systemInstruction: systemInstruction,
                 responseMimeType: isJSON ? "application/json" : "text/plain",
             }
         });
