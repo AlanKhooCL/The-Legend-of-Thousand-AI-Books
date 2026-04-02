@@ -11,20 +11,61 @@ const genAI = new GoogleGenerativeAI("AIzaSyCGmLb5QcGC6oUQW6G2SxfVkngTKNHj2Gg");
 // SHARED UTILS
 // ============================================================================
 const tripSchema = {
-    type: "object",
+    type: "OBJECT",
     properties: {
-        overview: { type: "object", properties: { title: { type: "string" }, dates: { type: "string" }, pax: { type: "string" }, totalBudget: { type: "string" } } },
-        budget: { type: "array", items: { type: "object", properties: { item: { type: "string" }, cost: { type: "string" }, amount: { type: "number" }, icon: { type: "string" } } } },
-        locations: { type: "array", items: { type: "object", properties: { id: { type: "string" }, name: { type: "string" }, color: { type: "string" }, image: { type: "string" } } } },
+        overview: { 
+            type: "OBJECT", 
+            properties: { 
+                title: { type: "STRING" }, 
+                dates: { type: "STRING" }, 
+                pax: { type: "STRING" }, 
+                totalBudget: { type: "STRING" } 
+            } 
+        },
+        budget: { 
+            type: "ARRAY", 
+            items: { 
+                type: "OBJECT", 
+                properties: { 
+                    item: { type: "STRING" }, 
+                    cost: { type: "STRING" }, 
+                    amount: { type: "NUMBER" }, 
+                    icon: { type: "STRING" } 
+                } 
+            } 
+        },
+        locations: { 
+            type: "ARRAY", 
+            items: { 
+                type: "OBJECT", 
+                properties: { 
+                    id: { type: "STRING" }, 
+                    name: { type: "STRING" }, 
+                    color: { type: "STRING" }, 
+                    image: { type: "STRING" } 
+                } 
+            } 
+        },
         itinerary: {
-            type: "array", items: {
-                type: "object", properties: {
-                    day: { type: "number" }, date: { type: "string" }, location: { type: "string" }, title: { type: "string" },
+            type: "ARRAY", 
+            items: {
+                type: "OBJECT", 
+                properties: {
+                    day: { type: "NUMBER" }, 
+                    date: { type: "STRING" }, 
+                    location: { type: "STRING" }, 
+                    title: { type: "STRING" },
                     events: {
-                        type: "array", items: {
-                            type: "object", properties: {
-                                time: { type: "string" }, desc: { type: "string" }, icon: { type: "string" }, link: { type: "string" },
-                                latlng: { type: "array", items: { type: "number" } }, expense: { type: "number" }
+                        type: "ARRAY", 
+                        items: {
+                            type: "OBJECT", 
+                            properties: {
+                                time: { type: "STRING" }, 
+                                desc: { type: "STRING" }, 
+                                icon: { type: "STRING" }, 
+                                link: { type: "STRING" },
+                                latlng: { type: "ARRAY", items: { type: "NUMBER" } }, 
+                                expense: { type: "NUMBER" }
                             }
                         }
                     }
