@@ -5,7 +5,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 admin.initializeApp();
 
 // Initialize the Gemini AI client with your API Key
-const genAI = new GoogleGenerativeAI("AIzaSyCGmLb5QcGC6oUQW6G2SxfVkngTKNHj2Gg");
+const genAI = new GoogleGenerativeAI("AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M");
 
 // ============================================================================
 // SHARED UTILS
