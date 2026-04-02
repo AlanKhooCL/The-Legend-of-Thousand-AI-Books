@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>萬卷書 — Ten Thousand Scrolls</title>
@@ -3122,16 +3123,7 @@ window.createQuest = async function() {
 
 function setGenStatus(t,s=''){document.getElementById('gen-status-text').textContent=t;document.getElementById('gen-step').textContent=s;}
 
-function buildQuestPrompt(topic,objective,numChapters){
-  return {
-    system:`You are the Loremaster of Ten Thousand Scrolls, an ancient Chinese fantasy realm. You generate structured learning quests. ALWAYS respond with ONLY valid JSON, no markdown.`,
-    user:`Create a learning quest for topic: "${topic}". ${objective?`Objective: ${objective}`:''}
-Number of chapters: ${numChapters}
-Return this exact JSON:
-{"questTitle":"dramatic wuxia-themed quest title in English","questNarrative":"2-3 sentence wuxia lore intro","bossName":"Chinese demon name (2-3 chars transliterated + translation)","bossTitle":"demon epithet","bossLore":"2 sentence demon background","chapters":[{"title":"clear modern educational title","tag":"SUBTOPIC TAG","summary":"one sentence chapter description"}]}
-Make exactly ${numChapters} chapters.`
-  };
-}
+
 
 // ════════════════════════════════
 //  CHAPTER MODAL
@@ -3164,10 +3156,15 @@ async function loadChapterContent(chapterIdx) {
   const ch=chapters[chapterIdx];
   if(!ch) return;
   try {
-    const content=await callAI({
-      system:`You are an expert educator. Write clear, modern, engaging HTML learning material. RESPOND WITH ONLY AN HTML FRAGMENT. Use <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`,
-      user:`Topic: ${quest.topic}\nChapter: ${ch.title} (${ch.tag})\nSummary: ${ch.summary}\n\nWrite a comprehensive educational chapter (400-600 words). Include practical examples. End with a "Scroll Mastery" summary <h3>.`,
-      isJSON: false
+    // We only send the variables now, not the instructions!
+    const content = await callAI({
+      action: 'generateChapter',
+      payload: {
+        topic: quest.topic,
+        chapterTitle: ch.title,
+        chapterTag: ch.tag,
+        chapterSummary: ch.summary
+      }
     });
     quest.chapterContent[chapterIdx]=content;
     saveState();
@@ -3176,7 +3173,10 @@ async function loadChapterContent(chapterIdx) {
     document.getElementById('chapter-content-area').innerHTML=`<p style="color:var(--red2);">Failed to load: ${e.message}</p>`;
   }
 }
-function renderChapterContent(html){document.getElementById('chapter-content-area').innerHTML=html;}
+  
+function renderChapterContent(html) {
+  document.getElementById('chapter-content-area').innerHTML = DOMPurify.sanitize(html);
+}
 
 window.markChapterComplete = async function() {
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -3307,7 +3307,15 @@ window.openBattleModal = async function() {
     document.getElementById('quiz-question').textContent='Preparing the trial...';
     document.getElementById('quiz-options').innerHTML='';
     try {
-      const qd=await callAI({ ...buildQuizPrompt(quest), isJSON: true });
+      const chapters = quest.chapters || [];
+      // Send only the variables!
+      const qd = await callAI({
+        action: 'generateQuiz',
+        payload: {
+          topic: quest.topic,
+          chapterTitles: chapters.map(c=>c.title).join(', ')
+        }
+      });
       let parsed = parseJSON(qd);
       if(!parsed || typeof parsed !== 'object') parsed = {};
       quest.quiz=parsed;
@@ -3325,14 +3333,6 @@ window.openBattleModal = async function() {
   STATE.quizCurrent=0; STATE.quizScore=0;
   renderQuizQuestion(quest);
 };
-
-function buildQuizPrompt(quest){
-  const chapters = quest.chapters || [];
-  return {
-    system:`You are an expert educator generating quiz questions. ALWAYS respond with ONLY valid JSON. Use clear modern language.`,
-    user:`Topic: ${quest.topic}\nChapters: ${chapters.map(c=>c.title).join(', ')}\n\nCreate exactly 5 multiple-choice questions.\nReturn JSON: {"questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}]}\ncorrect is 0-indexed.`
-  };
-}
 
 function renderQuizQuestion(quest) {
   const questions = quest.quiz.questions || [];
@@ -3459,20 +3459,15 @@ function checkRankUp() {
     }
   },100);
 }
-
-// ════════════════════════════════
-//  AI CALL
-// ════════════════════════════════
 // ════════════════════════════════
 //  AI CALL (SECURED VIA CLOUD FUNCTIONS)
 // ════════════════════════════════
-async function callAI({system, user, isJSON = false}) {
+async function callAI({action, payload}) {
   try {
     const communeFunction = httpsCallable(functions, 'communeWithScrolls');
     const response = await communeFunction({ 
-        system: system, 
-        user: user, 
-        isJSON: isJSON,
+        action: action, 
+        payload: payload, 
         modelId: STATE.selectedModel 
     });
     
@@ -3484,6 +3479,7 @@ async function callAI({system, user, isJSON = false}) {
     throw new Error(e.message || "Failed to communicate with the scrolls.");
   }
 }
+  
 function parseJSON(text) {
   if (!text) return {};
   if (typeof text !== 'string') return {};
