@@ -1,78 +1,89 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 admin.initializeApp();
 
-// Initialize the Gemini AI client.
-const ai = new GoogleGenAI({ apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M" }); 
+// Initialize the Gemini AI client with your API Key
+const genAI = new GoogleGenerativeAI("AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M");
+
+// ============================================================================
+// SHARED UTILS
+// ============================================================================
+const tripSchema = {
+    type: "object",
+    properties: {
+        overview: { type: "object", properties: { title: { type: "string" }, dates: { type: "string" }, pax: { type: "string" }, totalBudget: { type: "string" } } },
+        budget: { type: "array", items: { type: "object", properties: { item: { type: "string" }, cost: { type: "string" }, amount: { type: "number" }, icon: { type: "string" } } } },
+        locations: { type: "array", items: { type: "object", properties: { id: { type: "string" }, name: { type: "string" }, color: { type: "string" }, image: { type: "string" } } } },
+        itinerary: {
+            type: "array", items: {
+                type: "object", properties: {
+                    day: { type: "number" }, date: { type: "string" }, location: { type: "string" }, title: { type: "string" },
+                    events: {
+                        type: "array", items: {
+                            type: "object", properties: {
+                                time: { type: "string" }, desc: { type: "string" }, icon: { type: "string" }, link: { type: "string" },
+                                latlng: { type: "array", items: { type: "number" } }, expense: { type: "number" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
 
 // ============================================================================
 // APP 1: TEN THOUSAND SCROLLS ENDPOINTS
 // ============================================================================
 
-exports.summonQuest = onCall({ 
-    enforceAppCheck: true,
-    cors: true 
-}, async (request) => {
-    if (!request.auth) throw new HttpsError('unauthenticated', 'You must be logged in to summon quests.');
+exports.summonQuest = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Login required.');
     const { topic, objective, numChapters, modelId } = request.data;
-    if (!topic || !numChapters) throw new HttpsError('invalid-argument', 'Topic and chapter count are required.');
 
-    const systemInstruction = `You are the Loremaster of Ten Thousand Scrolls, an ancient Chinese fantasy realm. You generate structured learning quests. ALWAYS respond with ONLY valid JSON, no markdown.`;
-    const prompt = `Create a learning quest for topic: "${topic}". ${objective ? `Objective: ${objective}` : ''}\nNumber of chapters: ${numChapters}\nReturn this exact JSON:\n{"questTitle":"dramatic wuxia-themed quest title in English","questNarrative":"2-3 sentence wuxia lore intro","bossName":"Chinese demon name (2-3 chars transliterated + translation)","bossTitle":"demon epithet","bossLore":"2 sentence demon background","chapters":[{"title":"clear modern educational title","tag":"SUBTOPIC TAG","summary":"one sentence chapter description"}]}\nMake exactly ${numChapters} chapters.`;
+    const model = genAI.getGenerativeModel({ model: modelId || "gemini-1.5-flash" });
+    const systemInstruction = `You are the Loremaster of Ten Thousand Scrolls. Ancient Chinese fantasy realm. Respond ONLY with valid JSON.`;
+    const prompt = `Create a ${numChapters}-chapter learning quest for topic: "${topic}". ${objective ? `Objective: ${objective}` : ''}
+    Return JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":"","chapters":[{"title":"","tag":"","summary":""}]}`;
 
     try {
-        const response = await ai.models.generateContent({
-            model: modelId || 'gemini-2.5-flash',
-            contents: prompt,
-            config: { systemInstruction, responseMimeType: "application/json" }
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" },
+            systemInstruction: systemInstruction
         });
-        if (!response.text) throw new HttpsError('internal', 'The scrolls returned empty.');
-        return { result: response.text };
+        return { result: result.response.text() };
     } catch (error) {
-        console.error("AI Generation Error:", error);
-        throw new HttpsError('internal', 'Failed to commune with the scrolls.', error.message);
+        throw new HttpsError('internal', error.message);
     }
 });
 
-exports.communeWithScrolls = onCall({ 
-    enforceAppCheck: true, 
-    cors: true 
-}, async (request) => {
-    if (!request.auth) throw new HttpsError('unauthenticated', 'You must be logged in.');
+exports.communeWithScrolls = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Login required.');
     const { action, payload, modelId } = request.data;
-    if (!action || !payload) throw new HttpsError('invalid-argument', 'Action and payload are required.');
 
-    let systemInstruction = '';
-    let prompt = '';
-    let isJSON = false;
+    let sys = ""; let prompt = ""; let mime = "text/plain";
 
     if (action === 'generateChapter') {
-        const { topic, chapterTitle, chapterTag, chapterSummary } = payload;
-        systemInstruction = `You are an expert educator. Write clear, modern, engaging HTML learning material. RESPOND WITH ONLY AN HTML FRAGMENT. Use <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`;
-        prompt = `Topic: ${topic}\nChapter: ${chapterTitle} (${chapterTag})\nSummary: ${chapterSummary}\n\nWrite a comprehensive educational chapter (400-600 words). Include practical examples. End with a "Scroll Mastery" summary <h3>.`;
-        isJSON = false;
+        sys = `You are an expert educator. Write HTML fragments using <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`;
+        prompt = `Topic: ${payload.topic}. Write chapter: ${payload.chapterTitle}. 400-600 words.`;
     } else if (action === 'generateQuiz') {
-        const { topic, chapterTitles } = payload;
-        systemInstruction = `You are an expert educator generating quiz questions. ALWAYS respond with ONLY valid JSON. Use clear modern language.`;
-        prompt = `Topic: ${topic}\nChapters: ${chapterTitles}\n\nCreate exactly 5 multiple-choice questions.\nReturn JSON: {"questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}]}\ncorrect is 0-indexed.`;
-        isJSON = true;
-    } else {
-        throw new HttpsError('invalid-argument', 'Unknown action requested.');
+        sys = `Expert educator. Return ONLY valid JSON.`;
+        prompt = `Create 5 MCQs for topic: ${payload.topic}. JSON format: {"questions":[{"question":"","options":[],"correct":0,"explanation":""}]}`;
+        mime = "application/json";
     }
 
     try {
-        const response = await ai.models.generateContent({
-            model: modelId || 'gemini-2.5-flash',
-            contents: prompt,
-            config: { systemInstruction, responseMimeType: isJSON ? "application/json" : "text/plain" }
+        const model = genAI.getGenerativeModel({ model: modelId || "gemini-2.5-flash" });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: mime },
+            systemInstruction: sys
         });
-        if (!response.text) throw new HttpsError('internal', 'The scrolls returned empty.');
-        return { result: response.text };
+        return { result: result.response.text() };
     } catch (error) {
-        console.error("AI Generation Error:", error);
-        throw new HttpsError('internal', 'Failed to commune with the scrolls.', error.message);
+        throw new HttpsError('internal', error.message);
     }
 });
 
@@ -80,91 +91,51 @@ exports.communeWithScrolls = onCall({
 // APP 2: JOURNEYS & LEDGERS ENDPOINTS
 // ============================================================================
 
-// The strict JSON schema for the travel app
-const tripSchema = {
-  type: "OBJECT",
-  properties: {
-    overview: { type: "OBJECT", properties: { title: {type:"STRING"}, dates: {type:"STRING"}, pax: {type:"STRING"}, totalBudget: {type:"STRING"} } },
-    budget: { type: "ARRAY", items: { type: "OBJECT", properties: { item: {type:"STRING"}, cost: {type:"STRING"}, amount: {type:"NUMBER"}, icon: {type:"STRING"} } } },
-    locations: { type: "ARRAY", items: { type: "OBJECT", properties: { id: {type:"STRING"}, name: {type:"STRING"}, color: {type:"STRING"}, image: {type:"STRING"} } } },
-    itinerary: {
-      type: "ARRAY", items: {
-        type: "OBJECT", properties: {
-          day: {type:"NUMBER"}, date: {type:"STRING"}, location: {type:"STRING"}, title: {type:"STRING"},
-          events: {
-            type: "ARRAY", items: {
-              type: "OBJECT", properties: {
-                time: {type:"STRING"}, desc: {type:"STRING"}, icon: {type:"STRING"}, link: {type:"STRING"},
-                latlng: {type:"ARRAY", items: {type:"NUMBER"}}, expense: {type:"NUMBER"}
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-};
-
-exports.generateTrip = onCall({ 
-    enforceAppCheck: true, 
-    cors: true 
-}, async (request) => {
-    if (!request.auth) throw new HttpsError('unauthenticated', 'You must be logged in.');
+exports.generateTrip = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Login required.');
     const { prompt, dates, pax, modelId } = request.data;
-    if (!prompt) throw new HttpsError('invalid-argument', 'Trip prompt is required.');
 
-    const systemInstruction = `You are an expert travel planner. Create a highly detailed travel itinerary. 
-        The trip dates are: ${dates}. Number of pax: ${pax}.
-        Rules:
-        - "color" must be one of: amber, teal, rose, violet, sky, emerald, pink, orange, purple.
-        - "id" inside locations must be lowercase letters with no spaces.
-        - "location" in itinerary MUST precisely match an "id" from locations.
-        - "icon" must be a valid Lucide icon name.
-        - "latlng" must be a 2-element array [latitude, longitude]. Use [] if unknown.`;
+    const sys = `Expert travel planner. Return highly detailed travel itinerary. Dates: ${dates}, Pax: ${pax}. 
+    Strict Rules: color must be (amber, teal, rose, violet, sky, emerald, pink, orange, purple). 
+    id must be lowercase no spaces.`;
 
     try {
-        const response = await ai.models.generateContent({
-            model: modelId || 'gemini-3-flash-preview',
-            contents: prompt,
-            config: {
-                systemInstruction: systemInstruction,
+        const model = genAI.getGenerativeModel({ model: modelId || "gemini-2.5-flash" });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { 
                 responseMimeType: "application/json",
-                responseSchema: tripSchema
-            }
+                responseSchema: tripSchema 
+            },
+            systemInstruction: sys
         });
-        if (!response.text) throw new HttpsError('internal', 'The grimoires returned empty.');
-        return { result: response.text };
+        return { result: result.response.text() };
     } catch (error) {
-        console.error("Trip Gen Error:", error);
-        throw new HttpsError('internal', 'Magic interrupted.', error.message);
+        console.error("Gen Error:", error);
+        throw new HttpsError('internal', 'Magic interrupted.');
     }
 });
 
-exports.editTrip = onCall({ 
-    enforceAppCheck: true, 
-    cors: true 
-}, async (request) => {
-    if (!request.auth) throw new HttpsError('unauthenticated', 'You must be logged in.');
+exports.editTrip = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Login required.');
     const { prompt, currentTripData, modelId } = request.data;
-    if (!prompt || !currentTripData) throw new HttpsError('invalid-argument', 'Missing prompt or trip data.');
 
-    const systemInstruction = `You are an expert travel planner. Modify this existing itinerary based on the user's request. Return the identical JSON structure.
-        Current JSON: ${JSON.stringify(currentTripData)}`;
+    const sys = `Expert travel planner. Modify the existing JSON itinerary based on user request. Maintain identical structure.
+    Current JSON: ${JSON.stringify(currentTripData)}`;
 
     try {
-        const response = await ai.models.generateContent({
-            model: modelId || 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                systemInstruction: systemInstruction,
+        const model = genAI.getGenerativeModel({ model: modelId || "gemini-2.5-flash" });
+        const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { 
                 responseMimeType: "application/json",
-                responseSchema: tripSchema
-            }
+                responseSchema: tripSchema 
+            },
+            systemInstruction: sys
         });
-        if (!response.text) throw new HttpsError('internal', 'The grimoires returned empty.');
-        return { result: response.text };
+        return { result: result.response.text() };
     } catch (error) {
-        console.error("Trip Edit Error:", error);
-        throw new HttpsError('internal', 'Magic interrupted.', error.message);
+        console.error("Edit Error:", error);
+        throw new HttpsError('internal', 'Magic interrupted.');
     }
 });
