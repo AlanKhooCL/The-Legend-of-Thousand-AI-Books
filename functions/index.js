@@ -7,7 +7,7 @@ admin.initializeApp();
 // Initialize the Gemini AI client.
 // Note: For a quick test, you can paste your API key directly below replacing the placeholder. 
 // For production, it's best practice to use Firebase Secret Manager or environment variables.
-const ai = new GoogleGenAI({ apiKey: "YOUR_API_KEY_HERE" }); 
+const ai = new GoogleGenAI({ apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M" }); 
 
 exports.summonQuest = onCall({ 
     enforceAppCheck: true, // Blocks requests that don't pass your frontend reCAPTCHA
