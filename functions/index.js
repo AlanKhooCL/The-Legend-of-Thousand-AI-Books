@@ -153,7 +153,7 @@ exports.editTrip = onCall({
 
     try {
         const response = await ai.models.generateContent({
-            model: modelId || 'gemini-3-flash-preview',
+            model: modelId || 'gemini-2.5-flash',
             contents: prompt,
             config: {
                 systemInstruction: systemInstruction,
