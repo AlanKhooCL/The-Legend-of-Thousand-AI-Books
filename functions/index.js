@@ -6,68 +6,34 @@ admin.initializeApp();
 
 /**
  * 🔑 YOUR BACKEND API KEY
- * Use the API Key from Google AI Studio. 
- * This key is secure because it never leaves Google's servers.
+ * (Ensure this is the key from your NEW AI Studio project)
  */
 const genAI = new GoogleGenerativeAI("AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M");
 
 // ============================================================================
 // SHARED SCHEMAS
 // ============================================================================
-
 const tripSchema = {
-  type: "object",
+  type: "OBJECT",
   properties: {
     overview: { 
-      type: "object", 
-      properties: { 
-        title: { type: "string" }, 
-        dates: { type: "string" }, 
-        pax: { type: "string" } 
-      } 
+      type: "OBJECT", properties: { title: { type: "STRING" }, dates: { type: "STRING" }, pax: { type: "STRING" } } 
     },
     budget: { 
-      type: "array", 
-      items: { 
-        type: "object", 
-        properties: { 
-          item: { type: "string" }, 
-          amount: { type: "number" }, 
-          icon: { type: "string" } 
-        } 
-      } 
+      type: "ARRAY", items: { type: "OBJECT", properties: { item: { type: "STRING" }, amount: { type: "NUMBER" }, icon: { type: "STRING" } } } 
     },
     locations: { 
-      type: "array", 
-      items: { 
-        type: "object", 
-        properties: { 
-          id: { type: "string" }, 
-          name: { type: "string" }, 
-          color: { type: "string" }, 
-          image: { type: "string" } 
-        } 
-      } 
+      type: "ARRAY", items: { type: "OBJECT", properties: { id: { type: "STRING" }, name: { type: "STRING" }, color: { type: "STRING" }, image: { type: "STRING" } } } 
     },
     itinerary: {
-      type: "array", 
-      items: {
-        type: "object", 
-        properties: {
-          day: { type: "number" }, 
-          date: { type: "string" }, 
-          location: { type: "string" }, 
-          title: { type: "string" },
+      type: "ARRAY", items: {
+        type: "OBJECT", properties: {
+          day: { type: "NUMBER" }, date: { type: "STRING" }, location: { type: "STRING" }, title: { type: "STRING" },
           events: {
-            type: "array", 
-            items: {
-              type: "object", 
-              properties: {
-                time: { type: "string" }, 
-                desc: { type: "string" }, 
-                icon: { type: "string" },
-                latlng: { type: "array", items: { type: "number" } }, 
-                expense: { type: "number" }
+            type: "ARRAY", items: {
+              type: "OBJECT", properties: {
+                time: { type: "STRING" }, desc: { type: "STRING" }, icon: { type: "STRING" }, link: { type: "STRING" },
+                latlng: { type: "ARRAY", items: { type: "NUMBER" } }, expense: { type: "NUMBER" }
               }
             }
           }
@@ -78,7 +44,7 @@ const tripSchema = {
 };
 
 // ============================================================================
-// APP 1: TEN THOUSAND SCROLLS (SUMMON QUEST)
+// APP 1: TEN THOUSAND SCROLLS
 // ============================================================================
 
 exports.summonQuest = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
@@ -103,8 +69,37 @@ exports.summonQuest = onCall({ enforceAppCheck: true, cors: true }, async (reque
   }
 });
 
+exports.communeWithScrolls = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Login required.');
+  const { action, payload, modelId } = request.data;
+
+  let sys = ""; let prompt = ""; let mime = "text/plain";
+
+  if (action === 'generateChapter') {
+      sys = `You are an expert educator. Write HTML fragments using <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>.`;
+      prompt = `Topic: ${payload.topic}. Write chapter: ${payload.chapterTitle}. 400-600 words.`;
+  } else if (action === 'generateQuiz') {
+      sys = `Expert educator. Return ONLY valid JSON.`;
+      prompt = `Create 5 MCQs for topic: ${payload.topic}. JSON format: {"questions":[{"question":"","options":[],"correct":0,"explanation":""}]}`;
+      mime = "application/json";
+  }
+
+  try {
+      const model = genAI.getGenerativeModel({ model: modelId || "gemini-2.5-flash" });
+      const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: mime },
+          systemInstruction: sys
+      });
+      return { result: result.response.text() };
+  } catch (error) {
+      console.error("Commune Error:", error);
+      throw new HttpsError('internal', error.message);
+  }
+});
+
 // ============================================================================
-// APP 2: JOURNEYS & LEDGERS (GENERATE TRIP)
+// APP 2: JOURNEYS & LEDGERS
 // ============================================================================
 
 exports.generateTrip = onCall({ enforceAppCheck: true, cors: true }, async (request) => {
