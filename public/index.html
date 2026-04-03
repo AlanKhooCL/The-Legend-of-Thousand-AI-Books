@@ -4,7 +4,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>萬卷書 — Ten Thousand Scrolls</title>
+<title>LearNow</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;0,800;1,700;1,800&family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -239,16 +239,6 @@
   .orb-1 { animation: orbFloat 3s ease-in-out infinite; }
   .orb-2 { animation: orbFloat 4s ease-in-out 1.2s infinite; }
 
-  /* Catalyst chip active */
-  .catalyst-btn.active {
-    border-color: #ae1d53;
-    background: rgba(174,29,83,0.1);
-  }
-  .catalyst-btn.active-secondary {
-    border-color: #725800;
-    background: rgba(253,207,80,0.15);
-  }
-
   /* Summoning in-progress state */
   @keyframes ritualPing { 0%,100%{transform:scale(1);opacity:0.25;} 50%{transform:scale(1.4);opacity:0.5;} }
   .ritual-ping { animation: ritualPing 1.2s ease-in-out infinite; }
@@ -261,6 +251,9 @@
   .fate-scroll-gradient { background: linear-gradient(180deg, #fefbf6 0%, #f9f3e8 100%); }
   .sigil-glow { filter: drop-shadow(0 0 12px rgba(253, 207, 80, 0.6)); }
   .pixel-text { font-family: monospace; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+  
+  /* Drag and Drop indication */
+  .folder-content.drag-over { background: rgba(174,29,83,0.05); border-radius: 0.5rem; }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface overflow-hidden">
@@ -281,14 +274,14 @@
         <div class="absolute inset-4 border-[3px] border-primary/30 rounded-full seal-spin-rev"></div>
         <div class="w-24 h-24 bg-surface-container-lowest border-4 border-primary rounded-full flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform duration-500 relative">
           <div class="absolute inset-0 rounded-full gloss"></div>
-          <span class="text-5xl font-black text-primary select-none font-headline" style="line-height:1">書</span>
+          <span class="material-symbols-outlined text-5xl text-primary select-none" style="line-height:1">school</span>
         </div>
       </div>
     </div>
-    <h1 class="font-headline font-black text-5xl text-primary italic tracking-tight drop-shadow-sm text-center mb-1">Ten Thousand Scrolls</h1>
+    <h1 class="font-headline font-black text-6xl text-primary italic tracking-tight drop-shadow-sm text-center mb-1">LearNow</h1>
     <div class="flex items-center gap-3 mb-8">
       <div class="h-[2px] w-8 bg-outline-variant"></div>
-      <span class="font-headline text-xl font-bold text-on-surface-variant tracking-[0.45em]">萬卷書</span>
+      <span class="font-headline text-lg font-bold text-on-surface-variant tracking-[0.4em] uppercase">Learn Anytime</span>
       <div class="h-[2px] w-8 bg-outline-variant"></div>
     </div>
     <div class="w-full glass-panel p-7 rounded-xl border-b-4 border-outline-variant/30 shadow-2xl space-y-5">
@@ -342,7 +335,6 @@
             <div class="space-y-1">
               <span class="bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-black tracking-tighter uppercase">Path of Might</span>
               <h2 class="font-headline text-3xl font-extrabold text-primary mt-1">Warrior</h2>
-              <p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">武者</p>
             </div>
             <div class="bg-tertiary-fixed text-on-tertiary-fixed p-2 rounded-xl shadow-[0_4px_0_#eec143]">
               <span class="material-symbols-outlined">swords</span>
@@ -370,7 +362,6 @@
             <div class="space-y-1">
               <span class="bg-secondary text-on-secondary px-3 py-1 rounded-full text-[10px] font-black tracking-tighter uppercase">Path of Wisdom</span>
               <h2 class="font-headline text-3xl font-extrabold text-secondary mt-1">Scholar</h2>
-              <p class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">謀士</p>
             </div>
             <div class="bg-tertiary-fixed text-on-tertiary-fixed p-2 rounded-xl shadow-[0_4px_0_#eec143]">
               <span class="material-symbols-outlined">menu_book</span>
@@ -401,7 +392,7 @@
 
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden">
   <nav class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high z-20 flex justify-between items-center px-6 py-3">
-    <div class="font-headline font-black text-xl text-primary italic tracking-tight">Ten Thousand Scrolls</div>
+    <div class="font-headline font-black text-xl text-primary italic tracking-tight">LearNow</div>
     <button onclick="openApiModal()" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
       <span class="material-symbols-outlined text-lg">settings</span>
     </button>
@@ -571,7 +562,7 @@
   </div>
 </div>
 
-<div id="summon-screen" class="flex-col items-center justify-start overflow-y-auto overflow-x-hidden">
+<div id="summon-screen" class="flex-col items-center justify-center overflow-hidden">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfZxYvnk64Y4e541yQn37m5JiehBvookhcvDCpCUGZvjAbweMx0I50hpDCxh3j5xjrteFpAyzlLegrBxi5JRYQxDjaEfZx3rch3QUrICAO_fRiev4AknF1Ack2Y0na8RuEr5XT-2MvuJia9U-E0t0V8fjGDTkC06AQEUk9b3uiYP5qsibz0VEKhA4K_-nT3j067gBTwdoEJsCSw6SudNSuO_cZgWXm-sMxbxDQXt9C_rmNG1XhHfY5SM8AIcfJbzgQpmn0XDiyf8c"
          class="w-full h-full object-cover opacity-35 pixel-bg" alt=""/>
@@ -579,50 +570,50 @@
   </div>
 
   <div class="fixed top-0 left-0 w-full z-20 px-6 py-4 flex justify-between items-center pointer-events-none">
-    <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic pointer-events-none">Ten Thousand Scrolls</h1>
+    <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic pointer-events-none">LearNow</h1>
     <button onclick="closeSummonScreen()" class="pointer-events-auto bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full border-2 border-primary/20 hover:scale-110 transition-transform hover:border-primary">
       <span class="material-symbols-outlined text-primary">close</span>
     </button>
   </div>
 
-  <div class="relative z-10 w-full max-w-6xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-24 pb-24">
+  <div class="relative z-10 w-full max-w-5xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center pt-16 pb-8">
 
-    <div class="relative flex items-center justify-center order-2 lg:order-1 mt-8 lg:mt-0">
-      <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
+    <div class="relative flex items-center justify-center order-2 lg:order-1 mt-4 lg:mt-0">
+      <div class="relative w-48 h-48 md:w-72 md:h-72 flex items-center justify-center">
         <div class="absolute inset-0 border-[5px] border-dashed border-tertiary/40 rounded-full ring-outer"></div>
-        <div class="absolute inset-8 border-[3px] border-primary/30 rounded-full ring-mid"></div>
-        <div class="absolute inset-16 border-2 border-secondary/20 rounded-full ring-inner"></div>
+        <div class="absolute inset-6 border-[3px] border-primary/30 rounded-full ring-mid"></div>
+        <div class="absolute inset-12 border-2 border-secondary/20 rounded-full ring-inner"></div>
 
-        <div class="absolute top-6 left-1/2 -translate-x-1/2 font-headline font-black text-2xl text-primary/50 glyph-float-1 select-none">天</div>
-        <div class="absolute bottom-8 left-[18%] font-headline font-black text-xl text-secondary/50 glyph-float-2 select-none">地</div>
-        <div class="absolute top-[22%] right-6 font-headline font-black text-xl text-tertiary/60 glyph-float-3 select-none">人</div>
+        <div class="absolute top-2 left-1/2 -translate-x-1/2 font-headline font-black text-lg text-primary/50 glyph-float-1 select-none">INT</div>
+        <div class="absolute bottom-4 left-[15%] font-headline font-black text-lg text-secondary/50 glyph-float-2 select-none">WIS</div>
+        <div class="absolute top-[20%] right-4 font-headline font-black text-lg text-tertiary/60 glyph-float-3 select-none">STR</div>
 
-        <div class="relative z-20 w-40 h-40 md:w-52 md:h-52 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
+        <div class="relative z-20 w-28 h-28 md:w-40 md:h-40 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
           <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle,rgba(253,207,80,0.18) 0%,rgba(174,29,83,0.06) 70%)"></div>
-          <span id="summon-seal-char" class="text-7xl md:text-8xl font-black text-primary drop-shadow-md select-none font-headline" style="line-height:1">書</span>
+          <span class="material-symbols-outlined text-6xl md:text-7xl text-primary drop-shadow-md select-none font-headline" style="line-height:1">school</span>
           <div class="absolute inset-0 border-4 border-primary rounded-full animate-ping opacity-15"></div>
         </div>
 
-        <div class="absolute top-2 left-4 w-5 h-5 bg-primary-fixed rounded-full blur-sm opacity-60 orb-1"></div>
-        <div class="absolute bottom-14 right-2 w-7 h-7 bg-tertiary-fixed rounded-full blur-md opacity-40 orb-2"></div>
+        <div class="absolute top-0 left-2 w-4 h-4 bg-primary-fixed rounded-full blur-sm opacity-60 orb-1"></div>
+        <div class="absolute bottom-10 right-0 w-5 h-5 bg-tertiary-fixed rounded-full blur-md opacity-40 orb-2"></div>
       </div>
     </div>
 
-    <div class="order-1 lg:order-2 space-y-6" id="summon-form-side">
+    <div class="order-1 lg:order-2 space-y-4" id="summon-form-side">
       <header class="space-y-1">
-        <h2 class="text-4xl md:text-5xl font-extrabold font-headline text-on-background tracking-tight leading-tight">
+        <h2 class="text-3xl md:text-4xl font-extrabold font-headline text-on-background tracking-tight leading-tight">
           Initiate <span class="text-primary italic">Summoning</span>
         </h2>
-        <p class="text-base text-on-surface-variant font-medium">Manifest your quest into the digital scrolls.</p>
+        <p class="text-sm text-on-surface-variant font-medium">Manifest your quest into the digital scrolls.</p>
       </header>
 
-      <div class="bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-6 space-y-6 border border-white/50 shadow-xl">
+      <div class="bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-5 space-y-5 border border-white/50 shadow-xl">
 
         <div class="space-y-2">
-          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Quest Topic</label>
+          <label class="text-[10px] font-black uppercase tracking-widest text-primary font-label">Quest Topic</label>
           <div class="relative group">
             <input id="summon-topic-input" type="text" placeholder="e.g. Ancient Rome, Machine Learning..."
-                   class="w-full bg-white border-b-[3px] border-outline-variant px-5 py-4 text-lg font-bold font-headline rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50"/>
+                   class="w-full bg-white border-b-[3px] border-outline-variant px-4 py-3 text-base font-bold font-headline rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50"/>
             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary opacity-0 group-focus-within:opacity-100 transition-opacity">
               <span class="material-symbols-outlined">auto_fix_high</span>
             </div>
@@ -630,64 +621,15 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Learning Objective <span class="text-outline normal-case font-normal">(optional)</span></label>
-          <textarea id="summon-objective-input" rows="2" placeholder="What should you understand after this quest?"
-                    class="w-full bg-white border-b-[3px] border-outline-variant px-5 py-3 text-sm font-body rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50 resize-none"></textarea>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Choose Catalyst</label>
-          <div class="grid grid-cols-2 gap-3" id="summon-catalyst-group">
-            <button type="button" data-value="gemini-2.0-flash" onclick="selectCatalyst(this)"
-                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-primary/40 transition-all group">
-              <div class="w-10 h-10 bg-surface-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-outline">bolt</span>
-              </div>
-              <div class="text-center">
-                <p class="font-bold text-on-background text-xs">Swift Scroll</p>
-                <p class="text-[9px] uppercase tracking-tighter text-outline font-black">2.0 Flash</p>
-              </div>
-            </button>
-            <button type="button" data-value="gemini-2.5-flash" onclick="selectCatalyst(this)"
-                    class="catalyst-btn active relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-primary bg-primary/10 transition-all group">
-              <div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-on-primary-container">bolt</span>
-              </div>
-              <div class="text-center">
-                <p class="font-bold text-on-background text-xs">Scroll of Swiftness</p>
-                <p class="text-[9px] uppercase tracking-tighter text-primary font-black">2.5 Flash ✓</p>
-              </div>
-              <div class="absolute top-2 right-2">
-                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">check_circle</span>
-              </div>
-            </button>
-            <button type="button" data-value="gemini-2.5-pro" onclick="selectCatalyst(this)"
-                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-tertiary/60 transition-all group">
-              <div class="w-10 h-10 bg-tertiary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-on-tertiary-container">menu_book</span>
-              </div>
-              <div class="text-center">
-                <p class="font-bold text-on-background text-xs">Scroll of Wisdom</p>
-                <p class="text-[9px] uppercase tracking-tighter text-tertiary font-black">2.5 Pro</p>
-              </div>
-            </button>
-            <button type="button" data-value="gemini-3-flash-preview" onclick="selectCatalyst(this)"
-                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-secondary/40 transition-all group">
-              <div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-on-secondary-container">auto_awesome</span>
-              </div>
-              <div class="text-center">
-                <p class="font-bold text-on-background text-xs">Ancient Scroll</p>
-                <p class="text-[9px] uppercase tracking-tighter text-secondary font-black">3 Flash</p>
-              </div>
-            </button>
-          </div>
+          <label class="text-[10px] font-black uppercase tracking-widest text-primary font-label">Learning Objective <span class="text-outline normal-case font-normal">(optional)</span></label>
+          <textarea id="summon-objective-input" rows="1" placeholder="What should you understand after this quest?"
+                    class="w-full bg-white border-b-[3px] border-outline-variant px-4 py-2 text-sm font-body rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50 resize-none"></textarea>
         </div>
 
         <div class="space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Chapters</label>
-            <span id="summon-chapter-display" class="font-headline font-extrabold text-primary text-sm">5 Chapters</span>
+            <label class="text-[10px] font-black uppercase tracking-widest text-primary font-label">Chapters</label>
+            <span id="summon-chapter-display" class="font-headline font-extrabold text-primary text-xs">5 Chapters</span>
           </div>
           <div class="flex gap-2 items-center">
             <span class="text-xs text-on-surface-variant font-bold">3</span>
@@ -701,16 +643,16 @@
         </div>
 
         <button onclick="doSummonQuest()" id="summon-action-btn"
-                class="bubbly-btn w-full py-5 bg-primary text-on-primary rounded-full font-headline text-xl font-black tracking-widest border-b-[5px] border-primary-dim hover:translate-y-0.5 active:translate-y-1.5 active:border-b-0 transition-all shadow-lg flex items-center justify-center gap-3 group">
+                class="bubbly-btn w-full py-4 bg-primary text-on-primary rounded-full font-headline text-lg font-black tracking-widest border-b-[5px] border-primary-dim hover:translate-y-0.5 active:translate-y-1.5 active:border-b-0 transition-all shadow-lg flex items-center justify-center gap-3 group">
           SUMMON
-          <span class="material-symbols-outlined group-hover:rotate-45 transition-transform text-2xl">send</span>
+          <span class="material-symbols-outlined group-hover:rotate-45 transition-transform text-xl">send</span>
         </button>
       </div>
 
-      <div class="flex justify-center items-center gap-4 text-on-surface-variant/60 font-semibold text-xs tracking-widest uppercase">
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary"></span> 42 Mana Required</span>
+      <div class="flex justify-center items-center gap-4 text-on-surface-variant/60 font-semibold text-[10px] tracking-widest uppercase">
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> 42 Mana Required</span>
         <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary"></span> 98% Success Rate</span>
+        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 98% Success Rate</span>
       </div>
     </div>
 
@@ -718,7 +660,7 @@
       <div class="relative w-28 h-28 flex items-center justify-center">
         <div class="absolute inset-0 bg-primary/20 rounded-full ritual-ping"></div>
         <div class="w-24 h-24 bg-surface-container-lowest rounded-full border-4 border-primary flex items-center justify-center shadow-xl">
-          <span class="text-4xl font-black text-primary font-headline" style="line-height:1">書</span>
+          <span class="material-symbols-outlined text-5xl text-primary font-headline" style="line-height:1">school</span>
         </div>
       </div>
       <div>
@@ -780,8 +722,8 @@
 
     <div class="relative z-10 flex-1 flex flex-col items-center justify-between p-4 md:p-8 mt-12 overflow-y-auto">
       
-      <div id="battle-top-section" class="w-full flex flex-col items-center gap-4">
-        <div class="w-full max-w-2xl flex flex-col gap-2 items-center mb-2">
+      <div id="battle-top-section" class="w-full flex flex-col items-center gap-2">
+        <div class="w-full max-w-2xl flex flex-col gap-1 items-center mb-1">
           <div class="flex justify-between w-full px-2">
             <span id="battle-title" class="pixel-text text-white font-bold tracking-widest text-shadow uppercase">GUARDIAN</span>
             <span class="pixel-text text-primary-container font-bold" id="battle-hp-text">100/100</span>
@@ -794,20 +736,20 @@
         </div>
 
         <div class="relative group">
-          <div class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-transform hover:scale-105 flex justify-center items-center">
+          <div class="w-32 h-32 md:w-48 md:h-48 drop-shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-transform hover:scale-105 flex justify-center items-center">
             <canvas id="battle-boss-canvas" width="220" height="220"></canvas>
           </div>
           <div class="damage-floater font-headline font-black text-4xl text-yellow-400 drop-shadow-[0_2px_0px_rgba(0,0,0,1)]" id="damage-floater" style="top:-20px; left:50%; margin-left:-20px">-25</div>
         </div>
       </div>
 
-      <div id="quiz-container" class="w-full max-w-4xl bg-surface/90 backdrop-blur-xl p-4 md:p-6 rounded-xl border-t-4 border-primary-container shadow-2xl relative overflow-hidden mt-6">
+      <div id="quiz-container" class="w-full max-w-4xl bg-surface/90 backdrop-blur-xl p-3 md:p-6 rounded-xl border-t-4 border-primary-container shadow-2xl relative mt-2 md:mt-4 flex flex-col">
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-primary-container to-primary"></div>
-        <div class="mb-4 md:mb-6 text-center">
-          <h2 id="quiz-question" class="font-headline text-lg md:text-2xl font-extrabold text-on-surface tracking-tight leading-snug">Loading...</h2>
+        <div class="mb-3 md:mb-4 text-center">
+          <h2 id="quiz-question" class="font-headline text-base md:text-xl font-extrabold text-on-surface tracking-tight leading-snug">Loading...</h2>
         </div>
-        <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"></div>
-        <p id="quiz-feedback" class="text-xs md:text-sm text-on-surface-variant font-bold text-center mt-3 min-h-[1.2rem]"></p>
+        <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 overflow-y-auto max-h-[35vh]"></div>
+        <p id="quiz-feedback" class="text-xs md:text-sm text-on-surface-variant font-bold text-center mt-2 min-h-[1.2rem]"></p>
       </div>
       
     </div>
@@ -823,7 +765,7 @@
 <div class="modal-overlay z-[200]" id="gambit-modal">
   <div class="glass-panel w-full max-w-sm mx-4 rounded-xl border-2 border-tertiary/40 shadow-2xl overflow-hidden">
     <div class="bg-tertiary-container p-4 text-center">
-      <h3 class="font-headline font-extrabold text-on-tertiary-container text-xl italic">天命一擲</h3>
+      <h3 class="font-headline font-extrabold text-on-tertiary-container text-xl italic">Gambit</h3>
       <p class="text-[10px] font-black uppercase tracking-widest text-on-tertiary-container/70">Celestial Gambit · Wager Your Fate</p>
     </div>
     <div class="p-5 space-y-4 text-center">
@@ -836,7 +778,7 @@
       </div>
       <p id="gambit-wager-display" class="font-headline font-extrabold text-primary text-lg">No Wager</p>
       <input type="range" id="gambit-slider" min="0" max="100" value="0" class="w-full accent-primary" oninput="updateGambitWager(this.value)"/>
-      <div id="gambit-coin" onclick="spinGambitCoin()" class="w-20 h-20 mx-auto bg-tertiary-container border-4 border-tertiary rounded-full flex items-center justify-center font-headline font-black text-3xl text-tertiary cursor-pointer hover:scale-110 transition-transform shadow-[0_4px_0_#644c00]">賭</div>
+      <div id="gambit-coin" onclick="spinGambitCoin()" class="w-20 h-20 mx-auto bg-tertiary-container border-4 border-tertiary rounded-full flex items-center justify-center font-headline font-black text-3xl text-tertiary cursor-pointer hover:scale-110 transition-transform shadow-[0_4px_0_#644c00] material-symbols-outlined">casino</div>
       <p id="gambit-result" class="text-sm text-on-surface-variant italic min-h-[1.2rem]"></p>
       <div class="flex gap-3">
         <button onclick="proceedAfterGambit()" class="bubbly-btn flex-1 bg-primary text-on-primary font-headline font-bold py-3 rounded-full border-b-[4px] border-primary-dim">Proceed to Battle</button>
@@ -960,6 +902,7 @@ const auth = getAuth(app);
 const functions = getFunctions(app);
 
 let USER_ID = null;
+let USER_EMAIL = null;
 let STATE = {
   selectedModel: 'gemini-2.5-flash',
   summonChapters: 5,
@@ -977,16 +920,16 @@ function defaultPlayer(name, path='warrior') {
 
 // ── RANKS ──────────────────────────────────────────
 const WARRIOR_RANKS = [
-  {name:'凡人',en:'Mortal',xp:0},{name:'武者',en:'Warrior',xp:100},
-  {name:'刀客',en:'Blade Wanderer',xp:250},{name:'猛将',en:'Fierce General',xp:500},
-  {name:'虎将',en:'Tiger Lord',xp:900},{name:'战神',en:'God of War',xp:1400},
-  {name:'大圣',en:'Great Sage',xp:2000},{name:'齐天大圣',en:'Equal of Heaven',xp:3000},
+  {name:'Level 1',en:'Mortal',xp:0},{name:'Level 5',en:'Warrior',xp:100},
+  {name:'Level 15',en:'Blade Wanderer',xp:250},{name:'Level 30',en:'Fierce General',xp:500},
+  {name:'Level 50',en:'Tiger Lord',xp:900},{name:'Level 70',en:'God of War',xp:1400},
+  {name:'Level 90',en:'Great Sage',xp:2000},{name:'Level 99',en:'Equal of Heaven',xp:3000},
 ];
 const SCHOLAR_RANKS = [
-  {name:'凡人',en:'Mortal',xp:0},{name:'书童',en:'Apprentice',xp:100},
-  {name:'秀才',en:'Gifted Scholar',xp:250},{name:'谋士',en:'Strategist',xp:500},
-  {name:'军师',en:'Grand Strategist',xp:900},{name:'国士',en:'Master of State',xp:1400},
-  {name:'圣贤',en:'Sage Counselor',xp:2000},{name:'卧龙',en:'Sleeping Dragon',xp:3000},
+  {name:'Level 1',en:'Mortal',xp:0},{name:'Level 5',en:'Apprentice',xp:100},
+  {name:'Level 15',en:'Gifted Scholar',xp:250},{name:'Level 30',en:'Strategist',xp:500},
+  {name:'Level 50',en:'Grand Strategist',xp:900},{name:'Level 70',en:'Master of State',xp:1400},
+  {name:'Level 90',en:'Sage Counselor',xp:2000},{name:'Level 99',en:'Sleeping Dragon',xp:3000},
 ];
 function getRanks(){ return STATE.player?.path==='scholar'?SCHOLAR_RANKS:WARRIOR_RANKS; }
 function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.forEach(x=>{ if(STATE.player.totalXp>=x.xp) c=x; }); return c; }
@@ -1263,7 +1206,7 @@ function startCharCanvas(){
   const path = STATE.player.path || 'warrior';
   const ri = getCurrentRankIdx();
   const W = canvas.width, H = canvas.height;
-  const scale = W / 100;
+  const scale = Math.min(W, H) / 130; // Adjusted scaling to fix chopped off head
   const cx = W / 2;
 
   function frame(){
@@ -1271,7 +1214,7 @@ function startCharCanvas(){
     ctx.clearRect(0,0,W,H);
     const bob = Math.sin(t*1.8)*1.5;
     ctx.save();
-    ctx.translate(cx, H*0.1 + bob);
+    ctx.translate(cx, H*0.25 + bob); // Moved down slightly to fix head cut-off
     ctx.scale(scale, scale);
     if(path==='scholar') drawChibiScholar(ctx, ri, t);
     else drawChibiWarrior(ctx, ri, t);
@@ -1307,8 +1250,8 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   else{ctx.beginPath();ctx.roundRect(-28,2,56,55,[4,16,4,16]);ctx.fill();}
   ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
   ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 14px serif'; ctx.textAlign='center';
-  ctx.fillText(['邪','魔','鬼','煞','厉','怒'][Math.floor(sr(0,6))],0,30);
+  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+  ctx.fillText(['DARK','VOID','DOOM','RUIN','FEAR','BANE'][Math.floor(sr(0,6))],0,30);
   ctx.fillStyle=bodyColor;
   ctx.beginPath();ctx.roundRect(-46,5,18,34,[7]);ctx.fill();
   ctx.beginPath();ctx.roundRect(28,5,18,34,[7]);ctx.fill();
@@ -1370,7 +1313,7 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
   const ctx=c.getContext('2d');
   function resize(){ c.width=window.innerWidth; c.height=window.innerHeight; }
   window.addEventListener('resize',resize); resize();
-  const glyphs=['道','德','智','書','學'];
+  const glyphs=['L','E','A','R','N'];
   const particles=Array.from({length:28},()=>({
     x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
     vy:-Math.random()*0.28-0.04, vx:(Math.random()-0.5)*0.1,
@@ -1389,12 +1332,31 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
       ctx.globalAlpha=a; ctx.fillStyle=p.color;
       if(p.type===0){ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}
       else if(p.type===1){ctx.fillRect(p.x,p.y,p.size,p.size);}
-      else{ctx.globalAlpha=a*0.4;ctx.font=`${9+p.size*3}px serif`;ctx.fillText(p.glyph,p.x,p.y);}
+      else{ctx.globalAlpha=a*0.4;ctx.font=`bold ${9+p.size*3}px sans-serif`;ctx.fillText(p.glyph,p.x,p.y);}
     });
     ctx.globalAlpha=1; requestAnimationFrame(tick);
   }
   tick();
 })();
+
+// ── DRAG AND DROP UTILS ────────────────────────────
+window.dragQuest = function(ev, idx) {
+  ev.dataTransfer.setData("text/plain", idx);
+  ev.dataTransfer.effectAllowed = 'move';
+};
+window.allowDrop = function(ev) {
+  ev.preventDefault();
+};
+window.dropQuest = function(ev, newTopic) {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over');
+  const idx = ev.dataTransfer.getData("text/plain");
+  if (idx !== "" && STATE.quests[idx]) {
+      STATE.quests[idx].topic = newTopic;
+      saveState();
+      renderQuestGrid();
+  }
+};
 
 // ── FIREBASE STATE ─────────────────────────────────
 async function loadState(){
@@ -1514,23 +1476,6 @@ window.openSummonScreen=function(){
 };
 window.closeSummonScreen=function(){
   document.getElementById('summon-screen').classList.remove('open');
-};
-
-window.selectCatalyst=function(btn){
-  document.querySelectorAll('.catalyst-btn').forEach(b=>{
-    b.classList.remove('active','border-primary','bg-primary/10','border-tertiary','bg-tertiary/10','border-secondary','bg-secondary/10');
-    b.classList.add('border-outline-variant/40','bg-surface-container-low');
-    const p=b.querySelector('p:last-child');
-    if(p){ p.classList.remove('text-primary','text-tertiary','text-secondary'); p.classList.add('text-outline'); }
-    const tick=b.querySelector('.material-symbols-outlined:last-of-type');
-    if(tick&&tick.textContent==='check_circle') tick.remove();
-  });
-  btn.classList.remove('border-outline-variant/40','bg-surface-container-low');
-  btn.classList.add('active','border-primary','bg-primary/10');
-  STATE.selectedModel=btn.dataset.value;
-  // Update label
-  const p2=btn.querySelector('p:last-child');
-  if(p2){ p2.textContent=p2.textContent.replace(' ✓','')+' ✓'; p2.classList.add('text-primary'); }
 };
 
 window.setSummonChapters=function(n){
@@ -1722,12 +1667,18 @@ function renderQuestGrid(){
     // Check if any quest inside is in progress/not defeated, to decide if we start expanded
     const hasActive = grouped[topic].some(item => !item.quest.defeated);
     
+    // Setup the folder, making it a drop target
     folderDiv.innerHTML = `
       <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container p-3 rounded-xl border-2 border-outline-variant font-headline font-bold text-sm hover:border-primary transition-colors focus:outline-none">
         <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">folder_open</span> ${topic}</div>
         <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">${grouped[topic].length} Scrolls</span>
       </button>
-      <div class="${hasActive ? '' : 'hidden'} flex-col gap-3 mt-3 pl-3 border-l-2 border-outline-variant/30 ml-3 folder-content transition-all"></div>
+      <div class="${hasActive ? '' : 'hidden'} flex-col gap-3 mt-3 pl-3 border-l-2 border-outline-variant/30 ml-3 folder-content transition-all min-h-[40px]" 
+           ondragover="allowDrop(event)" 
+           ondrop="dropQuest(event, '${topic}')"
+           ondragenter="this.classList.add('drag-over')" 
+           ondragleave="this.classList.remove('drag-over')">
+      </div>
     `;
     const contentDiv = folderDiv.querySelector('.folder-content');
 
@@ -1738,9 +1689,14 @@ function renderQuestGrid(){
       const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
       
       const card=document.createElement('div');
-      card.className='bg-surface-container-lowest rounded-xl border-2 border-outline-variant border-b-4 border-b-surface-container-high shadow-sm hover:-translate-y-1 transition-all relative overflow-hidden cursor-pointer p-4';
+      card.className='bg-surface-container-lowest rounded-xl border-2 border-outline-variant border-b-4 border-b-surface-container-high shadow-sm hover:-translate-y-1 transition-all relative overflow-hidden cursor-pointer p-4 cursor-grab';
+      
+      // Make the card draggable
+      card.setAttribute('draggable', 'true');
+      card.addEventListener('dragstart', (e) => window.dragQuest(e, idx));
+
       card.innerHTML=`
-        <div class="flex items-center gap-3 mb-3">
+        <div class="flex items-center gap-3 mb-3 pointer-events-none">
           <div class="quest-boss-art flex-shrink-0 flex items-center justify-center">
             <canvas width="56" height="56" class="boss-mini-canvas"></canvas>
           </div>
@@ -1748,10 +1704,10 @@ function renderQuestGrid(){
             <p class="font-headline font-extrabold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p>
           </div>
         </div>
-        <div class="flex gap-1 mb-2">
+        <div class="flex gap-1 mb-2 pointer-events-none">
           ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 pointer-events-none">
           <div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden border border-outline-variant">
             <div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div>
           </div>
@@ -1793,6 +1749,9 @@ function renderLibraryGrid(){
     grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic">The library is empty. Be the first to share a quest!</div>`;
     return;
   }
+  
+  const isSuperAdmin = USER_EMAIL === 'alan.khoo.chi.loon@gmail.com';
+
   STATE.publicQuests.forEach((quest,idx)=>{
     if(!quest) return;
     const chapters=quest.chapters||[];
@@ -1815,7 +1774,9 @@ function renderLibraryGrid(){
     `;
     const mini=card.querySelector('.boss-mini-canvas');
     drawBossSprite(mini,quest,1.0);
-    if(quest.authorId===USER_ID){
+    
+    // Super Admin OR Author can delete
+    if(quest.authorId===USER_ID || isSuperAdmin){
       const del=document.createElement('button');
       del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-base">close</span>';
       del.className='absolute top-3 right-3 z-10';
@@ -1956,7 +1917,7 @@ window.openGambitModal=function(){
   document.getElementById('gambit-slider').value=0;
   window.updateGambitWager(0);
   document.getElementById('gambit-result').textContent='';
-  document.getElementById('gambit-coin').textContent='賭';
+  document.getElementById('gambit-coin').textContent='casino';
   document.getElementById('gambit-coin').style.color='';
   document.getElementById('gambit-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -1971,7 +1932,7 @@ window.spinGambitCoin=function(){
   setTimeout(()=>{
     coin.classList.remove('gambit-coin-spin');
     const lucky=Math.random()<0.5;
-    coin.textContent=lucky?'天':'地';
+    coin.textContent=lucky?'check_circle':'cancel';
     coin.style.color=lucky?'#006668':'#b41340';
     document.getElementById('gambit-result').textContent=lucky?'Heaven smiles ☉ — Double XP if you win perfectly!':'The earth is indifferent. Gambit resolved fairly.';
     STATE.gambitActive=STATE.gambitWager>0;
@@ -1992,7 +1953,7 @@ const FATE_EVENTS=[
   {text:'+100',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
   {text:'+20',bonus:'A humble blessing.',xp:20,sigil:false},
   {text:'+150',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
-  {text:'+60',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
+  {text:'+60',bonus:'Victory echoes through the scrolls.',xp:60,sigil:false},
 ];
 let fateScrollRevealed=false, pendingFateEvent=null;
 
@@ -2024,7 +1985,7 @@ window.openBattleModal=async function(){
   const bc=document.getElementById('battle-boss-canvas');
   animateBossCanvas(bc,quest,quest.bossHp/quest.bossMaxHp,'battle');
   updateBattleHp(quest);
-  document.getElementById('quiz-container').style.display='block';
+  document.getElementById('quiz-container').style.display='flex';
   document.getElementById('finishing-blow').classList.add('hidden');
   document.getElementById('finishing-blow').classList.remove('flex');
 
@@ -2059,7 +2020,7 @@ function renderQuizQuestion(quest){
   const labels = ['A','B','C','D'];
   (q.options||[]).forEach((opt,i)=>{
     const btn=document.createElement('button');
-    btn.className='flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl border-2 border-outline-variant hover:border-primary group transition-all active:translate-y-1 active:border-b-0 border-b-[4px] text-left w-full';
+    btn.className='flex items-center gap-4 bg-surface-container-lowest p-3 rounded-xl border-2 border-outline-variant hover:border-primary group transition-all active:translate-y-1 active:border-b-0 border-b-[4px] text-left w-full';
     btn.innerHTML=`
       <span class="w-10 h-10 flex-shrink-0 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">${labels[i]||(i+1)}</span>
       <span class="font-body font-semibold text-sm md:text-base text-on-surface">${opt}</span>
@@ -2215,7 +2176,11 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
 
   onAuthStateChanged(auth,user=>{
-    if(user){ USER_ID=user.uid; loadState(); }
+    if(user){ 
+      USER_ID=user.uid; 
+      USER_EMAIL=user.email; 
+      loadState(); 
+    }
     else{
       document.getElementById('loading-text').style.display='none';
       document.getElementById('auth-buttons').classList.remove('hidden');
