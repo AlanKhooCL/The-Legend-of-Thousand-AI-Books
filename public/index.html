@@ -641,10 +641,11 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
-
+    
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
   authDomain: "ai-study-party.firebaseapp.com",
@@ -656,6 +657,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+const app = initializeApp(firebaseConfig);
+
+// ADD THIS BLOCK BACK IN
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6LdjNqEsAAAAAEI2m37oYKa3iluG5Mbx_Ge3VImh'),
+  isTokenAutoRefreshEnabled: true
+});
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+const vertexAI = getVertexAI(app, { location: "global" });
+    
 const db = getFirestore(app);
 const auth = getAuth(app);
 const vertexAI = getVertexAI(app, { location: "global" });
