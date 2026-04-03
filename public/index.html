@@ -833,8 +833,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
-
+// ADD THIS LINE:
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+  
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
   authDomain: "ai-study-party.firebaseapp.com",
@@ -858,6 +859,7 @@ const appCheck = initializeAppCheck(app, {
 const db = getFirestore(app);
 const auth = getAuth(app);
 const vertexAI = getVertexAI(app, { location: "global" });
+const functions = getFunctions(app);
 
 let USER_ID = null;
 let STATE = {
