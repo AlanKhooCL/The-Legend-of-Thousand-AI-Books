@@ -189,7 +189,7 @@
             </button>
         </div>
         
-        <button id="btn-enter" onclick="enterRealm()" class="hidden w-full group relative bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[6px] border-primary-dim hover:translate-y-[2px] active:translate-y-[4px] active:border-b-0 transition-all">ENTER THE REALM</button>
+        <button id="btn-enter" onclick="enterRealm()" class="hidden w-full group relative bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[6px] border-primary-dim hover:translate-y-[2px] active:translate-y-[4px] active:border-b-0 transition-all justify-center">ENTER THE REALM</button>
     </div>
 </div>
 
@@ -328,8 +328,7 @@
                     <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
                     <h2 class="font-headline font-extrabold text-xl">Celestial Sigils</h2>
                 </div>
-                <div id="sigil-slots" class="grid grid-cols-4 md:grid-cols-8 gap-3">
-                    </div>
+                <div id="sigil-slots" class="grid grid-cols-4 md:grid-cols-8 gap-3"></div>
             </section>
 
             <section class="bg-surface-container-lowest p-6 rounded-xl border-2 border-outline-variant shadow-sm space-y-4">
@@ -642,27 +641,28 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
-// [YOUR FIREBASE CONFIG HERE - DO NOT FORGET TO ADD IT IN PROD]
-// const app = initializeApp(firebaseConfig);
-const app = initializeApp({}); // Placeholder config
+const firebaseConfig = {
+  apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
+  authDomain: "ai-study-party.firebaseapp.com",
+  projectId: "ai-study-party",
+  storageBucket: "ai-study-party.firebasestorage.app",
+  messagingSenderId: "583546365173",
+  appId: "1:583546365173:web:dd2fbec4ec4d20380951bc",
+  measurementId: "G-SFDQ0QELTE"
+};
 
-const functions = getFunctions(app);
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LdjNqEsAAAAAEI2m37oYKa3iluG5Mbx_Ge3VImh'),
-  isTokenAutoRefreshEnabled: true
-});
-
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const vertexAI = getVertexAI(app, { location: "global" });
 
 let USER_ID = null;
 let STATE = {
-  selectedModel: 'gemini-2.0-flash',
+  selectedModel: 'gemini-2.5-flash',
   saves: [],
   activeSaveId: null,
   publicQuests: [],
@@ -1155,6 +1155,36 @@ function drawChibiScholar(ctx, rankIdx, t) {
   ctx.beginPath(); ctx.arc(0, 5, 4, 0.3, Math.PI-0.3); ctx.stroke();
 }
 
+function drawCharSprite(canvas, rankIdx, path, w=140, h=180) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = w; canvas.height = h;
+  ctx.clearRect(0,0,w,h);
+  const t = Date.now()*0.001;
+  // Center and scale for the canvas
+  const scale = w / 100;
+  const cx = w / 2;
+  const bob = Math.sin(t * 1.8) * 1.5;
+
+  ctx.save();
+  ctx.translate(cx, h * 0.08 + bob);
+  ctx.scale(scale, scale);
+  if(path === 'scholar') drawChibiScholar(ctx, rankIdx, t);
+  else drawChibiWarrior(ctx, rankIdx, t);
+  ctx.restore();
+}
+
+let charAnimFrame = null;
+function startCharAnimation() {
+  if(charAnimFrame) cancelAnimationFrame(charAnimFrame);
+  const canvas = document.getElementById('scene-canvas');
+  if(!canvas || !STATE.player) return;
+  function frame() {
+    drawCharSprite(canvas, getCurrentRankIdx(), STATE.player.path, 300, 300);
+    charAnimFrame = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
 function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
   const ctx = canvasEl.getContext('2d');
   const w=canvasEl.width, h=canvasEl.height;
@@ -1214,29 +1244,6 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0) {
     ctx.globalAlpha=1;
   }
   ctx.restore();
-}
-
-let sceneRAF = null;
-let sceneT = 0;
-function startCharAnimation() {
-  if(sceneRAF) cancelAnimationFrame(sceneRAF);
-  const canvas = document.getElementById('scene-canvas');
-  if(!canvas || !STATE.player) return;
-  const path = STATE.player.path || 'warrior';
-  
-  // Set logical size larger for crispness
-  canvas.width = 300; 
-  canvas.height = 300;
-  
-  const ctx = canvas.getContext('2d');
-  function frame() {
-    sceneT += 0.016;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    // Draw simple dynamic chibi in center of scene
-    drawChibiSprite(ctx, path, getCurrentRankIdx(), canvas.width, canvas.height, sceneT);
-    sceneRAF = requestAnimationFrame(frame);
-  }
-  frame();
 }
 
 let bossAnimFrames = {};
@@ -1311,7 +1318,6 @@ function renderChapterList(quest) {
   const chapters = quest.chapters || [];
   const completed = quest.completed || [];
   
-  // Progress counter
   const chapDone = completed.filter(Boolean).length;
   list.innerHTML = `
     <div class="flex items-center justify-between mb-4 px-2">
@@ -1324,7 +1330,6 @@ function renderChapterList(quest) {
     const item=document.createElement('div');
     item.className = `border-4 rounded-xl p-5 flex items-center gap-5 group hover:-translate-y-1 transition-all duration-200 cursor-pointer ${done ? 'jade-border bg-surface-container-lowest' : 'border-outline-variant bg-surface-container-lowest hover:border-primary/50'}`;
     
-    // Check if it's the next active chapter (first not done)
     const firstNotDone = completed.findIndex(c => !c);
     const isActive = i === firstNotDone;
 
@@ -1412,7 +1417,6 @@ function renderQuestGrid() {
     const card = document.createElement('article');
     card.className='bg-surface-container-lowest rounded-xl p-6 shadow-[0_10px_0_0_#ede7dd] border-b-4 border-surface-container-high hover:-translate-y-1 transition-all duration-200 relative cursor-pointer';
     
-    // Generate Pips HTML
     let pipsHtml = '';
     for(let i=0; i<chapTotal; i++) {
         pipsHtml += `<div class="h-2 flex-1 rounded-full ${completed[i]?'bg-secondary': i===chapDone ? 'bg-primary animate-pulse' : 'bg-surface-variant'} shadow-sm"></div>`;
@@ -1468,7 +1472,6 @@ function renderQuestGrid() {
     });
     card.appendChild(delBtn);
     
-    // Draw Mini Boss
     const mini = card.querySelector('.boss-mini-sprite');
     drawBossSprite(mini, quest, hpRatio);
     
@@ -1632,12 +1635,14 @@ window.createQuest = async function() {
     genState.classList.add('flex');
     setGenStatus('Communing with the ancient scrolls...', 'CRAFTING QUEST NARRATIVE');
 
-    const summonQuestFunction = httpsCallable(functions, 'summonQuest');
     let questDataText;
     try {
-      const response = await summonQuestFunction({ topic, objective, numChapters, modelId: STATE.selectedModel });
-      questDataText = response.data.result;
-    } catch (aiErr) { throw new Error("Cloud Function Error: " + (aiErr.message || "Could not fetch scrolls.")); }
+      // 1. Client-Side Vertex AI generation logic instead of Cloud Functions
+      const model = getGenerativeModel(vertexAI, { model: STATE.selectedModel, systemInstruction: "You are the Loremaster of Ten Thousand Scrolls. Generate structured learning quests. ALWAYS respond with ONLY valid JSON." });
+      const prompt = `Create a learning quest for topic: "${topic}". ${objective?`Objective: ${objective}`:''} Number of chapters: ${numChapters}. Return this exact JSON: {"questTitle":"dramatic quest title in English","questNarrative":"2-3 sentence lore intro","bossName":"Chinese demon name (2-3 chars + translation)","bossTitle":"demon epithet","bossLore":"2 sentence demon background","chapters":[{"title":"educational title","tag":"SUBTOPIC TAG","summary":"one sentence summary"}]}`;
+      const response = await model.generateContent(prompt);
+      questDataText = response.response.text();
+    } catch (aiErr) { throw new Error("AI Generation Error: " + (aiErr.message || "Could not fetch scrolls.")); }
 
     let parsed = parseJSON(questDataText);
     if (!parsed || typeof parsed !== 'object') parsed = {};
@@ -1725,7 +1730,10 @@ async function loadChapterContent(chapterIdx) {
   const ch=chapters[chapterIdx];
   if(!ch) return;
   try {
-    const content = await callAI({ action: 'generateChapter', payload: { topic: quest.topic, chapterTitle: ch.title, chapterTag: ch.tag, chapterSummary: ch.summary } });
+    const model = getGenerativeModel(vertexAI, { model: STATE.selectedModel, systemInstruction: "You are an expert educator. Write clear, modern, engaging HTML learning material. RESPOND WITH ONLY AN HTML FRAGMENT. Use <h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<pre>." });
+    const prompt = `Topic: ${quest.topic}\nChapter: ${ch.title} (${ch.tag})\nSummary: ${ch.summary}\n\nWrite a comprehensive educational chapter (400-600 words). Include practical examples. End with a "Scroll Mastery" summary <h3>.`;
+    const response = await model.generateContent(prompt);
+    const content = response.response.text();
     quest.chapterContent[chapterIdx]=content;
     saveState();
     renderChapterContent(content);
@@ -1733,7 +1741,9 @@ async function loadChapterContent(chapterIdx) {
 }
   
 function renderChapterContent(html) {
-  document.getElementById('chapter-content-area').innerHTML = DOMPurify.sanitize(html);
+  // Strip markdown blocks if AI includes them
+  let cleanHtml = html.replace(/```html/g, '').replace(/```/g, '');
+  document.getElementById('chapter-content-area').innerHTML = DOMPurify.sanitize(cleanHtml);
 }
 
 window.markChapterComplete = async function() {
@@ -1825,8 +1835,10 @@ window.openBattleModal = async function() {
     document.getElementById('quiz-options').innerHTML='';
     try {
       const chapters = quest.chapters || [];
-      const qd = await callAI({ action: 'generateQuiz', payload: { topic: quest.topic, chapterTitles: chapters.map(c=>c.title).join(', ') } });
-      let parsed = parseJSON(qd);
+      const model = getGenerativeModel(vertexAI, { model: STATE.selectedModel, systemInstruction: "You are an expert educator generating quiz questions. ALWAYS respond with ONLY valid JSON.", generationConfig: { responseMimeType: "application/json" } });
+      const prompt = `Topic: ${quest.topic}\nChapters: ${chapters.map(c=>c.title).join(', ')}\n\nCreate exactly 5 multiple-choice questions.\nReturn JSON: {"questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}]}\ncorrect is 0-indexed.`;
+      const response = await model.generateContent(prompt);
+      let parsed = parseJSON(response.response.text());
       if(!parsed || typeof parsed !== 'object') parsed = {};
       quest.quiz=parsed;
       if (!quest.quiz.questions) quest.quiz.questions = [];
@@ -2020,29 +2032,8 @@ function checkRankUp() {
 }
 
 // ════════════════════════════════
-//  UTILS & AI
+//  UTILS
 // ════════════════════════════════
-async function callAI({action, payload}) {
-  try {
-    const communeFunction = httpsCallable(functions, 'communeWithScrolls');
-    const response = await communeFunction({ action, payload, modelId: STATE.selectedModel });
-    const text = response.data.result;
-    if (!text) throw new Error("The scrolls returned empty.");
-    return text;
-  } catch(e) { throw new Error(e.message || "Failed to communicate with the scrolls."); }
-}
-  
-function parseJSON(text) {
-  if (!text) return {};
-  if (typeof text !== 'string') return {};
-  try { return JSON.parse(text); } catch(e) {}
-  const clean = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
-  try { return JSON.parse(clean); } catch(e) {}
-  const m = clean.match(/\{[\s\S]*\}/);
-  if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
-  return {};
-}
-
 function showToast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
