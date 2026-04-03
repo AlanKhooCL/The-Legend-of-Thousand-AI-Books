@@ -84,48 +84,77 @@
 <style>
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 1;
+    display: inline-block; vertical-align: middle; line-height: 1;
   }
   .seal-spin { animation: seal-spin 20s linear infinite; }
   .seal-spin-rev { animation: seal-spin 14s linear infinite reverse; }
+  .seal-spin-slow { animation: seal-spin 30s linear infinite; }
   @keyframes seal-spin { to { transform: rotate(360deg); } }
 
-  .bubbly-btn {
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-  }
-  .bubbly-btn:active {
-    transform: translateY(3px);
-    box-shadow: none !important;
-  }
+  .bubbly-btn { transition: transform 0.1s ease, box-shadow 0.1s ease; }
+  .bubbly-btn:active { transform: translateY(3px); box-shadow: none !important; }
 
-  .glass-panel {
-    background: rgba(252,246,237,0.82);
-    backdrop-filter: blur(16px);
-  }
+  .glass-panel { background: rgba(252,246,237,0.82); backdrop-filter: blur(16px); }
+  .glass-dark { background: rgba(10,7,16,0.75); backdrop-filter: blur(16px); }
 
   .gloss::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%);
-    border-radius: inherit;
-    pointer-events: none;
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to bottom, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%);
+    border-radius:inherit; pointer-events:none;
   }
+  .pixel-bg { image-rendering: pixelated; }
 
-  .pixel-bg {
-    image-rendering: pixelated;
-  }
-
-  /* Screen management */
+  /* Screens */
   .screen { display: none; }
   .screen.active { display: flex; }
 
-  /* Bottom nav safe area */
-  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 12px); }
+  /* Tab panes */
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
 
-  /* Quest card pip */
+  /* Modal overlay */
+  .modal-overlay { display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+
+  /* Full-screen summoning modal */
+  #summon-screen { display:none; position:fixed; inset:0; z-index:300; }
+  #summon-screen.open { display:flex; }
+
+  /* Toast */
+  #toast {
+    position:fixed; bottom:6rem; left:50%; transform:translateX(-50%);
+    background:#ae1d53; color:#ffeff0;
+    padding:0.65rem 1.4rem; border-radius:9999px;
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.82rem;
+    letter-spacing:0.02em; z-index:9999; opacity:0; transition:opacity 0.35s;
+    pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center;
+    box-shadow: 0 6px 0 #9e0a47, 0 12px 30px rgba(174,29,83,0.3);
+  }
+  #toast.show { opacity:1; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background: #f6f0e6; }
+  ::-webkit-scrollbar-thumb { background: #e8a0b0; border-radius:9999px; }
+
+  /* Generating spinner */
+  .gen-spinner {
+    width:48px; height:48px; border:4px solid #f6f0e6;
+    border-top-color:#ae1d53; border-radius:50%;
+    animation:spin 0.9s linear infinite; margin:0 auto 1rem;
+  }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  canvas { image-rendering: pixelated; }
+
+  /* Quest card boss art */
+  .quest-boss-art {
+    width:56px; height:56px; flex-shrink:0;
+    background:linear-gradient(135deg,#ff7198,#fdcf50);
+    border-radius:12px; overflow:hidden; position:relative;
+  }
+
+  /* Quest pip */
   .pip-done { background: #ae1d53; border-color: #ae1d53; }
   .pip-active { background: #006668; border-color: #006668; animation: pipPulse 1s ease-in-out infinite; }
   @keyframes pipPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
@@ -139,81 +168,11 @@
     100%{opacity:0;transform:translateY(-60px) scale(0.8);}
   }
 
-  /* Modal overlay */
-  .modal-overlay { display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-
-  /* Toast */
-  #toast {
-    position:fixed; bottom:6rem; left:50%; transform:translateX(-50%);
-    background:#ae1d53; color:#ffeff0;
-    padding:0.65rem 1.4rem; border-radius:9999px;
-    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:0.82rem;
-    letter-spacing:0.02em; z-index:999; opacity:0; transition:opacity 0.35s;
-    pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center;
-    box-shadow: 0 6px 0 #9e0a47, 0 12px 30px rgba(174,29,83,0.3);
-  }
-  #toast.show { opacity:1; }
-
-  /* Tab panes */
-  .tab-pane { display:none; }
-  .tab-pane.active { display:block; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background: #f6f0e6; }
-  ::-webkit-scrollbar-thumb { background: #e8a0b0; border-radius:9999px; }
-
-  /* Generating spinner */
-  .gen-spinner {
-    width:56px; height:56px; border:5px solid #f6f0e6;
-    border-top-color:#ae1d53; border-radius:50%;
-    animation:spin 0.9s linear infinite; margin:0 auto 1rem;
-  }
-  @keyframes spin { to{transform:rotate(360deg);} }
-
-  /* Boss canvas pixel */
-  canvas { image-rendering: pixelated; }
-
-  /* Quest card image placeholder */
-  .quest-boss-art {
-    width:56px; height:56px; flex-shrink:0;
-    background:linear-gradient(135deg,#ff7198,#fdcf50);
-    border-radius:12px; overflow:hidden; position:relative;
-  }
-
-  /* Sigil slot */
-  .sigil-slot-filled {
-    background: linear-gradient(135deg, #fdcf50 0%, #ff7198 100%);
-    box-shadow: 0 4px 0 #eec143;
-  }
-  .sigil-tooltip-card {
-    position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%);
-    width:200px; background:#fff; border:3px solid #ae1d53;
-    border-radius:16px; padding:0.85rem; pointer-events:none;
-    opacity:0; transition:opacity 0.2s; z-index:50;
-    box-shadow:0 8px 0 #9e0a47, 0 16px 30px rgba(174,29,83,0.2);
-  }
-  .sigil-slot:hover .sigil-tooltip-card { opacity:1; }
-
-  /* Gambit coin */
-  .gambit-coin-spin { animation: coinFlip 0.6s ease infinite; }
-  @keyframes coinFlip {
-    0%{transform:rotateY(0);}
-    50%{transform:rotateY(90deg) scaleX(0.2);}
-    100%{transform:rotateY(180deg);}
-  }
-
-  /* Scroll bob */
-  .scroll-bob { animation:scrollBob 2s ease-in-out infinite; }
-  @keyframes scrollBob { 0%,100%{transform:translateY(0) rotate(-3deg);}  50%{transform:translateY(-8px) rotate(3deg);} }
-
-  /* XP bar shine sweep */
+  /* XP bar shine */
   .xp-bar-fill::after {
-    content:'';position:absolute;inset:0;
+    content:''; position:absolute; inset:0;
     background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.5) 50%,transparent 100%);
-    background-size:200% 100%;
-    animation:shine 2.5s linear infinite;
+    background-size:200% 100%; animation:shine 2.5s linear infinite;
   }
   @keyframes shine { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
@@ -221,7 +180,11 @@
   .path-card { transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s; }
   .path-card:hover { transform: translateY(-8px); }
 
-  /* Chapter content styling */
+  /* Finishing blow */
+  @keyframes finishPulse { 0%{transform:scale(1);}100%{transform:scale(1.05);} }
+  .finish-pulse { animation:finishPulse 0.4s ease infinite alternate; }
+
+  /* Chapter content */
   .chapter-content h3 { font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.1rem; color:#ae1d53; margin:1.2rem 0 0.4rem; }
   .chapter-content p { margin-bottom:0.75rem; line-height:1.85; color:#312e29; }
   .chapter-content ul { padding-left:1.4rem; margin-bottom:0.75rem; }
@@ -230,32 +193,89 @@
   .chapter-content em { color:#725800; }
   .chapter-content code { background:#fde8ef; border:1px solid #ff7198; padding:0.1em 0.4em; font-size:0.82em; color:#ae1d53; border-radius:6px; }
 
-  /* Finishing blow pulse */
-  @keyframes finishPulse { 0%{transform:scale(1);}100%{transform:scale(1.05);} }
-  .finish-pulse { animation:finishPulse 0.4s ease infinite alternate; }
+  /* Gambit coin */
+  .gambit-coin-spin { animation: coinFlip 0.6s ease infinite; }
+  @keyframes coinFlip { 0%{transform:rotateY(0);} 50%{transform:rotateY(90deg) scaleX(0.2);} 100%{transform:rotateY(180deg);} }
+
+  /* Scroll bob */
+  .scroll-bob { animation:scrollBob 2s ease-in-out infinite; }
+  @keyframes scrollBob { 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-8px) rotate(3deg);} }
 
   /* Particle canvas */
   #particle-canvas { position:fixed; inset:0; z-index:1; pointer-events:none; width:100%; height:100%; }
+
+  /* ── SPIRIT TAB: character stage ── */
+  .char-stage-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(180deg, #f6e8d0 0%, #fcf6ed 100%);
+    border-radius: 1.25rem;
+    min-height: 260px;
+  }
+
+  /* Bubble pop animation for speech bubble */
+  @keyframes bubblePop { 0%{opacity:0;transform:scale(0.7) translateY(8px);} 60%{transform:scale(1.06) translateY(-2px);} 100%{opacity:1;transform:scale(1) translateY(0);} }
+  .bubble-pop { animation: bubblePop 0.35s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+  /* Topic chip hover */
+  .topic-chip { transition: all 0.18s cubic-bezier(.34,1.56,.64,1); }
+  .topic-chip:hover { transform: translateY(-3px) scale(1.04); }
+  .topic-chip:active { transform: translateY(0) scale(0.97); }
+
+  /* Summoning screen ring animations */
+  .ring-outer { animation: seal-spin 20s linear infinite; }
+  .ring-mid   { animation: seal-spin 12s linear infinite reverse; }
+  .ring-inner { animation: seal-spin 8s linear infinite; }
+
+  /* Summoning seal pulse */
+  @keyframes sealPulse { 0%,100%{box-shadow:0 0 40px rgba(174,29,83,0.25);} 50%{box-shadow:0 0 80px rgba(174,29,83,0.45), 0 0 120px rgba(253,207,80,0.2);} }
+  .seal-pulse { animation: sealPulse 3s ease-in-out infinite; }
+
+  /* Glyph float */
+  @keyframes glyphFloat { 0%,100%{transform:translateY(0) rotate(-5deg);opacity:0.5;} 50%{transform:translateY(-12px) rotate(5deg);opacity:0.8;} }
+  .glyph-float-1 { animation: glyphFloat 4s ease-in-out infinite; }
+  .glyph-float-2 { animation: glyphFloat 5s ease-in-out 1s infinite; }
+  .glyph-float-3 { animation: glyphFloat 3.5s ease-in-out 0.5s infinite; }
+
+  /* Orb float */
+  @keyframes orbFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-16px);} }
+  .orb-1 { animation: orbFloat 3s ease-in-out infinite; }
+  .orb-2 { animation: orbFloat 4s ease-in-out 1.2s infinite; }
+
+  /* Catalyst chip active */
+  .catalyst-btn.active {
+    border-color: #ae1d53;
+    background: rgba(174,29,83,0.1);
+  }
+  .catalyst-btn.active-secondary {
+    border-color: #725800;
+    background: rgba(253,207,80,0.15);
+  }
+
+  /* Summoning in-progress state */
+  @keyframes ritualPing { 0%,100%{transform:scale(1);opacity:0.25;} 50%{transform:scale(1.4);opacity:0.5;} }
+  .ritual-ping { animation: ritualPing 1.2s ease-in-out infinite; }
+
+  /* Chapter count pips */
+  .chap-pip { transition: all 0.2s; }
+  .chap-pip.active-pip { background:#ae1d53; transform:scale(1.25); }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface overflow-hidden">
 
-<!-- Soft ambient particles canvas -->
 <canvas id="particle-canvas"></canvas>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════
      SCREEN: TITLE / SIGN-IN
-══════════════════════════════════════════════════ -->
+═══════════════════════════════════════ -->
 <div id="screen-title" class="screen active fixed inset-0 z-10 flex-col items-center justify-center overflow-hidden">
-  <!-- Pixel art BG -->
   <div class="absolute inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
-         class="w-full h-full object-cover opacity-75 pixel-bg" alt="MapleStory forest background"/>
+         class="w-full h-full object-cover opacity-75 pixel-bg" alt=""/>
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-surface/30 to-surface"></div>
   </div>
-
   <div class="relative z-10 flex flex-col items-center px-6 w-full max-w-md">
-    <!-- Animated Seal -->
     <div class="relative mb-6 group">
       <div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full group-hover:bg-primary/35 transition-colors duration-700"></div>
       <div class="relative w-40 h-40 flex items-center justify-center">
@@ -267,26 +287,18 @@
         </div>
       </div>
     </div>
-
-    <!-- Title -->
     <h1 class="font-headline font-black text-5xl text-primary italic tracking-tight drop-shadow-sm text-center mb-1">Ten Thousand Scrolls</h1>
     <div class="flex items-center gap-3 mb-8">
       <div class="h-[2px] w-8 bg-outline-variant"></div>
       <span class="font-headline text-xl font-bold text-on-surface-variant tracking-[0.45em]">萬卷書</span>
       <div class="h-[2px] w-8 bg-outline-variant"></div>
     </div>
-
-    <!-- Auth card -->
     <div class="w-full glass-panel p-7 rounded-xl border-b-4 border-outline-variant/30 shadow-2xl space-y-5">
       <div class="text-center space-y-1">
         <p class="font-headline font-bold text-on-surface text-lg">Begin Your Journey</p>
         <p class="text-on-surface-variant text-sm">Select your path into the infinite library.</p>
       </div>
-
-      <div id="loading-text" class="text-center text-primary font-headline font-bold text-sm tracking-widest py-2">
-        COMMUNING WITH THE SCROLLS...
-      </div>
-
+      <div id="loading-text" class="text-center text-primary font-headline font-bold text-sm tracking-widest py-2">COMMUNING WITH THE SCROLLS...</div>
       <div id="auth-buttons" class="hidden space-y-3">
         <button onclick="signInGoogle()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-3 shadow-md">
           <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.224 1.224-3.136 2.576-6.64 2.576-5.392 0-9.672-4.384-9.672-9.776s4.28-9.776 9.672-9.776c2.928 0 5.144 1.144 6.776 2.704l2.312-2.312c-2.392-2.272-5.464-4.016-9.088-4.016-6.608 0-12 5.392-12 12s5.392 12 12 12c3.576 0 6.264-1.176 8.368-3.36 2.16-2.16 2.848-5.216 2.848-7.632 0-.528-.056-1.048-.152-1.512h-10.136z"/></svg>
@@ -297,33 +309,27 @@
           <span class="tracking-wide">Guest Play</span>
         </button>
       </div>
-
       <button id="btn-enter" onclick="enterRealm()" style="display:none" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-3 shadow-md">
         <span class="material-symbols-outlined text-xl">auto_awesome</span>
         Enter the Realm
       </button>
-
       <div class="pt-1 flex justify-between items-center text-[10px] font-bold text-outline uppercase tracking-widest">
-        <span>Server: Online</span>
-        <span>Terms of Spirit</span>
+        <span>Server: Online</span><span>Terms of Spirit</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════
      SCREEN: PATH SELECTION
-══════════════════════════════════════════════════ -->
+═══════════════════════════════════════ -->
 <div id="screen-path" class="screen fixed inset-0 z-10 flex-col items-center overflow-y-auto">
-  <!-- BG -->
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KHNKSVDby76END8YXKPuSjWJXDvtLrb1V4a-efG0M8Goo4Nl0s_zrhnsI0p8piLX0_ZgPUtKp2jbtkxwUnfZq8BDjywiS0CZQYoKdtIPlcHL1V9IIaAGyhmZrHsIu52NZwVohGJXMZDKFQesU2qlINCJupAKvm5xV8B99Aq7JfGspxma2Uuz1e3elGWoFIfxw5vqxzOza2jG_uJ6Qcofw7qiolAl8oRG1PiJy_MJL2ZWoriCoQps-8J--AEpGG_UqCSJ5DCVWQM"
-         class="w-full h-full object-cover opacity-30 pixel-bg" alt="sky background"/>
+         class="w-full h-full object-cover opacity-30 pixel-bg" alt=""/>
     <div class="absolute inset-0 bg-gradient-to-b from-surface/60 via-surface/20 to-surface/80"></div>
   </div>
-
   <div class="relative z-10 w-full max-w-3xl px-6 pt-24 pb-28">
-    <!-- Header -->
     <header class="text-center mb-10 space-y-3">
       <h1 class="font-headline font-black text-5xl text-primary italic tracking-tight">Choose Your Destiny</h1>
       <p class="text-on-surface-variant text-base">Before your journey begins, what is the name that will be sung across the scrolls?</p>
@@ -333,8 +339,6 @@
         <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-tertiary text-on-tertiary px-3 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase">Identity</div>
       </div>
     </header>
-
-    <!-- Path Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Warrior -->
       <div onclick="choosePath('warrior')" class="path-card group relative overflow-hidden bg-surface-container-lowest rounded-xl p-7 border-b-8 border-primary-dim shadow-xl cursor-pointer">
@@ -365,7 +369,6 @@
           </div>
         </div>
       </div>
-
       <!-- Scholar -->
       <div onclick="choosePath('scholar')" class="path-card group relative overflow-hidden bg-surface-container-lowest rounded-xl p-7 border-b-8 border-secondary-dim shadow-xl cursor-pointer">
         <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
@@ -396,7 +399,6 @@
         </div>
       </div>
     </div>
-
     <div class="mt-8 text-center space-y-2">
       <button id="path-cancel-btn" style="display:none" onclick="cancelPathSelection()" class="text-outline font-bold text-sm border-2 border-outline-variant rounded-full px-6 py-2 hover:border-primary hover:text-primary transition-colors">Cancel</button>
       <p class="text-outline text-xs font-bold uppercase tracking-widest">This choice is permanent · Choose wisely</p>
@@ -404,78 +406,72 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════
      SCREEN: HUB
-══════════════════════════════════════════════════ -->
+═══════════════════════════════════════ -->
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden">
-  <!-- TopAppBar -->
   <nav class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high z-20 flex justify-between items-center px-6 py-3">
     <div class="font-headline font-black text-xl text-primary italic tracking-tight">Ten Thousand Scrolls</div>
-    <button onclick="openApiModal()" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-headline font-bold text-xs uppercase tracking-widest">
+    <button onclick="openApiModal()" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
       <span class="material-symbols-outlined text-lg">settings</span>
     </button>
   </nav>
-
-  <!-- Tab Bar -->
   <div class="flex-shrink-0 bg-surface/90 border-b-2 border-surface-container-high z-20 flex">
     <button onclick="switchTab('tab-profile')" data-target="tab-profile" class="tab-btn flex-1 py-3 font-headline font-bold text-xs uppercase tracking-widest text-outline border-b-[3px] border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">auto_awesome</span>
-      Spirit
+      <span class="material-symbols-outlined text-lg">auto_awesome</span>Spirit
     </button>
     <button onclick="switchTab('tab-quests')" data-target="tab-quests" class="tab-btn flex-1 py-3 font-headline font-bold text-xs uppercase tracking-widest text-outline border-b-[3px] border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">menu_book</span>
-      Scrolls
+      <span class="material-symbols-outlined text-lg">menu_book</span>Scrolls
     </button>
     <button onclick="switchTab('tab-library')" data-target="tab-library" class="tab-btn flex-1 py-3 font-headline font-bold text-xs uppercase tracking-widest text-outline border-b-[3px] border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">local_library</span>
-      Library
+      <span class="material-symbols-outlined text-lg">local_library</span>Library
     </button>
   </div>
-
-  <!-- Tab Bodies -->
   <div class="flex-1 overflow-hidden">
 
     <!-- ── SPIRIT TAB ── -->
     <div id="tab-profile" class="tab-pane h-full overflow-y-auto">
-      <!-- Hero banner with pixel art BG -->
-      <div class="relative h-56 overflow-hidden">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
-             class="w-full h-full object-cover opacity-60 pixel-bg" alt=""/>
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface"></div>
+      <div class="px-4 pt-4 pb-28 max-w-lg mx-auto space-y-4">
 
-        <!-- Activity tag -->
-        <div class="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border-2 border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary" id="spirit-activity-tag">⚔ TRAINING</div>
-
-        <!-- Speech bubble -->
-        <div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur border-2 border-primary/30 rounded-xl rounded-bl-sm px-3 py-2 text-xs font-bold text-on-surface max-w-[170px] leading-snug" id="personality-bubble">...</div>
-
-        <!-- Character sprite -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-24 h-24 flex items-center justify-center">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8AuTRKMJ_gNbWqr1sAfjSV502ftzESUYywnrvpUPZS0SSoP-0poCSZEEU4w0gSCRouP4eq-EekO7_Fr_dKeJxv9EOySdLfd8KdBUXEXXKx2NSK3Fw3trQgFo45hmcZHQfS-AFTbEafvFpdqHGnGH5zq_bPmA1g4PjQy2r0Cur3azv1LUXqExh98gPCDl07awE8QjK-FveS-4u2rZRkSGgUodVRBbzdcyq0KqGa0sMJ_MSmOeae1SBnQXav_uyhcFZWqBDJ4nJPNA"
-               id="char-sprite-img" class="w-full h-full object-contain drop-shadow-xl pixel-bg" alt="Character sprite"/>
-        </div>
-      </div>
-
-      <!-- Profile info -->
-      <div class="px-4 pb-24 -mt-2 space-y-4 max-w-lg mx-auto">
-        <!-- Name & rank -->
-        <div class="text-center space-y-1">
-          <div class="flex items-center justify-center gap-2">
-            <h2 id="char-name" onclick="renameCharacter()" class="font-headline font-extrabold text-2xl text-primary cursor-pointer hover:opacity-75 transition-opacity"></h2>
-            <span id="char-path-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary text-on-primary"></span>
+        <!-- Character Stage Card -->
+        <div class="char-stage-wrap shadow-lg border-2 border-outline-variant/40">
+          <!-- BG scenery strip -->
+          <div class="absolute inset-0 overflow-hidden rounded-[1.2rem]">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
+                 class="w-full h-full object-cover opacity-20 pixel-bg" alt=""/>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#f6e8d0]/90 via-transparent to-transparent"></div>
           </div>
-          <p id="char-rank" class="text-xs font-bold text-on-surface-variant tracking-widest uppercase"></p>
-        </div>
 
-        <!-- XP Bar -->
-        <div class="bg-surface-container-high p-4 rounded-xl space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="text-xs font-black uppercase tracking-widest text-primary font-headline">Cultivation</span>
-            <span id="xp-text" class="text-xs font-bold text-on-surface-variant font-headline">0 / 100 XP</span>
-          </div>
-          <div class="h-5 bg-surface-container rounded-full overflow-hidden border-2 border-primary-dim p-0.5">
-            <div id="xp-fill" class="xp-bar-fill h-full rounded-full relative overflow-hidden bg-primary transition-all duration-1000" style="width:0%">
-              <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-full"></div>
+          <div class="relative z-10 flex flex-col items-center pt-5 pb-4 px-4">
+            <!-- Activity tag -->
+            <div class="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border-2 border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary" id="spirit-activity-tag">⚔ TRAINING</div>
+
+            <!-- Speech bubble -->
+            <div id="speech-bubble-wrap" class="mb-2 max-w-[200px] text-center">
+              <div id="personality-bubble" class="inline-block bg-surface-container-lowest border-2 border-primary/30 rounded-2xl rounded-bl-sm px-4 py-2 text-xs font-bold text-on-surface shadow-sm leading-snug bubble-pop">...</div>
+            </div>
+
+            <!-- Animated canvas sprite -->
+            <canvas id="char-canvas" width="140" height="160" class="drop-shadow-xl"></canvas>
+
+            <!-- Name + badge row -->
+            <div class="flex items-center gap-2 mt-2">
+              <h2 id="char-name" onclick="renameCharacter()" class="font-headline font-extrabold text-xl text-primary cursor-pointer hover:opacity-75 transition-opacity"></h2>
+              <span id="char-path-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary text-on-primary"></span>
+            </div>
+            <p id="char-rank" class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mt-0.5"></p>
+
+            <!-- XP bar -->
+            <div class="w-full mt-3 space-y-1">
+              <div class="flex justify-between text-[10px] font-bold text-on-surface-variant">
+                <span class="font-headline font-black text-primary uppercase tracking-widest text-[9px]">Cultivation</span>
+                <span id="xp-text">0 / 100 XP</span>
+              </div>
+              <div class="h-4 bg-surface-container rounded-full overflow-hidden border-2 border-primary-dim p-0.5">
+                <div id="xp-fill" class="xp-bar-fill h-full rounded-full relative overflow-hidden bg-primary transition-all duration-1000" style="width:0%">
+                  <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent rounded-full"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -504,32 +500,28 @@
           </div>
         </div>
 
-        <!-- Sigils -->
-        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 space-y-3">
+        <!-- Topic Suggestions Panel -->
+        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 space-y-3" id="topic-suggestions-panel">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1">stars</span>
-            <h3 class="font-headline font-extrabold text-base">Celestial Sigils</h3>
-            <span class="text-[9px] font-bold text-outline uppercase tracking-widest ml-auto">Hover to inspect</span>
+            <span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1">lightbulb</span>
+            <h3 class="font-headline font-extrabold text-sm text-on-surface">Your Companion Suggests</h3>
+            <button onclick="refreshTopicSuggestions()" class="ml-auto text-outline hover:text-primary transition-colors" title="Refresh">
+              <span class="material-symbols-outlined text-base">refresh</span>
+            </button>
           </div>
-          <div id="sigil-slots" class="flex gap-2 flex-wrap"></div>
+          <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Based on your scrolls, explore next:</p>
+          <div id="topic-chip-container" class="flex flex-wrap gap-2">
+            <div class="text-xs text-on-surface-variant italic">Complete a quest to unlock suggestions...</div>
+          </div>
         </div>
 
-        <!-- Realm Chronicles -->
-        <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 space-y-2">
-          <div class="flex items-center gap-2 border-b-2 border-surface-container-high pb-2">
-            <span class="material-symbols-outlined text-primary">history_edu</span>
-            <h3 class="font-headline font-extrabold text-base">Realm Chronicles</h3>
-          </div>
-          <p id="world-lore-text" class="text-sm leading-relaxed text-on-surface-variant italic">The fractured realm of Jiuzhou trembles...</p>
-        </div>
       </div>
     </div>
 
     <!-- ── SCROLLS TAB ── -->
     <div id="tab-quests" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
-        <!-- New quest button -->
-        <button onclick="openCreateModal()" class="bubbly-btn w-full flex items-center gap-4 p-4 bg-surface-container-lowest border-4 border-dashed border-outline-variant rounded-xl hover:border-primary hover:bg-primary/5 transition-all group">
+        <button onclick="openSummonScreen()" class="bubbly-btn w-full flex items-center gap-4 p-4 bg-surface-container-lowest border-4 border-dashed border-outline-variant rounded-xl hover:border-primary hover:bg-primary/5 transition-all group">
           <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-primary transition-colors flex-shrink-0">
             <span class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">add_circle</span>
           </div>
@@ -538,7 +530,6 @@
             <p class="text-on-surface-variant text-xs">Seek knowledge, bind a guardian demon</p>
           </div>
         </button>
-
         <div id="quest-grid" class="space-y-3"></div>
       </div>
     </div>
@@ -553,11 +544,10 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════
      SCREEN: QUEST DETAIL
-══════════════════════════════════════════════════ -->
+═══════════════════════════════════════ -->
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
-  <!-- Header -->
   <div class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high flex items-center gap-3 px-4 py-3">
     <button onclick="showHub()" class="bg-surface-container border-2 border-outline-variant rounded-full p-2 flex items-center justify-center hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary">arrow_back</span>
@@ -567,10 +557,7 @@
       <p id="q-title-label" class="font-headline font-extrabold text-base text-primary">Quest Title</p>
     </div>
   </div>
-
-  <!-- Body: split or stacked on mobile -->
   <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
-    <!-- Chapter list -->
     <div class="lg:col-span-5 overflow-y-auto border-b lg:border-b-0 lg:border-r border-surface-container-high">
       <div class="p-4 space-y-3">
         <h3 class="font-headline font-extrabold text-lg flex items-center gap-2">
@@ -579,11 +566,8 @@
         <div id="chapter-list" class="space-y-2"></div>
       </div>
     </div>
-
-    <!-- Boss panel -->
     <div id="boss-panel" class="lg:col-span-7 overflow-y-auto bg-gradient-to-b from-[#4d001e] to-[#100e09]">
       <div class="flex flex-col items-center p-6 gap-4">
-        <!-- Boss art -->
         <div class="relative w-40 h-40 flex items-center justify-center">
           <div class="absolute inset-0 rounded-full" style="background:radial-gradient(ellipse,rgba(255,113,152,0.25) 0%,transparent 70%)"></div>
           <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10"></canvas>
@@ -592,7 +576,6 @@
           <h3 id="boss-name-display" class="font-headline font-extrabold text-2xl text-primary-fixed italic">??</h3>
           <p id="boss-title-display" class="text-xs font-bold text-primary-fixed/60 uppercase tracking-widest">Guardian Demon</p>
         </div>
-        <!-- HP -->
         <div class="w-full space-y-1">
           <div class="flex justify-between text-xs font-bold">
             <span class="text-primary-fixed/70 uppercase tracking-wider">Demon HP</span>
@@ -604,12 +587,10 @@
             </div>
           </div>
         </div>
-        <!-- Lore -->
         <div class="w-full bg-white/5 border-2 border-white/10 rounded-xl p-4">
           <p class="text-[10px] font-black uppercase tracking-widest text-primary-container/70 mb-1">Demon Lore</p>
           <p id="boss-lore-text" class="text-xs text-primary-fixed/60 italic leading-relaxed">...</p>
         </div>
-        <!-- Challenge btn -->
         <button id="boss-complete-btn" onclick="tryOpenBattle()" disabled
                 class="bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg">
           <span class="material-symbols-outlined">swords</span> Challenge the Demon
@@ -619,63 +600,187 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════
-     MODALS
-══════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════
+     FULL-SCREEN: SUMMONING RITUAL
+═══════════════════════════════════════ -->
+<div id="summon-screen" class="flex-col items-center justify-center overflow-hidden">
+  <!-- Atmospheric BG -->
+  <div class="fixed inset-0 z-0">
+    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfZxYvnk64Y4e541yQn37m5JiehBvookhcvDCpCUGZvjAbweMx0I50hpDCxh3j5xjrteFpAyzlLegrBxi5JRYQxDjaEfZx3rch3QUrICAO_fRiev4AknF1Ack2Y0na8RuEr5XT-2MvuJia9U-E0t0V8fjGDTkC06AQEUk9b3uiYP5qsibz0VEKhA4K_-nT3j067gBTwdoEJsCSw6SudNSuO_cZgWXm-sMxbxDQXt9C_rmNG1XhHfY5SM8AIcfJbzgQpmn0XDiyf8c"
+         class="w-full h-full object-cover opacity-35 pixel-bg" alt=""/>
+    <div class="absolute inset-0 bg-gradient-to-b from-surface/80 via-surface/40 to-surface/90"></div>
+  </div>
 
-<!-- Backdrop -->
-<div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-on-background/40 backdrop-blur-sm hidden"></div>
+  <!-- Header bar -->
+  <div class="fixed top-0 left-0 w-full z-20 px-6 py-4 flex justify-between items-center pointer-events-none">
+    <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic pointer-events-none">Ten Thousand Scrolls</h1>
+    <button onclick="closeSummonScreen()" class="pointer-events-auto bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full border-2 border-primary/20 hover:scale-110 transition-transform hover:border-primary">
+      <span class="material-symbols-outlined text-primary">close</span>
+    </button>
+  </div>
 
-<!-- Create Quest Modal -->
-<div class="modal-overlay z-[200]" id="create-modal">
-  <div class="glass-panel w-full max-w-md mx-4 rounded-xl border-2 border-primary/30 shadow-2xl overflow-hidden">
-    <div class="bg-primary p-4 flex items-center gap-2">
-      <span class="material-symbols-outlined text-on-primary">history_edu</span>
-      <h3 class="font-headline font-extrabold text-on-primary text-lg">Summon Quest</h3>
-    </div>
-    <div class="p-5 max-h-[70vh] overflow-y-auto space-y-4" id="create-form">
-      <div>
-        <label class="block text-xs font-black uppercase tracking-widest text-primary mb-1">Topic / Subject</label>
-        <input id="topic-input" class="w-full bg-surface-container border-2 border-outline-variant rounded-xl px-4 py-3 font-body focus:border-primary focus:outline-none transition-colors" placeholder="e.g. Machine Learning, Ancient Rome..."/>
-      </div>
-      <div>
-        <label class="block text-xs font-black uppercase tracking-widest text-primary mb-1">Learning Objective (optional)</label>
-        <textarea id="objective-input" rows="2" class="w-full bg-surface-container border-2 border-outline-variant rounded-xl px-4 py-3 font-body focus:border-primary focus:outline-none transition-colors resize-none" placeholder="What should the learner understand?"></textarea>
-      </div>
-      <div>
-        <label class="block text-xs font-black uppercase tracking-widest text-primary mb-1">Chapters</label>
-        <select id="chapters-input" class="w-full bg-surface-container border-2 border-outline-variant rounded-xl px-4 py-3 font-body focus:border-primary focus:outline-none transition-colors">
-          <option value="3">3 Chapters — Swift Campaign</option>
-          <option value="5" selected>5 Chapters — Standard Siege</option>
-          <option value="7">7 Chapters — Grand Conquest</option>
-        </select>
-      </div>
-      <!-- Model chips -->
-      <div class="bg-surface-container rounded-xl p-3 space-y-2">
-        <p class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">AI Engine</p>
-        <div id="model-chip-group" class="flex flex-wrap gap-2">
-          <button type="button" data-value="gemini-2.0-flash" class="model-chip px-3 py-1 border-2 border-outline-variant rounded-full text-xs font-bold text-outline hover:border-primary hover:text-primary transition-colors">2.0 Flash</button>
-          <button type="button" data-value="gemini-2.5-flash" class="model-chip active px-3 py-1 border-2 border-primary rounded-full text-xs font-bold text-primary bg-primary/10">2.5 Flash</button>
-          <button type="button" data-value="gemini-2.5-pro" class="model-chip px-3 py-1 border-2 border-outline-variant rounded-full text-xs font-bold text-outline hover:border-primary hover:text-primary transition-colors">2.5 Pro</button>
-          <button type="button" data-value="gemini-3-flash-preview" class="model-chip px-3 py-1 border-2 border-outline-variant rounded-full text-xs font-bold text-outline hover:border-primary hover:text-primary transition-colors">3 Flash</button>
+  <!-- Main content -->
+  <div class="relative z-10 w-full max-w-6xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-20 pb-8">
+
+    <!-- LEFT: Summoning Seal Visual -->
+    <div class="relative flex items-center justify-center order-2 lg:order-1">
+      <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
+        <!-- Rings -->
+        <div class="absolute inset-0 border-[5px] border-dashed border-tertiary/40 rounded-full ring-outer"></div>
+        <div class="absolute inset-8 border-[3px] border-primary/30 rounded-full ring-mid"></div>
+        <div class="absolute inset-16 border-2 border-secondary/20 rounded-full ring-inner"></div>
+
+        <!-- Floating glyphs -->
+        <div class="absolute top-6 left-1/2 -translate-x-1/2 font-headline font-black text-2xl text-primary/50 glyph-float-1 select-none">天</div>
+        <div class="absolute bottom-8 left-[18%] font-headline font-black text-xl text-secondary/50 glyph-float-2 select-none">地</div>
+        <div class="absolute top-[22%] right-6 font-headline font-black text-xl text-tertiary/60 glyph-float-3 select-none">人</div>
+
+        <!-- Central seal -->
+        <div class="relative z-20 w-40 h-40 md:w-52 md:h-52 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
+          <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle,rgba(253,207,80,0.18) 0%,rgba(174,29,83,0.06) 70%)"></div>
+          <span id="summon-seal-char" class="text-7xl md:text-8xl font-black text-primary drop-shadow-md select-none font-headline" style="line-height:1">書</span>
+          <div class="absolute inset-0 border-4 border-primary rounded-full animate-ping opacity-15"></div>
         </div>
-        <input type="hidden" id="modelSelect" value="gemini-2.5-flash">
-      </div>
-      <div class="flex gap-3">
-        <button onclick="createQuest()" class="bubbly-btn flex-1 bg-primary text-on-primary font-headline font-extrabold py-3 rounded-full border-b-[4px] border-primary-dim flex items-center justify-center gap-2">
-          <span class="material-symbols-outlined text-sm">swords</span> Summon
-        </button>
-        <button onclick="closeCreateModal()" class="px-5 py-3 border-2 border-outline-variant rounded-full font-bold text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">Cancel</button>
+
+        <!-- Orbs -->
+        <div class="absolute top-2 left-4 w-5 h-5 bg-primary-fixed rounded-full blur-sm opacity-60 orb-1"></div>
+        <div class="absolute bottom-14 right-2 w-7 h-7 bg-tertiary-fixed rounded-full blur-md opacity-40 orb-2"></div>
       </div>
     </div>
-    <!-- Generating state -->
-    <div class="hidden p-8 text-center space-y-3" id="generating-state">
-      <div class="gen-spinner"></div>
-      <p id="gen-status-text" class="font-headline font-bold text-primary">Binding the demon to the scroll...</p>
-      <p id="gen-step" class="text-xs text-on-surface-variant uppercase tracking-widest"></p>
+
+    <!-- RIGHT: Interaction Form -->
+    <div class="order-1 lg:order-2 space-y-6" id="summon-form-side">
+      <header class="space-y-1">
+        <h2 class="text-4xl md:text-5xl font-extrabold font-headline text-on-background tracking-tight leading-tight">
+          Initiate <span class="text-primary italic">Summoning</span>
+        </h2>
+        <p class="text-base text-on-surface-variant font-medium">Manifest your quest into the digital scrolls.</p>
+      </header>
+
+      <div class="bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-6 space-y-6 border border-white/50 shadow-xl">
+
+        <!-- Topic input -->
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Quest Topic</label>
+          <div class="relative group">
+            <input id="summon-topic-input" type="text" placeholder="e.g. Ancient Rome, Machine Learning..."
+                   class="w-full bg-white border-b-[3px] border-outline-variant px-5 py-4 text-lg font-bold font-headline rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50"/>
+            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary opacity-0 group-focus-within:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined">auto_fix_high</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objective input -->
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Learning Objective <span class="text-outline normal-case font-normal">(optional)</span></label>
+          <textarea id="summon-objective-input" rows="2" placeholder="What should you understand after this quest?"
+                    class="w-full bg-white border-b-[3px] border-outline-variant px-5 py-3 text-sm font-body rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50 resize-none"></textarea>
+        </div>
+
+        <!-- Catalyst (model) selection -->
+        <div class="space-y-2">
+          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Choose Catalyst</label>
+          <div class="grid grid-cols-2 gap-3" id="summon-catalyst-group">
+            <button type="button" data-value="gemini-2.0-flash" onclick="selectCatalyst(this)"
+                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-primary/40 transition-all group">
+              <div class="w-10 h-10 bg-surface-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-outline">bolt</span>
+              </div>
+              <div class="text-center">
+                <p class="font-bold text-on-background text-xs">Swift Scroll</p>
+                <p class="text-[9px] uppercase tracking-tighter text-outline font-black">2.0 Flash</p>
+              </div>
+            </button>
+            <button type="button" data-value="gemini-2.5-flash" onclick="selectCatalyst(this)"
+                    class="catalyst-btn active relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-primary bg-primary/10 transition-all group">
+              <div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-on-primary-container">bolt</span>
+              </div>
+              <div class="text-center">
+                <p class="font-bold text-on-background text-xs">Scroll of Swiftness</p>
+                <p class="text-[9px] uppercase tracking-tighter text-primary font-black">2.5 Flash ✓</p>
+              </div>
+              <div class="absolute top-2 right-2">
+                <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">check_circle</span>
+              </div>
+            </button>
+            <button type="button" data-value="gemini-2.5-pro" onclick="selectCatalyst(this)"
+                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-tertiary/60 transition-all group">
+              <div class="w-10 h-10 bg-tertiary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-on-tertiary-container">menu_book</span>
+              </div>
+              <div class="text-center">
+                <p class="font-bold text-on-background text-xs">Scroll of Wisdom</p>
+                <p class="text-[9px] uppercase tracking-tighter text-tertiary font-black">2.5 Pro</p>
+              </div>
+            </button>
+            <button type="button" data-value="gemini-3-flash-preview" onclick="selectCatalyst(this)"
+                    class="catalyst-btn relative flex flex-col items-center gap-2 p-4 rounded-xl border-[3px] border-outline-variant/40 bg-surface-container-low hover:border-secondary/40 transition-all group">
+              <div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-on-secondary-container">auto_awesome</span>
+              </div>
+              <div class="text-center">
+                <p class="font-bold text-on-background text-xs">Ancient Scroll</p>
+                <p class="text-[9px] uppercase tracking-tighter text-secondary font-black">3 Flash</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chapter count -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Chapters</label>
+            <span id="summon-chapter-display" class="font-headline font-extrabold text-primary text-sm">5 Chapters</span>
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="text-xs text-on-surface-variant font-bold">3</span>
+            <div class="flex-1 flex gap-1.5 items-center justify-center">
+              <button onclick="setSummonChapters(3)" class="chap-pip w-6 h-6 rounded-full border-2 border-outline-variant bg-surface-container text-[9px] font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all">3</button>
+              <button onclick="setSummonChapters(5)" class="chap-pip active-pip w-6 h-6 rounded-full border-2 border-primary bg-primary text-on-primary text-[9px] font-black flex items-center justify-center">5</button>
+              <button onclick="setSummonChapters(7)" class="chap-pip w-6 h-6 rounded-full border-2 border-outline-variant bg-surface-container text-[9px] font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all">7</button>
+            </div>
+            <span class="text-xs text-on-surface-variant font-bold">7</span>
+          </div>
+        </div>
+
+        <!-- Summon button -->
+        <button onclick="doSummonQuest()" id="summon-action-btn"
+                class="bubbly-btn w-full py-5 bg-primary text-on-primary rounded-full font-headline text-xl font-black tracking-widest border-b-[5px] border-primary-dim hover:translate-y-0.5 active:translate-y-1.5 active:border-b-0 transition-all shadow-lg flex items-center justify-center gap-3 group">
+          SUMMON
+          <span class="material-symbols-outlined group-hover:rotate-45 transition-transform text-2xl">send</span>
+        </button>
+      </div>
+
+      <!-- Subtle hints -->
+      <div class="flex justify-center items-center gap-4 text-on-surface-variant/60 font-semibold text-xs tracking-widest uppercase">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary"></span> 42 Mana Required</span>
+        <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary"></span> 98% Success Rate</span>
+      </div>
+    </div>
+
+    <!-- Summoning in progress overlay (shown over the form side) -->
+    <div id="summoning-progress" class="order-1 lg:order-2 hidden flex-col items-center justify-center gap-6 text-center py-8">
+      <div class="relative w-28 h-28 flex items-center justify-center">
+        <div class="absolute inset-0 bg-primary/20 rounded-full ritual-ping"></div>
+        <div class="w-24 h-24 bg-surface-container-lowest rounded-full border-4 border-primary flex items-center justify-center shadow-xl">
+          <span class="text-4xl font-black text-primary font-headline" style="line-height:1">書</span>
+        </div>
+      </div>
+      <div>
+        <p id="summon-gen-status" class="font-headline font-extrabold text-primary text-xl">Communing with the scrolls...</p>
+        <p id="summon-gen-step" class="text-sm text-on-surface-variant mt-1 uppercase tracking-widest font-bold"></p>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════
+     MODALS
+═══════════════════════════════════════ -->
+<div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-on-background/40 backdrop-blur-sm hidden"></div>
 
 <!-- Chapter Modal -->
 <div class="modal-overlay z-[200]" id="chapter-modal">
@@ -723,14 +828,12 @@
         </div>
       </div>
     </div>
-
     <div id="quiz-container" class="flex-1 overflow-y-auto p-5 space-y-4 bg-surface">
       <p id="quiz-progress" class="text-[10px] font-black uppercase tracking-widest text-outline text-center">QUESTION 1 / 5</p>
       <p id="quiz-question" class="font-headline font-extrabold text-on-surface text-base text-center leading-snug min-h-[48px]">Loading...</p>
       <div id="quiz-options" class="grid grid-cols-1 gap-2"></div>
       <p id="quiz-feedback" class="text-xs text-on-surface-variant italic text-center min-h-[1.2rem]"></p>
     </div>
-
     <div id="finishing-blow" class="hidden flex-col items-center gap-4 p-6 bg-surface text-center">
       <div id="finishing-text" class="font-headline font-black text-3xl text-primary finish-pulse">⚡ FINAL STRIKE ⚡</div>
       <p id="victory-lore" class="text-sm text-on-surface-variant italic leading-relaxed"></p>
@@ -754,16 +857,10 @@
       <div class="flex justify-center gap-4 text-sm font-bold">
         <span class="text-error">Fail perfectly → <span class="text-on-surface font-extrabold">LOSE XP</span></span>
       </div>
-
       <p id="gambit-wager-display" class="font-headline font-extrabold text-primary text-lg">No Wager</p>
-      <input type="range" id="gambit-slider" min="0" max="100" value="0"
-             class="w-full accent-primary" oninput="updateGambitWager(this.value)"/>
-
-      <div id="gambit-coin" onclick="spinGambitCoin()"
-           class="w-20 h-20 mx-auto bg-tertiary-container border-4 border-tertiary rounded-full flex items-center justify-center font-headline font-black text-3xl text-tertiary cursor-pointer hover:scale-110 transition-transform shadow-[0_4px_0_#644c00]">賭</div>
-
+      <input type="range" id="gambit-slider" min="0" max="100" value="0" class="w-full accent-primary" oninput="updateGambitWager(this.value)"/>
+      <div id="gambit-coin" onclick="spinGambitCoin()" class="w-20 h-20 mx-auto bg-tertiary-container border-4 border-tertiary rounded-full flex items-center justify-center font-headline font-black text-3xl text-tertiary cursor-pointer hover:scale-110 transition-transform shadow-[0_4px_0_#644c00]">賭</div>
       <p id="gambit-result" class="text-sm text-on-surface-variant italic min-h-[1.2rem]"></p>
-
       <div class="flex gap-3">
         <button onclick="proceedAfterGambit()" class="bubbly-btn flex-1 bg-primary text-on-primary font-headline font-bold py-3 rounded-full border-b-[4px] border-primary-dim">Proceed to Battle</button>
         <button onclick="closeGambitModal()" class="px-4 py-3 border-2 border-outline-variant rounded-full font-bold text-on-surface-variant text-sm hover:border-primary hover:text-primary transition-colors">Retreat</button>
@@ -793,8 +890,7 @@
         <p id="fate-reveal-text" class="font-headline font-black text-2xl text-primary">⚡ +50 XP</p>
         <p id="fate-bonus-text" class="text-sm text-on-surface-variant italic"></p>
       </div>
-      <button id="fate-close-btn" style="display:none" onclick="closeFateModal()"
-              class="bubbly-btn w-full bg-tertiary text-on-tertiary font-headline font-bold py-3 rounded-full border-b-[4px] border-tertiary-dim">Receive Blessing</button>
+      <button id="fate-close-btn" style="display:none" onclick="closeFateModal()" class="bubbly-btn w-full bg-tertiary text-on-tertiary font-headline font-bold py-3 rounded-full border-b-[4px] border-tertiary-dim">Receive Blessing</button>
     </div>
   </div>
 </div>
@@ -823,20 +919,18 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════
      JAVASCRIPT
-══════════════════════════════════════════════════ -->
+═══════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-// ADD THIS LINE:
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
-  
+
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
   authDomain: "ai-study-party.firebaseapp.com",
@@ -847,16 +941,11 @@ const firebaseConfig = {
   measurementId: "G-SFDQ0QELTE"
 };
 
-// 1. Initialize the App (Only ONCE!)
 const app = initializeApp(firebaseConfig);
-
-// 2. Initialize App Check
 const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider('6LdjNqEsAAAAAEI2m37oYKa3iluG5Mbx_Ge3VImh'),
   isTokenAutoRefreshEnabled: true
 });
-
-// 3. Initialize other services
 const db = getFirestore(app);
 const auth = getAuth(app);
 const functions = getFunctions(app);
@@ -864,6 +953,7 @@ const functions = getFunctions(app);
 let USER_ID = null;
 let STATE = {
   selectedModel: 'gemini-2.5-flash',
+  summonChapters: 5,
   saves: [], activeSaveId: null,
   publicQuests: [], quests: [], player: null,
   activeQuestIdx: null, activeChapterIdx: null,
@@ -876,7 +966,7 @@ function defaultPlayer(name, path='warrior') {
     questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[] };
 }
 
-// ─── RANKS ─────────────────────────────────────────
+// ── RANKS ──────────────────────────────────────────
 const WARRIOR_RANKS = [
   {name:'凡人',en:'Mortal',xp:0},{name:'武者',en:'Warrior',xp:100},
   {name:'刀客',en:'Blade Wanderer',xp:250},{name:'猛将',en:'Fierce General',xp:500},
@@ -894,83 +984,451 @@ function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.fo
 function getCurrentRankIdx(){ const r=getRanks(); let i=0; if(STATE.player) r.forEach((x,j)=>{ if(STATE.player.totalXp>=x.xp) i=j; }); return i; }
 function getNextRank(){ const r=getRanks(),i=r.indexOf(getCurrentRank()); return i<r.length-1?r[i+1]:null; }
 
-// ─── QUOTES ────────────────────────────────────────
-const WARRIOR_QUOTES = ["I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.","They said I couldn't. Watch me.","DRAW YOUR SWORD!","The strongest earn the right to know."];
-const SCHOLAR_QUOTES = ["Fascinating. Completely predictable.","Knowledge is the sharpest blade.","Three steps ahead. Always.","Your demon is already defeated.","The wise man bends the wind."];
-function getRandomQuote(){ return (STATE.player?.path==='scholar'?SCHOLAR_QUOTES:WARRIOR_QUOTES)[Math.floor(Math.random()*6)]; }
+// ── QUOTES ─────────────────────────────────────────
+const WARRIOR_QUOTES = ["I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.","They said I couldn't. Watch me.","DRAW YOUR SWORD!","The strongest earn the right to know.","Show me your next challenge!","Knowledge sharpens the blade."];
+const SCHOLAR_QUOTES = ["Fascinating. Completely predictable.","Knowledge is the sharpest blade.","Three steps ahead. Always.","Your demon is already defeated.","The wise man bends the wind.","I have a suggestion for you...","The scrolls never stop whispering.","What shall we study next?"];
+function getRandomQuote(){ const q=STATE.player?.path==='scholar'?SCHOLAR_QUOTES:WARRIOR_QUOTES; return q[Math.floor(Math.random()*q.length)]; }
 
 let personalityInterval = null;
 function startPersonalityQuotes(){
   if(personalityInterval) clearInterval(personalityInterval);
   const b=document.getElementById('personality-bubble'); if(!b) return;
-  const u=()=>{ if(b) b.textContent=getRandomQuote(); }; u();
-  personalityInterval=setInterval(u,5000);
+  const u=()=>{
+    if(b){
+      b.textContent=getRandomQuote();
+      b.classList.remove('bubble-pop'); void b.offsetWidth; b.classList.add('bubble-pop');
+    }
+  };
+  u(); personalityInterval=setInterval(u,5000);
 }
 
-// ─── SIGILS ────────────────────────────────────────
-const SIGILS=['龙','凤','虎','玄','雷','火','水','木','金','土','道','德'];
-const SIGIL_DATA={
-  '龙':{name:'Dragon Sigil',element:'★ HEAVENLY TIER',effect:'Perfect battle victories grant +20 bonus XP.',bonus:'+20 XP ON PERFECT RUNS'},
-  '凤':{name:'Phoenix Sigil',element:'★ REBIRTH TIER',effect:'After a wrong answer, the next correct answer deals double damage.',bonus:'DOUBLE DAMAGE AFTER MISS'},
-  '虎':{name:'Tiger Sigil',element:'★ FEROCITY TIER',effect:'Each boss defeated this session increases XP gain by 10% (max 3x).',bonus:'+10% XP PER WIN'},
-  '玄':{name:'Mystic Sigil',element:'★ ARCANE TIER',effect:'Chapter content is richer and more detailed.',bonus:'RICHER CHAPTERS'},
-  '雷':{name:'Thunder Sigil',element:'◆ SWIFT TIER',effect:'Every chapter completed earns +5 bonus XP.',bonus:'+5 XP PER CHAPTER'},
-  '火':{name:'Flame Sigil',element:'◆ PASSION TIER',effect:'Completing 3+ chapters in a row may grant a bonus Fate Scroll.',bonus:'STREAK → BONUS SCROLL'},
-  '水':{name:'Water Sigil',element:'◆ FLOW TIER',effect:'Any topic studied earns +10% XP.',bonus:'+10% XP ANY TOPIC'},
-  '木':{name:'Wood Sigil',element:'◆ GROWTH TIER',effect:'New quests automatically gain 1 extra chapter.',bonus:'+1 BONUS CHAPTER'},
-  '金':{name:'Gold Sigil',element:'◆ REFINED TIER',effect:'Boss defeat XP increased by 25 per previous victory.',bonus:'+25 XP PER PAST WIN'},
-  '土':{name:'Earth Sigil',element:'◆ FOUNDATION TIER',effect:'XP can never drop below half its current value.',bonus:'XP FLOOR PROTECTION'},
-  '道':{name:'Dao Sigil',element:'✦ ENLIGHTENMENT',effect:'Gambit coin flips have a hidden 60% win rate.',bonus:'GAMBIT FAVOR +60%'},
-  '德':{name:'Virtue Sigil',element:'✦ DIVINE TIER',effect:'Earn 5 XP when another scholar copies your quests.',bonus:'+5 XP WHEN COPIED'},
+// ── TOPIC SUGGESTIONS ──────────────────────────────
+const TOPIC_EXPANSIONS = {
+  'history':      ['Ancient Greece','The Ming Dynasty','World War II','The Roman Empire','Medieval Japan'],
+  'science':      ['Quantum Physics','Black Holes','DNA & Genetics','The Big Bang','Cell Biology'],
+  'math':         ['Linear Algebra','Number Theory','Calculus','Graph Theory','Statistics'],
+  'programming':  ['Data Structures','System Design','Machine Learning','Web Security','Algorithms'],
+  'language':     ['Linguistics','Etymology','Mandarin Writing','Ancient Scripts','Phonetics'],
+  'philosophy':   ['Stoicism','Buddhism','Ethics','Existentialism','Ancient Logic'],
+  'art':          ['The Renaissance','Impressionism','Typography','Pixel Art History','Architecture'],
+  'economics':    ['Game Theory','Behavioral Economics','Supply Chains','Cryptocurrency','Central Banking'],
 };
 
-function awardSigil(){
-  const p=STATE.player; if(!p.sigils) p.sigils=[];
-  const av=SIGILS.filter(s=>!p.sigils.includes(s));
-  if(!av.length) return null;
-  const s=av[Math.floor(Math.random()*av.length)]; p.sigils.push(s); return s;
-}
+const RELATED_TOPICS = {
+  'machine learning': ['Neural Networks','Data Preprocessing','Reinforcement Learning','Computer Vision','NLP'],
+  'ancient rome': ['The Byzantine Empire','Julius Caesar','Roman Architecture','Stoic Philosophy','The Republic'],
+  'python': ['Data Science','FastAPI','Asyncio','Testing Patterns','Python Internals'],
+  'world war': ['Cold War','The Treaty of Versailles','Propaganda Techniques','Military Strategy','Post-War Europe'],
+  'biology': ['Ecology','Evolution','Microbiology','Biochemistry','Neuroscience'],
+  'astronomy': ['Black Holes','Exoplanets','The Milky Way','Dark Matter','Space Exploration'],
+};
 
-function renderSigils(){
-  const c=document.getElementById('sigil-slots'); if(!c||!STATE.player) return;
-  c.innerHTML='';
-  const ps=STATE.player.sigils||[];
-  SIGILS.slice(0,8).forEach(s=>{
-    const owned=ps.includes(s);
-    const slot=document.createElement('div');
-    slot.className='sigil-slot relative w-10 h-10 rounded-xl border-2 flex items-center justify-center cursor-default '+(owned?'sigil-slot-filled border-tertiary-fixed shadow-[0_4px_0_#eec143]':'border-dashed border-outline-variant bg-surface-container opacity-50');
-    if(owned){
-      const d=SIGIL_DATA[s]||{};
-      slot.innerHTML=`<span class="font-headline font-black text-on-primary-fixed text-lg">${s}</span>
-        <div class="sigil-tooltip-card">
-          <p class="font-headline font-extrabold text-primary text-sm">${d.name||s}</p>
-          <p class="text-[9px] font-black uppercase tracking-widest text-tertiary mb-1">${d.element||''}</p>
-          <p class="text-xs text-on-surface-variant leading-snug mb-2">${d.effect||''}</p>
-          <div class="bg-primary/10 border-l-2 border-primary px-2 py-1 rounded text-[10px] font-black text-primary uppercase tracking-wide">${d.bonus||''}</div>
-        </div>`;
-    } else {
-      slot.innerHTML=`<span class="material-symbols-outlined text-outline text-base">lock</span>`;
-    }
-    c.appendChild(slot);
+function getTopicSuggestions(){
+  if(!STATE.quests || !STATE.quests.length) return [];
+  const topics = STATE.quests.map(q=>(q.topic||'').toLowerCase().trim()).filter(Boolean);
+  if(!topics.length) return [];
+
+  const suggestions = new Set();
+
+  // Try direct related topic lookup
+  topics.forEach(t=>{
+    Object.keys(RELATED_TOPICS).forEach(key=>{
+      if(t.includes(key)||key.includes(t)){
+        RELATED_TOPICS[key].forEach(s=>suggestions.add(s));
+      }
+    });
   });
+
+  // Try keyword expansion
+  topics.forEach(t=>{
+    Object.keys(TOPIC_EXPANSIONS).forEach(key=>{
+      if(t.includes(key)){
+        TOPIC_EXPANSIONS[key].forEach(s=>suggestions.add(s));
+      }
+    });
+  });
+
+  // Remove topics already studied
+  const studied = new Set(topics.map(t=>t.toLowerCase()));
+  const filtered = [...suggestions].filter(s=>!studied.has(s.toLowerCase()));
+
+  // If still empty, fallback to complement topics
+  if(!filtered.length){
+    const fallback = ['The Silk Road','Calculus','Game Theory','Stoicism','The Human Brain','Quantum Computing','Typography','Ancient Egypt'];
+    return fallback.filter(f=>!studied.has(f.toLowerCase())).slice(0,5);
+  }
+
+  // Shuffle & limit
+  return filtered.sort(()=>Math.random()-0.5).slice(0,6);
 }
 
-// ─── FIREBASE STATE ─────────────────────────────────
+function renderTopicSuggestions(){
+  const container = document.getElementById('topic-chip-container');
+  if(!container) return;
+  const suggestions = getTopicSuggestions();
+  if(!suggestions.length){
+    container.innerHTML = `<div class="text-xs text-on-surface-variant italic">Complete a quest to unlock suggestions...</div>`;
+    return;
+  }
+  container.innerHTML = suggestions.map(s=>`
+    <button onclick="launchSuggestion('${s.replace(/'/g,"\\'")}') "
+            class="topic-chip bg-surface-container border-2 border-outline-variant rounded-full px-3 py-1.5 text-xs font-bold text-on-surface hover:border-primary hover:bg-primary/5 hover:text-primary flex items-center gap-1.5 shadow-sm">
+      <span class="material-symbols-outlined text-[13px] text-tertiary">auto_fix_high</span>
+      ${s}
+    </button>
+  `).join('');
+}
+
+window.launchSuggestion = function(topic){
+  openSummonScreen();
+  setTimeout(()=>{
+    const inp = document.getElementById('summon-topic-input');
+    if(inp){ inp.value = topic; inp.focus(); }
+  }, 100);
+};
+
+window.refreshTopicSuggestions = function(){
+  renderTopicSuggestions();
+  showToast('Suggestions refreshed!');
+};
+
+// ── CHIBI SPRITE RENDERER ──────────────────────────
+// (Full procedural chibi from original codebase)
+const WARRIOR_PALETTES = [
+  {body:'#5c3a1e',armor:'#7a4a28',trim:'#a06030',hair:'#1a0a04',skin:'#f0b878',eye:'#3a1a0a',blush:'#e87070',weapon:'#888888'},
+  {body:'#2a3820',armor:'#4a6030',trim:'#80a040',hair:'#1a0a04',skin:'#f0b878',eye:'#1a3010',blush:'#e87070',weapon:'#c0c0c0'},
+  {body:'#3a1a10',armor:'#6a2a18',trim:'#c07030',skin:'#f0b878',hair:'#1a0804',eye:'#3a1808',blush:'#e87070',weapon:'#d08030'},
+  {body:'#4a1808',armor:'#8a2810',trim:'#e88030',skin:'#f0b878',hair:'#200804',eye:'#400a08',blush:'#ff8060',weapon:'#e8a040'},
+  {body:'#5a0808',armor:'#a01818',trim:'#ff4020',skin:'#f0b878',hair:'#300404',eye:'#500808',blush:'#ff6040',weapon:'#f8b040'},
+  {body:'#3a0408',armor:'#800010',trim:'#ff2010',skin:'#f0b878',hair:'#400408',eye:'#600408',blush:'#ff5030',weapon:'#ffc030'},
+  {body:'#1a0404',armor:'#500008',trim:'#ffc020',skin:'#f0b878',hair:'#500410',eye:'#700408',blush:'#ff9050',weapon:'#ffe050'},
+  {body:'#100204',armor:'#300006',trim:'#ffe060',skin:'#f8c890',hair:'#600420',eye:'#800410',blush:'#ffb070',weapon:'#fff090'},
+];
+const SCHOLAR_PALETTES = [
+  {body:'#1a2a3a',armor:'#2a4a5a',trim:'#4a8a7a',hair:'#1a0a04',skin:'#f0b878',eye:'#102030',blush:'#c07090',fan:'#8aaa7a'},
+  {body:'#102038',armor:'#203060',trim:'#2a7a6a',hair:'#1a0a04',skin:'#f0b878',eye:'#082028',blush:'#c07090',fan:'#aaca8a'},
+  {body:'#082030',armor:'#183858',trim:'#189060',skin:'#f0b878',hair:'#180a04',eye:'#062028',blush:'#b06080',fan:'#c8daa8'},
+  {body:'#041828',armor:'#103050',trim:'#10a870',skin:'#f0b878',hair:'#160804',eye:'#041820',blush:'#b06080',fan:'#d8e8c0'},
+  {body:'#020c18',armor:'#082040',trim:'#08c880',skin:'#f0b878',hair:'#200804',eye:'#020c18',blush:'#a05070',fan:'#e8f0d0'},
+  {body:'#010818',armor:'#041830',trim:'#06e098',skin:'#f0b878',hair:'#300808',eye:'#010808',blush:'#a05070',fan:'#f0f8e0'},
+  {body:'#010410',armor:'#031020',trim:'#20f0b0',skin:'#f0b878',hair:'#400c18',eye:'#010408',blush:'#9040a0',fan:'#f8fff0'},
+  {body:'#010208',armor:'#020810',trim:'#40f8c8',skin:'#f8c890',hair:'#500820',eye:'#010208',blush:'#c060c0',fan:'#ffffff'},
+];
+
+function drawChibiWarrior(ctx, ri, t){
+  const p=WARRIOR_PALETTES[Math.min(ri,7)];
+  const blink=t&&Math.sin(t*3.7)>0.92;
+  const arm_swing=t?Math.sin(t*1.8)*5:0;
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.beginPath(); ctx.ellipse(0,82,22,5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.body;
+  ctx.beginPath(); ctx.roundRect(-16,56,13,20,[4,4,6,6]); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(3,56,13,20,[4,4,6,6]); ctx.fill();
+  ctx.fillStyle='#1a0a04';
+  ctx.beginPath(); ctx.ellipse(-10,77,10,6,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,77,10,6,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.armor;
+  ctx.beginPath(); ctx.roundRect(-18,30,36,30,[5,5,8,8]); ctx.fill();
+  ctx.fillStyle=p.trim;
+  ctx.fillRect(-18,30,36,3);
+  ctx.fillRect(-16,34,6,20); ctx.fillRect(10,34,6,20);
+  ctx.beginPath(); ctx.arc(0,43,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.body; ctx.beginPath(); ctx.arc(0,43,3,0,Math.PI*2); ctx.fill();
+  ctx.save(); ctx.translate(-22,36); ctx.rotate((-arm_swing*Math.PI)/180);
+  ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-7,0,12,22,[4]); ctx.fill();
+  ctx.fillStyle=p.trim; ctx.beginPath(); ctx.ellipse(-2,22,7,5,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.save(); ctx.translate(22,36); ctx.rotate((arm_swing*Math.PI)/180);
+  ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-5,0,12,22,[4]); ctx.fill();
+  ctx.fillStyle=p.trim; ctx.beginPath(); ctx.ellipse(3,22,7,5,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=p.weapon; ctx.lineWidth=3; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(3,22); ctx.lineTo(8,55); ctx.stroke();
+  ctx.fillStyle=p.weapon; ctx.beginPath(); ctx.moveTo(5,52); ctx.lineTo(11,58); ctx.lineTo(4,60); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle=p.trim; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-1,25); ctx.lineTo(7,21); ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,-5,28,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.blush; ctx.globalAlpha=0.35;
+  ctx.beginPath(); ctx.ellipse(-15,2,9,6,-0.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(15,2,9,6,0.2,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.fillStyle=p.hair;
+  ctx.beginPath(); ctx.arc(0,-5,29,Math.PI*0.7,Math.PI*2.3); ctx.lineTo(0,-5); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-16,-28,10,8,-0.3,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-4,-33,8,7,-0.1,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(8,-33,9,7,0.1,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(19,-28,9,8,0.3,0,Math.PI*2); ctx.fill();
+  if(ri>=2){ ctx.fillStyle=p.trim; ctx.fillRect(-20,-15,40,4); }
+  if(ri>=4){
+    ctx.fillStyle=p.trim;
+    ctx.beginPath(); ctx.moveTo(-10,-34); ctx.lineTo(-6,-48); ctx.lineTo(-2,-34); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(2,-34); ctx.lineTo(6,-48); ctx.lineTo(10,-34); ctx.closePath(); ctx.fill();
+  }
+  if(ri>=6){ ctx.strokeStyle='#ffd040'; ctx.lineWidth=2; ctx.globalAlpha=0.7; ctx.beginPath(); ctx.arc(0,-36,18,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1; }
+  if(ri>=7){
+    ctx.fillStyle='#ffe060';
+    ctx.beginPath(); ctx.moveTo(-14,-34); ctx.lineTo(-14,-44); ctx.lineTo(-7,-38); ctx.lineTo(0,-46); ctx.lineTo(7,-38); ctx.lineTo(14,-44); ctx.lineTo(14,-34); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#ff4040'; ctx.beginPath(); ctx.arc(0,-44,3,0,Math.PI*2); ctx.fill();
+  }
+  const eyeY=blink?-2:-6; const eyeH=blink?1:9;
+  ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.ellipse(-10,-6,8,9,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,-6,8,9,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.eye;
+  ctx.beginPath(); ctx.ellipse(-10,eyeY,5,eyeH,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,eyeY,5,eyeH,0,0,Math.PI*2); ctx.fill();
+  if(!blink){
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(-12,-9,2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(8,-9,2,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-8,-3,1,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(12,-3,1,0,Math.PI*2); ctx.fill();
+  }
+  ctx.strokeStyle='#1a0a04'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(-18,-10); ctx.lineTo(-14,-15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-10,-15); ctx.lineTo(-10,-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-2,-10); ctx.lineTo(-4,-15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(2,-10); ctx.lineTo(4,-15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(10,-15); ctx.lineTo(10,-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(18,-10); ctx.lineTo(14,-15); ctx.stroke();
+  ctx.strokeStyle=p.hair; ctx.lineWidth=2; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-18,-18); ctx.quadraticCurveTo(-10,-22,-2,-18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(2,-18); ctx.quadraticCurveTo(10,-22,18,-18); ctx.stroke();
+  ctx.strokeStyle='#c07050'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(0,6,5,0.2,Math.PI-0.2); ctx.stroke();
+  ctx.fillStyle='#c09060'; ctx.beginPath(); ctx.arc(0,2,1.5,0,Math.PI*2); ctx.fill();
+}
+
+function drawChibiScholar(ctx, ri, t){
+  const p=SCHOLAR_PALETTES[Math.min(ri,7)];
+  const blink=t&&Math.sin(t*3.3+1)>0.93;
+  const arm_swing=t?Math.sin(t*1.8)*4:0;
+  const fan_rot=t?Math.sin(t*1.4)*0.2:0;
+  ctx.fillStyle='rgba(0,0,0,0.12)';
+  ctx.beginPath(); ctx.ellipse(0,82,20,4,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.body;
+  ctx.beginPath(); ctx.moveTo(-22,28); ctx.lineTo(-28,80); ctx.lineTo(28,80); ctx.lineTo(22,28); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-16,28,32,30,[4,4,0,0]); ctx.fill();
+  ctx.fillStyle=p.trim; ctx.fillRect(-16,28,32,3);
+  ctx.fillStyle=p.body; ctx.fillRect(-2,36,4,24);
+  ctx.fillStyle=p.body;
+  ctx.beginPath(); ctx.moveTo(-16,32); ctx.lineTo(-36,50); ctx.lineTo(-30,56); ctx.lineTo(-12,42); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=p.trim; ctx.beginPath(); ctx.moveTo(-36,50); ctx.lineTo(-30,56); ctx.lineTo(-28,52); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=p.body;
+  ctx.save(); ctx.translate(22,38); ctx.rotate((arm_swing*Math.PI)/180);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(16,14); ctx.lineTo(12,20); ctx.lineTo(-4,8); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=p.trim; ctx.beginPath(); ctx.moveTo(16,14); ctx.lineTo(12,20); ctx.lineTo(10,16); ctx.closePath(); ctx.fill();
+  ctx.save(); ctx.translate(14,18); ctx.rotate(fan_rot);
+  ctx.strokeStyle=p.fan; ctx.lineWidth=1.2;
+  for(let i=-3;i<=3;i++){ ctx.save(); ctx.rotate(i*0.22); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-22); ctx.stroke(); ctx.restore(); }
+  ctx.fillStyle=p.fan; ctx.globalAlpha=0.75;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,22,-Math.PI/2-0.66,-Math.PI/2+0.66); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.restore(); ctx.restore();
+  ctx.fillStyle='#1a0a04';
+  ctx.beginPath(); ctx.ellipse(-8,78,8,5,-0.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(8,78,8,5,0.2,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.skin; ctx.beginPath(); ctx.arc(0,-5,27,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.blush; ctx.globalAlpha=0.3;
+  ctx.beginPath(); ctx.ellipse(-14,2,8,5,-0.2,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(14,2,8,5,0.2,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.fillStyle=p.hair;
+  ctx.beginPath(); ctx.moveTo(-20,-20); ctx.lineTo(-26,40); ctx.lineTo(-16,40); ctx.lineTo(-10,-25); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(20,-20); ctx.lineTo(26,40); ctx.lineTo(16,40); ctx.lineTo(10,-25); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.arc(0,-5,28,Math.PI*0.65,Math.PI*2.35); ctx.lineTo(0,-5); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-12,-28,9,7,-0.4,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0,-32,8,7,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(12,-28,9,7,0.4,0,Math.PI*2); ctx.fill();
+  if(ri>=1){ ctx.fillStyle=p.trim; ctx.fillRect(-2,-38,4,18); ctx.beginPath(); ctx.ellipse(0,-40,5,4,0,0,Math.PI*2); ctx.fill(); }
+  if(ri>=3){ ctx.fillStyle=p.armor; ctx.beginPath(); ctx.roundRect(-18,-32,36,8,[3]); ctx.fill(); ctx.fillStyle=p.trim; ctx.fillRect(-18,-32,36,2); ctx.beginPath(); ctx.roundRect(-26,-32,9,14,[2]); ctx.fill(); ctx.beginPath(); ctx.roundRect(17,-32,9,14,[2]); ctx.fill(); }
+  if(ri>=6){ ctx.strokeStyle=p.trim; ctx.lineWidth=1.5; ctx.globalAlpha=0.5; ctx.beginPath(); ctx.moveTo(-28,-10); ctx.quadraticCurveTo(-38,-25,-30,-38); ctx.stroke(); ctx.beginPath(); ctx.moveTo(28,-10); ctx.quadraticCurveTo(38,-25,30,-38); ctx.stroke(); ctx.globalAlpha=1; }
+  if(ri>=7){ ctx.fillStyle='#40f8c8'; ctx.globalAlpha=0.9; ctx.beginPath(); ctx.arc(0,-46,7,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
+  const eyeH2=blink?1:8;
+  ctx.fillStyle='#fff';
+  ctx.beginPath(); ctx.ellipse(-10,-6,7,8,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,-6,7,8,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.eye||'#1a3050';
+  ctx.beginPath(); ctx.ellipse(-10,blink?-2:-5,4.5,eyeH2,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10,blink?-2:-5,4.5,eyeH2,0,0,Math.PI*2); ctx.fill();
+  if(!blink){
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(-11,-8,1.8,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(9,-8,1.8,0,Math.PI*2); ctx.fill();
+  }
+  ctx.strokeStyle='#1a0a04'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(-17,-10); ctx.lineTo(-14,-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-10,-14); ctx.lineTo(-9,-18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-3,-10); ctx.lineTo(-5,-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(3,-10); ctx.lineTo(5,-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(10,-14); ctx.lineTo(9,-18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(17,-10); ctx.lineTo(14,-14); ctx.stroke();
+  ctx.strokeStyle=p.hair; ctx.lineWidth=1.5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-16,-20); ctx.quadraticCurveTo(-10,-23,-3,-20); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(3,-20); ctx.quadraticCurveTo(10,-23,16,-20); ctx.stroke();
+  ctx.strokeStyle='#c07060'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(0,5,4,0.3,Math.PI-0.3); ctx.stroke();
+  ctx.fillStyle='#c09060'; ctx.beginPath(); ctx.arc(0,1,1.2,0,Math.PI*2); ctx.fill();
+}
+
+// ── ANIMATED CHAR CANVAS ───────────────────────────
+let charRAF = null;
+function startCharCanvas(){
+  if(charRAF) cancelAnimationFrame(charRAF);
+  const canvas = document.getElementById('char-canvas');
+  if(!canvas || !STATE.player) return;
+  const ctx = canvas.getContext('2d');
+  const path = STATE.player.path || 'warrior';
+  const ri = getCurrentRankIdx();
+  const W = canvas.width, H = canvas.height;
+  const scale = W / 100;
+  const cx = W / 2;
+
+  function frame(){
+    const t = Date.now() * 0.001;
+    ctx.clearRect(0,0,W,H);
+    const bob = Math.sin(t*1.8)*1.5;
+    ctx.save();
+    ctx.translate(cx, H*0.1 + bob);
+    ctx.scale(scale, scale);
+    if(path==='scholar') drawChibiScholar(ctx, ri, t);
+    else drawChibiWarrior(ctx, ri, t);
+    ctx.restore();
+    charRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ── BOSS SPRITE ────────────────────────────────────
+function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
+  const ctx=canvasEl.getContext('2d');
+  const w=canvasEl.width, h=canvasEl.height;
+  ctx.clearRect(0,0,w,h);
+  let seed=0;
+  for(let i=0;i<(bossData.bossName||'Boss').length;i++) seed+=((bossData.bossName||'Boss').charCodeAt(i)*(i+1));
+  function sr(min,max){ const x=Math.sin(seed++)*10000; return min+(x-Math.floor(x))*(max-min); }
+  const hue1=sr(0,360), hue2=(hue1+sr(120,180))%360;
+  const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(20,35)}%)`;
+  const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
+  const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
+  const cx=w/2, cy=h*0.52, sc=w/170;
+  const t=Date.now()*0.001;
+  const hover=Math.sin(t*0.9)*3;
+  ctx.save(); ctx.translate(cx,cy+hover); ctx.scale(sc,sc);
+  ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
+  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
+  const bs=Math.floor(sr(0,4));
+  ctx.fillStyle=bodyColor;
+  if(bs===0){ctx.beginPath();ctx.roundRect(-30,5,60,48,[10]);ctx.fill();}
+  else if(bs===1){ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(34,5);ctx.lineTo(28,52);ctx.lineTo(-28,52);ctx.lineTo(-34,5);ctx.closePath();ctx.fill();}
+  else if(bs===2){ctx.beginPath();ctx.arc(0,26,32,0,Math.PI*2);ctx.fill();}
+  else{ctx.beginPath();ctx.roundRect(-28,2,56,55,[4,16,4,16]);ctx.fill();}
+  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
+  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 14px serif'; ctx.textAlign='center';
+  ctx.fillText(['邪','魔','鬼','煞','厉','怒'][Math.floor(sr(0,6))],0,30);
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.roundRect(-46,5,18,34,[7]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(28,5,18,34,[7]);ctx.fill();
+  ctx.fillStyle=accentColor;
+  for(const side of[-1,1]){const bx=side*42;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(bx+i*4,40);ctx.lineTo(bx+i*4-2,52);ctx.lineTo(bx+i*4+2,52);ctx.closePath();ctx.fill();}}
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.roundRect(-22,52,18,20,[5]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(4,52,18,20,[5]);ctx.fill();
+  ctx.fillStyle=accentColor;
+  ctx.beginPath();ctx.roundRect(-24,70,22,6,[2]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(2,70,22,6,[2]);ctx.fill();
+  ctx.fillStyle=bodyColor;
+  const hs=Math.floor(sr(0,3));
+  if(hs===0){ctx.beginPath();ctx.arc(0,-26,28,0,Math.PI*2);ctx.fill();}
+  else if(hs===1){ctx.beginPath();ctx.roundRect(-28,-52,56,52,[10]);ctx.fill();}
+  else{ctx.beginPath();ctx.moveTo(-26,-50);ctx.lineTo(26,-50);ctx.lineTo(34,-2);ctx.lineTo(-34,-2);ctx.closePath();ctx.fill();}
+  ctx.fillStyle=accentColor;
+  const ht=Math.floor(sr(0,4));
+  if(ht===0){
+    ctx.beginPath();ctx.moveTo(-18,-52);ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65);ctx.lineTo(-14,-60);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(18,-52);ctx.bezierCurveTo(30,-70,10,-80,6,-65);ctx.lineTo(14,-60);ctx.closePath();ctx.fill();
+  } else if(ht===1){
+    for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*12,-52);ctx.lineTo(i*12-3,-72);ctx.lineTo(i*12+3,-72);ctx.closePath();ctx.fill();}
+  } else if(ht===2){
+    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*22,Math.sin(a)*8-46,6,0,Math.PI*2);ctx.fill();}
+  } else {
+    ctx.strokeStyle=accentColor;ctx.lineWidth=4;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-20,-50);ctx.lineTo(-28,-70);ctx.lineTo(-22,-68);ctx.moveTo(-28,-70);ctx.lineTo(-34,-62);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(20,-50);ctx.lineTo(28,-70);ctx.lineTo(22,-68);ctx.moveTo(28,-70);ctx.lineTo(34,-62);ctx.stroke();
+  }
+  const eg=0.65+Math.sin(t*3+seed)*0.35;
+  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eg;
+  const es=Math.floor(sr(0,3));
+  if(es===0){ctx.beginPath();ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,8,6,0,0,Math.PI*2);ctx.fill();}
+  else if(es===1){ctx.beginPath();ctx.arc(-12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(0,-38,5,0,Math.PI*2);ctx.fill();}
+  else{ctx.beginPath();ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2);ctx.fill();}
+  ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,0.5)';
+  ctx.beginPath();ctx.arc(-11,-27,3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(11,-27,3,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
+  ctx.beginPath();
+  if(hp_ratio<0.3){ctx.arc(0,-12,12,0.3,Math.PI-0.3,true);}
+  else{ctx.arc(0,-8,10,0.2,Math.PI-0.2);}
+  ctx.stroke();
+  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.25;ctx.fillStyle='#ff0000';ctx.beginPath();ctx.arc(0,0,60,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  ctx.restore();
+}
+
+let bossAnimFrames={};
+function animateBossCanvas(el,data,ratio=1.0,key='main'){
+  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
+  function frame(){ drawBossSprite(el,data,ratio); bossAnimFrames[key]=requestAnimationFrame(frame); }
+  frame();
+}
+
+// ── PARTICLES ──────────────────────────────────────
+(function initParticles(){
+  const c=document.getElementById('particle-canvas');
+  const ctx=c.getContext('2d');
+  function resize(){ c.width=window.innerWidth; c.height=window.innerHeight; }
+  window.addEventListener('resize',resize); resize();
+  const glyphs=['道','德','智','書','學'];
+  const particles=Array.from({length:28},()=>({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    vy:-Math.random()*0.28-0.04, vx:(Math.random()-0.5)*0.1,
+    size:Math.random()*1.2+0.4, life:Math.random()*200, maxLife:150+Math.random()*180,
+    type:Math.floor(Math.random()*3),
+    color:['#ae1d53','#006668','#725800','#ff7198','#fdcf50'][Math.floor(Math.random()*5)],
+    glyph:glyphs[Math.floor(Math.random()*5)],
+  }));
+  function tick(){
+    ctx.clearRect(0,0,c.width,c.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.life++;
+      if(p.life>p.maxLife){ p.y=c.height+5; p.x=Math.random()*c.width; p.life=0; }
+      const lr=p.life/p.maxLife;
+      const a=(lr<0.2?lr/0.2:lr>0.8?(1-lr)/0.2:1)*0.18;
+      ctx.globalAlpha=a; ctx.fillStyle=p.color;
+      if(p.type===0){ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}
+      else if(p.type===1){ctx.fillRect(p.x,p.y,p.size,p.size);}
+      else{ctx.globalAlpha=a*0.4;ctx.font=`${9+p.size*3}px serif`;ctx.fillText(p.glyph,p.x,p.y);}
+    });
+    ctx.globalAlpha=1; requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// ── FIREBASE STATE ─────────────────────────────────
 async function loadState(){
   if(!USER_ID) return;
   let loaded=false;
-  try {
+  try{
     const snap=await getDoc(doc(db,"users",USER_ID));
     if(snap.exists()){
       const d=snap.data();
       if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
-      else { const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
+      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
       loaded=true;
     }
-  } catch(e){ showToast("Could not load data."); }
+  }catch(e){ showToast("Could not load data."); }
   try{ await loadPublicQuests(); }catch(e){}
   const btn=document.getElementById('btn-enter');
-  if(loaded && STATE.saves?.length>0){
+  if(loaded&&STATE.saves?.length>0){
     STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.path) s.player.path='warrior'; if(!s.player.sigils) s.player.sigils=[]; });
     syncActiveSaveToState();
     if(btn){ btn.style.display='flex'; }
@@ -983,7 +1441,7 @@ async function loadState(){
 
 window.enterRealm=function(){
   if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); }
-  else { showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
+  else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
 };
 
 function syncActiveSaveToState(){
@@ -1020,7 +1478,7 @@ window.nukeLibrary=async function(){
   STATE.publicQuests=[]; renderLibraryGrid(); closeApiModal(); showToast(`Nuked ${n} scrolls.`);
 };
 
-// ─── AUTH ───────────────────────────────────────────
+// ── AUTH ────────────────────────────────────────────
 window.signInGoogle=async()=>{
   document.getElementById('auth-buttons').classList.add('hidden');
   document.getElementById('loading-text').style.display='block';
@@ -1035,7 +1493,7 @@ window.signInGuest=async()=>{
 };
 window.signOutUser=async()=>{ try{ await signOut(auth); window.location.reload(); }catch(e){ showToast("Failed to sign out."); } };
 
-// ─── TABS ───────────────────────────────────────────
+// ── TABS ────────────────────────────────────────────
 window.switchTab=function(tabId){
   document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el=>{
@@ -1048,7 +1506,7 @@ window.switchTab=function(tabId){
   if(tabId==='tab-library') loadPublicQuests().then(()=>renderLibraryGrid());
 };
 
-// ─── PATH SELECTION ─────────────────────────────────
+// ── PATH SELECTION ──────────────────────────────────
 window.choosePath=async function(path){
   const input=document.getElementById('path-name-input');
   const name=(input?.value.trim())||(path==='warrior'?'Wei Xuan':'Wen Ru');
@@ -1060,123 +1518,99 @@ window.choosePath=async function(path){
 };
 window.cancelPathSelection=function(){ showScreen('screen-hub'); };
 
-// ─── PARTICLE SYSTEM (light, soft) ──────────────────
-(function initParticles(){
-  const c=document.getElementById('particle-canvas');
-  const ctx=c.getContext('2d');
-  function resize(){ c.width=window.innerWidth; c.height=window.innerHeight; }
-  window.addEventListener('resize',resize); resize();
-  const glyphs=['道','德','智','書','學'];
-  const particles=Array.from({length:30},()=>({
-    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
-    vy:-Math.random()*0.3-0.05, vx:(Math.random()-0.5)*0.1,
-    size:Math.random()*1.2+0.4, life:Math.random()*200, maxLife:150+Math.random()*180,
-    type:Math.floor(Math.random()*3),
-    color:['#ae1d53','#006668','#725800','#ff7198','#fdcf50'][Math.floor(Math.random()*5)],
-    glyph:glyphs[Math.floor(Math.random()*5)],
-  }));
-  function tick(){
-    ctx.clearRect(0,0,c.width,c.height);
-    particles.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy; p.life++;
-      if(p.life>p.maxLife){ p.y=c.height+5; p.x=Math.random()*c.width; p.life=0; }
-      const lr=p.life/p.maxLife;
-      const a=(lr<0.2?lr/0.2:lr>0.8?(1-lr)/0.2:1)*0.2;
-      ctx.globalAlpha=a; ctx.fillStyle=p.color;
-      if(p.type===0){ ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); }
-      else if(p.type===1){ ctx.fillRect(p.x,p.y,p.size,p.size); }
-      else { ctx.globalAlpha=a*0.4; ctx.font=`${9+p.size*3}px serif`; ctx.fillText(p.glyph,p.x,p.y); }
-    });
-    ctx.globalAlpha=1; requestAnimationFrame(tick);
+// ── SUMMON SCREEN ───────────────────────────────────
+window.openSummonScreen=function(){
+  const ss=document.getElementById('summon-screen');
+  ss.classList.add('open');
+  document.getElementById('summon-form-side').classList.remove('hidden');
+  document.getElementById('summoning-progress').classList.add('hidden');
+  document.getElementById('summoning-progress').classList.remove('flex');
+  // Clear inputs
+  document.getElementById('summon-topic-input').value='';
+  document.getElementById('summon-objective-input').value='';
+};
+window.closeSummonScreen=function(){
+  document.getElementById('summon-screen').classList.remove('open');
+};
+
+window.selectCatalyst=function(btn){
+  document.querySelectorAll('.catalyst-btn').forEach(b=>{
+    b.classList.remove('active','border-primary','bg-primary/10','border-tertiary','bg-tertiary/10','border-secondary','bg-secondary/10');
+    b.classList.add('border-outline-variant/40','bg-surface-container-low');
+    const p=b.querySelector('p:last-child');
+    if(p){ p.classList.remove('text-primary','text-tertiary','text-secondary'); p.classList.add('text-outline'); }
+    const tick=b.querySelector('.material-symbols-outlined:last-of-type');
+    if(tick&&tick.textContent==='check_circle') tick.remove();
+  });
+  btn.classList.remove('border-outline-variant/40','bg-surface-container-low');
+  btn.classList.add('active','border-primary','bg-primary/10');
+  STATE.selectedModel=btn.dataset.value;
+  // Update label
+  const p2=btn.querySelector('p:last-child');
+  if(p2){ p2.textContent=p2.textContent.replace(' ✓','')+' ✓'; p2.classList.add('text-primary'); }
+};
+
+window.setSummonChapters=function(n){
+  STATE.summonChapters=n;
+  document.getElementById('summon-chapter-display').textContent=`${n} Chapters`;
+  document.querySelectorAll('.chap-pip').forEach(b=>{
+    const v=parseInt(b.textContent);
+    if(v===n){ b.classList.add('active-pip','bg-primary','text-on-primary','border-primary'); b.classList.remove('border-outline-variant','bg-surface-container'); }
+    else{ b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary'); b.classList.add('border-outline-variant','bg-surface-container'); }
+  });
+};
+
+window.doSummonQuest=async function(){
+  const topic=document.getElementById('summon-topic-input').value.trim();
+  if(!topic){ showToast('Please enter a topic.'); return; }
+  const objective=document.getElementById('summon-objective-input').value.trim();
+  const numChapters=STATE.summonChapters||5;
+
+  // Switch to progress view
+  document.getElementById('summon-form-side').classList.add('hidden');
+  document.getElementById('summoning-progress').classList.remove('hidden');
+  document.getElementById('summoning-progress').classList.add('flex');
+  setSummonStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
+
+  try{
+    const summonFn=httpsCallable(functions,'summonQuest');
+    let questDataText;
+    try{ const r=await summonFn({topic,objective,numChapters,modelId:STATE.selectedModel}); questDataText=r.data.result; }
+    catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
+
+    let parsed=parseJSON(questDataText);
+    if(!parsed||typeof parsed!=='object') parsed={};
+    setSummonStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
+    await delay(400);
+
+    const chapters=parsed.chapters||parsed.chapterList||[];
+    if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
+
+    const baseQuest={topic:topic||"Unknown",objective:objective||"",questTitle:parsed.questTitle||parsed.title||`${topic} Mastery`,questNarrative:parsed.questNarrative||"A newly discovered scroll.",bossName:parsed.bossName||"Mo Wang",bossTitle:parsed.bossTitle||"The Unknown",bossLore:parsed.bossLore||"A mysterious entity.",chapters};
+    const userQuest={...baseQuest,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false};
+    if(!STATE.quests) STATE.quests=[];
+    STATE.quests.unshift(userQuest); STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
+    try{ await saveState(); }catch(e){}
+    try{ const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID}; const ref=await addDoc(collection(db,"public_quests"),pubQ); pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ); }catch(e){}
+
+    closeSummonScreen();
+    showToast(`Quest summoned: "${userQuest.questTitle}"`);
+    window.switchTab('tab-quests');
+    renderQuestGrid();
+    renderTopicSuggestions();
+    window.showQuestScreen(0);
+  }catch(e){
+    console.error(e);
+    document.getElementById('summon-form-side').classList.remove('hidden');
+    document.getElementById('summoning-progress').classList.add('hidden');
+    document.getElementById('summoning-progress').classList.remove('flex');
+    showToast('Error: '+(e.message?e.message.substring(0,60):'Unknown'));
   }
-  tick();
-})();
+};
 
-// ─── BOSS SPRITE (pixel procedural, same as original) ──
-function drawBossSprite(canvasEl,bossData,hp_ratio=1.0){
-  const ctx=canvasEl.getContext('2d');
-  const w=canvasEl.width,h=canvasEl.height;
-  ctx.clearRect(0,0,w,h);
-  let seed=0;
-  for(let i=0;i<(bossData.bossName||'Boss').length;i++) seed+=((bossData.bossName||'Boss').charCodeAt(i)*(i+1));
-  function sr(min,max){ const x=Math.sin(seed++)*10000; return min+(x-Math.floor(x))*(max-min); }
-  const hue1=sr(0,360),hue2=(hue1+sr(120,180))%360;
-  const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(20,35)}%)`;
-  const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
-  const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
-  const cx=w/2,cy=h*0.52,sc=w/170;
-  const t=Date.now()*0.001;
-  const hover=Math.sin(t*0.9)*3;
-  ctx.save();
-  ctx.translate(cx,cy+hover); ctx.scale(sc,sc);
-  ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
-  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
-  const bs=Math.floor(sr(0,4));
-  ctx.fillStyle=bodyColor;
-  if(bs===0){ ctx.beginPath(); ctx.roundRect(-30,5,60,48,[10]); ctx.fill(); }
-  else if(bs===1){ ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(34,5); ctx.lineTo(28,52); ctx.lineTo(-28,52); ctx.lineTo(-34,5); ctx.closePath(); ctx.fill(); }
-  else if(bs===2){ ctx.beginPath(); ctx.arc(0,26,32,0,Math.PI*2); ctx.fill(); }
-  else { ctx.beginPath(); ctx.roundRect(-28,2,56,55,[4,16,4,16]); ctx.fill(); }
-  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
-  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 14px serif'; ctx.textAlign='center';
-  ctx.fillText(['邪','魔','鬼','煞','厉','怒'][Math.floor(sr(0,6))],0,30);
-  ctx.fillStyle=bodyColor;
-  ctx.beginPath(); ctx.roundRect(-46,5,18,34,[7]); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(28,5,18,34,[7]); ctx.fill();
-  ctx.fillStyle=accentColor;
-  for(const side of[-1,1]){ const bx=side*42; for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(bx+i*4,40); ctx.lineTo(bx+i*4-2,52); ctx.lineTo(bx+i*4+2,52); ctx.closePath(); ctx.fill(); } }
-  ctx.fillStyle=bodyColor;
-  ctx.beginPath(); ctx.roundRect(-22,52,18,20,[5]); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(4,52,18,20,[5]); ctx.fill();
-  ctx.fillStyle=accentColor;
-  ctx.beginPath(); ctx.roundRect(-24,70,22,6,[2]); ctx.fill();
-  ctx.beginPath(); ctx.roundRect(2,70,22,6,[2]); ctx.fill();
-  ctx.fillStyle=bodyColor;
-  const hs=Math.floor(sr(0,3));
-  if(hs===0){ ctx.beginPath(); ctx.arc(0,-26,28,0,Math.PI*2); ctx.fill(); }
-  else if(hs===1){ ctx.beginPath(); ctx.roundRect(-28,-52,56,52,[10]); ctx.fill(); }
-  else { ctx.beginPath(); ctx.moveTo(-26,-50); ctx.lineTo(26,-50); ctx.lineTo(34,-2); ctx.lineTo(-34,-2); ctx.closePath(); ctx.fill(); }
-  ctx.fillStyle=accentColor;
-  const ht=Math.floor(sr(0,4));
-  if(ht===0){
-    ctx.beginPath(); ctx.moveTo(-18,-52); ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65); ctx.lineTo(-14,-60); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(18,-52); ctx.bezierCurveTo(30,-70,10,-80,6,-65); ctx.lineTo(14,-60); ctx.closePath(); ctx.fill();
-  } else if(ht===1){
-    for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(i*12,-52); ctx.lineTo(i*12-3,-72); ctx.lineTo(i*12+3,-72); ctx.closePath(); ctx.fill(); }
-  } else if(ht===2){
-    for(let i=0;i<6;i++){ const a=(i/6)*Math.PI*2; ctx.beginPath(); ctx.arc(Math.cos(a)*22,Math.sin(a)*8-46,6,0,Math.PI*2); ctx.fill(); }
-  } else {
-    ctx.strokeStyle=accentColor; ctx.lineWidth=4; ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(-20,-50); ctx.lineTo(-28,-70); ctx.lineTo(-22,-68); ctx.moveTo(-28,-70); ctx.lineTo(-34,-62); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(20,-50); ctx.lineTo(28,-70); ctx.lineTo(22,-68); ctx.moveTo(28,-70); ctx.lineTo(34,-62); ctx.stroke();
-  }
-  const eg=0.65+Math.sin(t*3+seed)*0.35;
-  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eg;
-  const es=Math.floor(sr(0,3));
-  if(es===0){ ctx.beginPath(); ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(11,-27,8,6,0,0,Math.PI*2); ctx.fill(); }
-  else if(es===1){ ctx.beginPath(); ctx.arc(-12,-28,6,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(12,-28,6,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(0,-38,5,0,Math.PI*2); ctx.fill(); }
-  else { ctx.beginPath(); ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2); ctx.fill(); }
-  ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,0.5)';
-  ctx.beginPath(); ctx.arc(-11,-27,3,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(11,-27,3,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
-  ctx.beginPath();
-  if(hp_ratio<0.3){ ctx.arc(0,-12,12,0.3,Math.PI-0.3,true); }
-  else { ctx.arc(0,-8,10,0.2,Math.PI-0.2); }
-  ctx.stroke();
-  if((1-hp_ratio)>0){ ctx.globalAlpha=(1-hp_ratio)*0.25; ctx.fillStyle='#ff0000'; ctx.beginPath(); ctx.arc(0,0,60,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
-  ctx.restore();
-}
+function setSummonStatus(t,s=''){ document.getElementById('summon-gen-status').textContent=t; document.getElementById('summon-gen-step').textContent=s; }
 
-let bossAnimFrames={};
-function animateBossCanvas(el,data,ratio=1.0,key='main'){
-  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
-  function frame(){ drawBossSprite(el,data,ratio); bossAnimFrames[key]=requestAnimationFrame(frame); }
-  frame();
-}
-
-// ─── NAV ────────────────────────────────────────────
+// ── NAV ─────────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1201,7 +1635,7 @@ window.showQuestScreen=function(idx){
   const btn=document.getElementById('boss-complete-btn');
   btn.disabled=!allDone;
   if(quest.defeated){
-    btn.textContent='✓ Demon Defeated'; btn.disabled=true;
+    btn.innerHTML='✓ Demon Defeated'; btn.disabled=true;
     btn.classList.remove('bg-primary','border-primary-dim'); btn.classList.add('bg-secondary','border-secondary-dim');
   } else if(allDone){
     btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
@@ -1216,8 +1650,7 @@ function updateBossHpDisplay(quest){
 }
 
 function renderChapterList(quest){
-  const list=document.getElementById('chapter-list');
-  list.innerHTML='';
+  const list=document.getElementById('chapter-list'); list.innerHTML='';
   const chapters=quest.chapters||[];
   const completed=quest.completed||[];
   chapters.forEach((ch,i)=>{
@@ -1240,22 +1673,16 @@ function renderChapterList(quest){
   });
 }
 
-// ─── HUB RENDER ─────────────────────────────────────
+// ── HUB RENDER ──────────────────────────────────────
 function renderHub(){
   if(!STATE.player) return;
   const p=STATE.player;
   const rank=getCurrentRank();
   const nextRank=getNextRank();
   const rankIdx=getCurrentRankIdx();
-  startPersonalityQuotes();
 
-  // Update sprite image based on path
-  const sprite=document.getElementById('char-sprite-img');
-  if(sprite){
-    sprite.src = p.path==='warrior'
-      ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuBvB2F8hVNWy0uwpeVoUnc-6cyQ_dy4WFXME-laXPPqrsuNXUXnC34n7oUGrphcQ2wNNF-3A2OP5_ez9-9mcyzugvjlLUL9Te9jHAZGzPfXcWJD8t-nJmOAo9lgy4UP-cgInBLl1djU-H-6r9qGp3DCaJYvRk7ecpX64yudAgTRM8-mRdcVN3fMxQrOV3UD6uI09s3FoqyL3lMFT5FK_IBsZ3t95fpMSva4XSClexnVGMecsdnn31mNM_X-dJrm95vsqI_WnxjuAjY'
-      : 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8AuTRKMJ_gNbWqr1sAfjSV502ftzESUYywnrvpUPZS0SSoP-0poCSZEEU4w0gSCRouP4eq-EekO7_Fr_dKeJxv9EOySdLfd8KdBUXEXXKx2NSK3Fw3trQgFo45hmcZHQfS-AFTbEafvFpdqHGnGH5zq_bPmA1g4PjQy2r0Cur3azv1LUXqExh98gPCDl07awE8QjK-FveS-4u2rZRkSGgUodVRBbzdcyq0KqGa0sMJ_MSmOeae1SBnQXav_uyhcFZWqBDJ4nJPNA';
-  }
+  startPersonalityQuotes();
+  startCharCanvas();
 
   const nm=document.getElementById('char-name');
   if(nm) nm.textContent=`${p.name||'Hero'} ✎`;
@@ -1264,7 +1691,6 @@ function renderHub(){
   const rk=document.getElementById('char-rank');
   if(rk) rk.textContent=`${rank.name} · ${rank.en}`;
 
-  // XP
   const xpFill=document.getElementById('xp-fill');
   if(xpFill){
     const next=nextRank?nextRank.xp:rank.xp;
@@ -1275,7 +1701,6 @@ function renderHub(){
   const xt=document.getElementById('xp-text');
   if(xt) xt.textContent=`${p.totalXp} / ${nextRank?nextRank.xp:rank.xp} XP`;
 
-  // Activity tag
   const at=document.getElementById('spirit-activity-tag');
   if(at){
     const wA=['⚔ TRAINING','⚔ SPARRING','⚔ DRILLING','⚔ BATTLE FORM','⚔ SWORD FORM','⚔ WAR FORM','☀ ASCENDING','☉ HEAVEN REALM'];
@@ -1283,25 +1708,17 @@ function renderHub(){
     at.textContent=(p.path==='scholar'?sA:wA)[Math.min(rankIdx,7)];
   }
 
-  // Stats
   const sv=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
   sv('stat-quests',p.questsCreated); sv('stat-chapters',p.chaptersCompleted);
   sv('stat-bosses',p.bossesDefeated); sv('stat-perfect',p.perfectRuns);
 
-  renderSigils();
-
-  // Lore
-  const wL=[`The realm trembles. ${p.name} sharpens their blade.`,`Three border skirmishes won. ${p.name} is no ordinary warrior.`,`The Iron Fortress fell. ${p.name}'s war-cry echoes across the realm.`,`Five kingdoms send tribute. They fear the blade of ${p.name}.`,`The Grand Battle of Longmen. ${p.name} stood alone against a thousand.`,`Legends are carved into stone. Every province knows the name ${p.name}.`,`The Dragon Throne is within reach. One final demon stands.`,`The Heavenly Court bows. 齊天大聖 — ${p.name}'s legend shall never fade.`];
-  const sL=[`The realm is a puzzle. ${p.name} has begun to see its patterns.`,`A scholar who defeats demon-generals with thought alone. True.`,`${p.name}'s formation shattered three armies without a blade drawn.`,`Four kingdoms now seek ${p.name}'s counsel.`,`The Strategist of Ten Thousand Scrolls.`,`Kings bow. ${p.name} bows only to knowledge itself.`,`One final mind-demon remains. ${p.name} walks calmly to face it.`,`臥龍 awakens. ${p.name} unified Jiuzhou with wisdom.`];
-  sv('world-lore-text',(p.path==='scholar'?sL:wL)[Math.min(rankIdx,7)]);
-
+  renderTopicSuggestions();
   renderQuestGrid();
   renderLibraryGrid();
 }
 
 function renderQuestGrid(){
-  const grid=document.getElementById('quest-grid');
-  grid.innerHTML='';
+  const grid=document.getElementById('quest-grid'); grid.innerHTML='';
   if(!STATE.quests?.length){
     grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic">No active quests. Summon one to begin your journey.</div>`;
     return;
@@ -1325,7 +1742,7 @@ function renderQuestGrid(){
         </div>
       </div>
       <div class="flex gap-1 mb-2">
-        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant ${completed[i]?'pip-done':'i===chapDone?pip-active bg-surface-container-high'}"></div>`).join('')}
+        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}
       </div>
       <div class="flex items-center gap-3">
         <div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden border border-outline-variant">
@@ -1360,8 +1777,7 @@ function renderQuestGrid(){
 }
 
 function renderLibraryGrid(){
-  const grid=document.getElementById('library-grid');
-  grid.innerHTML='';
+  const grid=document.getElementById('library-grid'); grid.innerHTML='';
   if(!STATE.publicQuests?.length){
     grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic">The library is empty. Be the first to share a quest!</div>`;
     return;
@@ -1440,19 +1856,12 @@ window.deleteCharacter=function(id,event){
   if(!confirm("Banish this warrior forever?")) return;
   STATE.saves=STATE.saves.filter(s=>s.id!==id);
   if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; saveState(); closeApiModal(); showScreen('screen-path'); document.getElementById('path-cancel-btn').style.display='none'; }
-  else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); }
+  else{ if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); }
 };
 
 window.createNewCharacter=function(){ closeApiModal(); showScreen('screen-path'); document.getElementById('path-cancel-btn').style.display='block'; };
 
-// ─── MODALS ──────────────────────────────────────────
-window.openCreateModal=()=>{
-  document.getElementById('create-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('create-form').style.display='block';
-  document.getElementById('generating-state').classList.add('hidden');
-};
-window.closeCreateModal=()=>{ document.getElementById('create-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); };
+// ── MODALS ──────────────────────────────────────────
 window.openApiModal=()=>{ renderSettingsCharacters(); document.getElementById('api-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); };
 window.closeApiModal=()=>{ document.getElementById('api-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); };
 window.closeAllModals=()=>{
@@ -1460,17 +1869,7 @@ window.closeAllModals=()=>{
   document.getElementById('modal-backdrop').classList.add('hidden');
 };
 
-document.getElementById('model-chip-group').addEventListener('click',e=>{
-  if(e.target.closest('.model-chip')){
-    const chip=e.target.closest('.model-chip');
-    document.querySelectorAll('.model-chip').forEach(c=>{ c.classList.remove('active','border-primary','text-primary','bg-primary/10'); c.classList.add('border-outline-variant','text-outline'); });
-    chip.classList.add('active','border-primary','text-primary','bg-primary/10'); chip.classList.remove('border-outline-variant','text-outline');
-    document.getElementById('modelSelect').value=chip.dataset.value;
-    STATE.selectedModel=chip.dataset.value;
-  }
-});
-
-// ─── CREATE QUEST ────────────────────────────────────
+// ── COPY PUBLIC QUEST ────────────────────────────────
 window.copyPublicQuest=function(idx){
   const pub=STATE.publicQuests[idx];
   const chapters=pub.chapters||[];
@@ -1480,40 +1879,7 @@ window.copyPublicQuest=function(idx){
   showToast(`Copied "${nq.questTitle}"!`);
 };
 
-window.createQuest=async function(){
-  try{
-    const topic=document.getElementById('topic-input').value.trim();
-    if(!topic){ showToast('Please enter a topic.'); return; }
-    const objective=document.getElementById('objective-input').value.trim();
-    const numChapters=parseInt(document.getElementById('chapters-input').value);
-    document.getElementById('create-form').style.display='none';
-    document.getElementById('generating-state').classList.remove('hidden');
-    setGenStatus('Binding the demon to the scroll...','CRAFTING QUEST NARRATIVE');
-    const summonFn=httpsCallable(functions,'summonQuest');
-    let questDataText;
-    try{ const r=await summonFn({topic,objective,numChapters,modelId:STATE.selectedModel}); questDataText=r.data.result; }
-    catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
-    let parsed=parseJSON(questDataText);
-    if(!parsed||typeof parsed!=='object') parsed={};
-    setGenStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
-    await delay(400);
-    const chapters=parsed.chapters||parsed.chapterList||[];
-    if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
-    const baseQuest={topic:topic||"Unknown",objective:objective||"",questTitle:parsed.questTitle||parsed.title||`${topic} Mastery`,questNarrative:parsed.questNarrative||"A newly discovered scroll.",bossName:parsed.bossName||"Mo Wang",bossTitle:parsed.bossTitle||"The Unknown",bossLore:parsed.bossLore||"A mysterious entity.",chapters};
-    const userQuest={...baseQuest,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false};
-    if(!STATE.quests) STATE.quests=[];
-    STATE.quests.unshift(userQuest); STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
-    try{ await saveState(); }catch(e){}
-    try{ const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID}; const ref=await addDoc(collection(db,"public_quests"),pubQ); pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ); }catch(e){}
-    closeCreateModal();
-    showToast(`Quest summoned: "${userQuest.questTitle}"`);
-    window.switchTab('tab-quests'); window.showQuestScreen(0);
-  }catch(e){ console.error(e); document.getElementById('create-form').style.display='block'; document.getElementById('generating-state').classList.add('hidden'); showToast('Error: '+(e.message?e.message.substring(0,60):'Unknown')); }
-};
-
-function setGenStatus(t,s=''){ document.getElementById('gen-status-text').textContent=t; document.getElementById('gen-step').textContent=s; }
-
-// ─── CHAPTER MODAL ───────────────────────────────────
+// ── CHAPTER MODAL ────────────────────────────────────
 window.openChapterModal=function(chapterIdx){
   STATE.activeChapterIdx=chapterIdx;
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -1564,9 +1930,10 @@ window.markChapterComplete=async function(){
   btn.disabled=!allDone;
   if(allDone) btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
   showToast('Chapter mastered! +20 XP');
+  renderTopicSuggestions();
 };
 
-// ─── GAMBIT ──────────────────────────────────────────
+// ── GAMBIT ───────────────────────────────────────────
 function shouldShowGambit(){ return STATE.player.bossesDefeated>=2||STATE.player.gambitUsed>0; }
 window.tryOpenBattle=function(){
   if(shouldShowGambit()&&!STATE.quests[STATE.activeQuestIdx].defeated) window.openGambitModal();
@@ -1607,18 +1974,16 @@ window.proceedAfterGambit=function(){
   window.openBattleModal();
 };
 
-// ─── FATE SCROLL ─────────────────────────────────────
+// ── FATE SCROLL ──────────────────────────────────────
 const FATE_EVENTS=[
   {text:'⚡ +50 XP',bonus:'The ancestors nod in approval.',xp:50,sigil:false},
   {text:'🌟 +80 XP',bonus:'A celestial storm of knowledge!',xp:80,sigil:false},
-  {text:'🎋 +30 XP + SIGIL',bonus:'A rare sigil manifests from the void.',xp:30,sigil:true},
   {text:'☯ +100 XP',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
   {text:'🏮 +20 XP',bonus:'A humble blessing.',xp:20,sigil:false},
   {text:'🐉 +150 XP!',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
-  {text:'🌙 SIGIL AWARDED',bonus:'The moon marks you as worthy.',xp:0,sigil:true},
   {text:'⚔ +60 XP',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
 ];
-let fateScrollRevealed=false,pendingFateEvent=null;
+let fateScrollRevealed=false, pendingFateEvent=null;
 function openFateScrollModal(){
   fateScrollRevealed=false; pendingFateEvent=FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
   document.getElementById('fate-reveal-area').style.display='none';
@@ -1635,12 +2000,11 @@ window.revealFateScroll=function(){
   document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text;
   document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus;
   if(pendingFateEvent.xp>0){ STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; }
-  if(pendingFateEvent.sigil){ const s=awardSigil(); if(s){ const d=SIGIL_DATA[s]; setTimeout(()=>showToast(`✨ Sigil: ${s} ${d.name} — ${d.bonus}`),1000); } }
   checkRankUp(); saveState();
 };
 window.closeFateModal=function(){ document.getElementById('fate-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); renderHub(); };
 
-// ─── BOSS BATTLE ─────────────────────────────────────
+// ── BOSS BATTLE ──────────────────────────────────────
 window.openBattleModal=async function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
   document.getElementById('battle-title').textContent=quest.bossName;
@@ -1734,7 +2098,6 @@ function finishQuiz(quest){
   if(quest.bossHp===0&&!quest.defeated){
     quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100;
     checkRankUp();
-    if(perfect){ const s=awardSigil(); if(s){ const d=SIGIL_DATA[s]; setTimeout(()=>showToast(`✨ Sigil: ${s} ${d.name}!`),2000); } }
   } else if(quest.bossHp>0){ quest.bossHp=100; }
   updateBattleHp(quest); saveState();
 }
@@ -1770,13 +2133,13 @@ function checkRankUp(){
   },100);
 }
 
-// ─── RENAME ──────────────────────────────────────────
+// ── RENAME ───────────────────────────────────────────
 window.renameCharacter=function(){
   const n=prompt("New character name:",STATE.player.name);
   if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); }
 };
 
-// ─── AI ──────────────────────────────────────────────
+// ── AI ────────────────────────────────────────────────
 async function callAI({action,payload}){
   try{
     const fn=httpsCallable(functions,'communeWithScrolls');
@@ -1797,7 +2160,7 @@ function parseJSON(text){
   return {};
 }
 
-// ─── UTILS ───────────────────────────────────────────
+// ── UTILS ─────────────────────────────────────────────
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
@@ -1805,9 +2168,8 @@ function showToast(msg){
 }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-// ─── INIT ─────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  // Set initial active tab style
   const firstTab=document.querySelector('.tab-btn[data-target="tab-profile"]');
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
 
