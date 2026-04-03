@@ -859,7 +859,6 @@ const appCheck = initializeAppCheck(app, {
 // 3. Initialize other services
 const db = getFirestore(app);
 const auth = getAuth(app);
-const vertexAI = getVertexAI(app, { location: "global" });
 const functions = getFunctions(app);
 
 let USER_ID = null;
