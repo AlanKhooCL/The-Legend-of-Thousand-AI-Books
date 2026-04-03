@@ -214,10 +214,6 @@
     min-height: 260px;
   }
 
-  /* Bubble pop animation for speech bubble */
-  @keyframes bubblePop { 0%{opacity:0;transform:scale(0.7) translateY(8px);} 60%{transform:scale(1.06) translateY(-2px);} 100%{opacity:1;transform:scale(1) translateY(0);} }
-  .bubble-pop { animation: bubblePop 0.35s cubic-bezier(.34,1.56,.64,1) forwards; }
-
   /* Topic chip hover */
   .topic-chip { transition: all 0.18s cubic-bezier(.34,1.56,.64,1); }
   .topic-chip:hover { transform: translateY(-3px) scale(1.04); }
@@ -260,15 +256,17 @@
   /* Chapter count pips */
   .chap-pip { transition: all 0.2s; }
   .chap-pip.active-pip { background:#ae1d53; transform:scale(1.25); }
+
+  /* Fate scroll additions */
+  .fate-scroll-gradient { background: linear-gradient(180deg, #fefbf6 0%, #f9f3e8 100%); }
+  .sigil-glow { filter: drop-shadow(0 0 12px rgba(253, 207, 80, 0.6)); }
+  .pixel-text { font-family: monospace; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface overflow-hidden">
 
 <canvas id="particle-canvas"></canvas>
 
-<!-- ═══════════════════════════════════════
-     SCREEN: TITLE / SIGN-IN
-═══════════════════════════════════════ -->
 <div id="screen-title" class="screen active fixed inset-0 z-10 flex-col items-center justify-center overflow-hidden">
   <div class="absolute inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
@@ -320,9 +318,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCREEN: PATH SELECTION
-═══════════════════════════════════════ -->
 <div id="screen-path" class="screen fixed inset-0 z-10 flex-col items-center overflow-y-auto">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KHNKSVDby76END8YXKPuSjWJXDvtLrb1V4a-efG0M8Goo4Nl0s_zrhnsI0p8piLX0_ZgPUtKp2jbtkxwUnfZq8BDjywiS0CZQYoKdtIPlcHL1V9IIaAGyhmZrHsIu52NZwVohGJXMZDKFQesU2qlINCJupAKvm5xV8B99Aq7JfGspxma2Uuz1e3elGWoFIfxw5vqxzOza2jG_uJ6Qcofw7qiolAl8oRG1PiJy_MJL2ZWoriCoQps-8J--AEpGG_UqCSJ5DCVWQM"
@@ -340,7 +335,6 @@
       </div>
     </header>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Warrior -->
       <div onclick="choosePath('warrior')" class="path-card group relative overflow-hidden bg-surface-container-lowest rounded-xl p-7 border-b-8 border-primary-dim shadow-xl cursor-pointer">
         <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
         <div class="space-y-4">
@@ -369,7 +363,6 @@
           </div>
         </div>
       </div>
-      <!-- Scholar -->
       <div onclick="choosePath('scholar')" class="path-card group relative overflow-hidden bg-surface-container-lowest rounded-xl p-7 border-b-8 border-secondary-dim shadow-xl cursor-pointer">
         <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
         <div class="space-y-4">
@@ -406,9 +399,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCREEN: HUB
-═══════════════════════════════════════ -->
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden">
   <nav class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high z-20 flex justify-between items-center px-6 py-3">
     <div class="font-headline font-black text-xl text-primary italic tracking-tight">Ten Thousand Scrolls</div>
@@ -429,39 +419,27 @@
   </div>
   <div class="flex-1 overflow-hidden">
 
-    <!-- ── SPIRIT TAB ── -->
     <div id="tab-profile" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-lg mx-auto space-y-4">
 
-        <!-- Character Stage Card -->
         <div class="char-stage-wrap shadow-lg border-2 border-outline-variant/40">
-          <!-- BG scenery strip -->
           <div class="absolute inset-0 overflow-hidden rounded-[1.2rem]">
             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
                  class="w-full h-full object-cover opacity-20 pixel-bg" alt=""/>
             <div class="absolute inset-0 bg-gradient-to-t from-[#f6e8d0]/90 via-transparent to-transparent"></div>
           </div>
 
-          <div class="relative z-10 flex flex-col items-center pt-5 pb-4 px-4">
-            <!-- Activity tag -->
+          <div class="relative z-10 flex flex-col items-center pt-5 pb-4 px-4 mt-8">
             <div class="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full border-2 border-primary/30 text-[10px] font-black uppercase tracking-widest text-primary" id="spirit-activity-tag">⚔ TRAINING</div>
 
-            <!-- Speech bubble -->
-            <div id="speech-bubble-wrap" class="mb-2 max-w-[200px] text-center">
-              <div id="personality-bubble" class="inline-block bg-surface-container-lowest border-2 border-primary/30 rounded-2xl rounded-bl-sm px-4 py-2 text-xs font-bold text-on-surface shadow-sm leading-snug bubble-pop">...</div>
-            </div>
-
-            <!-- Animated canvas sprite -->
             <canvas id="char-canvas" width="140" height="160" class="drop-shadow-xl"></canvas>
 
-            <!-- Name + badge row -->
             <div class="flex items-center gap-2 mt-2">
               <h2 id="char-name" onclick="renameCharacter()" class="font-headline font-extrabold text-xl text-primary cursor-pointer hover:opacity-75 transition-opacity"></h2>
               <span id="char-path-badge" class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary text-on-primary"></span>
             </div>
             <p id="char-rank" class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mt-0.5"></p>
 
-            <!-- XP bar -->
             <div class="w-full mt-3 space-y-1">
               <div class="flex justify-between text-[10px] font-bold text-on-surface-variant">
                 <span class="font-headline font-black text-primary uppercase tracking-widest text-[9px]">Cultivation</span>
@@ -476,7 +454,6 @@
           </div>
         </div>
 
-        <!-- Stat Ribbon -->
         <div class="grid grid-cols-4 gap-2">
           <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-3 flex flex-col items-center hover:border-primary transition-colors">
             <span class="material-symbols-outlined text-primary text-lg mb-0.5">auto_stories</span>
@@ -500,7 +477,6 @@
           </div>
         </div>
 
-        <!-- Topic Suggestions Panel -->
         <div class="bg-surface-container-lowest border-2 border-outline-variant rounded-xl p-4 space-y-3" id="topic-suggestions-panel">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1">lightbulb</span>
@@ -518,7 +494,6 @@
       </div>
     </div>
 
-    <!-- ── SCROLLS TAB ── -->
     <div id="tab-quests" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
         <button onclick="openSummonScreen()" class="bubbly-btn w-full flex items-center gap-4 p-4 bg-surface-container-lowest border-4 border-dashed border-outline-variant rounded-xl hover:border-primary hover:bg-primary/5 transition-all group">
@@ -530,11 +505,10 @@
             <p class="text-on-surface-variant text-xs">Seek knowledge, bind a guardian demon</p>
           </div>
         </button>
-        <div id="quest-grid" class="space-y-3"></div>
+        <div id="quest-grid" class="space-y-4 mt-4"></div>
       </div>
     </div>
 
-    <!-- ── LIBRARY TAB ── -->
     <div id="tab-library" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
         <p class="text-center text-on-surface-variant text-xs font-bold uppercase tracking-widest py-2">Quests from scholars across the realm — tap to copy</p>
@@ -544,9 +518,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SCREEN: QUEST DETAIL
-═══════════════════════════════════════ -->
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
   <div class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high flex items-center gap-3 px-4 py-3">
     <button onclick="showHub()" class="bg-surface-container border-2 border-outline-variant rounded-full p-2 flex items-center justify-center hover:border-primary transition-colors">
@@ -600,18 +571,13 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     FULL-SCREEN: SUMMONING RITUAL
-═══════════════════════════════════════ -->
-<div id="summon-screen" class="flex-col items-center justify-center overflow-hidden">
-  <!-- Atmospheric BG -->
+<div id="summon-screen" class="flex-col items-center justify-start overflow-y-auto overflow-x-hidden">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfZxYvnk64Y4e541yQn37m5JiehBvookhcvDCpCUGZvjAbweMx0I50hpDCxh3j5xjrteFpAyzlLegrBxi5JRYQxDjaEfZx3rch3QUrICAO_fRiev4AknF1Ack2Y0na8RuEr5XT-2MvuJia9U-E0t0V8fjGDTkC06AQEUk9b3uiYP5qsibz0VEKhA4K_-nT3j067gBTwdoEJsCSw6SudNSuO_cZgWXm-sMxbxDQXt9C_rmNG1XhHfY5SM8AIcfJbzgQpmn0XDiyf8c"
          class="w-full h-full object-cover opacity-35 pixel-bg" alt=""/>
     <div class="absolute inset-0 bg-gradient-to-b from-surface/80 via-surface/40 to-surface/90"></div>
   </div>
 
-  <!-- Header bar -->
   <div class="fixed top-0 left-0 w-full z-20 px-6 py-4 flex justify-between items-center pointer-events-none">
     <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic pointer-events-none">Ten Thousand Scrolls</h1>
     <button onclick="closeSummonScreen()" class="pointer-events-auto bg-surface-container-lowest/80 backdrop-blur p-2 rounded-full border-2 border-primary/20 hover:scale-110 transition-transform hover:border-primary">
@@ -619,36 +585,29 @@
     </button>
   </div>
 
-  <!-- Main content -->
-  <div class="relative z-10 w-full max-w-6xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-20 pb-8">
+  <div class="relative z-10 w-full max-w-6xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-24 pb-24">
 
-    <!-- LEFT: Summoning Seal Visual -->
-    <div class="relative flex items-center justify-center order-2 lg:order-1">
+    <div class="relative flex items-center justify-center order-2 lg:order-1 mt-8 lg:mt-0">
       <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
-        <!-- Rings -->
         <div class="absolute inset-0 border-[5px] border-dashed border-tertiary/40 rounded-full ring-outer"></div>
         <div class="absolute inset-8 border-[3px] border-primary/30 rounded-full ring-mid"></div>
         <div class="absolute inset-16 border-2 border-secondary/20 rounded-full ring-inner"></div>
 
-        <!-- Floating glyphs -->
         <div class="absolute top-6 left-1/2 -translate-x-1/2 font-headline font-black text-2xl text-primary/50 glyph-float-1 select-none">天</div>
         <div class="absolute bottom-8 left-[18%] font-headline font-black text-xl text-secondary/50 glyph-float-2 select-none">地</div>
         <div class="absolute top-[22%] right-6 font-headline font-black text-xl text-tertiary/60 glyph-float-3 select-none">人</div>
 
-        <!-- Central seal -->
         <div class="relative z-20 w-40 h-40 md:w-52 md:h-52 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
           <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle,rgba(253,207,80,0.18) 0%,rgba(174,29,83,0.06) 70%)"></div>
           <span id="summon-seal-char" class="text-7xl md:text-8xl font-black text-primary drop-shadow-md select-none font-headline" style="line-height:1">書</span>
           <div class="absolute inset-0 border-4 border-primary rounded-full animate-ping opacity-15"></div>
         </div>
 
-        <!-- Orbs -->
         <div class="absolute top-2 left-4 w-5 h-5 bg-primary-fixed rounded-full blur-sm opacity-60 orb-1"></div>
         <div class="absolute bottom-14 right-2 w-7 h-7 bg-tertiary-fixed rounded-full blur-md opacity-40 orb-2"></div>
       </div>
     </div>
 
-    <!-- RIGHT: Interaction Form -->
     <div class="order-1 lg:order-2 space-y-6" id="summon-form-side">
       <header class="space-y-1">
         <h2 class="text-4xl md:text-5xl font-extrabold font-headline text-on-background tracking-tight leading-tight">
@@ -659,7 +618,6 @@
 
       <div class="bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-6 space-y-6 border border-white/50 shadow-xl">
 
-        <!-- Topic input -->
         <div class="space-y-2">
           <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Quest Topic</label>
           <div class="relative group">
@@ -671,14 +629,12 @@
           </div>
         </div>
 
-        <!-- Objective input -->
         <div class="space-y-2">
           <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Learning Objective <span class="text-outline normal-case font-normal">(optional)</span></label>
           <textarea id="summon-objective-input" rows="2" placeholder="What should you understand after this quest?"
                     class="w-full bg-white border-b-[3px] border-outline-variant px-5 py-3 text-sm font-body rounded-xl focus:outline-none focus:border-primary transition-all placeholder:text-outline-variant/50 resize-none"></textarea>
         </div>
 
-        <!-- Catalyst (model) selection -->
         <div class="space-y-2">
           <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Choose Catalyst</label>
           <div class="grid grid-cols-2 gap-3" id="summon-catalyst-group">
@@ -728,7 +684,6 @@
           </div>
         </div>
 
-        <!-- Chapter count -->
         <div class="space-y-2">
           <div class="flex justify-between items-center">
             <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Chapters</label>
@@ -745,7 +700,6 @@
           </div>
         </div>
 
-        <!-- Summon button -->
         <button onclick="doSummonQuest()" id="summon-action-btn"
                 class="bubbly-btn w-full py-5 bg-primary text-on-primary rounded-full font-headline text-xl font-black tracking-widest border-b-[5px] border-primary-dim hover:translate-y-0.5 active:translate-y-1.5 active:border-b-0 transition-all shadow-lg flex items-center justify-center gap-3 group">
           SUMMON
@@ -753,7 +707,6 @@
         </button>
       </div>
 
-      <!-- Subtle hints -->
       <div class="flex justify-center items-center gap-4 text-on-surface-variant/60 font-semibold text-xs tracking-widest uppercase">
         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary"></span> 42 Mana Required</span>
         <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
@@ -761,7 +714,6 @@
       </div>
     </div>
 
-    <!-- Summoning in progress overlay (shown over the form side) -->
     <div id="summoning-progress" class="order-1 lg:order-2 hidden flex-col items-center justify-center gap-6 text-center py-8">
       <div class="relative w-28 h-28 flex items-center justify-center">
         <div class="absolute inset-0 bg-primary/20 rounded-full ritual-ping"></div>
@@ -777,12 +729,8 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MODALS
-═══════════════════════════════════════ -->
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-on-background/40 backdrop-blur-sm hidden"></div>
 
-<!-- Chapter Modal -->
 <div class="modal-overlay z-[200]" id="chapter-modal">
   <div class="glass-panel w-full max-w-lg mx-4 rounded-xl border-2 border-secondary/30 shadow-2xl max-h-[85vh] flex flex-col">
     <div class="bg-secondary p-4 flex items-center justify-between gap-2 flex-shrink-0">
@@ -806,43 +754,72 @@
   </div>
 </div>
 
-<!-- Battle Modal -->
-<div class="modal-overlay z-[200]" id="battle-modal">
-  <div class="glass-panel w-full max-w-md mx-4 rounded-xl border-2 border-primary/30 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-    <div id="battle-top-section" class="flex-shrink-0">
-      <div class="bg-gradient-to-b from-[#4d001e] to-[#241c2c] p-5 flex flex-col items-center gap-3">
-        <h3 id="battle-title" class="font-headline font-extrabold text-primary-fixed italic text-xl">Final Battle</h3>
-        <p class="text-[10px] font-bold text-primary-fixed/50 uppercase tracking-widest">Prove your mastery — defeat the demon</p>
-        <div class="relative w-28 h-28 flex items-center justify-center">
-          <canvas id="battle-boss-canvas" width="112" height="112"></canvas>
-          <div class="damage-floater font-headline font-black text-2xl text-error-container" id="damage-floater">-25</div>
+<div class="modal-overlay z-[200] p-4 md:p-8" id="battle-modal">
+  <div class="w-full max-w-4xl bg-stone-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col relative border-4 border-surface-container-high h-full max-h-[90vh]">
+    <img alt="Whispering Willow Woods" class="absolute inset-0 w-full h-full object-cover opacity-50 blur-sm scale-105" data-alt="enchanted mystical forest with giant glowing weeping willow trees" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ7yHP4VLQJ0vuaNtFXv7-QB6qQmw1OwH6JxXQn4U-bUuhTeNg8mX9hb476kbWuG4GF5aVegoc4iRR7yiCP94-M6_QwWzXgS2Y3UqUrla9VSWN4paZlm5N830B2jPjid7_FVwu0k2YCRs9F6o058T9VoCYYVbpZ9ukeitghFTjG_HUCakVT-RI7KpP4b7s8jTvsGBXTK8_7LziwB7EvFajH2jU62eBJ7nnwSSYyOlVOqRgb-k_K--qJhrfLzSy1xNiM51peDPOw3w"/>
+    
+    <div class="absolute inset-x-0 top-0 p-4 md:p-8 flex justify-between items-start z-10 pointer-events-none">
+      <div class="flex flex-col gap-2">
+        <div class="bg-surface/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg flex items-center gap-3 border-2 border-primary pointer-events-auto">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          <div class="w-24 md:w-32 h-4 bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full w-4/5 bg-gradient-to-r from-primary to-primary-container relative">
+              <div class="absolute top-0 left-0 w-full h-1/2 bg-white/20"></div>
+            </div>
+          </div>
+          <span class="pixel-text font-bold text-xs">HP</span>
         </div>
-        <div class="w-full space-y-1">
-          <div class="flex justify-between text-xs font-bold">
-            <span class="text-primary-fixed/70">Demon HP</span>
-            <span id="battle-hp-text" class="text-primary-fixed font-headline">100/100</span>
-          </div>
-          <div class="h-4 bg-white/10 rounded-full overflow-hidden border-2 border-white/20 p-0.5">
-            <div id="battle-hp-fill" class="h-full bg-gradient-to-r from-error-dim to-error-container rounded-full transition-all duration-500" style="width:100%"></div>
-          </div>
+      </div>
+      <div class="flex flex-col items-end gap-2">
+        <div class="bg-surface/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg flex items-center gap-3 border-2 border-tertiary pointer-events-auto">
+          <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+          <span class="pixel-text font-bold text-sm text-tertiary" id="quiz-progress-streak">STREAK: 0</span>
         </div>
       </div>
     </div>
-    <div id="quiz-container" class="flex-1 overflow-y-auto p-5 space-y-4 bg-surface">
-      <p id="quiz-progress" class="text-[10px] font-black uppercase tracking-widest text-outline text-center">QUESTION 1 / 5</p>
-      <p id="quiz-question" class="font-headline font-extrabold text-on-surface text-base text-center leading-snug min-h-[48px]">Loading...</p>
-      <div id="quiz-options" class="grid grid-cols-1 gap-2"></div>
-      <p id="quiz-feedback" class="text-xs text-on-surface-variant italic text-center min-h-[1.2rem]"></p>
+
+    <div class="relative z-10 flex-1 flex flex-col items-center justify-between p-4 md:p-8 mt-12 overflow-y-auto">
+      
+      <div id="battle-top-section" class="w-full flex flex-col items-center gap-4">
+        <div class="w-full max-w-2xl flex flex-col gap-2 items-center mb-2">
+          <div class="flex justify-between w-full px-2">
+            <span id="battle-title" class="pixel-text text-white font-bold tracking-widest text-shadow uppercase">GUARDIAN</span>
+            <span class="pixel-text text-primary-container font-bold" id="battle-hp-text">100/100</span>
+          </div>
+          <div class="w-full h-6 bg-black/40 rounded-full p-1 border-2 border-white/20 backdrop-blur-sm">
+            <div id="battle-hp-fill" class="h-full w-full bg-gradient-to-r from-primary to-[#ff7198] rounded-full relative group shadow-[0_0_20px_rgba(174,29,83,0.4)] transition-all duration-500">
+              <div class="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative group">
+          <div class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-transform hover:scale-105 flex justify-center items-center">
+            <canvas id="battle-boss-canvas" width="220" height="220"></canvas>
+          </div>
+          <div class="damage-floater font-headline font-black text-4xl text-yellow-400 drop-shadow-[0_2px_0px_rgba(0,0,0,1)]" id="damage-floater" style="top:-20px; left:50%; margin-left:-20px">-25</div>
+        </div>
+      </div>
+
+      <div id="quiz-container" class="w-full max-w-4xl bg-surface/90 backdrop-blur-xl p-4 md:p-6 rounded-xl border-t-4 border-primary-container shadow-2xl relative overflow-hidden mt-6">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-primary-container to-primary"></div>
+        <div class="mb-4 md:mb-6 text-center">
+          <h2 id="quiz-question" class="font-headline text-lg md:text-2xl font-extrabold text-on-surface tracking-tight leading-snug">Loading...</h2>
+        </div>
+        <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"></div>
+        <p id="quiz-feedback" class="text-xs md:text-sm text-on-surface-variant font-bold text-center mt-3 min-h-[1.2rem]"></p>
+      </div>
+      
     </div>
-    <div id="finishing-blow" class="hidden flex-col items-center gap-4 p-6 bg-surface text-center">
-      <div id="finishing-text" class="font-headline font-black text-3xl text-primary finish-pulse">⚡ FINAL STRIKE ⚡</div>
-      <p id="victory-lore" class="text-sm text-on-surface-variant italic leading-relaxed"></p>
-      <button onclick="claimVictory()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-4 rounded-full border-b-[5px] border-primary-dim">Claim Victory</button>
+
+    <div id="finishing-blow" class="hidden absolute inset-0 bg-surface/95 z-20 flex-col items-center justify-center p-8 text-center backdrop-blur-md">
+      <div id="finishing-text" class="font-headline font-black text-4xl md:text-5xl text-primary finish-pulse mb-6 drop-shadow-md">⚡ FINAL STRIKE ⚡</div>
+      <p id="victory-lore" class="text-base md:text-lg text-on-surface-variant font-semibold italic leading-relaxed max-w-lg mb-8"></p>
+      <button onclick="claimVictory()" class="bubbly-btn w-full max-w-sm bg-primary text-on-primary font-headline font-bold text-lg py-4 rounded-full border-b-[5px] border-primary-dim shadow-xl">Claim Victory</button>
     </div>
   </div>
 </div>
 
-<!-- Gambit Modal -->
 <div class="modal-overlay z-[200]" id="gambit-modal">
   <div class="glass-panel w-full max-w-sm mx-4 rounded-xl border-2 border-tertiary/40 shadow-2xl overflow-hidden">
     <div class="bg-tertiary-container p-4 text-center">
@@ -869,33 +846,68 @@
   </div>
 </div>
 
-<!-- Fate Scroll Modal -->
-<div class="modal-overlay z-[200]" id="fate-modal">
-  <div class="glass-panel w-full max-w-xs mx-4 rounded-xl border-2 border-tertiary/40 shadow-2xl overflow-hidden text-center">
-    <div class="bg-tertiary-container p-4">
-      <h3 class="font-headline font-extrabold text-on-tertiary-container text-xl italic">命卷</h3>
-      <p class="text-[10px] font-black uppercase tracking-widest text-on-tertiary-container/70">The Fate Scroll Reveals Itself</p>
+<div class="modal-overlay z-[200] p-4 md:p-8" id="fate-modal">
+  <div class="w-full max-w-2xl flex flex-col items-center relative transition-all">
+    <div class="w-full h-8 bg-[#5e3b2e] rounded-full shadow-lg relative flex items-center justify-between px-2 z-10">
+      <div class="h-10 w-4 bg-[#8b5e3c] rounded-sm -ml-1 border-2 border-[#5e3b2e]"></div>
+      <div class="flex-1 border-t-4 border-dashed border-[#8b5e3c]/30 mx-4"></div>
+      <div class="h-10 w-4 bg-[#8b5e3c] rounded-sm -mr-1 border-2 border-[#5e3b2e]"></div>
     </div>
-    <div class="p-6 space-y-4">
-      <p class="text-sm text-on-surface-variant">After defeating a demon, the heavens bestow a hidden gift...</p>
-      <div id="fate-scroll-icon" onclick="revealFateScroll()" class="scroll-bob cursor-pointer w-20 mx-auto">
-        <svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
+
+    <div class="w-[96%] fate-scroll-gradient min-h-[400px] shadow-2xl relative px-6 py-10 flex flex-col items-center border-x-[12px] border-[#e8dfcf] -my-2 z-0">
+      <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8tCm_2MgHeNgrtueAVm7hosgWowjmf5TQagMRAhKgefykrItWuEn4UOfsFSo7x4xC7pE38AoOozEocAIu2-wut-1ei-PCAb9pkraHARxgM2J7G6J_wvx_6rmUebVMkE3RKsZafERsKNa2OF1QzyGg5HEn-K3eosOJUumEXch5V0ZTuX0YHPbQjijg5mK1zw-6kp2bGT343xjpM5Mii1DDTSNxDL1XySme0m4THJ28La7T4zKCl8n1650fRfebivmyVFb1r1UIp5E')"></div>
+
+      <div id="fate-scroll-icon" onclick="revealFateScroll()" class="scroll-bob cursor-pointer w-24 mx-auto my-auto py-12 flex flex-col items-center gap-4">
+        <svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg" class="w-20">
           <rect x="5" y="8" width="70" height="84" rx="4" fill="#ede7dd" stroke="#ae1d53" stroke-width="2"/>
           <rect x="0" y="6" width="80" height="10" rx="3" fill="#e8e2d7" stroke="#ae1d53" stroke-width="1.5"/>
           <rect x="0" y="84" width="80" height="10" rx="3" fill="#e8e2d7" stroke="#ae1d53" stroke-width="1.5"/>
           <text x="40" y="55" text-anchor="middle" font-family="serif" font-size="28" fill="#ae1d53" opacity="0.7">?</text>
         </svg>
+        <span class="text-sm font-bold text-primary tracking-widest uppercase">Reveal Fate</span>
       </div>
-      <div id="fate-reveal-area" style="display:none" class="space-y-2">
-        <p id="fate-reveal-text" class="font-headline font-black text-2xl text-primary">⚡ +50 XP</p>
-        <p id="fate-bonus-text" class="text-sm text-on-surface-variant italic"></p>
+
+      <div id="fate-reveal-area" style="display:none" class="w-full flex flex-col items-center">
+        <h2 class="text-4xl md:text-5xl font-headline font-black text-primary tracking-tighter drop-shadow-[0_4px_0_#9e0a47] uppercase italic mb-8">VICTORY!</h2>
+
+        <p class="text-stone-500 font-bold tracking-widest text-xs uppercase mb-2">Experience Gained</p>
+        <div class="flex items-center gap-4 mb-10">
+          <div id="fate-reveal-text" class="text-5xl md:text-6xl font-black text-on-surface font-headline tracking-tight">+0</div>
+          <div class="bg-primary px-3 py-1 rounded-full text-on-primary font-bold text-xs shadow-md uppercase">Reward</div>
+        </div>
+
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div class="bg-surface-container-lowest p-4 rounded-xl border-b-[4px] border-surface-dim flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-full bg-tertiary-container/30 flex items-center justify-center mb-2 sigil-glow">
+              <span class="material-symbols-outlined text-3xl text-tertiary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+            </div>
+            <p class="font-bold text-sm text-center">Blessing</p>
+            <p id="fate-bonus-text" class="text-[10px] text-stone-500 font-medium text-center italic"></p>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl border-b-[4px] border-surface-dim flex flex-col items-center justify-center">
+             <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center mb-2">
+              <span class="material-symbols-outlined text-3xl text-secondary" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+            </div>
+            <p class="font-bold text-sm text-center">Scroll Mastery</p>
+            <p class="text-[10px] text-stone-500 font-medium text-center">Added to Archive</p>
+          </div>
+        </div>
+
+        <button id="fate-close-btn" onclick="closeFateModal()" class="bubbly-btn w-full max-w-sm bg-primary text-on-primary font-headline font-bold text-lg py-4 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-3 shadow-xl">
+          <span class="material-symbols-outlined">redeem</span> Claim Rewards
+        </button>
       </div>
-      <button id="fate-close-btn" style="display:none" onclick="closeFateModal()" class="bubbly-btn w-full bg-tertiary text-on-tertiary font-headline font-bold py-3 rounded-full border-b-[4px] border-tertiary-dim">Receive Blessing</button>
+    </div>
+
+    <div class="w-full h-8 bg-[#5e3b2e] rounded-full shadow-2xl relative flex items-center justify-between px-2 z-10">
+      <div class="h-10 w-4 bg-[#8b5e3c] rounded-sm -ml-1 border-2 border-[#5e3b2e]"></div>
+      <div class="flex-1 border-t-4 border-dashed border-[#8b5e3c]/30 mx-4"></div>
+      <div class="h-10 w-4 bg-[#8b5e3c] rounded-sm -mr-1 border-2 border-[#5e3b2e]"></div>
     </div>
   </div>
 </div>
 
-<!-- Settings Modal -->
+
 <div class="modal-overlay z-[200]" id="api-modal">
   <div class="glass-panel w-full max-w-sm mx-4 rounded-xl border-2 border-outline-variant shadow-2xl overflow-hidden">
     <div class="bg-surface-container-high p-4 flex items-center gap-2 border-b-2 border-surface-container">
@@ -921,9 +933,6 @@
 
 <div id="toast"></div>
 
-<!-- ═══════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
@@ -984,24 +993,6 @@ function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.fo
 function getCurrentRankIdx(){ const r=getRanks(); let i=0; if(STATE.player) r.forEach((x,j)=>{ if(STATE.player.totalXp>=x.xp) i=j; }); return i; }
 function getNextRank(){ const r=getRanks(),i=r.indexOf(getCurrentRank()); return i<r.length-1?r[i+1]:null; }
 
-// ── QUOTES ─────────────────────────────────────────
-const WARRIOR_QUOTES = ["I'll smash it with my fists!","No time to think, just charge!","Another demon? Good.","They said I couldn't. Watch me.","DRAW YOUR SWORD!","The strongest earn the right to know.","Show me your next challenge!","Knowledge sharpens the blade."];
-const SCHOLAR_QUOTES = ["Fascinating. Completely predictable.","Knowledge is the sharpest blade.","Three steps ahead. Always.","Your demon is already defeated.","The wise man bends the wind.","I have a suggestion for you...","The scrolls never stop whispering.","What shall we study next?"];
-function getRandomQuote(){ const q=STATE.player?.path==='scholar'?SCHOLAR_QUOTES:WARRIOR_QUOTES; return q[Math.floor(Math.random()*q.length)]; }
-
-let personalityInterval = null;
-function startPersonalityQuotes(){
-  if(personalityInterval) clearInterval(personalityInterval);
-  const b=document.getElementById('personality-bubble'); if(!b) return;
-  const u=()=>{
-    if(b){
-      b.textContent=getRandomQuote();
-      b.classList.remove('bubble-pop'); void b.offsetWidth; b.classList.add('bubble-pop');
-    }
-  };
-  u(); personalityInterval=setInterval(u,5000);
-}
-
 // ── TOPIC SUGGESTIONS ──────────────────────────────
 const TOPIC_EXPANSIONS = {
   'history':      ['Ancient Greece','The Ming Dynasty','World War II','The Roman Empire','Medieval Japan'],
@@ -1029,8 +1020,6 @@ function getTopicSuggestions(){
   if(!topics.length) return [];
 
   const suggestions = new Set();
-
-  // Try direct related topic lookup
   topics.forEach(t=>{
     Object.keys(RELATED_TOPICS).forEach(key=>{
       if(t.includes(key)||key.includes(t)){
@@ -1039,7 +1028,6 @@ function getTopicSuggestions(){
     });
   });
 
-  // Try keyword expansion
   topics.forEach(t=>{
     Object.keys(TOPIC_EXPANSIONS).forEach(key=>{
       if(t.includes(key)){
@@ -1048,17 +1036,13 @@ function getTopicSuggestions(){
     });
   });
 
-  // Remove topics already studied
   const studied = new Set(topics.map(t=>t.toLowerCase()));
   const filtered = [...suggestions].filter(s=>!studied.has(s.toLowerCase()));
 
-  // If still empty, fallback to complement topics
   if(!filtered.length){
     const fallback = ['The Silk Road','Calculus','Game Theory','Stoicism','The Human Brain','Quantum Computing','Typography','Ancient Egypt'];
     return fallback.filter(f=>!studied.has(f.toLowerCase())).slice(0,5);
   }
-
-  // Shuffle & limit
   return filtered.sort(()=>Math.random()-0.5).slice(0,6);
 }
 
@@ -1093,7 +1077,6 @@ window.refreshTopicSuggestions = function(){
 };
 
 // ── CHIBI SPRITE RENDERER ──────────────────────────
-// (Full procedural chibi from original codebase)
 const WARRIOR_PALETTES = [
   {body:'#5c3a1e',armor:'#7a4a28',trim:'#a06030',hair:'#1a0a04',skin:'#f0b878',eye:'#3a1a0a',blush:'#e87070',weapon:'#888888'},
   {body:'#2a3820',armor:'#4a6030',trim:'#80a040',hair:'#1a0a04',skin:'#f0b878',eye:'#1a3010',blush:'#e87070',weapon:'#c0c0c0'},
@@ -1681,7 +1664,6 @@ function renderHub(){
   const nextRank=getNextRank();
   const rankIdx=getCurrentRankIdx();
 
-  startPersonalityQuotes();
   startCharCanvas();
 
   const nm=document.getElementById('char-name');
@@ -1723,57 +1705,86 @@ function renderQuestGrid(){
     grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic">No active quests. Summon one to begin your journey.</div>`;
     return;
   }
-  STATE.quests.forEach((quest,idx)=>{
+
+  // Group by topic
+  const grouped = {};
+  STATE.quests.forEach((quest, idx) => {
     if(!quest) return;
-    const completed=quest.completed||[];
-    const chapters=quest.chapters||[];
-    const chapDone=completed.filter(Boolean).length;
-    const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
-    const card=document.createElement('div');
-    card.className='bg-surface-container-lowest rounded-xl border-2 border-outline-variant border-b-4 border-b-surface-container-high shadow-sm hover:-translate-y-1 transition-all relative overflow-hidden cursor-pointer p-4';
-    card.innerHTML=`
-      <div class="flex items-center gap-3 mb-3">
-        <div class="quest-boss-art flex-shrink-0 flex items-center justify-center">
-          <canvas width="56" height="56" class="boss-mini-canvas"></canvas>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-0.5">${(quest.topic||'Unknown').toUpperCase()}</p>
-          <p class="font-headline font-extrabold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p>
-        </div>
-      </div>
-      <div class="flex gap-1 mb-2">
-        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}
-      </div>
-      <div class="flex items-center gap-3">
-        <div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden border border-outline-variant">
-          <div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div>
-        </div>
-        <span class="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span>
-      </div>
-    `;
-    const mini=card.querySelector('.boss-mini-canvas');
-    drawBossSprite(mini,quest,hpRatio);
-    const del=document.createElement('button');
-    del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-base">close</span>';
-    del.className='absolute top-3 right-3 z-10';
-    del.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      if(confirm('Abandon this quest?')){
-        let xpD=0,chD=0;
-        completed.forEach(d=>{ if(d){ chD++; xpD+=20; } });
-        if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; }
-        STATE.player.questsCreated--;
-        STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD);
-        STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD);
-        STATE.player.xp=Math.max(0,STATE.player.xp-xpD);
-        STATE.quests.splice(idx,1);
-        saveState(); renderHub(); showToast("Quest abandoned.");
-      }
-    });
-    card.appendChild(del);
-    card.addEventListener('click',()=>window.showQuestScreen(idx));
-    grid.appendChild(card);
+    const topic = (quest.topic || 'Uncategorized').toUpperCase();
+    if(!grouped[topic]) grouped[topic] = [];
+    grouped[topic].push({ quest, idx });
   });
+
+  for(const topic in grouped) {
+    const folderDiv = document.createElement('div');
+    folderDiv.className = 'mb-4';
+    
+    // Check if any quest inside is in progress/not defeated, to decide if we start expanded
+    const hasActive = grouped[topic].some(item => !item.quest.defeated);
+    
+    folderDiv.innerHTML = `
+      <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container p-3 rounded-xl border-2 border-outline-variant font-headline font-bold text-sm hover:border-primary transition-colors focus:outline-none">
+        <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">folder_open</span> ${topic}</div>
+        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">${grouped[topic].length} Scrolls</span>
+      </button>
+      <div class="${hasActive ? '' : 'hidden'} flex-col gap-3 mt-3 pl-3 border-l-2 border-outline-variant/30 ml-3 folder-content transition-all"></div>
+    `;
+    const contentDiv = folderDiv.querySelector('.folder-content');
+
+    grouped[topic].forEach(({quest, idx}) => {
+      const completed=quest.completed||[];
+      const chapters=quest.chapters||[];
+      const chapDone=completed.filter(Boolean).length;
+      const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
+      
+      const card=document.createElement('div');
+      card.className='bg-surface-container-lowest rounded-xl border-2 border-outline-variant border-b-4 border-b-surface-container-high shadow-sm hover:-translate-y-1 transition-all relative overflow-hidden cursor-pointer p-4';
+      card.innerHTML=`
+        <div class="flex items-center gap-3 mb-3">
+          <div class="quest-boss-art flex-shrink-0 flex items-center justify-center">
+            <canvas width="56" height="56" class="boss-mini-canvas"></canvas>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-headline font-extrabold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p>
+          </div>
+        </div>
+        <div class="flex gap-1 mb-2">
+          ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden border border-outline-variant">
+            <div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div>
+          </div>
+          <span class="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span>
+        </div>
+      `;
+      const mini=card.querySelector('.boss-mini-canvas');
+      drawBossSprite(mini,quest,hpRatio);
+      
+      const del=document.createElement('button');
+      del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-base">close</span>';
+      del.className='absolute top-3 right-3 z-10';
+      del.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        if(confirm('Abandon this quest?')){
+          let xpD=0,chD=0;
+          completed.forEach(d=>{ if(d){ chD++; xpD+=20; } });
+          if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; }
+          STATE.player.questsCreated--;
+          STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD);
+          STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD);
+          STATE.player.xp=Math.max(0,STATE.player.xp-xpD);
+          STATE.quests.splice(idx,1);
+          saveState(); renderHub(); showToast("Quest abandoned.");
+        }
+      });
+      card.appendChild(del);
+      card.addEventListener('click',()=>window.showQuestScreen(idx));
+      contentDiv.appendChild(card);
+    });
+
+    grid.appendChild(folderDiv);
+  }
 }
 
 function renderLibraryGrid(){
@@ -1976,27 +1987,26 @@ window.proceedAfterGambit=function(){
 
 // ── FATE SCROLL ──────────────────────────────────────
 const FATE_EVENTS=[
-  {text:'⚡ +50 XP',bonus:'The ancestors nod in approval.',xp:50,sigil:false},
-  {text:'🌟 +80 XP',bonus:'A celestial storm of knowledge!',xp:80,sigil:false},
-  {text:'☯ +100 XP',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
-  {text:'🏮 +20 XP',bonus:'A humble blessing.',xp:20,sigil:false},
-  {text:'🐉 +150 XP!',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
-  {text:'⚔ +60 XP',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
+  {text:'+50',bonus:'The ancestors nod in approval.',xp:50,sigil:false},
+  {text:'+80',bonus:'A celestial storm of knowledge!',xp:80,sigil:false},
+  {text:'+100',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
+  {text:'+20',bonus:'A humble blessing.',xp:20,sigil:false},
+  {text:'+150',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
+  {text:'+60',bonus:'Victory echoes through ten thousand scrolls.',xp:60,sigil:false},
 ];
 let fateScrollRevealed=false, pendingFateEvent=null;
+
 function openFateScrollModal(){
   fateScrollRevealed=false; pendingFateEvent=FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
   document.getElementById('fate-reveal-area').style.display='none';
-  document.getElementById('fate-close-btn').style.display='none';
-  document.getElementById('fate-scroll-icon').style.display='block';
+  document.getElementById('fate-scroll-icon').style.display='flex';
   document.getElementById('fate-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
 }
 window.revealFateScroll=function(){
   if(fateScrollRevealed) return; fateScrollRevealed=true;
   document.getElementById('fate-scroll-icon').style.display='none';
-  document.getElementById('fate-reveal-area').style.display='block';
-  document.getElementById('fate-close-btn').style.display='block';
+  document.getElementById('fate-reveal-area').style.display='flex';
   document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text;
   document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus;
   if(pendingFateEvent.xp>0){ STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; }
@@ -2010,7 +2020,7 @@ window.openBattleModal=async function(){
   document.getElementById('battle-title').textContent=quest.bossName;
   document.getElementById('battle-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('battle-top-section').style.display='block';
+  document.getElementById('battle-top-section').style.display='flex';
   const bc=document.getElementById('battle-boss-canvas');
   animateBossCanvas(bc,quest,quest.bossHp/quest.bossMaxHp,'battle');
   updateBattleHp(quest);
@@ -2038,14 +2048,22 @@ window.openBattleModal=async function(){
 function renderQuizQuestion(quest){
   const questions=quest.quiz.questions||[];
   const q=questions[STATE.quizCurrent]; if(!q) return;
-  document.getElementById('quiz-progress').textContent=`QUESTION ${STATE.quizCurrent+1} / ${questions.length}`;
+  
+  // Update streak/progress HUD
+  document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`;
+  
   document.getElementById('quiz-question').textContent=q.question||'...';
   document.getElementById('quiz-feedback').textContent='';
   const opts=document.getElementById('quiz-options'); opts.innerHTML='';
+  
+  const labels = ['A','B','C','D'];
   (q.options||[]).forEach((opt,i)=>{
     const btn=document.createElement('button');
-    btn.className='w-full text-left px-4 py-3 rounded-xl border-2 border-outline-variant bg-surface-container-lowest font-body text-sm text-on-surface hover:border-primary hover:bg-primary/5 transition-all';
-    btn.textContent=opt;
+    btn.className='flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl border-2 border-outline-variant hover:border-primary group transition-all active:translate-y-1 active:border-b-0 border-b-[4px] text-left w-full';
+    btn.innerHTML=`
+      <span class="w-10 h-10 flex-shrink-0 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">${labels[i]||(i+1)}</span>
+      <span class="font-body font-semibold text-sm md:text-base text-on-surface">${opt}</span>
+    `;
     btn.addEventListener('click',()=>answerQuestion(i,quest));
     opts.appendChild(btn);
   });
@@ -2058,20 +2076,43 @@ function answerQuestion(chosen,quest){
   const correct=q.correct;
   document.querySelectorAll('#quiz-options button').forEach(o=>o.disabled=true);
   const optNodes=document.querySelectorAll('#quiz-options button');
-  if(optNodes[correct]) optNodes[correct].className=optNodes[correct].className+' border-secondary bg-secondary/10 text-secondary';
+  
+  // Style correct answer
+  if(optNodes[correct]) {
+    optNodes[correct].classList.replace('bg-surface-container-lowest', 'bg-primary-container/10');
+    optNodes[correct].classList.replace('border-outline-variant', 'border-primary');
+    const spanIcon = optNodes[correct].querySelector('span:first-child');
+    if(spanIcon) spanIcon.className = 'w-10 h-10 flex-shrink-0 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary';
+    const spanText = optNodes[correct].querySelector('span:last-child');
+    if(spanText) spanText.classList.add('text-primary');
+  }
+  
   const isRight=chosen===correct;
-  if(!isRight&&optNodes[chosen]) optNodes[chosen].className=optNodes[chosen].className+' border-error bg-error/10 text-error';
+  // Style wrong answer if picked
+  if(!isRight&&optNodes[chosen]) {
+    optNodes[chosen].classList.replace('bg-surface-container-lowest', 'bg-error/10');
+    optNodes[chosen].classList.replace('border-outline-variant', 'border-error');
+    const spanIcon = optNodes[chosen].querySelector('span:first-child');
+    if(spanIcon) spanIcon.className = 'w-10 h-10 flex-shrink-0 rounded-full bg-error flex items-center justify-center font-bold text-on-error';
+    const spanText = optNodes[chosen].querySelector('span:last-child');
+    if(spanText) spanText.classList.add('text-error');
+  }
+
   document.getElementById('quiz-feedback').textContent=isRight?`✓ Correct — ${q.explanation||''}`:`✗ Incorrect — ${q.explanation||''}`;
-  if(isRight) STATE.quizScore++;
+  if(isRight) {
+    STATE.quizScore++;
+    document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`;
+  }
+  
   const dmg=isRight?Math.ceil(100/questions.length):0;
   if(dmg>0){
     quest.bossHp=Math.max(0,quest.bossHp-dmg);
     showDamageFloat(dmg);
     const bc=document.getElementById('battle-boss-canvas');
-    bc.style.transform='translateX(-6px)'; setTimeout(()=>bc.style.transform='',400);
+    bc.style.transform='translateX(-6px)'; setTimeout(()=>bc.style.transform='scale(1.05)',150); setTimeout(()=>bc.style.transform='',400);
   }
   updateBattleHp(quest); saveState();
-  setTimeout(()=>{ STATE.quizCurrent++; if(STATE.quizCurrent>=questions.length) finishQuiz(quest); else renderQuizQuestion(quest); },1600);
+  setTimeout(()=>{ STATE.quizCurrent++; if(STATE.quizCurrent>=questions.length) finishQuiz(quest); else renderQuizQuestion(quest); },1800);
 }
 
 function finishQuiz(quest){
@@ -2116,7 +2157,7 @@ window.claimVictory=function(){
 function updateBattleHp(quest){
   const r=quest.bossHp/quest.bossMaxHp;
   document.getElementById('battle-hp-fill').style.width=(r*100)+'%';
-  document.getElementById('battle-hp-text').textContent=`${quest.bossHp} / ${quest.bossMaxHp}`;
+  document.getElementById('battle-hp-text').textContent=`${quest.bossHp}/${quest.bossMaxHp}`;
 }
 
 function showDamageFloat(val){
