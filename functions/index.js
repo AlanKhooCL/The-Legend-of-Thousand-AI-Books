@@ -134,14 +134,13 @@ exports.generateTrip = onCall({ enforceAppCheck: true, cors: true }, async (requ
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { 
         responseMimeType: "application/json"
-        // Schema removed to prevent strict validation crashes
       },
       systemInstruction: systemInstruction
     });
     return { result: result.response.text() };
   } catch (error) {
-    console.error("Trip Gen Error Details:", error);
-    throw new HttpsError('internal', 'The travel grimoires are sealed.', error.message);
+    console.error("Trip Gen Error:", error);
+    throw new HttpsError('internal', 'The travel grimoires are sealed.');
   }
 });
 
@@ -161,13 +160,12 @@ exports.editTrip = onCall({ enforceAppCheck: true, cors: true }, async (request)
       ],
       generationConfig: { 
         responseMimeType: "application/json"
-        // Schema removed
       },
       systemInstruction: systemInstruction
     });
     return { result: result.response.text() };
   } catch (error) {
-    console.error("Edit Trip Error Details:", error);
-    throw new HttpsError('internal', 'The revision failed.', error.message);
+    console.error("Edit Trip Error:", error);
+    throw new HttpsError('internal', 'The revision failed.');
   }
 });
