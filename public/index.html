@@ -1639,21 +1639,6 @@ function drawSpriteFrame(ctx, stageIdx, t, W, H, overrideImg) {
 
 // ── ANIMATED CHAR CANVAS ─────────────────────────────
 let charRAF = null;
-function startCharCanvas() {
-  if(charRAF) cancelAnimationFrame(charRAF);
-  const canvas = document.getElementById('char-canvas');
-  if(!canvas || !STATE.player) return;
-  const ctx = canvas.getContext('2d');
-  const stageIdx = getCurrentRank().stageIdx;
-  const W = canvas.width, H = canvas.height;
-  function frame() {
-    const t = Date.now() * 0.001;
-    ctx.clearRect(0,0,W,H);
-    drawSpriteFrame(ctx, stageIdx, t, W, H);
-    charRAF = requestAnimationFrame(frame);
-  }
-  frame();
-}
 
 // Animate path screen monster (stage 0 preview)
 let pathMonRAF = null;
