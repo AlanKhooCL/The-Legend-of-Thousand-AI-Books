@@ -132,15 +132,33 @@ JSON with EXACTLY ${n} chapters:
       commonMisconceptions: c.commonMisconceptions || [],
     }));
 
+    // Generate prerequisite topics and recommended next topics
+    let prereqTopics = curriculum.prerequisiteKnowledge || [];
+    let nextTopics = [];
+    try {
+      const nextTxt = await generate(model,
+        `You are a curriculum advisor. Respond ONLY with valid JSON.`,
+        `For someone who just completed a course on: "${resolvedTopic}" (${chapterCount} chapters covering: ${finalChapters.map(c=>c.title).join(', ')})\n\nProvide:\n1. prerequisiteTopics: 3-5 short topic names someone should know BEFORE this course (if any; leave empty if truly beginner-level)\n2. nextTopics: 4-6 specific topic names to study AFTER completing this course, ordered by relevance\n\nReturn JSON: {"prerequisiteTopics": [], "nextTopics": []}`,
+        "application/json"
+      );
+      const nextParsed = safeParseJSON(nextTxt);
+      if (nextParsed) {
+        if (Array.isArray(nextParsed.prerequisiteTopics)) prereqTopics = nextParsed.prerequisiteTopics;
+        if (Array.isArray(nextParsed.nextTopics)) nextTopics = nextParsed.nextTopics;
+      }
+    } catch (e) { console.warn("Next topics generation failed:", e.message); }
+
     return {
       result: JSON.stringify({
         ...questWrapper,
         resolvedTopic, originalTopic: topic,
         chapters: finalChapters,
+        prereqTopics,
+        nextTopics,
         curriculumMeta: {
           targetAudience: curriculum.targetAudience,
           overallObjective: curriculum.overallObjective,
-          prerequisiteKnowledge: curriculum.prerequisiteKnowledge || [],
+          prerequisiteKnowledge: prereqTopics,
           domain: topicDomain,
         },
       })
