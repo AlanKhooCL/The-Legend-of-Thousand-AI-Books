@@ -302,10 +302,7 @@
   .topic-chip:hover { transform: translateY(-3px) scale(1.04); }
   .topic-chip:active { transform: translateY(0) scale(0.97); }
 
-  /* Summoning screen ring animations */
-  .ring-outer { animation: seal-spin 20s linear infinite; }
-  .ring-mid   { animation: seal-spin 12s linear infinite reverse; }
-  .ring-inner { animation: seal-spin 8s linear infinite; }
+  /* ring animation classes removed — no longer used */
 
   /* Summoning seal pulse */
   @keyframes sealPulse { 0%,100%{box-shadow:0 0 40px rgba(174,29,83,0.25);} 50%{box-shadow:0 0 80px rgba(174,29,83,0.45), 0 0 120px rgba(253,207,80,0.2);} }
@@ -387,6 +384,16 @@
     100% { opacity:0; transform:translateY(-55px) scale(0.6); }
   }
 
+  @keyframes summonBookFloat { 0%,100%{transform:translateY(0) rotate(-1deg);} 50%{transform:translateY(-10px) rotate(1deg);} }
+  .summon-book-float { animation: summonBookFloat 4s ease-in-out infinite; }
+
+  /* Quest tab panels — mobile only shows active panel */
+  .quest-panel { display: none; }
+  .quest-panel.active { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+  @media (min-width: 1024px) {
+    .quest-panel { display: flex !important; flex-direction: column; overflow-y: auto; }
+  }
+
   /* ── SUMMON SCREEN FIXES ── */
   #summon-screen .summon-headline {
     color: #312e29;
@@ -409,6 +416,60 @@
     color: #5e5b54;
     font-weight: 600;
   }
+
+  /* ── TOOLTIP SYSTEM ── */
+  .tip-wrap { position: relative; display: inline-flex; align-items: center; }
+  .tip-btn {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(174,29,83,0.1); border: 1.5px solid rgba(174,29,83,0.3);
+    color: #ae1d53; font-size: 10px; font-weight: 900;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    user-select: none; -webkit-user-select: none;
+  }
+  .tip-btn:hover, .tip-btn:focus { background: #ae1d53; color: #ffeff0; border-color: #ae1d53; outline: none; }
+  .tip-box {
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: #312e29; color: #f5efe8;
+    padding: 8px 12px; border-radius: 10px;
+    font-size: 11px; line-height: 1.55; font-weight: 500;
+    width: 200px; text-align: center;
+    pointer-events: none; opacity: 0; transition: opacity 0.18s, transform 0.18s;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .tip-box::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #312e29;
+  }
+  .tip-wrap:hover .tip-box,
+  .tip-wrap:focus-within .tip-box { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* Right-aligned tooltips */
+  .tip-box.tip-right { left: auto; right: 0; transform: translateX(0) translateY(4px); }
+  .tip-box.tip-right::after { left: auto; right: 12px; }
+  .tip-wrap:hover .tip-box.tip-right,
+  .tip-wrap:focus-within .tip-box.tip-right { transform: translateX(0) translateY(0); }
+  /* Left-aligned */
+  .tip-box.tip-left { left: 0; transform: translateX(0) translateY(4px); }
+  .tip-box.tip-left::after { left: 12px; transform: none; }
+  .tip-wrap:hover .tip-box.tip-left,
+  .tip-wrap:focus-within .tip-box.tip-left { transform: translateX(0) translateY(0); }
+
+  /* ── EVOLUTION MAP MODAL ── */
+  #evo-modal .evo-stage-card {
+    background: #fff; border-radius: 12px; padding: 10px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border: 2px solid #e8e2d7; transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  #evo-modal .evo-stage-card.current-stage {
+    border-color: #ae1d53; box-shadow: 0 0 0 3px rgba(174,29,83,0.15);
+    transform: scale(1.05);
+  }
+  #evo-modal .evo-stage-card.unlocked { border-color: #006668; }
+  #evo-modal .evo-stage-card img { width: 52px; height: 52px; object-fit: contain; image-rendering: pixelated; }
 
   /* ── MONSTER EVOLUTION AURAS ── */
   @keyframes auraFloat { 0%,100%{opacity:0.5;transform:scale(1);} 50%{opacity:0.85;transform:scale(1.08);} }
@@ -568,7 +629,13 @@
 
             <div class="w-full mt-4 space-y-1">
               <div class="flex justify-between text-[10px] font-bold text-on-surface-variant">
-                <span class="font-headline font-black text-primary uppercase tracking-widest text-[9px]">Evolution Progress</span>
+                <span class="font-headline font-black text-primary uppercase tracking-widest text-[9px] flex items-center gap-1">
+                  Evolution Progress
+                  <span class="tip-wrap">
+                    <button class="tip-btn" tabindex="0">?</button>
+                    <span class="tip-box tip-left">Earn XP by reading chapters (+20) and defeating bosses (+100). Fill the bar to evolve your companion!</span>
+                  </span>
+                </span>
                 <span id="xp-text">0 / 100 XP</span>
               </div>
               <div class="h-4 bg-surface-container rounded-full overflow-hidden p-0.5 shadow-inner">
@@ -603,6 +670,18 @@
           </div>
         </div>
 
+        <!-- Evolution Map button -->
+        <button onclick="openEvoModal()" class="w-full flex items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border-[3px] border-outline-variant/50 hover:border-primary hover:bg-primary/5 transition-all shadow-sm group">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
+            <span class="material-symbols-outlined text-primary group-hover:text-white text-lg transition-colors">account_tree</span>
+          </div>
+          <div class="text-left flex-1">
+            <p class="font-headline font-extrabold text-sm text-primary">Evolution Map</p>
+            <p class="text-[10px] text-on-surface-variant">See all 11 evolution stages</p>
+          </div>
+          <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-base">chevron_right</span>
+        </button>
+
         <div class="bg-surface-container-lowest rounded-xl p-5 space-y-4 shadow-sm" id="topic-suggestions-panel">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-tertiary text-xl" style="font-variation-settings:'FILL' 1">lightbulb</span>
@@ -627,14 +706,20 @@
           <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-primary transition-colors flex-shrink-0 shadow-inner">
             <span class="material-symbols-outlined text-3xl group-hover:text-white transition-colors">add_circle</span>
           </div>
-          <div class="text-left">
+          <div class="text-left flex-1">
             <p class="font-headline font-extrabold text-primary text-base uppercase tracking-wide">Summon New Quest</p>
-            <p class="text-on-surface-variant text-sm">Seek knowledge, bind a guardian demon</p>
+            <p class="text-on-surface-variant text-sm">Enter a topic → AI builds your scroll & boss</p>
           </div>
         </button>
 
         <div class="flex justify-between items-center mb-2">
-          <h3 class="font-headline font-extrabold text-xl text-on-surface">Scroll Folders</h3>
+          <h3 class="font-headline font-extrabold text-xl text-on-surface flex items-center gap-2">
+            Scroll Folders
+            <span class="tip-wrap">
+              <button class="tip-btn" tabindex="0">?</button>
+              <span class="tip-box tip-left">Drag quests between folders to organise them. Tap a folder name to expand or collapse it.</span>
+            </span>
+          </h3>
           <button onclick="createNewFolder()" class="bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-bold hover:bg-primary/20 transition-colors shadow-sm flex items-center gap-1">
             <span class="material-symbols-outlined text-sm">create_new_folder</span> New
           </button>
@@ -658,27 +743,46 @@
      QUEST SCREEN
 ═══════════════════════════════════════════ -->
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
+  <!-- Header -->
   <div class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high flex items-center gap-3 px-4 py-3">
     <button onclick="showHub()" class="bg-surface-container rounded-full p-2 flex items-center justify-center hover:text-primary transition-colors shadow-sm">
       <span class="material-symbols-outlined text-primary">arrow_back</span>
     </button>
-    <div>
+    <div class="flex-1 min-w-0">
       <p id="q-topic-label" class="text-[10px] font-black uppercase tracking-widest text-secondary">TOPIC</p>
-      <p id="q-title-label" class="font-headline font-extrabold text-base text-primary">Quest Title</p>
+      <p id="q-title-label" class="font-headline font-extrabold text-base text-primary truncate">Quest Title</p>
+    </div>
+    <!-- Mobile tab switcher — only visible on small screens -->
+    <div class="flex lg:hidden bg-surface-container rounded-full p-1 gap-1 flex-shrink-0">
+      <button id="qtab-scrolls-btn" onclick="switchQuestTab('scrolls')"
+              class="quest-tab-btn active px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide transition-all bg-primary text-on-primary shadow-sm">
+        Scrolls
+      </button>
+      <button id="qtab-boss-btn" onclick="switchQuestTab('boss')"
+              class="quest-tab-btn px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wide transition-all text-outline">
+        Boss
+      </button>
     </div>
   </div>
-  <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
-    <div class="lg:col-span-5 overflow-y-auto border-b lg:border-b-0 lg:border-r border-surface-container-high">
-      <div class="p-4 space-y-4">
+
+  <!-- Body: desktop = side-by-side, mobile = tabbed -->
+  <div class="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-12">
+
+    <!-- SCROLLS PANEL -->
+    <div id="quest-panel-scrolls" class="quest-panel flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-surface-container-high lg:col-span-5">
+      <div class="p-4 space-y-4 pb-8">
         <h3 class="font-headline font-extrabold text-lg flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary">menu_book</span> Ancient Scrolls
+          <span class="ml-auto text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-1 rounded-full" id="chapter-progress-label"></span>
         </h3>
         <div id="chapter-list" class="space-y-3"></div>
       </div>
     </div>
-    <div id="boss-panel" class="lg:col-span-7 overflow-y-auto bg-gradient-to-b from-[#4d001e] to-[#100e09]">
-      <div class="flex flex-col items-center p-6 gap-5">
-        <div class="relative w-40 h-40 flex items-center justify-center">
+
+    <!-- BOSS PANEL -->
+    <div id="quest-panel-boss" class="quest-panel hidden lg:flex flex-col overflow-y-auto bg-gradient-to-b from-[#4d001e] to-[#100e09] lg:col-span-7">
+      <div class="flex flex-col items-center p-6 gap-5 flex-1">
+        <div class="relative w-40 h-40 flex items-center justify-center flex-shrink-0">
           <div class="absolute inset-0 rounded-full" style="background:radial-gradient(ellipse,rgba(255,113,152,0.25) 0%,transparent 70%)"></div>
           <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10"></canvas>
         </div>
@@ -702,11 +806,13 @@
           <p id="boss-lore-text" class="text-sm text-primary-fixed/60 italic leading-relaxed">...</p>
         </div>
         <button id="boss-complete-btn" onclick="tryOpenBattle()" disabled
-                class="bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl mt-4">
+                class="bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl">
           <span class="material-symbols-outlined">swords</span> Challenge the Demon
         </button>
+        <p class="text-[10px] text-primary-fixed/40 text-center">Read all chapters first to unlock the challenge</p>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -728,22 +834,47 @@
 
   <div class="relative z-10 w-full max-w-2xl mx-auto px-4 pb-10 pt-4 grid grid-cols-1 gap-4">
 
-    <!-- Left: visual orb — hidden on mobile -->
+    <!-- Left: illustrated book — hidden on mobile, shown on desktop only -->
     <div class="hidden lg:flex relative items-center justify-center order-2 lg:order-1">
-      <div class="relative w-48 h-48 md:w-72 md:h-72 flex items-center justify-center">
-        <div class="absolute inset-0 border-[5px] border-dashed border-tertiary/40 rounded-full ring-outer"></div>
-        <div class="absolute inset-6 border-[3px] border-primary/30 rounded-full ring-mid"></div>
-        <div class="absolute inset-12 border-2 border-secondary/20 rounded-full ring-inner"></div>
-        <div class="absolute top-2 left-1/2 -translate-x-1/2 font-headline font-black text-lg text-primary/70 glyph-float-1 select-none">INT</div>
-        <div class="absolute bottom-4 left-[15%] font-headline font-black text-lg text-secondary/70 glyph-float-2 select-none">WIS</div>
-        <div class="absolute top-[20%] right-4 font-headline font-black text-lg text-tertiary/80 glyph-float-3 select-none">STR</div>
-        <div class="relative z-20 w-28 h-28 md:w-40 md:h-40 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
-          <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle,rgba(253,207,80,0.18) 0%,rgba(174,29,83,0.06) 70%)"></div>
-          <span class="material-symbols-outlined text-6xl md:text-7xl text-primary drop-shadow-md select-none font-headline" style="line-height:1">school</span>
-          <div class="absolute inset-0 border-4 border-primary rounded-full animate-ping opacity-15"></div>
-        </div>
-        <div class="absolute top-0 left-2 w-4 h-4 bg-primary-fixed rounded-full blur-sm opacity-60 orb-1"></div>
-        <div class="absolute bottom-10 right-0 w-5 h-5 bg-tertiary-fixed rounded-full blur-md opacity-40 orb-2"></div>
+      <div class="relative flex flex-col items-center gap-6">
+        <!-- Floating glyph chips -->
+        <div class="absolute -top-6 -left-4 bg-primary/10 border-2 border-primary/25 rounded-full px-4 py-1.5 font-headline font-black text-sm text-primary glyph-float-1 select-none shadow-sm">INT</div>
+        <div class="absolute top-1/2 -right-8 bg-secondary/10 border-2 border-secondary/25 rounded-full px-4 py-1.5 font-headline font-black text-sm text-secondary glyph-float-2 select-none shadow-sm">WIS</div>
+        <div class="absolute -bottom-4 -left-6 bg-tertiary/10 border-2 border-tertiary/25 rounded-full px-4 py-1.5 font-headline font-black text-sm text-tertiary glyph-float-3 select-none shadow-sm">STR</div>
+        <!-- Big open book SVG -->
+        <svg width="220" height="180" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-2xl summon-book-float">
+          <!-- Book shadow -->
+          <ellipse cx="110" cy="172" rx="80" ry="8" fill="rgba(174,29,83,0.12)"/>
+          <!-- Left page -->
+          <path d="M20 30 Q20 20 32 18 L108 22 L108 158 L32 162 Q20 162 20 150 Z" fill="#fff8f2" stroke="#e8c0c8" stroke-width="1.5"/>
+          <!-- Left page lines -->
+          <line x1="36" y1="42" x2="98" y2="42" stroke="#e8a0b0" stroke-width="1.2" opacity="0.6"/>
+          <line x1="36" y1="54" x2="98" y2="54" stroke="#e8a0b0" stroke-width="1.2" opacity="0.5"/>
+          <line x1="36" y1="66" x2="88" y2="66" stroke="#e8a0b0" stroke-width="1.2" opacity="0.4"/>
+          <line x1="36" y1="78" x2="98" y2="78" stroke="#e8a0b0" stroke-width="1.2" opacity="0.4"/>
+          <line x1="36" y1="90" x2="78" y2="90" stroke="#e8a0b0" stroke-width="1.2" opacity="0.35"/>
+          <line x1="36" y1="102" x2="98" y2="102" stroke="#e8a0b0" stroke-width="1.2" opacity="0.3"/>
+          <!-- Left page small star deco -->
+          <text x="60" y="128" text-anchor="middle" font-size="18" fill="#ae1d53" opacity="0.25">✦</text>
+          <!-- Right page -->
+          <path d="M200 30 Q200 20 188 18 L112 22 L112 158 L188 162 Q200 162 200 150 Z" fill="#fff2f6" stroke="#e8c0c8" stroke-width="1.5"/>
+          <!-- Right page lines -->
+          <line x1="122" y1="42" x2="184" y2="42" stroke="#e8a0b0" stroke-width="1.2" opacity="0.6"/>
+          <line x1="122" y1="54" x2="184" y2="54" stroke="#e8a0b0" stroke-width="1.2" opacity="0.5"/>
+          <line x1="122" y1="66" x2="174" y2="66" stroke="#e8a0b0" stroke-width="1.2" opacity="0.4"/>
+          <line x1="122" y1="78" x2="184" y2="78" stroke="#e8a0b0" stroke-width="1.2" opacity="0.4"/>
+          <line x1="132" y1="90" x2="184" y2="90" stroke="#e8a0b0" stroke-width="1.2" opacity="0.35"/>
+          <line x1="122" y1="102" x2="184" y2="102" stroke="#e8a0b0" stroke-width="1.2" opacity="0.3"/>
+          <!-- Spine -->
+          <rect x="106" y="20" width="8" height="140" rx="2" fill="#ae1d53" opacity="0.85"/>
+          <!-- Top band -->
+          <rect x="18" y="18" width="184" height="10" rx="5" fill="#ae1d53" opacity="0.9"/>
+          <!-- Stars floating above -->
+          <circle cx="60" cy="10" r="3" fill="#fdcf50" opacity="0.7"/>
+          <circle cx="160" cy="8" r="2.5" fill="#fdcf50" opacity="0.6"/>
+          <circle cx="110" cy="4" r="3.5" fill="#ae1d53" opacity="0.5"/>
+        </svg>
+        <p class="font-headline font-black text-primary/60 text-sm tracking-widest uppercase">Ancient Scroll</p>
       </div>
     </div>
 
@@ -805,6 +936,32 @@
       <div>
         <p id="summon-gen-status" class="font-headline font-extrabold text-primary text-2xl">Communing with the scrolls...</p>
         <p id="summon-gen-step" class="text-sm text-on-surface-variant mt-2 uppercase tracking-widest font-bold"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     EVOLUTION MAP MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[200]" id="evo-modal">
+  <div class="glass-panel w-full max-w-lg mx-4 rounded-2xl shadow-2xl max-h-[88vh] flex flex-col border border-white/50">
+    <div class="bg-primary p-5 flex items-center justify-between gap-3 flex-shrink-0 rounded-t-2xl">
+      <div>
+        <h3 class="font-headline font-extrabold text-on-primary text-lg">Evolution Map</h3>
+        <p class="text-[10px] font-bold text-on-primary/70 uppercase tracking-widest">All 11 companion stages</p>
+      </div>
+      <button onclick="closeEvoModal()" class="text-on-primary/60 hover:text-on-primary transition-colors bg-primary-dim/40 p-2 rounded-full">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="overflow-y-auto flex-1 p-5 bg-surface-container-lowest">
+      <p class="text-xs text-on-surface-variant font-bold mb-4 text-center">Earn XP by reading chapters and defeating bosses to evolve!</p>
+      <div id="evo-map-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+      <div class="mt-5 flex gap-4 justify-center text-[10px] font-bold text-on-surface-variant">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-primary inline-block"></span> Current Stage</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-secondary inline-block"></span> Unlocked</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-outline-variant inline-block bg-surface-container"></span> Locked</span>
       </div>
     </div>
   </div>
@@ -916,8 +1073,9 @@
     </div>
     <div class="p-8 space-y-6 text-center bg-surface-container-lowest">
       <p class="text-base text-on-surface-variant leading-relaxed font-medium">Before you challenge the demon — dare you wager your accumulated XP?</p>
-      <div class="flex justify-center gap-6 text-base font-bold bg-surface-container p-4 rounded-xl">
+      <div class="flex justify-center gap-3 text-sm font-bold bg-surface-container p-4 rounded-xl items-center">
         <span class="text-secondary flex items-center gap-2"><span class="material-symbols-outlined">trending_up</span> Win perfectly → <span class="text-on-surface font-extrabold">DOUBLE XP</span></span>
+        <span class="tip-wrap"><button class="tip-btn" tabindex="0">?</button><span class="tip-box tip-right">"Perfect" means answering ALL quiz questions correctly in one attempt.</span></span>
       </div>
       <div class="flex justify-center gap-6 text-base font-bold bg-surface-container p-4 rounded-xl">
         <span class="text-error flex items-center gap-2"><span class="material-symbols-outlined">trending_down</span> Fail perfectly → <span class="text-on-surface font-extrabold">LOSE XP</span></span>
@@ -1523,9 +1681,69 @@ window.doSummonQuest=async function(){
 
 function setSummonStatus(t,s=''){ document.getElementById('summon-gen-status').textContent=t; document.getElementById('summon-gen-step').textContent=s; }
 
-// ── NAV ─────────────────────────────────────────────
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-window.showHub=function(){ showScreen('screen-hub'); renderHub(); };
+// ── QUEST SCREEN TAB SWITCHER (mobile) ──────────────
+window.switchQuestTab = function(tab) {
+  const scrollsPanel = document.getElementById('quest-panel-scrolls');
+  const bossPanel = document.getElementById('quest-panel-boss');
+  const scrollsBtn = document.getElementById('qtab-scrolls-btn');
+  const bossBtn = document.getElementById('qtab-boss-btn');
+  if(tab === 'scrolls') {
+    scrollsPanel.classList.add('active');
+    bossPanel.classList.remove('active');
+    scrollsBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
+    scrollsBtn.classList.remove('text-outline');
+    bossBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
+    bossBtn.classList.add('text-outline');
+  } else {
+    bossPanel.classList.add('active');
+    scrollsPanel.classList.remove('active');
+    bossBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
+    bossBtn.classList.remove('text-outline');
+    scrollsBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
+    scrollsBtn.classList.add('text-outline');
+  }
+};
+
+// ── EVOLUTION MAP ─────────────────────────────────────
+window.openEvoModal = function() {
+  renderEvoMap();
+  document.getElementById('evo-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+window.closeEvoModal = function() {
+  document.getElementById('evo-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+function renderEvoMap() {
+  const grid = document.getElementById('evo-map-grid');
+  if(!grid) return;
+  const currentStageIdx = getCurrentRank().stageIdx;
+  const totalXp = STATE.player ? STATE.player.totalXp : 0;
+  grid.innerHTML = '';
+  RANKS.forEach((rank, i) => {
+    const unlocked = totalXp >= rank.xp;
+    const isCurrent = rank.stageIdx === currentStageIdx;
+    const img = SPRITE_IMGS[rank.stageIdx];
+    const card = document.createElement('div');
+    card.className = 'evo-stage-card' + (isCurrent ? ' current-stage' : unlocked ? ' unlocked' : '');
+    card.innerHTML = `
+      <div class="relative w-14 h-14 flex items-center justify-center">
+        ${unlocked
+          ? `<img src="${img ? img.src : ''}" alt="${rank.en}" class="${unlocked?'':'opacity-30 grayscale'}" style="width:52px;height:52px;object-fit:contain;image-rendering:pixelated">`
+          : `<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-outline text-2xl">lock</span></div>`
+        }
+        ${isCurrent ? '<div class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center"><span class="text-white text-[8px] font-black">★</span></div>' : ''}
+      </div>
+      <p class="text-[9px] font-black uppercase tracking-wide ${isCurrent?'text-primary':unlocked?'text-secondary':'text-outline'}">${rank.name}</p>
+      <p class="text-[8px] font-bold ${unlocked?'text-on-surface-variant':'text-outline'} text-center leading-tight">${rank.en}</p>
+      <p class="text-[8px] font-bold text-outline">${rank.xp === 0 ? 'Start' : rank.xp+' XP'}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+
 
 window.showQuestScreen=function(idx){
   STATE.activeQuestIdx=idx;
@@ -1540,15 +1758,23 @@ window.showQuestScreen=function(idx){
   updateBossHpDisplay(quest); renderChapterList(quest);
   const chapters=quest.chapters||[];
   const completed=quest.completed||[];
+  const chapDone=completed.filter(Boolean).length;
   const allDone=chapters.length>0&&chapters.every((_,i)=>completed[i]);
+  // Update progress label
+  const lbl=document.getElementById('chapter-progress-label');
+  if(lbl) lbl.textContent=`${chapDone}/${chapters.length} read`;
+  // Reset mobile tab to Scrolls
+  window.switchQuestTab('scrolls');
   const btn=document.getElementById('boss-complete-btn');
   btn.disabled=!allDone;
-  btn.className='bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl mt-4';
+  btn.className='bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl';
   if(quest.defeated){
     btn.disabled=false;
     btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge Again';
-    btn.className='bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl mt-4';
+    btn.className='bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl';
   } else if(allDone){
+    btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
+  } else {
     btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
   }
   showScreen('screen-quest');
@@ -1560,6 +1786,16 @@ function renderChapterList(quest){
   const list=document.getElementById('chapter-list'); list.innerHTML='';
   const chapters=quest.chapters||[];
   const completed=quest.completed||[];
+  const chapDone=completed.filter(Boolean).length;
+  // Update header progress label
+  const lbl=document.getElementById('chapter-progress-label');
+  if(lbl) lbl.textContent=`${chapDone}/${chapters.length} read`;
+  // Update boss tab badge on mobile
+  const bossBtn=document.getElementById('qtab-boss-btn');
+  if(bossBtn && chapDone===chapters.length && chapters.length>0){
+    bossBtn.classList.add('animate-pulse');
+    setTimeout(()=>bossBtn.classList.remove('animate-pulse'),2000);
+  }
   chapters.forEach((ch,i)=>{
     const done=completed[i];
     const item=document.createElement('div');
@@ -1568,6 +1804,13 @@ function renderChapterList(quest){
     item.addEventListener('click',()=>window.openChapterModal(i));
     list.appendChild(item);
   });
+  // If all done, show a prompt to visit Boss tab on mobile
+  if(chapters.length>0 && chapDone===chapters.length){
+    const hint=document.createElement('div');
+    hint.className='mt-3 flex items-center gap-3 p-4 bg-primary/8 rounded-2xl border-[3px] border-primary/25 lg:hidden';
+    hint.innerHTML=`<span class="material-symbols-outlined text-primary text-xl">swords</span><div class="flex-1"><p class="font-headline font-extrabold text-sm text-primary">All chapters read!</p><p class="text-xs text-on-surface-variant">Tap the Boss tab to challenge the demon</p></div><button onclick="switchQuestTab('boss')" class="bg-primary text-on-primary px-3 py-1.5 rounded-full text-xs font-black">Go →</button>`;
+    list.appendChild(hint);
+  }
 }
 
 // ── HUB RENDER ──────────────────────────────────────
@@ -1716,8 +1959,14 @@ window.markChapterComplete=async function(){
   const allDone=chapters.length>0&&chapters.every((_,i)=>quest.completed[i]);
   const btn=document.getElementById('boss-complete-btn');
   btn.disabled=!allDone;
-  if(allDone) btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
-  showToast('Chapter mastered! +20 XP');
+  if(allDone){
+    btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
+    // On mobile, nudge user to Boss tab
+    if(window.innerWidth < 1024) showToast('All chapters read! Tap "Boss" to challenge the demon 🗡');
+    else showToast('Chapter mastered! +20 XP — Boss is ready to challenge!');
+  } else {
+    showToast('Chapter mastered! +20 XP');
+  }
   renderTopicSuggestions();
 };
 
