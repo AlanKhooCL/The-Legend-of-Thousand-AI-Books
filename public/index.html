@@ -749,7 +749,7 @@
             </span>
           </h3>
           <button onclick="createNewCurriculum()" class="bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-bold hover:bg-primary/20 transition-colors shadow-sm flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">create_new_curriculum</span> New Curriculum
+            <span class="material-symbols-outlined text-sm">create_new_folder</span> New Curriculum
           </button>
         </div>
 
@@ -2081,7 +2081,7 @@ function renderQuestGrid(){
     const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
     const curriculumDiv=document.createElement('div'); curriculumDiv.className='mb-6';
     const hasActive=curriculumQuests.some(item=>!item.q.defeated);
-    curriculumDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">curriculum_open</span> ${curriculum.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${curriculumQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 curriculum-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    curriculumDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${curriculum.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${curriculumQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 curriculum-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
     const contentDiv=curriculumDiv.querySelector('.curriculum-content');
     curriculumQuests.forEach(({q:quest,i:idx})=>{
       const completed=quest.completed||[];
