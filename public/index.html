@@ -698,7 +698,7 @@
           </div>
           <div class="text-left flex-1">
             <p class="font-headline font-extrabold text-sm text-primary">Evolution Map</p>
-            <p class="text-[10px] text-on-surface-variant">See all 11 evolution stages</p>
+            <p class="text-[10px] text-on-surface-variant">See all 4 evolution stages</p>
           </div>
           <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-base">chevron_right</span>
         </button>
@@ -1079,7 +1079,6 @@
         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-primary inline-block"></span> Current Stage</span>
         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-secondary inline-block"></span> Unlocked</span>
         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-outline-variant inline-block"></span> Locked</span>
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-outline-variant opacity-40 inline-block"></span> Not Owned</span>
       </div>
     </div>
   </div>
@@ -2069,7 +2068,7 @@ function renderEvoMap() {
     requestAnimationFrame(() => {
       const imgEl = document.getElementById(imgId);
       if (!imgEl) return;
-      const src = getMonsterStageSrc(m.stage);
+      const src = MONSTER_SPRITE_SRCS['s'+m.stage] || '';
       if (src) imgEl.src = src;
     });
   });
