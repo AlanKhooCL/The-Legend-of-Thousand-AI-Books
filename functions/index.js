@@ -4,12 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { defineSecret } = require("firebase-functions/params");
 
 admin.initializeApp();
-
 const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
 
 function getModel(genAI, modelId) {
   return genAI.getGenerativeModel({ model: modelId || "gemini-2.5-flash" });
@@ -24,168 +19,137 @@ async function generate(model, systemInstruction, prompt, mimeType = "text/plain
   return result.response.text();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  SUMMON QUEST
-//  Phase 1: Generate a pedagogically-sound curriculum plan first,
-//  then derive the gamified quest wrapper from it.
-// ─────────────────────────────────────────────────────────────────────────────
+function safeParseJSON(text) {
+  const clean = (text || "").replace(/```json|```/gi, "").trim();
+  try { return JSON.parse(clean); } catch (e) {
+    const m = clean.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]); } catch (_) {} }
+    return null;
+  }
+}
 
 exports.summonQuest = onCall(
-  {
-    enforceAppCheck: true,
-    cors: true,
-    secrets: [GEMINI_API_KEY],
-    timeoutSeconds: 120,
-  },
+  { enforceAppCheck: true, cors: true, secrets: [GEMINI_API_KEY], timeoutSeconds: 180 },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
     const { topic, objective, numChapters, modelId } = request.data;
     const chapterCount = Math.max(3, Math.min(10, parseInt(numChapters) || 5));
-
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
     const model = getModel(genAI, modelId);
 
-    // ── STEP 1: Build a curriculum plan ─────────────────────────────────────
-    // Ask the model to think like an instructional designer first.
-    // This plan is NOT returned to the user — it's used to generate better chapters.
+    // STEP 0 — Disambiguate topic
+    let resolvedTopic = topic;
+    let topicDomain = "";
+    try {
+      const dText = await generate(model,
+        `You resolve topic names to their precise educational meaning. Respond ONLY with valid JSON.`,
+        `A user wants to learn: "${topic}"\n${objective ? `Goal: "${objective}"` : ""}\n\nResolve any acronym, abbreviation, or ambiguous term to its most educationally-intended meaning.\n\nExamples:\n- "MCP" (no context) → "Model Context Protocol (MCP) — Anthropic's open standard for connecting AI models to external tools and data sources"\n- "ML" → "Machine Learning (ML)"\n- "TCP" → "TCP (Transmission Control Protocol)"\n- "Renaissance" → keep as-is, not ambiguous\n\nReturn JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":false,"clarification":""}`,
+        "application/json"
+      );
+      const d = safeParseJSON(dText);
+      if (d && d.resolvedTopic) { resolvedTopic = d.resolvedTopic; topicDomain = d.domain || ""; }
+    } catch (err) { console.warn("Disambiguation skipped:", err.message); }
 
-    const curriculumSys = `You are a senior instructional designer and subject-matter expert. 
-Your task is to design a rigorous, pedagogically sound learning curriculum.
-Respond ONLY with valid JSON. No markdown, no explanation.`;
+    // STEP 1 — Curriculum design with retry until exact chapter count
+    const curriculumSys = `You are a senior instructional designer and expert in ${topicDomain || "the relevant field"}. Respond ONLY with valid JSON.`;
 
-    const curriculumPrompt = `Design a ${chapterCount}-chapter learning curriculum for: "${topic}"
-${objective ? `Learning goal: ${objective}` : ""}
+    const buildPrompt = (n) => `Design EXACTLY ${n} chapters for: "${resolvedTopic}"
+${objective ? `Goal: ${objective}` : ""}
 
-Requirements:
-- Chapters must follow a clear logical progression (foundational → applied → advanced)
-- Each chapter must have concrete, testable learning outcomes
-- Identify prerequisite knowledge a learner needs before each chapter
-- Flag common misconceptions or pitfalls for each chapter
-- Calibrate depth: assume an intelligent adult with no prior knowledge of this specific topic
+RULES:
+- Return EXACTLY ${n} items in "chapters" array — this is mandatory
+- Logical progression: foundations → core → applied → advanced
+- Use correct domain terminology (for MCP: hosts, clients, servers, tools, resources, prompts)
+- Concrete learning outcomes per chapter
 
-Return this JSON structure:
+JSON with EXACTLY ${n} chapters:
 {
-  "topic": "${topic}",
-  "targetAudience": "brief description of assumed learner",
-  "overallObjective": "what the learner will be able to do after all chapters",
-  "prerequisiteKnowledge": ["list of general background knowledge assumed"],
+  "targetAudience": "...",
+  "overallObjective": "...",
+  "prerequisiteKnowledge": [],
   "chapters": [
-    {
-      "chapterNumber": 1,
-      "title": "precise descriptive title",
-      "tag": "SHORT TAG (e.g. FOUNDATIONS, CORE CONCEPT, APPLIED)",
-      "summary": "1-2 sentence description for the learner",
-      "learningOutcomes": ["by end of chapter, learner can..."],
-      "keyConceptsToTeach": ["concept1", "concept2"],
-      "commonMisconceptions": ["misconception to address"],
-      "buildsOn": [],
-      "leadsTo": ["concept that next chapter depends on this for"]
-    }
+    {"chapterNumber":1,"title":"","tag":"FOUNDATIONS","summary":"","learningOutcomes":[],"keyConceptsToTeach":[],"commonMisconceptions":[]}
   ]
 }`;
 
-    let curriculum;
-    try {
-      const curriculumText = await generate(model, curriculumSys, curriculumPrompt, "application/json");
-      curriculum = JSON.parse(curriculumText.replace(/```json|```/gi, "").trim());
-    } catch (err) {
-      console.error("Curriculum generation failed:", err);
-      throw new HttpsError("internal", "Failed to design curriculum: " + err.message);
+    let curriculum = null;
+    for (let attempt = 1; attempt <= 3 && !curriculum; attempt++) {
+      try {
+        const txt = await generate(model, curriculumSys, buildPrompt(chapterCount), "application/json");
+        const p = safeParseJSON(txt);
+        if (p && Array.isArray(p.chapters) && p.chapters.length === chapterCount) {
+          curriculum = p;
+        } else {
+          console.warn(`Attempt ${attempt}: got ${p?.chapters?.length} chapters, need ${chapterCount}`);
+        }
+      } catch (e) { console.warn(`Attempt ${attempt} failed:`, e.message); }
     }
 
-    // ── STEP 2: Generate the gamified quest wrapper ──────────────────────────
-    // Use the curriculum to create accurate boss names, lore, and quest narrative
-    // that actually reflects the topic domain.
-
-    const questSys = `You are a creative game writer designing an educational fantasy RPG. 
-The quest must be thematically tied to the actual academic topic.
-The "demon" represents the challenge of mastering this subject.
-Respond ONLY with valid JSON.`;
-
-    const chapterListForPrompt = curriculum.chapters
-      .map((c, i) => `Chapter ${i + 1}: ${c.title}`)
-      .join("\n");
-
-    const questPrompt = `Create a fantasy quest wrapper for this learning curriculum:
-Topic: "${topic}"
-Overall objective: "${curriculum.overallObjective}"
-Chapters:
-${chapterListForPrompt}
-
-Rules:
-- Quest title should be evocative but clearly reference the actual topic
-- Boss name and lore should use metaphors FROM the topic domain (e.g. for Machine Learning: "The Overfitting Specter", for History: "The Amnesia Wraith")
-- Narrative should frame the learning journey as a heroic quest
-- Boss lore should hint at WHY mastering this topic defeats the "demon" of ignorance
-
-Return JSON:
-{
-  "questTitle": "",
-  "questNarrative": "",
-  "bossName": "",
-  "bossTitle": "",
-  "bossLore": ""
-}`;
-
-    let questWrapper;
-    try {
-      const questText = await generate(model, questSys, questPrompt, "application/json");
-      questWrapper = JSON.parse(questText.replace(/```json|```/gi, "").trim());
-    } catch (err) {
-      console.error("Quest wrapper generation failed:", err);
-      // Fallback — don't fail the whole request over the creative wrapper
-      questWrapper = {
-        questTitle: `Mastery of ${topic}`,
-        questNarrative: `A great scroll of knowledge awaits. Study its chapters to defeat the guardian demon.`,
-        bossName: `The ${topic} Demon`,
-        bossTitle: "Guardian of Ignorance",
-        bossLore: `Only by mastering ${topic} can the demon be defeated.`,
+    // Fallback curriculum
+    if (!curriculum) {
+      curriculum = {
+        targetAudience: "adult learner with no prior knowledge",
+        overallObjective: `Understand and apply ${resolvedTopic}`,
+        prerequisiteKnowledge: [],
+        chapters: Array.from({ length: chapterCount }, (_, i) => ({
+          chapterNumber: i + 1,
+          title: i === 0 ? `Introduction to ${resolvedTopic}` : i === chapterCount - 1 ? `Advanced ${resolvedTopic}` : `${resolvedTopic} — Part ${i + 1}`,
+          tag: i === 0 ? "FOUNDATIONS" : i === chapterCount - 1 ? "ADVANCED" : "CORE",
+          summary: `Chapter ${i + 1} of ${chapterCount}.`,
+          learningOutcomes: [],
+          keyConceptsToTeach: [],
+          commonMisconceptions: [],
+        })),
       };
     }
 
-    // ── STEP 3: Assemble final response ─────────────────────────────────────
-    // Strip internal planning fields before sending to frontend,
-    // but keep learningOutcomes and keyConceptsToTeach for use in chapter generation.
+    // STEP 2 — Quest wrapper
+    let questWrapper = null;
+    try {
+      const qTxt = await generate(model,
+        `You are a creative game writer for an educational fantasy RPG. Respond ONLY with valid JSON.`,
+        `Create a fantasy quest for learning: "${resolvedTopic}" (domain: ${topicDomain})\nChapters: ${curriculum.chapters.map((c,i)=>`${i+1}. ${c.title}`).join(", ")}\n\nBoss name must use a domain-specific metaphor (e.g. ML→"The Overfitting Specter", MCP→"The Context Fragmentation Daemon", Networking→"The Packet Loss Wraith").\n\nJSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
+        "application/json"
+      );
+      questWrapper = safeParseJSON(qTxt);
+    } catch (e) { console.warn("Quest wrapper failed:", e.message); }
 
-    const finalChapters = curriculum.chapters.map((c) => ({
-      title: c.title,
-      tag: c.tag,
-      summary: c.summary,
-      // These are stored on the quest and used when generating chapter content:
+    if (!questWrapper) {
+      questWrapper = {
+        questTitle: `Mastery of ${resolvedTopic}`,
+        questNarrative: `${chapterCount} scrolls of knowledge await. Study them to defeat the guardian demon.`,
+        bossName: `The ${resolvedTopic} Specter`,
+        bossTitle: "Guardian of Ignorance",
+        bossLore: `Only by mastering ${resolvedTopic} can this demon of confusion be banished.`,
+      };
+    }
+
+    const finalChapters = curriculum.chapters.map(c => ({
+      title: c.title, tag: c.tag || "CHAPTER", summary: c.summary,
       learningOutcomes: c.learningOutcomes || [],
       keyConceptsToTeach: c.keyConceptsToTeach || [],
       commonMisconceptions: c.commonMisconceptions || [],
     }));
 
-    const response = {
-      ...questWrapper,
-      chapters: finalChapters,
-      // Store full curriculum metadata so chapter generation can use it:
-      curriculumMeta: {
-        targetAudience: curriculum.targetAudience,
-        overallObjective: curriculum.overallObjective,
-        prerequisiteKnowledge: curriculum.prerequisiteKnowledge || [],
-      },
+    return {
+      result: JSON.stringify({
+        ...questWrapper,
+        resolvedTopic, originalTopic: topic,
+        chapters: finalChapters,
+        curriculumMeta: {
+          targetAudience: curriculum.targetAudience,
+          overallObjective: curriculum.overallObjective,
+          prerequisiteKnowledge: curriculum.prerequisiteKnowledge || [],
+          domain: topicDomain,
+        },
+      })
     };
-
-    return { result: JSON.stringify(response) };
   }
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  COMMUNE WITH SCROLLS
-//  generateChapter: context-aware, curriculum-driven chapter content
-//  generateQuiz:    generated from actual chapter content, not just topic name
-// ─────────────────────────────────────────────────────────────────────────────
-
 exports.communeWithScrolls = onCall(
-  {
-    enforceAppCheck: true,
-    cors: true,
-    secrets: [GEMINI_API_KEY],
-    timeoutSeconds: 120,
-  },
+  { enforceAppCheck: true, cors: true, secrets: [GEMINI_API_KEY], timeoutSeconds: 120 },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
@@ -193,139 +157,94 @@ exports.communeWithScrolls = onCall(
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
     const model = getModel(genAI, modelId);
 
-    // ── GENERATE CHAPTER ─────────────────────────────────────────────────────
     if (action === "generateChapter") {
       const {
-        topic,
-        chapterTitle,
-        chapterTag,
-        chapterSummary,
-        chapterNumber,
-        totalChapters,
-        learningOutcomes,
-        keyConceptsToTeach,
-        commonMisconceptions,
-        curriculumMeta,
-        previousChaptersSummary,
+        topic, chapterTitle, chapterTag, chapterSummary,
+        chapterNumber, totalChapters,
+        learningOutcomes, keyConceptsToTeach, commonMisconceptions,
+        curriculumMeta, previousChaptersSummary,
       } = payload;
 
-      const sys = `You are a world-class educator and science communicator — think the clarity of Richard Feynman, 
-the narrative pull of Malcolm Gladwell, and the precision of a textbook author.
+      const domain = curriculumMeta?.domain || "the relevant field";
 
-Your writing rules:
-- NEVER be vague. Every claim must be concrete and specific.
-- Use real examples, analogies, and comparisons — not abstract placeholders.
-- If teaching a concept, show it working with a real scenario.
-- Address common misconceptions directly — say "A common mistake is..." when relevant.
-- Write for an intelligent adult who is new to THIS topic but not to learning.
-- Build on what earlier chapters established. Do not re-explain concepts already covered.
-- End with a clear "takeaway" sentence that ties back to the learning outcome.
+      const sys = `You are a world-class educator and expert in ${domain} — Feynman clarity, Gladwell narrative, textbook precision.
 
-Output format: HTML fragments only. 
-Use: <h3> for sub-headings, <p> for paragraphs, <ul>/<li> for lists, 
-<strong> for key terms (first use only), <em> for emphasis, 
-<code> for technical terms/formulas, <blockquote> for important callouts.
-No <html>, <body>, <head> tags. No inline styles.`;
+Rules:
+- Concrete and specific — name real tools, protocols, people, events
+- Show concepts with real scenarios (not placeholder examples)
+- Address misconceptions: "A common mistake is..." or "Contrary to intuition..."
+- Build on prior chapters, never re-explain covered concepts
+- End with a <blockquote> containing one sharp takeaway sentence
 
-      const outcomesText = (learningOutcomes || []).length > 0
-        ? `\nBy the end of this chapter, the learner must be able to:\n${(learningOutcomes).map(o => `- ${o}`).join("\n")}`
-        : "";
+Output: HTML fragments (<h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<blockquote>). No wrapper tags, no inline styles.`;
 
-      const conceptsText = (keyConceptsToTeach || []).length > 0
-        ? `\nKey concepts to cover (all must be explained):\n${(keyConceptsToTeach).map(c => `- ${c}`).join("\n")}`
-        : "";
+      const prompt = `Write Chapter ${chapterNumber || 1} of ${totalChapters || "?"} on: "${topic}"
 
-      const misconceptionsText = (commonMisconceptions || []).length > 0
-        ? `\nCommon misconceptions to address in this chapter:\n${(commonMisconceptions).map(m => `- ${m}`).join("\n")}`
-        : "";
+Title: "${chapterTitle}"
+Tag: ${chapterTag || ""}
+Purpose: ${chapterSummary}
+${(learningOutcomes||[]).length ? `\nLearning outcomes:\n${learningOutcomes.map(o=>`- ${o}`).join("\n")}` : ""}
+${(keyConceptsToTeach||[]).length ? `\nConcepts to cover (all required):\n${keyConceptsToTeach.map(c=>`- ${c}`).join("\n")}` : ""}
+${(commonMisconceptions||[]).length ? `\nMisconceptions to address:\n${commonMisconceptions.map(m=>`- ${m}`).join("\n")}` : ""}
+${curriculumMeta ? `\nAudience: ${curriculumMeta.targetAudience||"adult learner"}\nCourse goal: ${curriculumMeta.overallObjective||""}` : ""}
+${previousChaptersSummary ? `\nAlready covered (do NOT re-explain):\n${previousChaptersSummary}` : chapterNumber > 1 ? `\nChapter ${chapterNumber} of ${totalChapters}: assume foundations from earlier chapters.` : `\nChapter 1: start from scratch, assume no prior knowledge of ${topic}.`}
 
-      const contextText = curriculumMeta
-        ? `\nCourse context:\n- Target audience: ${curriculumMeta.targetAudience || "general adult learner"}\n- Overall course goal: ${curriculumMeta.overallObjective || ""}`
-        : "";
-
-      const previousText = previousChaptersSummary
-        ? `\nWhat has already been covered in previous chapters (do NOT re-explain these):\n${previousChaptersSummary}`
-        : chapterNumber > 1
-        ? `\nThis is chapter ${chapterNumber} of ${totalChapters}. Assume the learner has covered the foundational concepts from earlier chapters.`
-        : `\nThis is the first chapter — start from first principles, assume no prior knowledge of ${topic}.`;
-
-      const chapterPrompt = `Write Chapter ${chapterNumber || ""} of a ${totalChapters || ""}-chapter course on: "${topic}"
-
-Chapter title: "${chapterTitle}"
-Chapter purpose: ${chapterSummary}
-${outcomesText}
-${conceptsText}
-${misconceptionsText}
-${contextText}
-${previousText}
-
-Length: 550–750 words of actual educational content (not counting HTML tags).
-Start directly with content — no "In this chapter we will..." preamble.
-End with a <blockquote> containing a single sharp takeaway sentence.`;
+Length: 550–800 words. Start directly — no preamble. End with <blockquote> takeaway.`;
 
       try {
-        const content = await generate(model, sys, chapterPrompt, "text/plain");
+        const content = await generate(model, sys, prompt, "text/plain");
         return { result: content };
       } catch (err) {
-        console.error("Chapter generation error:", err);
+        console.error("Chapter error:", err);
         throw new HttpsError("internal", err.message);
       }
     }
 
-    // ── GENERATE QUIZ ────────────────────────────────────────────────────────
     if (action === "generateQuiz") {
-      const {
-        topic,
-        chapterTitles,
-        chapterContents,   // NEW: actual chapter text, sanitised plain text
-        curriculumMeta,
-      } = payload;
+      const { topic, chapterTitles, chapterContents, curriculumMeta, harderMode } = payload;
+      const optionCount = harderMode ? 5 : 4;
 
-      const sys = `You are an expert assessment designer. 
-Your job is to write quiz questions that genuinely test understanding — not just recall of surface facts.
-Good questions: test application of concepts, reveal common misconceptions, require reasoning.
-Bad questions: test trivia, are ambiguous, have "all of the above" options, or give away the answer.
+      const sys = `You are an expert assessment designer for ${curriculumMeta?.domain || "the relevant field"}.
+Test genuine understanding — application, not recall. All distractors must be plausible to a partial-knower.
 Respond ONLY with valid JSON. No markdown fences.`;
 
-      // If we have actual content, use it. Otherwise fall back to chapter titles.
-      const contentContext = chapterContents && chapterContents.length > 0
-        ? `Based on the following chapter content that the learner has studied:\n\n${chapterContents.slice(0, 6000)}`
-        : `Based on a course covering these chapters:\n${chapterTitles}`;
+      const contentContext = chapterContents && chapterContents.length > 100
+        ? `Based on this chapter content:\n\n${chapterContents.slice(0, 7000)}`
+        : `Based on a course covering: ${chapterTitles}`;
 
-      const audienceNote = curriculumMeta?.targetAudience
-        ? `\nTarget learner: ${curriculumMeta.targetAudience}`
-        : "";
-
-      const quizPrompt = `Create 5 multiple-choice quiz questions to test mastery of: "${topic}"
-${audienceNote}
+      const prompt = `Create 5 multiple-choice questions for: "${topic}"
+${curriculumMeta?.targetAudience ? `Learner: ${curriculumMeta.targetAudience}` : ""}
+${harderMode ? `\nHARD MODE: Generate ${optionCount} options per question. Option E must be a sophisticated distractor — expert-sounding but subtly incorrect.` : `\nGenerate exactly 4 options per question.`}
 
 ${contentContext}
 
-Requirements for each question:
-1. Test understanding or application — not just memorisation
-2. All 4 options must be plausible (avoid obviously wrong distractors)
-3. The explanation must clarify WHY the correct answer is right AND why common wrong answers are wrong
-4. Questions should vary in difficulty: 2 foundational, 2 applied, 1 analytical
-5. No trick questions. No "which of the following is NOT..." format.
+Rules:
+1. Test application/understanding — not surface recall
+2. All ${optionCount} options plausible to a partial-knower
+3. Explanation: why correct is right + why the most tempting wrong answer fails
+4. Mix: 2 foundational, 2 applied, 1 analytical
+5. No "which is NOT" format
 
-Return JSON:
+JSON:
 {
   "questions": [
     {
-      "question": "clear, specific question",
-      "options": ["option A", "option B", "option C", "option D"],
+      "question": "",
+      "options": [],
       "correct": 0,
-      "explanation": "explanation of correct answer and why distractors are wrong",
+      "explanation": "",
       "difficulty": "foundational|applied|analytical"
     }
   ]
 }`;
 
       try {
-        const quizText = await generate(model, sys, quizPrompt, "application/json");
-        return { result: quizText };
+        const quizText = await generate(model, sys, prompt, "application/json");
+        const parsed = safeParseJSON(quizText);
+        if (parsed) parsed._mode = harderMode ? 'hard' : 'normal';
+        return { result: JSON.stringify(parsed) };
       } catch (err) {
-        console.error("Quiz generation error:", err);
+        console.error("Quiz error:", err);
         throw new HttpsError("internal", err.message);
       }
     }
