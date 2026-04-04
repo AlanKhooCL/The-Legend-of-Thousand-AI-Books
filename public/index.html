@@ -484,6 +484,11 @@
   .collection-card img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
 
   /* ── DEADLINE URGENCY ── */
+  @keyframes monsterBob {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
   @keyframes deadlinePulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
   .deadline-urgent { animation: deadlinePulse 1.5s ease-in-out infinite; }
 
@@ -635,7 +640,7 @@
           <div class="relative z-10 flex flex-col items-center pt-5 pb-4 px-4 mt-8">
             <div class="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-sm" id="spirit-activity-tag">⚔ TRAINING</div>
 
-            <canvas id="char-canvas" width="160" height="180" class="drop-shadow-xl"></canvas>
+            <img id="char-canvas" width="160" height="180" class="drop-shadow-xl" style="image-rendering:pixelated;object-fit:contain;width:160px;height:180px;" src="" alt="companion"/>
 
             <div class="flex items-center gap-2 mt-2">
               <h2 id="char-name" onclick="renameCharacter()" class="font-headline font-extrabold text-xl text-primary cursor-pointer hover:opacity-75 transition-opacity"></h2>
@@ -1500,26 +1505,34 @@ let charRAF = null;
 let pathMonRAF = null;
 function startPathMonster() {
   if(pathMonRAF) cancelAnimationFrame(pathMonRAF);
+  pathMonRAF = null;
   const canvas = document.getElementById('path-monster-canvas');
   if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  // Show a random monster type on the name screen
+  // Replace canvas with img approach
   const randType = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
-  function frame() {
-    const t = Date.now()*0.001;
-    ctx.clearRect(0,0,W,H);
-    const img = getMonsterSprite(randType.id, 0);
-    if (img && img.complete && img.naturalWidth > 0) {
-      ctx.imageSmoothingEnabled = false;
-      const scale = Math.min(W/img.naturalWidth, H/img.naturalHeight) * 0.85;
-      const dw = img.naturalWidth*scale, dh = img.naturalHeight*scale;
-      const bob = Math.sin(t*1.8)*4;
-      ctx.drawImage(img, (W-dw)/2, (H-dh)/2+bob, dw, dh);
-    }
-    pathMonRAF = requestAnimationFrame(frame);
+  const map = MONSTER_STAGE_MAPS[randType.id];
+  if (!map) return;
+  const src = MONSTER_SPRITE_SRCS[map[0]];
+  if (src) {
+    // Draw on canvas using a regular img
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      function frame() {
+        const t = Date.now() * 0.001;
+        ctx.clearRect(0,0,W,H);
+        ctx.imageSmoothingEnabled = false;
+        const scale = Math.min(W/img.naturalWidth, H/img.naturalHeight) * 0.85;
+        const dw = img.naturalWidth*scale, dh = img.naturalHeight*scale;
+        const bob = Math.sin(t*1.8)*4;
+        ctx.drawImage(img, (W-dw)/2, (H-dh)/2+bob, dw, dh);
+        pathMonRAF = requestAnimationFrame(frame);
+      }
+      frame();
+    };
   }
-  frame();
 }
 
 // ── BOSS SPRITE ────────────────────────────────────
@@ -2103,12 +2116,13 @@ function renderEvoMap() {
     const card = document.createElement('div');
     card.className = 'evo-stage-card' + (isCurrent ? ' current-stage' : unlocked ? ' unlocked' : '');
 
-    const canvasId = `evo-canvas-${i}`;
+    const imgId = `evo-img-${i}`;
     card.innerHTML = `
       <div class="relative w-14 h-14 flex items-center justify-center">
-        <canvas id="${canvasId}" width="52" height="52" style="image-rendering:pixelated;${!isOwned || !unlocked ? 'filter:grayscale(1) opacity(0.35)' : ''}"></canvas>
+        <img id="${imgId}" src="" alt="" width="52" height="52"
+          style="image-rendering:pixelated;object-fit:contain;width:52px;height:52px;${!isOwned || !unlocked ? 'filter:grayscale(1) opacity(0.35)' : ''}"/>
         ${isCurrent ? '<div class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center"><span class="text-white text-[8px] font-black">★</span></div>' : ''}
-        ${!isOwned ? '<div class="absolute inset-0 flex items-center justify-center"><span class="text-base">🔒</span></div>' : ''}
+        ${!isOwned ? '<div class="absolute inset-0 flex items-center justify-center bg-white/20 rounded-lg"><span class="text-base">🔒</span></div>' : ''}
       </div>
       <p class="text-[9px] font-black uppercase tracking-wide ${isCurrent?'text-primary':unlocked?'text-secondary':'text-outline'}">${rank.name}</p>
       <p class="text-[8px] font-bold ${unlocked?'text-on-surface-variant':'text-outline'} text-center leading-tight">${rank.en}</p>
@@ -2116,31 +2130,15 @@ function renderEvoMap() {
     `;
     grid.appendChild(card);
 
-    // Draw sprite on canvas — lazy loaded
+    // Set img src directly
     requestAnimationFrame(() => {
-      const cvs = document.getElementById(canvasId);
-      if (!cvs) return;
-      const ctx = cvs.getContext('2d');
+      const imgEl = document.getElementById(imgId);
+      if (!imgEl) return;
       const map = MONSTER_STAGE_MAPS[typeId];
       if (!map) return;
       const key = map[Math.min(stageToShow, map.length - 1)];
-      const img = getOrLoadSprite(key);
-      if (!img) return;
-
-      function drawToCanvas() {
-        if (!img.complete || !img.naturalWidth) return;
-        ctx.clearRect(0, 0, 52, 52);
-        ctx.imageSmoothingEnabled = false;
-        const scale = Math.min(52 / img.naturalWidth, 52 / img.naturalHeight);
-        const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-        ctx.drawImage(img, (52 - dw) / 2, (52 - dh) / 2, dw, dh);
-      }
-
-      if (img.complete && img.naturalWidth > 0) {
-        drawToCanvas();
-      } else {
-        img.onload = drawToCanvas;
-      }
+      const src = MONSTER_SPRITE_SRCS[key];
+      if (src) imgEl.src = src;
     });
   });
 }
@@ -2720,31 +2718,22 @@ function renderCollectionCountLabel() {
 // Override startCharCanvas to use active monster type
 function startCharCanvas() {
   if (charRAF) cancelAnimationFrame(charRAF);
-  const canvas = document.getElementById('char-canvas');
-  if (!canvas || !STATE.player) return;
-  const ctx = canvas.getContext('2d');
+  charRAF = null;
+  const imgEl = document.getElementById('char-canvas');
+  if (!imgEl || !STATE.player) return;
   const stageIdx = getCurrentRank().stageIdx;
   const activeM = getActiveMonster();
   const typeId = activeM ? activeM.typeId : MONSTER_TYPES[0].id;
-  const W = canvas.width, H = canvas.height;
-
-  function drawLoop() {
-    const t = Date.now() * 0.001;
-    ctx.clearRect(0, 0, W, H);
-    const img = getMonsterSprite(typeId, stageIdx);
-    if (img && img.complete && img.naturalWidth > 0) {
-      ctx.imageSmoothingEnabled = false;
-      const scale = Math.min(W / img.naturalWidth, H / img.naturalHeight) * 0.85;
-      const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-      const bob = Math.sin(t * 1.8) * 4;
-      ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2 + bob, dw, dh);
-    }
-    charRAF = requestAnimationFrame(drawLoop);
+  const map = MONSTER_STAGE_MAPS[typeId];
+  if (!map) return;
+  const key = map[Math.min(stageIdx, map.length - 1)];
+  const src = MONSTER_SPRITE_SRCS[key];
+  if (src) {
+    imgEl.src = src;
+    imgEl.style.imageRendering = 'pixelated';
+    // Bob animation via CSS
+    imgEl.style.animation = 'monsterBob 2.4s ease-in-out infinite';
   }
-
-  // Kick off — getMonsterSprite creates the Image and starts loading
-  // The loop will render it as soon as complete
-  drawLoop();
 }
 
 
