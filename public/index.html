@@ -1504,6 +1504,13 @@ async function loadState(){
   document.getElementById('loading-text').style.display='none';
 }
 
+// ── NAV ──────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+window.showHub=function(){ showScreen('screen-hub'); renderHub(); };
+
 window.enterRealm=function(){
   if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); startPathMonster(); }
   else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
