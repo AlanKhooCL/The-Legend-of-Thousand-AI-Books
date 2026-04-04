@@ -2163,23 +2163,26 @@ function renderEvoMap() {
     `;
     grid.appendChild(card);
 
-    // Draw sprite on canvas
+    // Draw sprite on canvas — handle load timing
     requestAnimationFrame(() => {
       const cvs = document.getElementById(canvasId);
       if (!cvs) return;
       const ctx = cvs.getContext('2d');
-      const img = getMonsterSprite(typeId, stageToShow);
-      const drawIt = (imgEl) => {
-        ctx.clearRect(0,0,52,52);
+
+      function drawToCanvas(imgEl) {
+        ctx.clearRect(0, 0, 52, 52);
         ctx.imageSmoothingEnabled = false;
-        const scale = Math.min(52/imgEl.naturalWidth, 52/imgEl.naturalHeight);
-        const dw = imgEl.naturalWidth*scale, dh = imgEl.naturalHeight*scale;
-        ctx.drawImage(imgEl, (52-dw)/2, (52-dh)/2, dw, dh);
-      };
-      if (img && img.complete && img.naturalWidth) {
-        drawIt(img);
-      } else if (img) {
-        img.onload = () => drawIt(img);
+        const scale = Math.min(52 / imgEl.naturalWidth, 52 / imgEl.naturalHeight);
+        const dw = imgEl.naturalWidth * scale, dh = imgEl.naturalHeight * scale;
+        ctx.drawImage(imgEl, (52 - dw) / 2, (52 - dh) / 2, dw, dh);
+      }
+
+      const img = getMonsterSprite(typeId, stageToShow);
+      if (!img) return;
+      if (img.complete && img.naturalWidth > 0) {
+        drawToCanvas(img);
+      } else {
+        img.onload = () => drawToCanvas(img);
       }
     });
   });
@@ -2768,20 +2771,33 @@ function startCharCanvas() {
   const typeId = activeM ? activeM.typeId : MONSTER_TYPES[0].id;
   const W = canvas.width, H = canvas.height;
 
-  function frame() {
+  const img = getMonsterSprite(typeId, stageIdx);
+
+  function drawFrame() {
     const t = Date.now() * 0.001;
-    ctx.clearRect(0,0,W,H);
-    const img = getMonsterSprite(typeId, stageIdx);
-    if (img && img.complete && img.naturalWidth) {
+    ctx.clearRect(0, 0, W, H);
+    if (img && img.complete && img.naturalWidth > 0) {
       ctx.imageSmoothingEnabled = false;
-      const scale = Math.min(W/img.naturalWidth, H/img.naturalHeight) * 0.85;
-      const dw = img.naturalWidth*scale, dh = img.naturalHeight*scale;
+      const scale = Math.min(W / img.naturalWidth, H / img.naturalHeight) * 0.85;
+      const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
       const bob = Math.sin(t * 1.8) * 4;
-      ctx.drawImage(img, (W-dw)/2, (H-dh)/2 + bob, dw, dh);
+      ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2 + bob, dw, dh);
     }
-    charRAF = requestAnimationFrame(frame);
+    charRAF = requestAnimationFrame(drawFrame);
   }
-  frame();
+
+  if (img) {
+    if (img.complete && img.naturalWidth > 0) {
+      drawFrame();
+    } else {
+      // Wait for image to load then start animation
+      img.onload = () => { if (charRAF) cancelAnimationFrame(charRAF); drawFrame(); };
+      // Also start loop anyway so it picks up as soon as ready
+      drawFrame();
+    }
+  } else {
+    drawFrame();
+  }
 }
 
 
@@ -2806,6 +2822,18 @@ function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-profile"]');
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
+
+  // Preload all monster sprites so img.complete is true when needed
+  const preloadAll = () => {
+    const imgs = Object.values(MONSTER_TYPE_SPRITES);
+    let loaded = 0;
+    imgs.forEach(img => {
+      if (img.complete && img.naturalWidth > 0) { loaded++; return; }
+      img.onload = () => { loaded++; };
+    });
+  };
+  // Run after a tick so IIFE has finished
+  setTimeout(preloadAll, 0);
 
   onAuthStateChanged(auth,user=>{
     if(user){ USER_ID=user.uid; loadState(); }
