@@ -333,7 +333,7 @@
   .pixel-text { font-family: monospace; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
 
   /* Drag and Drop indication */
-  .folder-content.drag-over { background: rgba(174,29,83,0.05); border-radius: 0.5rem; }
+  .curriculum-content.drag-over { background: rgba(174,29,83,0.05); border-radius: 0.5rem; }
 
   /* ── SUMMON PAGES ANIMATION ── */
   .summon-pages-anim { perspective: 400px; }
@@ -555,10 +555,6 @@
           <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.224 1.224-3.136 2.576-6.64 2.576-5.392 0-9.672-4.384-9.672-9.776s4.28-9.776 9.672-9.776c2.928 0 5.144 1.144 6.776 2.704l2.312-2.312c-2.392-2.272-5.464-4.016-9.088-4.016-6.608 0-12 5.392-12 12s5.392 12 12 12c3.576 0 6.264-1.176 8.368-3.36 2.16-2.16 2.848-5.216 2.848-7.632 0-.528-.056-1.048-.152-1.512h-10.136z"/></svg>
           <span class="tracking-wide">Sign in with Google</span>
         </button>
-        <button onclick="signInGuest()" class="bubbly-btn w-full bg-secondary text-on-secondary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-3 shadow-md">
-          <span class="material-symbols-outlined text-xl">person_play</span>
-          <span class="tracking-wide">Guest Play</span>
-        </button>
       </div>
       <button id="btn-enter" onclick="enterRealm()" style="display:none" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-3 shadow-md">
         <span class="material-symbols-outlined text-xl">auto_awesome</span>
@@ -620,9 +616,7 @@
     <button onclick="switchTab('tab-quests')" data-target="tab-quests" class="tab-btn flex-1 py-3 font-headline font-bold text-xs uppercase tracking-widest text-outline border-b-[3px] border-transparent transition-all flex flex-col items-center gap-0.5">
       <span class="material-symbols-outlined text-lg">menu_book</span>Scrolls
     </button>
-    <button onclick="switchTab('tab-library')" data-target="tab-library" class="tab-btn flex-1 py-3 font-headline font-bold text-xs uppercase tracking-widest text-outline border-b-[3px] border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">local_library</span>Library
-    </button>
+
   </div>
   <div class="flex-1 overflow-hidden">
 
@@ -742,20 +736,20 @@
           </div>
           <div class="text-left flex-1">
             <p class="font-headline font-extrabold text-primary text-base uppercase tracking-wide">Summon New Quest</p>
-            <p class="text-on-surface-variant text-sm">Enter a topic → AI builds your scroll & boss</p>
+            <p class="text-on-surface-variant text-sm">Enter a topic → AI builds your curriculum & boss</p>
           </div>
         </button>
 
         <div class="flex justify-between items-center mb-2">
           <h3 class="font-headline font-extrabold text-xl text-on-surface flex items-center gap-2">
-            Scroll Folders
+            Curriculum
             <span class="tip-wrap">
               <button class="tip-btn" tabindex="0">?</button>
-              <span class="tip-box tip-left">Drag quests between folders to organise them. Tap a folder name to expand or collapse it.</span>
+              <span class="tip-box tip-left">Group your quests into curricula. Drag quests between curricula to organise them. Tap a name to expand or collapse.</span>
             </span>
           </h3>
-          <button onclick="createNewFolder()" class="bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-bold hover:bg-primary/20 transition-colors shadow-sm flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">create_new_folder</span> New
+          <button onclick="createNewCurriculum()" class="bg-primary/10 text-primary px-4 py-2 rounded-full text-xs font-bold hover:bg-primary/20 transition-colors shadow-sm flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">create_new_curriculum</span> New Curriculum
           </button>
         </div>
 
@@ -763,13 +757,7 @@
       </div>
     </div>
 
-    <!-- LIBRARY TAB -->
-    <div id="tab-library" class="tab-pane h-full overflow-y-auto">
-      <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
-        <p class="text-center text-on-surface-variant text-xs font-bold uppercase tracking-widest py-2">Quests from scholars across the realm — tap to copy</p>
-        <div id="library-grid" class="space-y-4"></div>
-      </div>
-    </div>
+    
 
 
   </div>
@@ -1379,7 +1367,7 @@ let STATE = {
   selectedModel: 'gemini-2.5-flash',
   summonChapters: 5,
   saves: [], activeSaveId: null,
-  publicQuests: [], quests: [], player: null, folders: [],
+  publicQuests: [], quests: [], player: null, curriculums: [],
   activeQuestIdx: null, activeChapterIdx: null,
   quizData: null, quizCurrent: 0, quizScore: 0,
   gambitWager: 0, gambitActive: false, gambitRevealed: false,
@@ -1608,8 +1596,8 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
 // ── DRAG AND DROP ──────────────────────────────────
 window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; };
 window.allowDrop=function(ev){ ev.preventDefault(); };
-window.dropQuest=function(ev,folderId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].folderId=folderId; saveState(); renderQuestGrid(); } };
-window.createNewFolder=function(){ const name=prompt("Enter new folder name:"); if(name&&name.trim()){ if(!STATE.folders) STATE.folders=[]; STATE.folders.push({id:Date.now().toString(),name:name.trim()}); saveState(); renderQuestGrid(); } };
+window.dropQuest=function(ev,curriculumId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].curriculumId=curriculumId; saveState(); renderQuestGrid(); } };
+window.createNewCurriculum=function(){ const name=prompt("Enter new curriculum name:"); if(name&&name.trim()){ if(!STATE.curriculums) STATE.curriculums=[]; STATE.curriculums.push({id:Date.now().toString(),name:name.trim()}); saveState(); renderQuestGrid(); } };
 
 // ── FIREBASE STATE ─────────────────────────────────
 async function loadState(){
@@ -1620,14 +1608,14 @@ async function loadState(){
     if(snap.exists()){
       const d=snap.data();
       if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
-      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[],folders:[{id:'default',name:'My Scrolls'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
+      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
       loaded=true;
     }
   }catch(e){ showToast("Could not load data."); }
   try{ await loadPublicQuests(); }catch(e){}
   const btn=document.getElementById('btn-enter');
   if(loaded&&STATE.saves?.length>0){
-    STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.folders) s.folders=[{id:'default',name:'My Scrolls'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
+    STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
     syncActiveSaveToState();
     // Persist any migration fixes (stale monster IDs, etc.)
     saveState();
@@ -1655,8 +1643,8 @@ function syncActiveSaveToState(){
   const s=STATE.saves.find(s=>s.id===STATE.activeSaveId);
   if(s){
     STATE.player=s.player;
-    STATE.folders=s.folders||[{id:'default',name:'My Scrolls'}];
-    STATE.quests=(s.quests||[]).filter(Boolean).map(q=>({...q,topic:q.topic||'Unknown',questTitle:q.questTitle||'Forgotten Scroll',bossName:q.bossName||'Unknown',chapters:q.chapters||[],completed:q.completed||[],bossHp:typeof q.bossHp==='number'?q.bossHp:100,bossMaxHp:typeof q.bossMaxHp==='number'?q.bossMaxHp:100,folderId:q.folderId||'default'}));
+    STATE.curriculums=s.curriculums||[{id:'default',name:'My Curriculum'}];
+    STATE.quests=(s.quests||[]).filter(Boolean).map(q=>({...q,topic:q.topic||'Unknown',questTitle:q.questTitle||'Forgotten Scroll',bossName:q.bossName||'Unknown',chapters:q.chapters||[],completed:q.completed||[],bossHp:typeof q.bossHp==='number'?q.bossHp:100,bossMaxHp:typeof q.bossMaxHp==='number'?q.bossMaxHp:100,curriculumId:q.curriculumId||'default'}));
     STATE.player.questsCreated=STATE.quests.length;
     // Ensure collection exists and has valid typeIds
     if(!STATE.player.collection) {
@@ -1679,7 +1667,7 @@ function syncActiveSaveToState(){
 function syncStateToActiveSave(){
   if(!STATE.activeSaveId) return;
   const i=STATE.saves.findIndex(s=>s.id===STATE.activeSaveId);
-  if(i!==-1){ STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; STATE.saves[i].folders=STATE.folders; }
+  if(i!==-1){ STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; STATE.saves[i].curriculums=STATE.curriculums; }
 }
 
 async function saveState(){
@@ -1688,17 +1676,12 @@ async function saveState(){
   try{ await setDoc(doc(db,"users",USER_ID),{saves:STATE.saves,activeSaveId:STATE.activeSaveId},{merge:true}); }catch(e){}
 }
 
-async function loadPublicQuests(){
-  const q=query(collection(db,"public_quests"),orderBy("id","desc"),limit(12));
-  const snap=await getDocs(q);
-  STATE.publicQuests=snap.docs.map(d=>({...d.data(),docId:d.id}));
-}
 
 window.nukeLibrary=async function(){
   if(!confirm("Delete ALL quests from the Realm Library?")) return;
   let n=0;
   for(const q of STATE.publicQuests){ try{ await deleteDoc(doc(db,"public_quests",q.docId)); n++; }catch(e){} }
-  STATE.publicQuests=[]; renderLibraryGrid(); closeApiModal(); showToast(`Nuked ${n} scrolls.`);
+  STATE.publicQuests=[]; closeApiModal(); showToast(`Nuked ${n} scrolls.`);
 };
 
 // ── AUTH ────────────────────────────────────────────
@@ -1708,12 +1691,7 @@ window.signInGoogle=async()=>{
   try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
   catch(e){ showToast("Google Sign-In failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
 };
-window.signInGuest=async()=>{
-  document.getElementById('auth-buttons').classList.add('hidden');
-  document.getElementById('loading-text').style.display='flex';
-  try{ await signInAnonymously(auth); }
-  catch(e){ showToast("Guest login failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
-};
+
 window.signOutUser=async()=>{ try{ await signOut(auth); window.location.reload(); }catch(e){ showToast("Failed to sign out."); } };
 
 // ── TABS ────────────────────────────────────────────
@@ -1723,7 +1701,6 @@ window.switchTab=function(tabId){
   document.getElementById(tabId).classList.add('active');
   const btn=document.querySelector(`.tab-btn[data-target="${tabId}"]`);
   if(btn){ btn.classList.remove('text-outline','border-transparent'); btn.classList.add('text-primary','border-primary','bg-primary/5'); }
-  if(tabId==='tab-library') loadPublicQuests().then(()=>renderLibraryGrid());
 };
 
 // ── PATH SELECTION ──────────────────────────────────
@@ -1733,7 +1710,7 @@ window.choosePath=async function(){
   const newPlayer = defaultPlayer(name);
   // Use the same monster that was shown on the path screen
   newPlayer.collection = defaultCollection();
-  const newSave={id:Date.now().toString(),player:newPlayer,quests:[],folders:[{id:'default',name:'My Scrolls'}]};
+  const newSave={id:Date.now().toString(),player:newPlayer,quests:[],curriculums:[{id:'default',name:'My Curriculum'}]};
   STATE.saves.push(newSave); STATE.activeSaveId=newSave.id;
   syncActiveSaveToState();
   await saveState();
@@ -1968,7 +1945,7 @@ window.doSummonQuest=async function(){
       bossLore: parsed.bossLore||"A mysterious entity.",
       chapters,
       curriculumMeta,  // stored for use in chapter generation
-      folderId:'default',
+      curriculumId:'default',
     };
     const userQuest={
       ...baseQuest,
@@ -2093,20 +2070,20 @@ function renderHub(){
   const sv=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
   sv('stat-quests',p.questsCreated); sv('stat-chapters',p.chaptersCompleted); sv('stat-bosses',p.bossesDefeated); sv('stat-perfect',p.perfectRuns);
   checkAndExtendOverdueDeadlines();
-  renderTopicSuggestions(); renderQuestGrid(); renderLibraryGrid(); renderBgCountLabel(); applyActiveBg();
+  renderTopicSuggestions(); renderQuestGrid(); renderBgCountLabel(); applyActiveBg();
 }
 
 function renderQuestGrid(){
   const grid=document.getElementById('quest-grid'); grid.innerHTML='';
   if(!STATE.quests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">No active quests. Summon one to begin your journey.</div>`; return; }
-  if(!STATE.folders||STATE.folders.length===0) STATE.folders=[{id:'default',name:'My Scrolls'}];
-  STATE.folders.forEach(folder=>{
-    const folderQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.folderId||'default')===folder.id);
-    const folderDiv=document.createElement('div'); folderDiv.className='mb-6';
-    const hasActive=folderQuests.some(item=>!item.q.defeated);
-    folderDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${folder.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${folderQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 folder-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${folder.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
-    const contentDiv=folderDiv.querySelector('.folder-content');
-    folderQuests.forEach(({q:quest,i:idx})=>{
+  if(!STATE.curriculums||STATE.curriculums.length===0) STATE.curriculums=[{id:'default',name:'My Curriculum'}];
+  STATE.curriculums.forEach(curriculum=>{
+    const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
+    const curriculumDiv=document.createElement('div'); curriculumDiv.className='mb-6';
+    const hasActive=curriculumQuests.some(item=>!item.q.defeated);
+    curriculumDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">curriculum_open</span> ${curriculum.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${curriculumQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 curriculum-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    const contentDiv=curriculumDiv.querySelector('.curriculum-content');
+    curriculumQuests.forEach(({q:quest,i:idx})=>{
       const completed=quest.completed||[];
       const chapters=quest.chapters||[];
       const chapDone=completed.filter(Boolean).length;
@@ -2125,27 +2102,12 @@ function renderQuestGrid(){
       card.addEventListener('click',()=>window.showQuestScreen(idx));
       contentDiv.appendChild(card);
     });
-    grid.appendChild(folderDiv);
+    grid.appendChild(curriculumDiv);
   });
 }
 
-function renderLibraryGrid(){
-  const grid=document.getElementById('library-grid'); grid.innerHTML='';
-  if(!STATE.publicQuests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">The library is empty. Be the first to share a quest!</div>`; return; }
-  STATE.publicQuests.forEach((quest,idx)=>{
-    if(!quest) return;
-    const chapters=quest.chapters||[];
-    const card=document.createElement('div');
-    card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5';
-    card.innerHTML=`<div class="flex items-center gap-4 mb-3"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-0.5">${(quest.topic||'Unknown').toUpperCase()}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled'}</p></div></div><div class="flex items-center justify-between border-t-2 border-outline-variant/20 pt-3"><span class="text-xs text-on-surface-variant font-bold">${chapters.length} Chapters</span><span class="text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">+ Add to Quests</span></div>`;
-    const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,1.0);
-    if(quest.authorId===USER_ID){ const del=document.createElement('button'); del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>'; del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1'; del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Remove from library?')) window.deletePublicQuest(quest.docId,idx); }); card.appendChild(del); }
-    card.addEventListener('click',()=>window.copyPublicQuest(idx));
-    grid.appendChild(card);
-  });
-}
 
-window.deletePublicQuest=async function(docId,idx){ try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); renderLibraryGrid(); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); } };
+window.deletePublicQuest=async function(docId,idx){ try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); } };
 
 function renderSettingsCharacters(){
   const list=document.getElementById('character-list'); if(!list) return;
@@ -2162,7 +2124,7 @@ function renderSettingsCharacters(){
 }
 
 window.switchCharacter=function(id){ STATE.activeSaveId=id; syncActiveSaveToState(); saveState(); STATE.activeQuestIdx=null; STATE.quizCurrent=0; renderHub(); renderSettingsCharacters(); closeApiModal(); showToast(`Switched to ${STATE.player.name}`); };
-window.deleteCharacter=function(id,event){ event.stopPropagation(); if(!confirm("Banish this companion forever?")) return; STATE.saves=STATE.saves.filter(s=>s.id!==id); if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.folders=[]; saveState(); closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='none'; } else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); } };
+window.deleteCharacter=function(id,event){ event.stopPropagation(); if(!confirm("Banish this companion forever?")) return; STATE.saves=STATE.saves.filter(s=>s.id!==id); if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.curriculums=[]; saveState(); closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='none'; } else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); } };
 window.createNewCharacter=function(){ closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='block'; };
 
 // ── MODALS ──────────────────────────────────────────
@@ -2171,7 +2133,7 @@ window.closeApiModal=()=>{ document.getElementById('api-modal').classList.remove
 window.closeAllModals=()=>{ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); document.getElementById('modal-backdrop').classList.add('hidden'); };
 
 // ── COPY PUBLIC QUEST ────────────────────────────────
-window.copyPublicQuest=function(idx){ const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,folderId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-quests'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
+window.copyPublicQuest=function(idx){ return; const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,curriculumId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-quests'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
 
 // ── CHAPTER MODAL ────────────────────────────────────
 window.openChapterModal=function(chapterIdx){
