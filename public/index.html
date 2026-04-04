@@ -907,6 +907,19 @@
         </div>
 
 
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="summon-label text-xs font-black uppercase tracking-widest font-label block">Chapters</label>
+            <span id="summon-chapter-display" class="font-headline font-extrabold text-primary text-sm">5 Chapters</span>
+          </div>
+          <div class="flex gap-2 items-center bg-surface-container-low p-2 rounded-xl border border-outline-variant/50">
+            <button onclick="setSummonChapters(3)" class="chap-pip flex-1 py-2 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-xs font-black hover:border-primary hover:text-primary transition-all text-on-surface">3</button>
+            <button onclick="setSummonChapters(5)" class="chap-pip flex-1 py-2 rounded-lg border-2 border-primary bg-primary text-on-primary text-xs font-black shadow-md active-pip">5</button>
+            <button onclick="setSummonChapters(7)" class="chap-pip flex-1 py-2 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-xs font-black hover:border-primary hover:text-primary transition-all text-on-surface">7</button>
+            <button onclick="setSummonChapters(10)" class="chap-pip flex-1 py-2 rounded-lg border-2 border-outline-variant bg-surface-container-lowest text-xs font-black hover:border-primary hover:text-primary transition-all text-on-surface">10</button>
+          </div>
+        </div>
+
         <button onclick="doSummonQuest()" id="summon-action-btn"
                 class="bubbly-btn w-full py-5 bg-primary text-on-primary rounded-xl font-headline text-lg font-black tracking-widest border-b-[5px] border-primary-dim hover:translate-y-0.5 active:translate-y-1.5 active:border-b-0 transition-all shadow-lg flex items-center justify-center gap-3 group mt-2">
           SUMMON
@@ -1643,14 +1656,26 @@ window.openSummonScreen=function(){
 };
 window.closeSummonScreen=function(){ document.getElementById('summon-screen').classList.remove('open'); };
 
-window.setSummonChapters=function(n){ STATE.summonChapters=n; };
+window.setSummonChapters=function(n){
+  STATE.summonChapters=n;
+  document.getElementById('summon-chapter-display').textContent=`${n} Chapters`;
+  document.querySelectorAll('.chap-pip').forEach(b=>{
+    const v=parseInt(b.textContent);
+    if(v===n){
+      b.classList.add('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
+      b.classList.remove('border-outline-variant','bg-surface-container-lowest','text-on-surface');
+    } else {
+      b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
+      b.classList.add('border-outline-variant','bg-surface-container-lowest','text-on-surface');
+    }
+  });
+};
 
 window.doSummonQuest=async function(){
   const topic=document.getElementById('summon-topic-input').value.trim();
   if(!topic){ showToast('Please enter a topic.'); return; }
   const objective=document.getElementById('summon-objective-input').value.trim();
-  // Auto-determine chapter count — pass 0 to let the AI decide based on complexity
-  const numChapters=0;
+  const numChapters=STATE.summonChapters||5;
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('flex');
@@ -1665,9 +1690,7 @@ window.doSummonQuest=async function(){
     setSummonStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
     await delay(400);
     const chapters=parsed.chapters||parsed.chapterList||[];
-    // Fallback: use a sensible default based on topic length if AI returned nothing
-    const fallbackCount = topic.length > 30 ? 7 : topic.split(' ').length > 3 ? 5 : 3;
-    if(!chapters.length) for(let i=0;i<fallbackCount;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
+    if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
     const baseQuest={topic:topic||"Unknown",objective:objective||"",questTitle:parsed.questTitle||parsed.title||`${topic} Mastery`,questNarrative:parsed.questNarrative||"A newly discovered scroll.",bossName:parsed.bossName||"Demon",bossTitle:parsed.bossTitle||"The Unknown",bossLore:parsed.bossLore||"A mysterious entity.",chapters,folderId:'default'};
     const userQuest={...baseQuest,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false};
     if(!STATE.quests) STATE.quests=[];
