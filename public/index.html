@@ -776,6 +776,11 @@
       <p id="q-topic-label" class="text-[10px] font-black uppercase tracking-widest text-secondary">TOPIC</p>
       <p id="q-title-label" class="font-headline font-extrabold text-base text-primary truncate">Quest Title</p>
     </div>
+    <!-- Move to curriculum button -->
+    <button onclick="openMoveModal()" class="flex-shrink-0 bg-surface-container rounded-full px-3 py-2 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-all shadow-sm">
+      <span class="material-symbols-outlined text-sm">drive_file_move</span>
+      <span class="hidden sm:inline">Move</span>
+    </button>
     <!-- Mobile tab switcher — only visible on small screens -->
     <div class="flex lg:hidden bg-surface-container rounded-full p-1 gap-1 flex-shrink-0">
       <button id="qtab-scrolls-btn" onclick="switchQuestTab('scrolls')"
@@ -795,6 +800,23 @@
     <!-- SCROLLS PANEL -->
     <div id="quest-panel-scrolls" class="quest-panel flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-surface-container-high lg:col-span-5">
       <div class="p-4 space-y-4 pb-8">
+
+        <!-- Prereq & Next Topics -->
+        <div id="quest-meta-panel" class="space-y-3 hidden">
+          <div class="bg-surface-container rounded-xl p-3 space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">checklist</span> Prerequisites
+            </p>
+            <div id="prereq-chips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+          <div class="bg-surface-container rounded-xl p-3 space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-tertiary flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">arrow_forward</span> Learn Next
+            </p>
+            <div id="next-topic-chips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
         <h3 class="font-headline font-extrabold text-lg flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary">menu_book</span> Ancient Scrolls
           <span class="ml-auto text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-1 rounded-full" id="chapter-progress-label"></span>
@@ -1069,6 +1091,24 @@
         <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded border-2 border-outline-variant inline-block"></span> Locked</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MOVE TO CURRICULUM MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[200]" id="move-modal">
+  <div class="glass-panel w-full max-w-sm mx-4 rounded-2xl shadow-2xl overflow-hidden border border-white/50">
+    <div class="bg-secondary p-5 flex items-center justify-between gap-3 flex-shrink-0 rounded-t-2xl">
+      <div>
+        <h3 class="font-headline font-extrabold text-on-secondary text-lg">Move to Curriculum</h3>
+        <p class="text-[10px] font-bold text-on-secondary/70 uppercase tracking-widest">Select a destination</p>
+      </div>
+      <button onclick="closeMoveModal()" class="text-on-secondary/60 hover:text-on-secondary transition-colors bg-secondary-dim/40 p-2 rounded-full">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="p-4 bg-surface-container-lowest space-y-2" id="move-curriculum-list"></div>
   </div>
 </div>
 
@@ -1945,6 +1985,8 @@ window.doSummonQuest=async function(){
       bossLore: parsed.bossLore||"A mysterious entity.",
       chapters,
       curriculumMeta,  // stored for use in chapter generation
+      prereqTopics: parsed.prereqTopics || [],
+      nextTopics: parsed.nextTopics || [],
       curriculumId:'default',
     };
     const userQuest={
@@ -2089,10 +2131,15 @@ function renderQuestGrid(){
       const chapDone=completed.filter(Boolean).length;
       const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
       const card=document.createElement('div');
-      card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5 cursor-grab';
+      card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5';
       card.setAttribute('draggable','true');
       card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
-      card.innerHTML=`<div class="flex items-center gap-4 mb-4 pointer-events-none"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3 pointer-events-none">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4 pointer-events-none"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
+      // Mobile: prevent drag from swallowing taps
+      let touchMoved = false;
+      card.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
+      card.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+      card.addEventListener('touchend', (e) => { if (!touchMoved) { e.preventDefault(); window.showQuestScreen(idx); } });
+      card.innerHTML=`<div class="flex items-center gap-4 mb-4"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
       const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
       del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>';
@@ -2106,6 +2153,180 @@ function renderQuestGrid(){
   });
 }
 
+
+
+// ── QUEST SCREEN ──────────────────────────────────────
+window.showQuestScreen = function(questIdx) {
+  STATE.activeQuestIdx = questIdx;
+  const quest = STATE.quests[questIdx];
+  if (!quest) return;
+
+  // Check and extend overdue deadlines before showing
+  checkAndExtendOverdueDeadlines();
+
+  // Header
+  document.getElementById('q-topic-label').textContent = (quest.topic || 'Unknown').toUpperCase();
+  document.getElementById('q-title-label').textContent = quest.questTitle || 'Untitled Quest';
+
+  // Boss panel
+  const bossCanvas = document.getElementById('boss-sprite-canvas');
+  animateBossCanvas(bossCanvas, quest, quest.bossHp / quest.bossMaxHp, 'quest');
+  document.getElementById('boss-name-display').textContent = quest.bossName || '??';
+  document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian Demon';
+  const loreEl = document.getElementById('boss-lore-text');
+  if (loreEl) loreEl.textContent = quest.bossLore || 'A mysterious entity.';
+
+  // HP bar
+  const hpRatio = quest.bossHp / quest.bossMaxHp;
+  document.getElementById('boss-hp-fill').style.width = (hpRatio * 100) + '%';
+  document.getElementById('boss-hp-text').textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
+
+  // Deadline
+  updateDeadlineDisplay(quest);
+
+  // Challenge button
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  const allDone = chapters.length > 0 && chapters.every((_, i) => completed[i]);
+  const btn = document.getElementById('boss-complete-btn');
+  btn.disabled = !allDone;
+  if (quest.defeated) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge Again';
+    btn.className = 'bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl';
+  } else {
+    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge the Demon';
+    btn.className = 'bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl';
+  }
+
+  // Chapter list
+  renderChapterList(quest);
+
+  // Prereqs & next topics
+  renderQuestMeta(quest);
+
+  // Mobile: default to scrolls tab
+  switchQuestTab('scrolls');
+
+  showScreen('screen-quest');
+};
+
+function renderChapterList(quest) {
+  const list = document.getElementById('chapter-list');
+  if (!list) return;
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  const chapDone = completed.filter(Boolean).length;
+  document.getElementById('chapter-progress-label').textContent = `${chapDone}/${chapters.length}`;
+  list.innerHTML = '';
+  chapters.forEach((ch, i) => {
+    const done = completed[i];
+    const item = document.createElement('div');
+    item.className = `flex items-start gap-3 p-4 rounded-2xl border-[3px] cursor-pointer transition-all ${done ? 'border-secondary/40 bg-secondary/5' : 'border-outline-variant/50 bg-surface-container-lowest hover:border-primary/40'}`;
+    item.innerHTML = `
+      <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-black text-sm ${done ? 'bg-secondary text-on-secondary' : 'bg-surface-container text-on-surface-variant'}">${done ? '✓' : i + 1}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[9px] font-black uppercase tracking-widest ${done ? 'text-secondary' : 'text-primary'} mb-0.5">${ch.tag || 'CHAPTER ' + (i+1)}</p>
+        <p class="font-headline font-extrabold text-sm text-on-surface leading-tight">${ch.title}</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2">${ch.summary || ''}</p>
+      </div>
+      ${done ? '<span class="material-symbols-outlined text-secondary text-base flex-shrink-0">check_circle</span>' : ''}
+    `;
+    item.addEventListener('click', () => window.openChapterModal(i));
+    // Mobile touch handler
+    let tm = false;
+    item.addEventListener('touchstart', () => { tm = false; }, { passive: true });
+    item.addEventListener('touchmove', () => { tm = true; }, { passive: true });
+    item.addEventListener('touchend', (e) => { if (!tm) { e.preventDefault(); window.openChapterModal(i); } });
+    list.appendChild(item);
+  });
+}
+
+function renderQuestMeta(quest) {
+  const panel = document.getElementById('quest-meta-panel');
+  const prereqEl = document.getElementById('prereq-chips');
+  const nextEl = document.getElementById('next-topic-chips');
+  if (!panel || !prereqEl || !nextEl) return;
+
+  const meta = quest.curriculumMeta;
+  const prereqs = meta?.prerequisiteKnowledge || quest.prereqTopics || [];
+  const nextTopics = quest.nextTopics || [];
+
+  if (!prereqs.length && !nextTopics.length) {
+    panel.classList.add('hidden');
+    return;
+  }
+
+  panel.classList.remove('hidden');
+
+  prereqEl.innerHTML = prereqs.length
+    ? prereqs.map(t => `<span class="bg-secondary/10 text-secondary border border-secondary/30 rounded-full px-2.5 py-0.5 text-[10px] font-bold">${t}</span>`).join('')
+    : '<span class="text-[10px] text-on-surface-variant italic">None required</span>';
+
+  nextEl.innerHTML = nextTopics.length
+    ? nextTopics.map(t => `<button onclick="launchNextTopic('${t.replace(/'/g,"\\'")}')" class="bg-tertiary/10 text-tertiary border border-tertiary/30 rounded-full px-2.5 py-0.5 text-[10px] font-bold hover:bg-tertiary/20 transition-colors">${t} →</button>`).join('')
+    : '<span class="text-[10px] text-on-surface-variant italic">Complete quest to unlock</span>';
+}
+
+window.launchNextTopic = function(topic) {
+  showHub();
+  setTimeout(() => {
+    switchTab('tab-quests');
+    openSummonScreen();
+    setTimeout(() => {
+      const inp = document.getElementById('summon-topic-input');
+      if (inp) { inp.value = topic; inp.focus(); }
+    }, 100);
+  }, 100);
+};
+
+function updateBossHpDisplay(quest) {
+  const ratio = quest.bossHp / quest.bossMaxHp;
+  const fill = document.getElementById('boss-hp-fill');
+  const text = document.getElementById('boss-hp-text');
+  if (fill) fill.style.width = (ratio * 100) + '%';
+  if (text) text.textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
+}
+
+// ── MOVE TO CURRICULUM ────────────────────────────────
+window.openMoveModal = function() {
+  const list = document.getElementById('move-curriculum-list');
+  if (!list) return;
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if (!quest) return;
+  const curriculums = STATE.curriculums || [{id:'default',name:'My Curriculum'}];
+  const currentId = quest.curriculumId || 'default';
+
+  list.innerHTML = curriculums.map(c => {
+    const isCurrent = c.id === currentId;
+    return `<button onclick="moveQuestTo('${c.id}')" ${isCurrent ? 'disabled' : ''}
+      class="w-full flex items-center gap-3 p-3 rounded-xl border-[2px] text-left transition-all ${isCurrent ? 'border-secondary/40 bg-secondary/5 opacity-60 cursor-not-allowed' : 'border-outline-variant/40 hover:border-secondary hover:bg-secondary/5 cursor-pointer'}">
+      <span class="material-symbols-outlined text-secondary text-lg">folder_open</span>
+      <span class="font-headline font-extrabold text-sm text-on-surface flex-1">${c.name}</span>
+      ${isCurrent ? '<span class="text-[9px] font-black text-secondary uppercase tracking-wide">Current</span>' : ''}
+    </button>`;
+  }).join('');
+
+  document.getElementById('move-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeMoveModal = function() {
+  document.getElementById('move-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+window.moveQuestTo = function(curriculumId) {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if (!quest) return;
+  const curriculums = STATE.curriculums || [];
+  const target = curriculums.find(c => c.id === curriculumId);
+  quest.curriculumId = curriculumId;
+  saveState();
+  closeMoveModal();
+  showToast(`Moved to "${target?.name || 'Curriculum'}"`);
+  renderQuestGrid();
+};
 
 window.deletePublicQuest=async function(docId,idx){ try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); } };
 
