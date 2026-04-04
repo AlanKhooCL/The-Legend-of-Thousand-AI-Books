@@ -1679,24 +1679,55 @@ window.doSummonQuest=async function(){
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('flex');
-  setSummonStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
+  setSummonStatus('Designing your curriculum...','PHASE 1 · INSTRUCTIONAL DESIGN');
   try{
     const summonFn=httpsCallable(functions,'summonQuest');
     let questDataText;
-    try{ const r=await summonFn({topic,objective,numChapters,modelId:'gemini-2.5-flash'}); questDataText=r.data.result; }
-    catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
+    try{
+      const r=await summonFn({topic,objective,numChapters,modelId:STATE.selectedModel||'gemini-2.5-flash'});
+      questDataText=r.data.result;
+    }catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
+
+    setSummonStatus('Summoning the guardian demon...','PHASE 2 · BINDING DEMON ESSENCE');
+    await delay(300);
+
     let parsed=parseJSON(questDataText);
     if(!parsed||typeof parsed!=='object') parsed={};
-    setSummonStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
-    await delay(400);
+
     const chapters=parsed.chapters||parsed.chapterList||[];
     if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
-    const baseQuest={topic:topic||"Unknown",objective:objective||"",questTitle:parsed.questTitle||parsed.title||`${topic} Mastery`,questNarrative:parsed.questNarrative||"A newly discovered scroll.",bossName:parsed.bossName||"Demon",bossTitle:parsed.bossTitle||"The Unknown",bossLore:parsed.bossLore||"A mysterious entity.",chapters,folderId:'default'};
-    const userQuest={...baseQuest,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false};
+
+    // Store curriculum metadata on the quest so chapter generation can use it
+    const curriculumMeta = parsed.curriculumMeta || null;
+
+    const baseQuest={
+      topic: topic||"Unknown",
+      objective: objective||"",
+      questTitle: parsed.questTitle||parsed.title||`${topic} Mastery`,
+      questNarrative: parsed.questNarrative||"A newly discovered scroll.",
+      bossName: parsed.bossName||"Demon",
+      bossTitle: parsed.bossTitle||"The Unknown",
+      bossLore: parsed.bossLore||"A mysterious entity.",
+      chapters,
+      curriculumMeta,  // stored for use in chapter generation
+      folderId:'default',
+    };
+    const userQuest={
+      ...baseQuest,
+      id:Date.now(),
+      bossMaxHp:100, bossHp:100,
+      completed:new Array(chapters.length).fill(false),
+      chapterContent:{}, quiz:null, defeated:false,
+    };
     if(!STATE.quests) STATE.quests=[];
-    STATE.quests.unshift(userQuest); STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
+    STATE.quests.unshift(userQuest);
+    STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
     try{ await saveState(); }catch(e){}
-    try{ const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID}; const ref=await addDoc(collection(db,"public_quests"),pubQ); pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ); }catch(e){}
+    try{
+      const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID};
+      const ref=await addDoc(collection(db,"public_quests"),pubQ);
+      pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ);
+    }catch(e){}
     closeSummonScreen();
     showToast(`Quest summoned: "${userQuest.questTitle}" · ${chapters.length} chapters`);
     window.switchTab('tab-quests'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
@@ -1966,11 +1997,47 @@ window.closeChapterModal=()=>{ document.getElementById('chapter-modal').classLis
 
 async function loadChapterContent(chapterIdx){
   const quest=STATE.quests[STATE.activeQuestIdx];
-  const ch=(quest.chapters||[])[chapterIdx]; if(!ch) return;
+  const chapters=quest.chapters||[];
+  const ch=chapters[chapterIdx];
+  if(!ch) return;
+
+  // Build a compact summary of what prior chapters taught
+  // so the AI knows not to re-explain those concepts
+  let previousChaptersSummary = '';
+  if(chapterIdx > 0){
+    const prevSummaries = chapters.slice(0, chapterIdx).map((c, i) => {
+      const hasContent = quest.chapterContent && quest.chapterContent[i];
+      return `Chapter ${i+1} "${c.title}": ${c.summary}${c.keyConceptsToTeach?.length ? ' [covered: '+c.keyConceptsToTeach.slice(0,3).join(', ')+']' : ''}`;
+    });
+    previousChaptersSummary = prevSummaries.join('\n');
+  }
+
   try{
-    const content=await callAI({action:'generateChapter',payload:{topic:quest.topic,chapterTitle:ch.title,chapterTag:ch.tag,chapterSummary:ch.summary}});
-    quest.chapterContent[chapterIdx]=content; saveState(); renderChapterContent(content);
-  }catch(e){ document.getElementById('chapter-content-area').innerHTML=`<p class="text-error text-sm font-bold">Failed to load: ${e.message}</p>`; }
+    const content = await callAI({
+      action: 'generateChapter',
+      payload: {
+        topic: quest.topic,
+        chapterTitle: ch.title,
+        chapterTag: ch.tag,
+        chapterSummary: ch.summary,
+        chapterNumber: chapterIdx + 1,
+        totalChapters: chapters.length,
+        // Pass pedagogy data from the curriculum plan
+        learningOutcomes: ch.learningOutcomes || [],
+        keyConceptsToTeach: ch.keyConceptsToTeach || [],
+        commonMisconceptions: ch.commonMisconceptions || [],
+        // Pass curriculum-level context
+        curriculumMeta: quest.curriculumMeta || null,
+        // Pass prior chapter context for continuity
+        previousChaptersSummary: previousChaptersSummary || '',
+      }
+    });
+    quest.chapterContent[chapterIdx]=content;
+    saveState();
+    renderChapterContent(content);
+  }catch(e){
+    document.getElementById('chapter-content-area').innerHTML=`<p class="text-error text-sm font-bold">Failed to load: ${e.message}</p>`;
+  }
 }
 
 function renderChapterContent(html){ document.getElementById('chapter-content-area').innerHTML=DOMPurify.sanitize(html); }
@@ -2044,12 +2111,30 @@ window.openBattleModal=async function(){
   document.getElementById('finishing-blow').classList.remove('flex');
 
   if(!quest.quiz?.questions){
-    document.getElementById('quiz-question').textContent='Preparing the trial...';
+    document.getElementById('quiz-question').textContent='Preparing your trial...';
     document.getElementById('quiz-options').innerHTML='';
     try{
-      const qd=await callAI({action:'generateQuiz',payload:{topic:quest.topic,chapterTitles:(quest.chapters||[]).map(c=>c.title).join(', ')}});
-      let parsed=parseJSON(qd); if(!parsed||typeof parsed!=='object') parsed={};
-      quest.quiz=parsed; if(!quest.quiz.questions) quest.quiz.questions=[]; saveState();
+      // Collect actual chapter content (strip HTML tags for clean text)
+      const chapterContents = Object.values(quest.chapterContent||{})
+        .map(html => html.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim())
+        .filter(Boolean)
+        .join('\n\n---\n\n');
+
+      const qd=await callAI({
+        action:'generateQuiz',
+        payload:{
+          topic: quest.topic,
+          chapterTitles: (quest.chapters||[]).map(c=>c.title).join(', '),
+          // Pass actual content so quiz tests what was taught
+          chapterContents: chapterContents,
+          curriculumMeta: quest.curriculumMeta || null,
+        }
+      });
+      let parsed=parseJSON(qd);
+      if(!parsed||typeof parsed!=='object') parsed={};
+      quest.quiz=parsed;
+      if(!quest.quiz.questions) quest.quiz.questions=[];
+      saveState();
     }catch(e){ document.getElementById('quiz-question').textContent='Error: '+e.message; return; }
   }
 
