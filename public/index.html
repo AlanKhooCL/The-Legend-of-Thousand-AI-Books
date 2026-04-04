@@ -102,7 +102,98 @@
     background:linear-gradient(to bottom, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%);
     border-radius:inherit; pointer-events:none;
   }
-  .pixel-bg { image-rendering: pixelated; }
+  canvas { image-rendering: pixelated; }
+
+  /* ══════════════════════════════════════
+     BOOK FLIP LOADER
+  ══════════════════════════════════════ */
+  .book-loader {
+    width: 60px; height: 48px;
+    position: relative; margin: 0 auto;
+  }
+  .book-loader .book-cover {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 44px; height: 36px;
+    background: #ae1d53;
+    border-radius: 2px 6px 6px 2px;
+    box-shadow: -3px 0 0 #9e0a47, 0 4px 0 #7a1438;
+  }
+  .book-loader .book-cover::before {
+    content:'';
+    position: absolute; left: 3px; top: 3px; bottom: 3px; width: 3px;
+    background: rgba(255,239,240,0.4);
+    border-radius: 2px;
+  }
+  .book-loader .book-spine {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 6px; height: 36px;
+    background: #7a1438;
+    border-radius: 2px 0 0 2px;
+    margin-left: -22px;
+  }
+  .book-loader .page {
+    position: absolute; bottom: 0;
+    left: 50%; margin-left: -18px;
+    width: 36px; height: 32px;
+    background: #fff8f0;
+    border-radius: 0 4px 4px 0;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+    border: 1px solid rgba(174,29,83,0.15);
+  }
+  .book-loader .page::after {
+    content:'';
+    position: absolute; top: 6px; left: 5px; right: 5px;
+    height: 2px; background: rgba(174,29,83,0.2);
+    border-radius: 2px;
+    box-shadow: 0 5px 0 rgba(174,29,83,0.15), 0 10px 0 rgba(174,29,83,0.1), 0 15px 0 rgba(174,29,83,0.07);
+  }
+  .book-loader .page-1 { animation: pageFlip 1.6s ease-in-out infinite; z-index: 4; }
+  .book-loader .page-2 { animation: pageFlip 1.6s ease-in-out 0.2s infinite; z-index: 3; background: #fdf4e8; }
+  .book-loader .page-3 { animation: pageFlip 1.6s ease-in-out 0.4s infinite; z-index: 2; background: #fbeedd; }
+
+  @keyframes pageFlip {
+    0%   { transform: rotateY(0deg) scaleX(1); }
+    45%  { transform: rotateY(-90deg) scaleX(0.1); }
+    50%  { transform: rotateY(-90deg) scaleX(0.1); }
+    95%  { transform: rotateY(-180deg) scaleX(1); }
+    100% { transform: rotateY(-180deg) scaleX(1); }
+  }
+
+  /* Small inline book loader variant */
+  .book-loader-sm {
+    width: 36px; height: 28px;
+    position: relative; display: inline-block; vertical-align: middle;
+  }
+  .book-loader-sm .book-cover {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 28px; height: 22px;
+    background: #ffffff;
+    border-radius: 1px 4px 4px 1px;
+    box-shadow: -2px 0 0 rgba(255,255,255,0.5), 0 3px 0 rgba(255,255,255,0.3);
+  }
+  .book-loader-sm .book-spine {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 22px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 2px 0 0 2px;
+    margin-left: -14px;
+  }
+  .book-loader-sm .page {
+    position: absolute; bottom: 0;
+    left: 50%; margin-left: -10px;
+    width: 22px; height: 19px;
+    background: rgba(255,239,240,0.9);
+    border-radius: 0 3px 3px 0;
+    transform-origin: left center;
+  }
+  .book-loader-sm .page-1 { animation: pageFlip 1.4s ease-in-out infinite; z-index: 4; }
+  .book-loader-sm .page-2 { animation: pageFlip 1.4s ease-in-out 0.18s infinite; z-index: 3; background: rgba(253,244,232,0.85); }
+  .book-loader-sm .page-3 { animation: pageFlip 1.4s ease-in-out 0.36s infinite; z-index: 2; background: rgba(251,238,221,0.75); }
 
   /* Screens */
   .screen { display: none; }
@@ -136,14 +227,6 @@
   ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-track { background: #f6f0e6; }
   ::-webkit-scrollbar-thumb { background: #e8a0b0; border-radius:9999px; }
-
-  /* Generating spinner */
-  .gen-spinner {
-    width:48px; height:48px; border:4px solid #f6f0e6;
-    border-top-color:#ae1d53; border-radius:50%;
-    animation:spin 0.9s linear infinite; margin:0 auto 1rem;
-  }
-  @keyframes spin { to{transform:rotate(360deg);} }
 
   canvas { image-rendering: pixelated; }
 
@@ -229,7 +312,7 @@
   .seal-pulse { animation: sealPulse 3s ease-in-out infinite; }
 
   /* Glyph float */
-  @keyframes glyphFloat { 0%,100%{transform:translateY(0) rotate(-5deg);opacity:0.5;} 50%{transform:translateY(-12px) rotate(5deg);opacity:0.8;} }
+  @keyframes glyphFloat { 0%,100%{transform:translateY(0) rotate(-5deg);opacity:0.7;} 50%{transform:translateY(-12px) rotate(5deg);opacity:1;} }
   .glyph-float-1 { animation: glyphFloat 4s ease-in-out infinite; }
   .glyph-float-2 { animation: glyphFloat 5s ease-in-out 1s infinite; }
   .glyph-float-3 { animation: glyphFloat 3.5s ease-in-out 0.5s infinite; }
@@ -239,37 +322,64 @@
   .orb-1 { animation: orbFloat 3s ease-in-out infinite; }
   .orb-2 { animation: orbFloat 4s ease-in-out 1.2s infinite; }
 
-  /* Catalyst chip active */
-  .catalyst-btn.active {
-    border-color: #ae1d53;
-    background: rgba(174,29,83,0.1);
-  }
-  .catalyst-btn.active-secondary {
-    border-color: #725800;
-    background: rgba(253,207,80,0.15);
-  }
-
   /* Summoning in-progress state */
   @keyframes ritualPing { 0%,100%{transform:scale(1);opacity:0.25;} 50%{transform:scale(1.4);opacity:0.5;} }
   .ritual-ping { animation: ritualPing 1.2s ease-in-out infinite; }
 
   /* Chapter count pips */
   .chap-pip { transition: all 0.2s; }
-  .chap-pip.active-pip { background:#ae1d53; transform:scale(1.25); }
+  .chap-pip.active-pip { background:#ae1d53; color:#ffeff0; transform:scale(1.25); border-color:#ae1d53; }
 
   /* Fate scroll additions */
   .fate-scroll-gradient { background: linear-gradient(180deg, #fefbf6 0%, #f9f3e8 100%); }
   .sigil-glow { filter: drop-shadow(0 0 12px rgba(253, 207, 80, 0.6)); }
   .pixel-text { font-family: monospace; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-  
+
   /* Drag and Drop indication */
   .folder-content.drag-over { background: rgba(174,29,83,0.05); border-radius: 0.5rem; }
+
+  /* ── SUMMON SCREEN FIXES ── */
+  #summon-screen .summon-headline {
+    color: #312e29;
+    text-shadow: none;
+  }
+  #summon-screen .summon-sub {
+    color: #5e5b54;
+  }
+  #summon-screen .summon-form-glass {
+    background: rgba(252,246,237,0.92);
+    backdrop-filter: blur(16px);
+    border: 2px solid rgba(174,29,83,0.15);
+    box-shadow: 0 20px 40px rgba(174,29,83,0.08);
+  }
+  #summon-screen .summon-label {
+    color: #ae1d53;
+    font-weight: 800;
+  }
+  #summon-screen .summon-meta {
+    color: #5e5b54;
+    font-weight: 600;
+  }
+
+  /* ── MONSTER EVOLUTION AURAS ── */
+  @keyframes auraFloat { 0%,100%{opacity:0.5;transform:scale(1);} 50%{opacity:0.85;transform:scale(1.08);} }
+  @keyframes legendAura { 0%,100%{opacity:0.6;transform:scale(1) rotate(0deg);} 50%{opacity:1;transform:scale(1.12) rotate(180deg);} }
+  @keyframes crownBob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
+  @keyframes wingFlap { 0%,100%{transform:scaleX(1);} 50%{transform:scaleX(0.85);} }
+  @keyframes tailWag { 0%,100%{transform:rotate(-10deg);} 50%{transform:rotate(10deg);} }
+  @keyframes eyeGlow { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.6) drop-shadow(0 0 4px currentColor);} }
+  @keyframes hornSpark { 0%,100%{opacity:0.7;} 50%{opacity:1;filter:drop-shadow(0 0 6px #fdcf50);} }
+  @keyframes bodyPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+  @keyframes cosmicSpin { to{transform:rotate(360deg);} }
 </style>
 </head>
 <body class="bg-surface font-body text-on-surface overflow-hidden">
 
 <canvas id="particle-canvas"></canvas>
 
+<!-- ═══════════════════════════════════════════
+     TITLE SCREEN
+═══════════════════════════════════════════ -->
 <div id="screen-title" class="screen active fixed inset-0 z-10 flex-col items-center justify-center overflow-hidden">
   <div class="absolute inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY"
@@ -299,7 +409,16 @@
         <p class="font-headline font-bold text-on-surface text-lg">Begin Your Journey</p>
         <p class="text-on-surface-variant text-sm">Select your path into the infinite library.</p>
       </div>
-      <div id="loading-text" class="text-center text-primary font-headline font-bold text-sm tracking-widest py-2">COMMUNING WITH THE SCROLLS...</div>
+      <div id="loading-text" class="flex flex-col items-center gap-3 py-2">
+        <div class="book-loader">
+          <div class="book-spine"></div>
+          <div class="book-cover"></div>
+          <div class="page page-3"></div>
+          <div class="page page-2"></div>
+          <div class="page page-1"></div>
+        </div>
+        <span class="text-primary font-headline font-bold text-sm tracking-widest">COMMUNING WITH THE SCROLLS...</span>
+      </div>
       <div id="auth-buttons" class="hidden space-y-3">
         <button onclick="signInGoogle()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-3 shadow-md">
           <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.224 1.224-3.136 2.576-6.64 2.576-5.392 0-9.672-4.384-9.672-9.776s4.28-9.776 9.672-9.776c2.928 0 5.144 1.144 6.776 2.704l2.312-2.312c-2.392-2.272-5.464-4.016-9.088-4.016-6.608 0-12 5.392-12 12s5.392 12 12 12c3.576 0 6.264-1.176 8.368-3.36 2.16-2.16 2.848-5.216 2.848-7.632 0-.528-.056-1.048-.152-1.512h-10.136z"/></svg>
@@ -321,6 +440,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     PATH / NAME SCREEN
+═══════════════════════════════════════════ -->
 <div id="screen-path" class="screen fixed inset-0 z-10 flex-col items-center justify-center overflow-y-auto">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KHNKSVDby76END8YXKPuSjWJXDvtLrb1V4a-efG0M8Goo4Nl0s_zrhnsI0p8piLX0_ZgPUtKp2jbtkxwUnfZq8BDjywiS0CZQYoKdtIPlcHL1V9IIaAGyhmZrHsIu52NZwVohGJXMZDKFQesU2qlINCJupAKvm5xV8B99Aq7JfGspxma2Uuz1e3elGWoFIfxw5vqxzOza2jG_uJ6Qcofw7qiolAl8oRG1PiJy_MJL2ZWoriCoQps-8J--AEpGG_UqCSJ5DCVWQM"
@@ -332,28 +454,27 @@
       <h1 class="font-headline font-black text-4xl text-primary italic tracking-tight">Name Your Companion</h1>
       <p class="text-on-surface-variant text-sm">Bond with a magical creature that evolves as you learn.</p>
     </header>
-    
     <div class="w-48 h-48 rounded-full bg-surface-container-low flex items-center justify-center shadow-inner mb-8 border-4 border-outline-variant relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent"></div>
-        <div class="w-16 h-16 bg-primary rounded-full animate-pulse shadow-[0_0_20px_#ae1d53]"></div>
+        <canvas id="path-monster-canvas" width="120" height="120"></canvas>
     </div>
-
     <div class="w-full relative mb-8">
       <input id="path-name-input" type="text" placeholder="Companion Name..."
              class="w-full bg-surface-container-lowest ring-2 ring-outline-variant rounded-full px-6 py-4 text-center text-lg font-bold font-headline focus:ring-primary focus:ring-4 transition-all outline-none placeholder:text-outline-variant border-0"/>
       <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-tertiary text-on-tertiary px-3 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase">Identity</div>
     </div>
-
     <button onclick="choosePath()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-extrabold py-4 px-6 rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 text-lg shadow-xl">
       Begin Journey <span class="material-symbols-outlined text-xl">arrow_forward</span>
     </button>
-
     <div class="mt-6 text-center">
       <button id="path-cancel-btn" style="display:none" onclick="cancelPathSelection()" class="text-outline font-bold text-sm hover:text-primary transition-colors">Cancel</button>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     MAIN HUB
+═══════════════════════════════════════════ -->
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden">
   <nav class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high z-20 flex justify-between items-center px-6 py-3">
     <div class="font-headline font-black text-xl text-primary italic tracking-tight">LearNow</div>
@@ -374,6 +495,7 @@
   </div>
   <div class="flex-1 overflow-hidden">
 
+    <!-- SPIRIT TAB -->
     <div id="tab-profile" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-lg mx-auto space-y-4">
 
@@ -387,7 +509,7 @@
           <div class="relative z-10 flex flex-col items-center pt-5 pb-4 px-4 mt-8">
             <div class="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-sm" id="spirit-activity-tag">⚔ TRAINING</div>
 
-            <canvas id="char-canvas" width="140" height="160" class="drop-shadow-xl"></canvas>
+            <canvas id="char-canvas" width="160" height="180" class="drop-shadow-xl"></canvas>
 
             <div class="flex items-center gap-2 mt-2">
               <h2 id="char-name" onclick="renameCharacter()" class="font-headline font-extrabold text-xl text-primary cursor-pointer hover:opacity-75 transition-opacity"></h2>
@@ -449,6 +571,7 @@
       </div>
     </div>
 
+    <!-- SCROLLS TAB -->
     <div id="tab-quests" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-6">
         <button onclick="openSummonScreen()" class="bubbly-btn w-full flex items-center gap-4 p-5 bg-surface-container-lowest rounded-xl hover:bg-primary/5 transition-all group shadow-sm">
@@ -472,6 +595,7 @@
       </div>
     </div>
 
+    <!-- LIBRARY TAB -->
     <div id="tab-library" class="tab-pane h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
         <p class="text-center text-on-surface-variant text-xs font-bold uppercase tracking-widest py-2">Quests from scholars across the realm — tap to copy</p>
@@ -481,6 +605,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     QUEST SCREEN
+═══════════════════════════════════════════ -->
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
   <div class="flex-shrink-0 bg-surface/90 backdrop-blur-md border-b-2 border-surface-container-high flex items-center gap-3 px-4 py-3">
     <button onclick="showHub()" class="bg-surface-container rounded-full p-2 flex items-center justify-center hover:text-primary transition-colors shadow-sm">
@@ -534,31 +661,35 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     SUMMON SCREEN (FIXED)
+═══════════════════════════════════════════ -->
 <div id="summon-screen" class="flex-col items-center justify-center overflow-hidden">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfZxYvnk64Y4e541yQn37m5JiehBvookhcvDCpCUGZvjAbweMx0I50hpDCxh3j5xjrteFpAyzlLegrBxi5JRYQxDjaEfZx3rch3QUrICAO_fRiev4AknF1Ack2Y0na8RuEr5XT-2MvuJia9U-E0t0V8fjGDTkC06AQEUk9b3uiYP5qsibz0VEKhA4K_-nT3j067gBTwdoEJsCSw6SudNSuO_cZgWXm-sMxbxDQXt9C_rmNG1XhHfY5SM8AIcfJbzgQpmn0XDiyf8c"
-         class="w-full h-full object-cover opacity-35 pixel-bg" alt=""/>
-    <div class="absolute inset-0 bg-gradient-to-b from-surface/80 via-surface/40 to-surface/90"></div>
+         class="w-full h-full object-cover opacity-20 pixel-bg" alt=""/>
+    <div class="absolute inset-0" style="background:linear-gradient(to bottom, rgba(252,246,237,0.88) 0%, rgba(252,246,237,0.75) 50%, rgba(252,246,237,0.92) 100%)"></div>
   </div>
 
-  <div class="fixed top-0 left-0 w-full z-20 px-6 py-4 flex justify-between items-center pointer-events-none">
-    <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic pointer-events-none">LearNow</h1>
-    <button onclick="closeSummonScreen()" class="pointer-events-auto glass-panel p-2 rounded-full hover:scale-110 transition-transform shadow-md">
+  <div class="fixed top-0 left-0 w-full z-20 px-6 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-black text-primary tracking-tighter font-headline italic">LearNow</h1>
+    <button onclick="closeSummonScreen()" class="glass-panel p-2 rounded-full hover:scale-110 transition-transform shadow-md border border-outline-variant/30">
       <span class="material-symbols-outlined text-primary">close</span>
     </button>
   </div>
 
-  <div class="relative z-10 w-full max-w-5xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center pt-16 pb-8">
+  <div class="relative z-10 w-full max-w-5xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center pt-20 pb-8">
 
+    <!-- Left: visual orb -->
     <div class="relative flex items-center justify-center order-2 lg:order-1 mt-4 lg:mt-0">
       <div class="relative w-48 h-48 md:w-72 md:h-72 flex items-center justify-center">
         <div class="absolute inset-0 border-[5px] border-dashed border-tertiary/40 rounded-full ring-outer"></div>
         <div class="absolute inset-6 border-[3px] border-primary/30 rounded-full ring-mid"></div>
         <div class="absolute inset-12 border-2 border-secondary/20 rounded-full ring-inner"></div>
 
-        <div class="absolute top-2 left-1/2 -translate-x-1/2 font-headline font-black text-lg text-primary/50 glyph-float-1 select-none">INT</div>
-        <div class="absolute bottom-4 left-[15%] font-headline font-black text-lg text-secondary/50 glyph-float-2 select-none">WIS</div>
-        <div class="absolute top-[20%] right-4 font-headline font-black text-lg text-tertiary/60 glyph-float-3 select-none">STR</div>
+        <div class="absolute top-2 left-1/2 -translate-x-1/2 font-headline font-black text-lg text-primary/70 glyph-float-1 select-none">INT</div>
+        <div class="absolute bottom-4 left-[15%] font-headline font-black text-lg text-secondary/70 glyph-float-2 select-none">WIS</div>
+        <div class="absolute top-[20%] right-4 font-headline font-black text-lg text-tertiary/80 glyph-float-3 select-none">STR</div>
 
         <div class="relative z-20 w-28 h-28 md:w-40 md:h-40 bg-surface-container-lowest rounded-full seal-pulse flex items-center justify-center border-4 border-primary overflow-hidden shadow-2xl">
           <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle,rgba(253,207,80,0.18) 0%,rgba(174,29,83,0.06) 70%)"></div>
@@ -571,21 +702,22 @@
       </div>
     </div>
 
+    <!-- Right: form -->
     <div class="order-1 lg:order-2 space-y-4" id="summon-form-side">
       <header class="space-y-1">
-        <h2 class="text-3xl md:text-4xl font-extrabold font-headline text-on-background tracking-tight leading-tight">
+        <h2 class="summon-headline text-3xl md:text-4xl font-extrabold font-headline tracking-tight leading-tight">
           Initiate <span class="text-primary italic">Summoning</span>
         </h2>
-        <p class="text-sm text-on-surface-variant font-medium">Manifest your quest into the digital scrolls.</p>
+        <p class="summon-sub text-sm font-medium">Manifest your quest into the digital scrolls.</p>
       </header>
 
-      <div class="glass-panel rounded-2xl p-6 space-y-6 shadow-2xl">
+      <div class="summon-form-glass rounded-2xl p-6 space-y-6 shadow-2xl">
 
         <div class="space-y-2">
-          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Quest Topic</label>
+          <label class="summon-label text-xs font-black uppercase tracking-widest font-label block">Quest Topic</label>
           <div class="relative group">
             <input id="summon-topic-input" type="text" placeholder="e.g. Ancient Rome, Machine Learning..."
-                   class="w-full bg-surface-container-lowest px-5 py-4 text-base font-bold font-headline rounded-xl focus:outline-none focus:ring-4 ring-primary/20 transition-all placeholder:text-outline-variant/50 border-2 border-outline-variant focus:border-primary"/>
+                   class="w-full bg-surface-container-lowest px-5 py-4 text-base font-bold font-headline rounded-xl focus:outline-none focus:ring-4 ring-primary/20 transition-all placeholder:text-outline-variant/50 border-2 border-outline-variant focus:border-primary text-on-surface"/>
             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary opacity-0 group-focus-within:opacity-100 transition-opacity">
               <span class="material-symbols-outlined">auto_fix_high</span>
             </div>
@@ -593,22 +725,22 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Learning Objective <span class="text-outline normal-case font-normal">(optional)</span></label>
+          <label class="summon-label text-xs font-black uppercase tracking-widest font-label block">Learning Objective <span class="text-outline-variant normal-case font-normal">(optional)</span></label>
           <textarea id="summon-objective-input" rows="2" placeholder="What should you understand after this quest?"
-                    class="w-full bg-surface-container-lowest px-5 py-3 text-sm font-body rounded-xl focus:outline-none focus:ring-4 ring-primary/20 transition-all placeholder:text-outline-variant/50 resize-none border-2 border-outline-variant focus:border-primary"></textarea>
+                    class="w-full bg-surface-container-lowest px-5 py-3 text-sm font-body rounded-xl focus:outline-none focus:ring-4 ring-primary/20 transition-all placeholder:text-outline-variant/50 resize-none border-2 border-outline-variant focus:border-primary text-on-surface"></textarea>
         </div>
 
         <div class="space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-black uppercase tracking-widest text-primary font-label">Chapters</label>
+            <label class="summon-label text-xs font-black uppercase tracking-widest font-label block">Chapters</label>
             <span id="summon-chapter-display" class="font-headline font-extrabold text-primary text-sm">5 Chapters</span>
           </div>
           <div class="flex gap-3 items-center bg-surface-container-low p-2 rounded-xl border border-outline-variant/50">
             <span class="text-xs text-on-surface-variant font-bold ml-2">3</span>
             <div class="flex-1 flex gap-2 items-center justify-center">
-              <button onclick="setSummonChapters(3)" class="chap-pip w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-xs font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all">3</button>
+              <button onclick="setSummonChapters(3)" class="chap-pip w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-xs font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all text-on-surface">3</button>
               <button onclick="setSummonChapters(5)" class="chap-pip active-pip w-8 h-8 rounded-full border-2 border-primary bg-primary text-on-primary text-xs font-black flex items-center justify-center shadow-md">5</button>
-              <button onclick="setSummonChapters(7)" class="chap-pip w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-xs font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all">7</button>
+              <button onclick="setSummonChapters(7)" class="chap-pip w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-xs font-black flex items-center justify-center hover:border-primary hover:text-primary transition-all text-on-surface">7</button>
             </div>
             <span class="text-xs text-on-surface-variant font-bold mr-2">7</span>
           </div>
@@ -621,18 +753,25 @@
         </button>
       </div>
 
-      <div class="flex justify-center items-center gap-4 text-on-surface-variant/60 font-semibold text-[10px] tracking-widest uppercase">
+      <div class="flex justify-center items-center gap-4 text-on-surface-variant font-semibold text-[10px] tracking-widest uppercase">
         <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> 42 Mana Required</span>
         <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
         <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 98% Success Rate</span>
       </div>
     </div>
 
+    <!-- Summoning in progress -->
     <div id="summoning-progress" class="order-1 lg:order-2 hidden flex-col items-center justify-center gap-6 text-center py-8">
       <div class="relative w-32 h-32 flex items-center justify-center">
         <div class="absolute inset-0 bg-primary/20 rounded-full ritual-ping"></div>
         <div class="w-28 h-28 bg-surface-container-lowest rounded-full border-4 border-primary flex items-center justify-center shadow-xl">
-          <span class="material-symbols-outlined text-6xl text-primary font-headline" style="line-height:1">school</span>
+          <div class="book-loader">
+            <div class="book-spine"></div>
+            <div class="book-cover"></div>
+            <div class="page page-3"></div>
+            <div class="page page-2"></div>
+            <div class="page page-1"></div>
+          </div>
         </div>
       </div>
       <div>
@@ -643,8 +782,12 @@
   </div>
 </div>
 
+<!-- MODAL BACKDROP -->
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-on-background/60 backdrop-blur-sm hidden"></div>
 
+<!-- ═══════════════════════════════════════════
+     CHAPTER MODAL
+═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="chapter-modal">
   <div class="glass-panel w-full max-w-xl mx-4 rounded-2xl shadow-2xl max-h-[85vh] flex flex-col border border-white/50">
     <div class="bg-secondary p-5 flex items-center justify-between gap-3 flex-shrink-0 rounded-t-2xl">
@@ -668,10 +811,13 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     BATTLE MODAL
+═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200] p-4 md:p-8" id="battle-modal">
   <div class="w-full max-w-5xl bg-stone-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative border-4 border-surface-container-high h-full max-h-[90vh]">
-    <img alt="Whispering Willow Woods" class="absolute inset-0 w-full h-full object-cover opacity-50 blur-sm scale-105" data-alt="enchanted mystical forest with giant glowing weeping willow trees" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ7yHP4VLQJ0vuaNtFXv7-QB6qQmw1OwH6JxXQn4U-bUuhTeNg8mX9hb476kbWuG4GF5aVegoc4iRR7yiCP94-M6_QwWzXgS2Y3UqUrla9VSWN4paZlm5N830B2jPjid7_FVwu0k2YCRs9F6o058T9VoCYYVbpZ9ukeitghFTjG_HUCakVT-RI7KpP4b7s8jTvsGBXTK8_7LziwB7EvFajH2jU62eBJ7nnwSSYyOlVOqRgb-k_K--qJhrfLzSy1xNiM51peDPOw3w"/>
-    
+    <img alt="Enchanted Battle Arena" class="absolute inset-0 w-full h-full object-cover opacity-50 blur-sm scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ7yHP4VLQJ0vuaNtFXv7-QB6qQmw1OwH6JxXQn4U-bUuhTeNg8mX9hb476kbWuG4GF5aVegoc4iRR7yiCP94-M6_QwWzXgS2Y3UqUrla9VSWN4paZlm5N830B2jPjid7_FVwu0k2YCRs9F6o058T9VoCYYVbpZ9ukeitghFTjG_HUCakVT-RI7KpP4b7s8jTvsGBXTK8_7LziwB7EvFajH2jU62eBJ7nnwSSYyOlVOqRgb-k_K--qJhrfLzSy1xNiM51peDPOw3w"/>
+
     <div class="absolute inset-x-0 top-0 p-4 md:p-8 flex justify-between items-start z-10 pointer-events-none">
       <div class="flex flex-col gap-2">
         <div class="bg-surface/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg flex items-center gap-4 border-2 border-primary pointer-events-auto">
@@ -693,11 +839,10 @@
     </div>
 
     <div class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 md:p-8 mt-16 md:mt-20 overflow-y-auto">
-      
       <div id="battle-top-section" class="w-full flex flex-col items-center gap-2 mb-4">
         <div class="w-full max-w-2xl flex flex-col gap-1 items-center mb-2">
           <div class="flex justify-between w-full px-3">
-            <span id="battle-title" class="pixel-text text-white font-bold tracking-widest text-shadow uppercase text-lg">GUARDIAN</span>
+            <span id="battle-title" class="pixel-text text-white font-bold tracking-widest uppercase text-lg">GUARDIAN</span>
             <span class="pixel-text text-primary-container font-bold text-lg" id="battle-hp-text">100/100</span>
           </div>
           <div class="w-full h-8 bg-black/50 rounded-full p-1.5 border-2 border-white/20 backdrop-blur-sm">
@@ -706,7 +851,6 @@
             </div>
           </div>
         </div>
-
         <div class="relative group">
           <div class="w-40 h-40 md:w-56 md:h-56 drop-shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-transform hover:scale-105 flex justify-center items-center">
             <canvas id="battle-boss-canvas" width="240" height="240"></canvas>
@@ -723,7 +867,6 @@
         <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 overflow-y-auto pr-2" style="max-height: 38vh;"></div>
         <p id="quiz-feedback" class="text-sm md:text-base text-on-surface-variant font-bold text-center mt-4 min-h-[1.5rem]"></p>
       </div>
-      
     </div>
 
     <div id="finishing-blow" class="hidden absolute inset-0 bg-surface/95 z-20 flex-col items-center justify-center p-8 text-center backdrop-blur-xl">
@@ -734,6 +877,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     GAMBIT MODAL
+═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="gambit-modal">
   <div class="glass-panel w-full max-w-md mx-4 rounded-3xl shadow-2xl overflow-hidden border border-white/50">
     <div class="bg-tertiary-container p-6 text-center rounded-t-3xl">
@@ -760,6 +906,9 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     FATE SCROLL MODAL
+═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200] p-4 md:p-8" id="fate-modal">
   <div class="w-full max-w-2xl flex flex-col items-center relative transition-all">
     <div class="w-full h-10 bg-[#5e3b2e] rounded-full shadow-xl relative flex items-center justify-between px-3 z-10">
@@ -767,10 +916,7 @@
       <div class="flex-1 border-t-[6px] border-dashed border-[#8b5e3c]/30 mx-4"></div>
       <div class="h-12 w-5 bg-[#8b5e3c] rounded-sm -mr-2 border-2 border-[#5e3b2e]"></div>
     </div>
-
     <div class="w-[94%] fate-scroll-gradient min-h-[450px] shadow-2xl relative px-8 py-12 flex flex-col items-center border-x-[16px] border-[#e8dfcf] -my-3 z-0">
-      <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8tCm_2MgHeNgrtueAVm7hosgWowjmf5TQagMRAhKgefykrItWuEn4UOfsFSo7x4xC7pE38AoOozEocAIu2-wut-1ei-PCAb9pkraHARxgM2J7G6J_wvx_6rmUebVMkE3RKsZafERsKNa2OF1QzyGg5HEn-K3eosOJUumEXch5V0ZTuX0YHPbQjijg5mK1zw-6kp2bGT343xjpM5Mii1DDTSNxDL1XySme0m4THJ28La7T4zKCl8n1650fRfebivmyVFb1r1UIp5E')"></div>
-
       <div id="fate-scroll-icon" onclick="revealFateScroll()" class="scroll-bob cursor-pointer w-32 mx-auto my-auto py-16 flex flex-col items-center gap-5">
         <svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg" class="w-24">
           <rect x="5" y="8" width="70" height="84" rx="4" fill="#ede7dd" stroke="#ae1d53" stroke-width="2"/>
@@ -783,13 +929,11 @@
 
       <div id="fate-reveal-area" style="display:none" class="w-full flex flex-col items-center">
         <h2 class="text-5xl md:text-6xl font-headline font-black text-primary tracking-tighter drop-shadow-[0_4px_0_#9e0a47] uppercase italic mb-10">VICTORY!</h2>
-
         <p class="text-stone-500 font-bold tracking-widest text-sm uppercase mb-3">Experience Gained</p>
         <div class="flex items-center gap-5 mb-12">
           <div id="fate-reveal-text" class="text-6xl md:text-7xl font-black text-on-surface font-headline tracking-tight">+0</div>
           <div class="bg-primary px-4 py-1.5 rounded-full text-on-primary font-bold text-sm shadow-md uppercase">Reward</div>
         </div>
-
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
           <div class="bg-surface-container-lowest p-5 rounded-2xl border-b-[5px] border-surface-dim flex flex-col items-center justify-center shadow-sm">
             <div class="w-16 h-16 rounded-full bg-tertiary-container/40 flex items-center justify-center mb-3 sigil-glow">
@@ -806,13 +950,11 @@
             <p class="text-xs text-stone-500 font-medium text-center mt-1">Added to Archive</p>
           </div>
         </div>
-
         <button id="fate-close-btn" onclick="closeFateModal()" class="bubbly-btn w-full max-w-md bg-primary text-on-primary font-headline font-extrabold text-xl py-5 rounded-full border-b-[6px] border-primary-dim flex items-center justify-center gap-3 shadow-xl">
           <span class="material-symbols-outlined text-2xl">redeem</span> Claim Rewards
         </button>
       </div>
     </div>
-
     <div class="w-full h-10 bg-[#5e3b2e] rounded-full shadow-2xl relative flex items-center justify-between px-3 z-10">
       <div class="h-12 w-5 bg-[#8b5e3c] rounded-sm -ml-2 border-2 border-[#5e3b2e]"></div>
       <div class="flex-1 border-t-[6px] border-dashed border-[#8b5e3c]/30 mx-4"></div>
@@ -821,7 +963,9 @@
   </div>
 </div>
 
-
+<!-- ═══════════════════════════════════════════
+     SETTINGS MODAL
+═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="api-modal">
   <div class="glass-panel w-full max-w-sm mx-4 rounded-3xl shadow-2xl overflow-hidden border border-white/50">
     <div class="bg-surface-container-high p-5 flex items-center gap-3 border-b-2 border-surface-container rounded-t-3xl">
@@ -846,6 +990,22 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER LOADING INDICATOR (inline)
+═══════════════════════════════════════════ -->
+<template id="book-loader-tpl">
+  <div class="flex flex-col items-center justify-center py-12 gap-4">
+    <div class="book-loader">
+      <div class="book-spine"></div>
+      <div class="book-cover"></div>
+      <div class="page page-3"></div>
+      <div class="page page-2"></div>
+      <div class="page page-1"></div>
+    </div>
+    <p class="font-headline font-bold text-primary text-sm">Unrolling the ancient scroll...</p>
+  </div>
+</template>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -889,188 +1049,523 @@ function defaultPlayer(name) {
     questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[] };
 }
 
-// ── MONSTER RANKS ──────────────────────────────────
+// ══════════════════════════════════════
+//  RANKS (10 stages at every 10th level)
+// ══════════════════════════════════════
 const RANKS = [
-  {name:'Level 1',en:'Novice Spirit',xp:0},
-  {name:'Level 10',en:'Awakened Form',xp:100},
-  {name:'Level 20',en:'Mystic Sprout',xp:250},
-  {name:'Level 30',en:'Arcane Beast',xp:500},
-  {name:'Level 40',en:'Gleaming Warden',xp:900},
-  {name:'Level 50',en:'Aura Walker',xp:1400},
-  {name:'Level 60',en:'Sky Soarer',xp:2000},
-  {name:'Level 70',en:'Astral Guardian',xp:3000},
-  {name:'Level 80',en:'Celestial Being',xp:4500},
-  {name:'Level 90',en:'Mythic Sovereign',xp:6500},
-  {name:'Level 100',en:'Eternal Legend',xp:9000},
+  { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
+  { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
+  { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
+  { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
+  { name:'Level 40',  en:'Gleaming Warden',   xp:900,  stageIdx:4  },
+  { name:'Level 50',  en:'Aura Walker',       xp:1400, stageIdx:5  },
+  { name:'Level 60',  en:'Sky Soarer',        xp:2000, stageIdx:6  },
+  { name:'Level 70',  en:'Astral Guardian',   xp:3000, stageIdx:7  },
+  { name:'Level 80',  en:'Celestial Being',   xp:4500, stageIdx:8  },
+  { name:'Level 90',  en:'Mythic Sovereign',  xp:6500, stageIdx:9  },
+  { name:'Level 100', en:'Eternal Legend',    xp:9000, stageIdx:10 },
 ];
 function getRanks(){ return RANKS; }
 function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.forEach(x=>{ if(STATE.player.totalXp>=x.xp) c=x; }); return c; }
 function getCurrentRankIdx(){ const r=getRanks(); let i=0; if(STATE.player) r.forEach((x,j)=>{ if(STATE.player.totalXp>=x.xp) i=j; }); return i; }
 function getNextRank(){ const r=getRanks(),i=r.indexOf(getCurrentRank()); return i<r.length-1?r[i+1]:null; }
 
-// ── TOPIC SUGGESTIONS ──────────────────────────────
-const TOPIC_EXPANSIONS = {
-  'history':      ['Ancient Greece','The Ming Dynasty','World War II','The Roman Empire','Medieval Japan'],
-  'science':      ['Quantum Physics','Black Holes','DNA & Genetics','The Big Bang','Cell Biology'],
-  'math':         ['Linear Algebra','Number Theory','Calculus','Graph Theory','Statistics'],
-  'programming':  ['Data Structures','System Design','Machine Learning','Web Security','Algorithms'],
-  'language':     ['Linguistics','Etymology','Mandarin Writing','Ancient Scripts','Phonetics'],
-  'philosophy':   ['Stoicism','Buddhism','Ethics','Existentialism','Ancient Logic'],
-  'art':          ['The Renaissance','Impressionism','Typography','Pixel Art History','Architecture'],
-  'economics':    ['Game Theory','Behavioral Economics','Supply Chains','Cryptocurrency','Central Banking'],
-};
+// ══════════════════════════════════════
+//  MONSTER SPRITE ENGINE — 11 STAGES
+//  Stage 0 = Lv1, Stage 10 = Lv100
+// ══════════════════════════════════════
 
-const RELATED_TOPICS = {
-  'machine learning': ['Neural Networks','Data Preprocessing','Reinforcement Learning','Computer Vision','NLP'],
-  'ancient rome': ['The Byzantine Empire','Julius Caesar','Roman Architecture','Stoic Philosophy','The Republic'],
-  'python': ['Data Science','FastAPI','Asyncio','Testing Patterns','Python Internals'],
-  'world war': ['Cold War','The Treaty of Versailles','Propaganda Techniques','Military Strategy','Post-War Europe'],
-  'biology': ['Ecology','Evolution','Microbiology','Biochemistry','Neuroscience'],
-  'astronomy': ['Black Holes','Exoplanets','The Milky Way','Dark Matter','Space Exploration'],
-};
+/*
+  Stage design summary:
+  0  Tiny Sprout      — small round blob, single sprout leaf, big innocent eyes
+  1  Awakened Flicker — slightly bigger, tiny tail starts, first hint of element glow
+  2  Mystic Seedling  — dual leaf antennae, faint aura ring, cute fangs
+  3  Arcane Sprout    — body slightly angular, swirling belly glyph, ear nubs
+  4  Gleaming Warden  — proper small horns, gem on forehead, shield-like back plate
+  5  Aura Walker      — sleek oval body, flowing petal wings begin, elemental tail
+  6  Sky Soarer       — full petal wings, glowing eye slit, subtle crown ring
+  7  Astral Guardian  — crystalline spines on back, star pupils, cosmic shimmer
+  8  Celestial Being  — large luminous wings, halo ring, floating crystal shards
+  9  Mythic Sovereign — draconic silhouette, full armor plating, twin tail blades
+  10 Eternal Legend   — transcendent form, starburst aura, floating orbit rings
+*/
 
-function getTopicSuggestions(){
-  if(!STATE.quests || !STATE.quests.length) return [];
-  const topics = STATE.quests.map(q=>(q.topic||'').toLowerCase().trim()).filter(Boolean);
-  if(!topics.length) return [];
+// Palette per stage
+const STAGE_PALETTES = [
+  { body:'#c8e6a0', shadow:'#8ab060', eye:'#4a8030', iris:'#2a5018', acc:'#f9e87f', aura:'rgba(200,230,160,0.3)'  }, // 0
+  { body:'#a8d4f0', shadow:'#6098c0', eye:'#3060a0', iris:'#1a3870', acc:'#ffd060', aura:'rgba(168,212,240,0.35)' }, // 1
+  { body:'#c0a8f8', shadow:'#8060c8', eye:'#5030a0', iris:'#300880', acc:'#f8c0e8', aura:'rgba(192,168,248,0.35)' }, // 2
+  { body:'#f8c880', shadow:'#c08030', eye:'#804020', iris:'#502808', acc:'#60d8b0', aura:'rgba(248,200,128,0.35)' }, // 3
+  { body:'#80d8d8', shadow:'#30a8b0', eye:'#106878', iris:'#083848', acc:'#fdcf50', aura:'rgba(128,216,216,0.4)'  }, // 4
+  { body:'#f0a8c8', shadow:'#c06090', eye:'#803060', iris:'#500038', acc:'#a0f0c0', aura:'rgba(240,168,200,0.4)'  }, // 5
+  { body:'#a0c8f8', shadow:'#5080d0', eye:'#2048a8', iris:'#102878', acc:'#ffd8a0', aura:'rgba(160,200,248,0.45)' }, // 6
+  { body:'#d0b8f8', shadow:'#9070d0', eye:'#5030a8', iris:'#280888', acc:'#80f8e8', aura:'rgba(208,184,248,0.5)'  }, // 7
+  { body:'#fff0c0', shadow:'#d0a030', eye:'#806010', iris:'#503800', acc:'#ff8888', aura:'rgba(255,240,192,0.5)'  }, // 8
+  { body:'#c8f0ff', shadow:'#40a8d8', eye:'#106090', iris:'#083858', acc:'#ffd0ff', aura:'rgba(200,240,255,0.55)' }, // 9
+  { body:'#ffffff', shadow:'#d0d0ff', eye:'#8080ff', iris:'#4040e0', acc:'#ffe080', aura:'rgba(255,255,255,0.6)'  }, // 10
+];
 
-  const suggestions = new Set();
-  topics.forEach(t=>{
-    Object.keys(RELATED_TOPICS).forEach(key=>{
-      if(t.includes(key)||key.includes(t)){
-        RELATED_TOPICS[key].forEach(s=>suggestions.add(s));
-      }
-    });
-  });
+function drawMonsterStage(ctx, stageIdx, t, W, H) {
+  const si = Math.min(stageIdx, 10);
+  const p = STAGE_PALETTES[si];
+  const cx = W / 2;
+  const cy = H * 0.52;
 
-  topics.forEach(t=>{
-    Object.keys(TOPIC_EXPANSIONS).forEach(key=>{
-      if(t.includes(key)){
-        TOPIC_EXPANSIONS[key].forEach(s=>suggestions.add(s));
-      }
-    });
-  });
+  // Universal bob
+  const bob = Math.sin(t * 2.0) * (4 + si * 0.5);
 
-  const studied = new Set(topics.map(t=>t.toLowerCase()));
-  const filtered = [...suggestions].filter(s=>!studied.has(s.toLowerCase()));
+  ctx.save();
+  ctx.translate(cx, cy + bob);
 
-  if(!filtered.length){
-    const fallback = ['The Silk Road','Calculus','Game Theory','Stoicism','The Human Brain','Quantum Computing','Typography','Ancient Egypt'];
-    return fallback.filter(f=>!studied.has(f.toLowerCase())).slice(0,5);
+  // ── SHADOW ──
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.beginPath();
+  ctx.ellipse(0, 30 + (si * 2) - bob * 0.4, 18 + si * 3, 5 + si * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // dispatch to stage renderer
+  switch(si) {
+    case 0:  _stage0(ctx, p, t); break;
+    case 1:  _stage1(ctx, p, t); break;
+    case 2:  _stage2(ctx, p, t); break;
+    case 3:  _stage3(ctx, p, t); break;
+    case 4:  _stage4(ctx, p, t); break;
+    case 5:  _stage5(ctx, p, t); break;
+    case 6:  _stage6(ctx, p, t); break;
+    case 7:  _stage7(ctx, p, t); break;
+    case 8:  _stage8(ctx, p, t); break;
+    case 9:  _stage9(ctx, p, t); break;
+    case 10: _stage10(ctx, p, t); break;
   }
-  return filtered.sort(()=>Math.random()-0.5).slice(0,6);
+
+  ctx.restore();
 }
 
-function renderTopicSuggestions(){
-  const container = document.getElementById('topic-chip-container');
-  if(!container) return;
-  const suggestions = getTopicSuggestions();
-  if(!suggestions.length){
-    container.innerHTML = `<div class="text-xs text-on-surface-variant italic font-medium">Complete a quest to unlock suggestions...</div>`;
-    return;
-  }
-  container.innerHTML = suggestions.map(s=>`
-    <button onclick="launchSuggestion('${s.replace(/'/g,"\\'")}') "
-            class="topic-chip bg-surface-container-lowest border-[2px] border-outline-variant/40 rounded-full px-4 py-2 text-xs font-extrabold text-on-surface hover:border-primary hover:bg-primary/10 hover:text-primary flex items-center gap-1.5 shadow-sm">
-      <span class="material-symbols-outlined text-base text-tertiary">auto_fix_high</span>
-      ${s}
-    </button>
-  `).join('');
+// ─── STAGE 0: Tiny Sprout ──────────────────────────
+function _stage0(ctx, p, t) {
+  // Leaf on top
+  ctx.fillStyle = '#7ac840';
+  ctx.save(); ctx.translate(0, -28); ctx.rotate(Math.sin(t*1.5)*0.2);
+  ctx.beginPath(); ctx.ellipse(0, -8, 5, 10, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#5a9830'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-16); ctx.stroke();
+  ctx.restore();
+  // Body — round blob
+  _drawRoundBody(ctx, p, 0, 0, 22, 20);
+  // Eyes
+  _drawCuteEyes(ctx, p, -8, -4, 7, t, false);
+  // Mouth
+  _drawSmile(ctx, 0, 8, 6, false);
 }
 
-window.launchSuggestion = function(topic){
-  openSummonScreen();
-  setTimeout(()=>{
-    const inp = document.getElementById('summon-topic-input');
-    if(inp){ inp.value = topic; inp.focus(); }
-  }, 100);
-};
+// ─── STAGE 1: Awakened Flicker ─────────────────────
+function _stage1(ctx, p, t) {
+  // Tiny tail
+  const tw = Math.sin(t*3)*8;
+  ctx.fillStyle = p.body; ctx.strokeStyle = p.shadow; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(18, 8); ctx.quadraticCurveTo(28+tw, 0, 24+tw, -12); ctx.quadraticCurveTo(20+tw, -18, 16, -8); ctx.fill(); ctx.stroke();
+  // Body
+  _drawRoundBody(ctx, p, 0, 0, 24, 22);
+  // Small inner glow
+  const ig = ctx.createRadialGradient(0, 2, 0, 0, 2, 18);
+  ig.addColorStop(0, 'rgba(255,255,200,0.35)'); ig.addColorStop(1, 'transparent');
+  ctx.fillStyle = ig; ctx.beginPath(); ctx.ellipse(0, 2, 18, 16, 0, 0, Math.PI*2); ctx.fill();
+  // Eyes with tiny sparkle
+  _drawCuteEyes(ctx, p, -8, -4, 7, t, false);
+  _drawSmile(ctx, 0, 8, 6, false);
+}
 
-window.refreshTopicSuggestions = function(){
-  renderTopicSuggestions();
-  showToast('Suggestions refreshed!');
-};
-
-// ── MONSTER SPRITE RENDERER (PLACEHOLDER) ─────────
-function drawMonster(ctx, ri, t) {
-    const bob = Math.sin(t * 2.5) * 6;
-    ctx.save();
-    ctx.translate(0, bob);
-    
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.beginPath(); ctx.ellipse(0, 50-bob, 25 + ri*2.5, 7, 0, 0, Math.PI*2); ctx.fill();
-
-    const size = 18 + (ri * 2.5);
-    const color = `hsl(${ri * 35}, 80%, 65%)`;
-    ctx.fillStyle = color;
-    
-    if(ri >= 5) {
-        ctx.shadowColor = color;
-        ctx.shadowBlur = 15 + (ri*2);
-    }
-    
-    ctx.beginPath();
-    ctx.arc(0, 0, size, 0, Math.PI*2);
-    ctx.fill();
-
-    if(ri >= 1) {
-        ctx.beginPath(); ctx.moveTo(-size*0.7, -size*0.5); ctx.lineTo(-size, -size*1.3); ctx.lineTo(-size*0.2, -size*0.8); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(size*0.7, -size*0.5); ctx.lineTo(size, -size*1.3); ctx.lineTo(size*0.2, -size*0.8); ctx.fill();
-    }
-
-    if(ri >= 2) {
-        ctx.strokeStyle = color; ctx.lineWidth = size*0.35; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(size*0.8, size*0.5); ctx.quadraticCurveTo(size*1.6 + Math.sin(t*4)*8, size*0.8, size*1.5, -size*0.6); ctx.stroke();
-    }
-    
-    if(ri >= 6) {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.shadowBlur = 0;
-        const wingS = size * (ri >= 8 ? 1.6 : 1.0);
-        ctx.beginPath(); ctx.ellipse(-size-wingS*0.5, 0, wingS, wingS*0.5, -Math.PI/6 + Math.sin(t*8)*0.25, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(size+wingS*0.5, 0, wingS, wingS*0.5, Math.PI/6 - Math.sin(t*8)*0.25, 0, Math.PI*2); ctx.fill();
-    }
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(-size*0.35, -size*0.1, size*0.25, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(size*0.35, -size*0.1, size*0.25, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#222';
-    ctx.beginPath(); ctx.arc(-size*0.35, -size*0.1, size*0.12, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(size*0.35, -size*0.1, size*0.12, 0, Math.PI*2); ctx.fill();
-
-    ctx.strokeStyle = '#222'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(-size*0.15, size*0.25); ctx.quadraticCurveTo(0, size*0.35, 0, size*0.25); ctx.quadraticCurveTo(0, size*0.35, size*0.15, size*0.25); ctx.stroke();
-
-    if(ri >= 9) {
-        ctx.fillStyle = '#fdcf50';
-        ctx.beginPath(); ctx.moveTo(0, -size*1.5); ctx.lineTo(-size*0.3, -size*0.9); ctx.lineTo(size*0.3, -size*0.9); ctx.fill();
-    }
-
+// ─── STAGE 2: Mystic Seedling ──────────────────────
+function _stage2(ctx, p, t) {
+  // Leaf antennae
+  for(const side of [-1,1]) {
+    ctx.save(); ctx.translate(side*10, -26); ctx.rotate(side*0.3 + Math.sin(t*2+side)*0.15);
+    ctx.fillStyle = '#c8a8f8';
+    ctx.beginPath(); ctx.ellipse(0, -7, 4, 9, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = p.shadow; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-14); ctx.stroke();
     ctx.restore();
+  }
+  // Faint aura ring
+  ctx.strokeStyle = p.aura.replace('0.35','0.5'); ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI*2); ctx.stroke();
+  // Body
+  _drawRoundBody(ctx, p, 0, 0, 25, 23);
+  // Belly glyph
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '10px serif'; ctx.textAlign='center'; ctx.fillText('✦', 0, 5);
+  // Cute fangs
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.moveTo(-5, 10); ctx.lineTo(-3, 16); ctx.lineTo(-1, 10); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(1, 10); ctx.lineTo(3, 16); ctx.lineTo(5, 10); ctx.fill();
+  _drawCuteEyes(ctx, p, -9, -5, 8, t, false);
+}
+
+// ─── STAGE 3: Arcane Sprout ────────────────────────
+function _stage3(ctx, p, t) {
+  // Ear nubs
+  for(const side of [-1,1]) {
+    ctx.fillStyle = p.shadow;
+    ctx.beginPath(); ctx.ellipse(side*22, -14, 6, 8, side*0.4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = p.acc;
+    ctx.beginPath(); ctx.ellipse(side*22, -14, 3, 5, side*0.4, 0, Math.PI*2); ctx.fill();
+  }
+  // Body slightly angular
+  ctx.fillStyle = p.body;
+  ctx.beginPath();
+  ctx.moveTo(-22, -14); ctx.quadraticCurveTo(-26, 0, -22, 18);
+  ctx.quadraticCurveTo(0, 26, 22, 18);
+  ctx.quadraticCurveTo(26, 0, 22, -14);
+  ctx.quadraticCurveTo(0, -28, -22, -14);
+  ctx.fill();
+  ctx.strokeStyle = p.shadow; ctx.lineWidth = 2; ctx.stroke();
+  // Belly swirl
+  ctx.strokeStyle = p.acc; ctx.lineWidth=1.5; ctx.globalAlpha=0.7;
+  ctx.beginPath(); ctx.arc(0, 4, 8, 0, Math.PI*1.5); ctx.stroke();
+  ctx.globalAlpha=1;
+  _drawCuteEyes(ctx, p, -9, -6, 9, t, false);
+  _drawSmile(ctx, 0, 10, 7, false);
+}
+
+// ─── STAGE 4: Gleaming Warden ──────────────────────
+function _stage4(ctx, p, t) {
+  // Back plate
+  ctx.fillStyle = p.shadow;
+  ctx.beginPath(); ctx.roundRect(-18, -20, 36, 16, [4]); ctx.fill();
+  // Small horns
+  for(const side of [-1,1]) {
+    ctx.save(); ctx.translate(side*14, -28); ctx.rotate(side*0.2);
+    ctx.fillStyle = p.acc;
+    ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(0, -14); ctx.lineTo(4, 0); ctx.fill();
+    ctx.restore();
+  }
+  _drawRoundBody(ctx, p, 0, 0, 26, 24);
+  // Forehead gem
+  const gemGlow = 0.7 + Math.sin(t*3)*0.3;
+  ctx.fillStyle = p.acc; ctx.globalAlpha = gemGlow;
+  ctx.beginPath(); ctx.arc(0, -16, 5, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1;
+  ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(-1, -18, 2, 0, Math.PI*1.2); ctx.stroke();
+  _drawCuteEyes(ctx, p, -9, -4, 9, t, false);
+  _drawSmile(ctx, 0, 10, 7, true);
+}
+
+// ─── STAGE 5: Aura Walker ──────────────────────────
+function _stage5(ctx, p, t) {
+  // Flowing petal wings (2)
+  for(const side of [-1,1]) {
+    const wf = Math.sin(t*2.5 + side)*0.25;
+    ctx.save(); ctx.translate(side*26, -5); ctx.rotate(wf);
+    ctx.fillStyle = p.acc; ctx.globalAlpha=0.5;
+    ctx.beginPath(); ctx.ellipse(0, 0, 12, 22, side*0.5, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=0.8;
+    ctx.beginPath(); ctx.ellipse(0, 0, 6, 16, side*0.5, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  // Sleek oval body
+  ctx.fillStyle = p.body;
+  ctx.beginPath(); ctx.ellipse(0, 0, 22, 28, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle=p.shadow; ctx.lineWidth=2; ctx.stroke();
+  // Elemental tail
+  const tf = Math.sin(t*3)*10;
+  ctx.strokeStyle=p.acc; ctx.lineWidth=3; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(0, 28); ctx.quadraticCurveTo(20+tf, 40, 10+tf, 52); ctx.stroke();
+  ctx.fillStyle=p.acc;
+  ctx.beginPath(); ctx.arc(10+tf, 52, 5, 0, Math.PI*2); ctx.fill();
+  _drawCuteEyes(ctx, p, -9, -8, 9, t, true);
+  _drawSmile(ctx, 0, 8, 8, true);
+}
+
+// ─── STAGE 6: Sky Soarer ───────────────────────────
+function _stage6(ctx, p, t) {
+  // Full petal wings (4)
+  for(let i=0; i<4; i++) {
+    const side = i < 2 ? -1 : 1;
+    const yOff = i%2===0 ? -12 : 8;
+    const wf = Math.sin(t*3 + i)*0.3;
+    ctx.save(); ctx.translate(side*28, yOff); ctx.rotate(side*0.3 + wf);
+    ctx.fillStyle = p.acc; ctx.globalAlpha = 0.4+i*0.05;
+    ctx.beginPath(); ctx.ellipse(0, 0, 10, 24, side*0.4, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  // Glowing crown ring
+  ctx.strokeStyle=p.acc; ctx.lineWidth=3; ctx.globalAlpha=0.6+Math.sin(t*2)*0.2;
+  ctx.beginPath(); ctx.ellipse(0, -28, 16, 5, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.globalAlpha=1;
+  // Body
+  ctx.fillStyle=p.body;
+  ctx.beginPath(); ctx.ellipse(0, 0, 24, 28, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle=p.shadow; ctx.lineWidth=2.5; ctx.stroke();
+  // Eye slit (glowing)
+  _drawSleekEyes(ctx, p, t, -10, -8, 8);
+  _drawSmile(ctx, 0, 12, 9, true);
+}
+
+// ─── STAGE 7: Astral Guardian ──────────────────────
+function _stage7(ctx, p, t) {
+  // Crystalline spines
+  for(let i=0; i<5; i++) {
+    const angle = -Math.PI/2 + (i-2)*0.35;
+    const len = 16 + (i===2 ? 8:0);
+    ctx.save(); ctx.translate(Math.cos(angle)*26, Math.sin(angle)*26-4);
+    ctx.rotate(angle + Math.PI/2);
+    ctx.fillStyle=p.acc; ctx.globalAlpha=0.75+Math.sin(t*2+i)*0.2;
+    ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(0,-len); ctx.lineTo(3,0); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  // Body
+  _drawRoundBody(ctx, p, 0, 0, 28, 26);
+  // Star pupils
+  _drawStarEyes(ctx, p, t, -10, -6);
+  _drawSmile(ctx, 0, 12, 9, true);
+  // Cosmic shimmer particles
+  for(let i=0; i<6; i++) {
+    const a = (i/6)*Math.PI*2 + t*1.5;
+    const r = 34 + Math.sin(t*3+i)*4;
+    ctx.fillStyle=p.acc; ctx.globalAlpha=0.3+Math.sin(t*4+i)*0.3;
+    ctx.beginPath(); ctx.arc(Math.cos(a)*r, Math.sin(a)*r, 2, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+
+// ─── STAGE 8: Celestial Being ──────────────────────
+function _stage8(ctx, p, t) {
+  // Large luminous wings
+  for(const side of [-1,1]) {
+    ctx.save(); ctx.translate(side*32, -8);
+    const wf = Math.sin(t*2+side)*0.35;
+    ctx.rotate(wf);
+    const wg = ctx.createLinearGradient(0,-32,0,32);
+    wg.addColorStop(0, p.acc); wg.addColorStop(1, 'transparent');
+    ctx.fillStyle=wg; ctx.globalAlpha=0.65;
+    ctx.beginPath(); ctx.ellipse(0, 0, 14, 36, side*0.3, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  // Halo
+  ctx.strokeStyle=p.acc; ctx.lineWidth=4;
+  ctx.globalAlpha=0.7+Math.sin(t*2)*0.2;
+  ctx.beginPath(); ctx.ellipse(0, -32, 20, 6, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.globalAlpha=1;
+  // Floating crystal shards
+  for(let i=0; i<4; i++) {
+    const a=(i/4)*Math.PI*2 + t*0.8;
+    const r=38;
+    ctx.save(); ctx.translate(Math.cos(a)*r, Math.sin(a)*r);
+    ctx.rotate(a+t);
+    ctx.fillStyle=p.acc; ctx.globalAlpha=0.55;
+    ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(3,0); ctx.lineTo(0,6); ctx.lineTo(-3,0); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  // Body glow
+  const bg=ctx.createRadialGradient(0,0,8,0,0,28);
+  bg.addColorStop(0,'rgba(255,255,255,0.4)'); bg.addColorStop(1,p.aura);
+  ctx.fillStyle=bg;
+  ctx.beginPath(); ctx.ellipse(0,0,28,30,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=p.body;
+  ctx.beginPath(); ctx.ellipse(0,0,26,28,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=p.shadow; ctx.lineWidth=2; ctx.stroke();
+  _drawStarEyes(ctx, p, t, -10, -8);
+  _drawSmile(ctx, 0, 12, 10, true);
+}
+
+// ─── STAGE 9: Mythic Sovereign ─────────────────────
+function _stage9(ctx, p, t) {
+  // Twin tail blades
+  for(const side of [-1,1]) {
+    const tf = Math.sin(t*2.5+side)*6;
+    ctx.save(); ctx.translate(side*12, 24);
+    ctx.fillStyle=p.acc;
+    ctx.beginPath();
+    ctx.moveTo(0,0); ctx.lineTo(side*8+tf, 18); ctx.lineTo(side*18+tf, 12); ctx.lineTo(side*14+tf, 24);
+    ctx.lineTo(side*6+tf, 28); ctx.lineTo(0, 18); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  // Draconic armor plating
+  ctx.fillStyle=p.shadow;
+  for(let i=0; i<3; i++) {
+    ctx.beginPath(); ctx.ellipse(0, -18+i*12, 24-i*2, 8, 0, 0, Math.PI*2); ctx.fill();
+  }
+  // Body
+  _drawRoundBody(ctx, p, 0, 0, 28, 30);
+  // Dragon eyes (slit)
+  _drawDragonEyes(ctx, p, t, -10, -8);
+  // Crown
+  ctx.fillStyle=p.acc;
+  for(let i=0; i<5; i++) {
+    const cx=-14+i*7;
+    const h=8+(i===2?8:(i===1||i===3?4:0));
+    ctx.beginPath(); ctx.moveTo(cx,-28); ctx.lineTo(cx+3,-28-h); ctx.lineTo(cx+6,-28); ctx.fill();
+  }
+}
+
+// ─── STAGE 10: Eternal Legend ──────────────────────
+function _stage10(ctx, p, t) {
+  // Outer orbit rings
+  for(let r=0; r<3; r++) {
+    const rotSpeed = (r+1)*0.6;
+    ctx.save(); ctx.rotate(t*rotSpeed*(r%2===0?1:-1));
+    ctx.strokeStyle=p.acc; ctx.lineWidth=1.5+r*0.5;
+    ctx.globalAlpha=0.25+r*0.1;
+    ctx.beginPath(); ctx.ellipse(0,0,42+r*10, 14+r*4, 0, 0, Math.PI*2); ctx.stroke();
+    // Orbiting dots
+    for(let d=0; d<3; d++) {
+      const a=(d/3)*Math.PI*2;
+      ctx.globalAlpha=0.7;
+      ctx.fillStyle=p.acc;
+      ctx.beginPath(); ctx.arc(Math.cos(a)*(42+r*10), Math.sin(a)*(14+r*4)*0.33, 3, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+  // Starburst aura
+  for(let i=0; i<12; i++) {
+    const a=(i/12)*Math.PI*2 + t*0.5;
+    const len=30+Math.sin(t*3+i)*8;
+    ctx.strokeStyle=p.acc; ctx.lineWidth=1.5; ctx.globalAlpha=0.3+Math.sin(t*2+i)*0.2;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a)*20, Math.sin(a)*20); ctx.lineTo(Math.cos(a)*len, Math.sin(a)*len); ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  // Transcendent body — luminous white with prismatic edge
+  const bg2=ctx.createRadialGradient(0,0,4,0,0,32);
+  bg2.addColorStop(0,'rgba(255,255,255,0.95)'); bg2.addColorStop(0.6,'rgba(220,220,255,0.7)'); bg2.addColorStop(1,'rgba(180,180,255,0.2)');
+  ctx.fillStyle=bg2;
+  ctx.beginPath(); ctx.ellipse(0,0,30,32,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=p.acc; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.ellipse(0,0,30,32,0,0,Math.PI*2); ctx.stroke();
+  // Eyes
+  _drawLegendEyes(ctx, p, t, -10, -8);
+  // Transcendent smile
+  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(0,12,10,0,Math.PI); ctx.stroke();
+}
+
+// ─── SHARED EYE / FACE HELPERS ──────────────────────
+function _drawRoundBody(ctx, p, x, y, rx, ry) {
+  ctx.fillStyle = p.body;
+  ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = p.shadow; ctx.lineWidth = 2; ctx.stroke();
+}
+
+function _drawCuteEyes(ctx, p, lx, y, r, t, glow) {
+  const blink = Math.sin(t*2.7)>0.92;
+  for(const side of [-1,1]) {
+    const ex = side===(-1) ? lx : -lx;
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.ellipse(ex, y, r, blink?1.5:r*1.1, 0, 0, Math.PI*2); ctx.fill();
+    if(!blink) {
+      ctx.fillStyle = p.iris;
+      ctx.beginPath(); ctx.ellipse(ex, y+1, r*0.55, r*0.65, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(ex-r*0.2, y-r*0.25, r*0.18, 0, Math.PI*2); ctx.fill();
+      if(glow) {
+        ctx.shadowColor = p.eye; ctx.shadowBlur = 8;
+        ctx.strokeStyle=p.eye; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.ellipse(ex, y, r, r*1.1, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0;
+      }
+    }
+  }
+}
+
+function _drawSleekEyes(ctx, p, t, lx, y, r) {
+  const gl = 0.7 + Math.sin(t*3)*0.3;
+  for(const side of [-1,1]) {
+    const ex = side===(-1) ? lx : -lx;
+    ctx.fillStyle=p.iris; ctx.globalAlpha=gl;
+    ctx.beginPath(); ctx.ellipse(ex, y, r*0.6, r, 0.2*side, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.beginPath(); ctx.arc(ex-r*0.15, y-r*0.3, r*0.2, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function _drawStarEyes(ctx, p, t, lx, y) {
+  const gl=0.8+Math.sin(t*4)*0.2;
+  for(const side of [-1,1]) {
+    const ex=side===(-1)?lx:-lx;
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(ex, y, 8, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle=p.iris; ctx.font='10px serif'; ctx.textAlign='center';
+    ctx.globalAlpha=gl; ctx.fillText('★', ex, y+4); ctx.globalAlpha=1;
+    ctx.strokeStyle=p.acc; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(ex, y, 8, 0, Math.PI*2); ctx.stroke();
+  }
+}
+
+function _drawDragonEyes(ctx, p, t, lx, y) {
+  const gl=0.7+Math.sin(t*3)*0.3;
+  for(const side of [-1,1]) {
+    const ex=side===(-1)?lx:-lx;
+    ctx.fillStyle=p.eye; ctx.globalAlpha=gl;
+    ctx.beginPath(); ctx.ellipse(ex, y, 8, 7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+    // Slit pupil
+    ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.ellipse(ex, y, 2, 6, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle=p.acc; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.ellipse(ex, y, 8, 7, 0, 0, Math.PI*2); ctx.stroke();
+  }
+}
+
+function _drawLegendEyes(ctx, p, t, lx, y) {
+  const gl=0.85+Math.sin(t*2)*0.15;
+  for(const side of [-1,1]) {
+    const ex=side===(-1)?lx:-lx;
+    const eg=ctx.createRadialGradient(ex,y,0,ex,y,9);
+    eg.addColorStop(0,'#fff'); eg.addColorStop(0.5,p.acc); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.globalAlpha=gl;
+    ctx.beginPath(); ctx.arc(ex, y, 9, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+function _drawSmile(ctx, x, y, r, happy) {
+  ctx.strokeStyle='rgba(80,40,20,0.55)'; ctx.lineWidth=2; ctx.lineCap='round';
+  if(happy) {
+    ctx.beginPath(); ctx.arc(x, y-r*0.3, r, 0.1, Math.PI-0.1); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.moveTo(x-r*0.6, y); ctx.quadraticCurveTo(x, y+r*0.5, x+r*0.6, y); ctx.stroke();
+  }
 }
 
 // ── ANIMATED CHAR CANVAS ───────────────────────────
 let charRAF = null;
-function startCharCanvas(){
+function startCharCanvas() {
   if(charRAF) cancelAnimationFrame(charRAF);
   const canvas = document.getElementById('char-canvas');
   if(!canvas || !STATE.player) return;
   const ctx = canvas.getContext('2d');
-  const ri = getCurrentRankIdx();
+  const rank = getCurrentRank();
+  const stageIdx = rank.stageIdx;
   const W = canvas.width, H = canvas.height;
-  const scale = Math.min(W, H) / 140; 
-  const cx = W / 2;
 
-  function frame(){
+  function frame() {
     const t = Date.now() * 0.001;
     ctx.clearRect(0,0,W,H);
-    ctx.save();
-    ctx.translate(cx, H*0.4); 
-    ctx.scale(scale, scale);
-    drawMonster(ctx, ri, t);
-    ctx.restore();
+    drawMonsterStage(ctx, stageIdx, t, W, H);
     charRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// Animate path screen monster (stage 0 preview)
+let pathMonRAF = null;
+function startPathMonster() {
+  if(pathMonRAF) cancelAnimationFrame(pathMonRAF);
+  const canvas = document.getElementById('path-monster-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  function frame() {
+    const t = Date.now()*0.001;
+    ctx.clearRect(0,0,W,H);
+    drawMonsterStage(ctx, 0, t, W, H);
+    pathMonRAF = requestAnimationFrame(frame);
   }
   frame();
 }
@@ -1087,10 +1582,10 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(20,35)}%)`;
   const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
   const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
-  const cx=w/2, cy=h*0.52, sc=w/170;
+  const cxb=w/2, cyb=h*0.52, sc=w/170;
   const t=Date.now()*0.001;
   const hover=Math.sin(t*0.9)*3;
-  ctx.save(); ctx.translate(cx,cy+hover); ctx.scale(sc,sc);
+  ctx.save(); ctx.translate(cxb,cyb+hover); ctx.scale(sc,sc);
   ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
   ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
   const bs=Math.floor(sr(0,4));
@@ -1190,34 +1685,11 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
   tick();
 })();
 
-// ── DRAG AND DROP UTILS ────────────────────────────
-window.dragQuest = function(ev, idx) {
-  ev.dataTransfer.setData("text/plain", idx);
-  ev.dataTransfer.effectAllowed = 'move';
-};
-window.allowDrop = function(ev) {
-  ev.preventDefault();
-};
-window.dropQuest = function(ev, folderId) {
-  ev.preventDefault();
-  ev.currentTarget.classList.remove('drag-over');
-  const idx = ev.dataTransfer.getData("text/plain");
-  if (idx !== "" && STATE.quests[idx]) {
-      STATE.quests[idx].folderId = folderId;
-      saveState();
-      renderQuestGrid();
-  }
-};
-
-window.createNewFolder = function() {
-  const name = prompt("Enter new folder name:");
-  if (name && name.trim()) {
-    if(!STATE.folders) STATE.folders = [];
-    STATE.folders.push({ id: Date.now().toString(), name: name.trim() });
-    saveState();
-    renderQuestGrid();
-  }
-};
+// ── DRAG AND DROP ──────────────────────────────────
+window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; };
+window.allowDrop=function(ev){ ev.preventDefault(); };
+window.dropQuest=function(ev,folderId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].folderId=folderId; saveState(); renderQuestGrid(); } };
+window.createNewFolder=function(){ const name=prompt("Enter new folder name:"); if(name&&name.trim()){ if(!STATE.folders) STATE.folders=[]; STATE.folders.push({id:Date.now().toString(),name:name.trim()}); saveState(); renderQuestGrid(); } };
 
 // ── FIREBASE STATE ─────────────────────────────────
 async function loadState(){
@@ -1246,7 +1718,7 @@ async function loadState(){
 }
 
 window.enterRealm=function(){
-  if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); }
+  if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); startPathMonster(); }
   else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
 };
 
@@ -1288,13 +1760,13 @@ window.nukeLibrary=async function(){
 // ── AUTH ────────────────────────────────────────────
 window.signInGoogle=async()=>{
   document.getElementById('auth-buttons').classList.add('hidden');
-  document.getElementById('loading-text').style.display='block';
+  document.getElementById('loading-text').style.display='flex';
   try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
   catch(e){ showToast("Google Sign-In failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
 };
 window.signInGuest=async()=>{
   document.getElementById('auth-buttons').classList.add('hidden');
-  document.getElementById('loading-text').style.display='block';
+  document.getElementById('loading-text').style.display='flex';
   try{ await signInAnonymously(auth); }
   catch(e){ showToast("Guest login failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
 };
@@ -1303,10 +1775,7 @@ window.signOutUser=async()=>{ try{ await signOut(auth); window.location.reload()
 // ── TABS ────────────────────────────────────────────
 window.switchTab=function(tabId){
   document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el=>{
-    el.classList.remove('text-primary','border-primary','bg-primary/5');
-    el.classList.add('text-outline','border-transparent');
-  });
+  document.querySelectorAll('.tab-btn').forEach(el=>{ el.classList.remove('text-primary','border-primary','bg-primary/5'); el.classList.add('text-outline','border-transparent'); });
   document.getElementById(tabId).classList.add('active');
   const btn=document.querySelector(`.tab-btn[data-target="${tabId}"]`);
   if(btn){ btn.classList.remove('text-outline','border-transparent'); btn.classList.add('text-primary','border-primary','bg-primary/5'); }
@@ -1325,28 +1794,65 @@ window.choosePath=async function(){
 };
 window.cancelPathSelection=function(){ showScreen('screen-hub'); };
 
+// ── TOPIC SUGGESTIONS ──────────────────────────────
+const TOPIC_EXPANSIONS={
+  'history':['Ancient Greece','The Ming Dynasty','World War II','The Roman Empire','Medieval Japan'],
+  'science':['Quantum Physics','Black Holes','DNA & Genetics','The Big Bang','Cell Biology'],
+  'math':['Linear Algebra','Number Theory','Calculus','Graph Theory','Statistics'],
+  'programming':['Data Structures','System Design','Machine Learning','Web Security','Algorithms'],
+  'language':['Linguistics','Etymology','Mandarin Writing','Ancient Scripts','Phonetics'],
+  'philosophy':['Stoicism','Buddhism','Ethics','Existentialism','Ancient Logic'],
+  'art':['The Renaissance','Impressionism','Typography','Pixel Art History','Architecture'],
+  'economics':['Game Theory','Behavioral Economics','Supply Chains','Cryptocurrency','Central Banking'],
+};
+const RELATED_TOPICS={
+  'machine learning':['Neural Networks','Data Preprocessing','Reinforcement Learning','Computer Vision','NLP'],
+  'ancient rome':['The Byzantine Empire','Julius Caesar','Roman Architecture','Stoic Philosophy','The Republic'],
+  'python':['Data Science','FastAPI','Asyncio','Testing Patterns','Python Internals'],
+  'world war':['Cold War','The Treaty of Versailles','Propaganda Techniques','Military Strategy','Post-War Europe'],
+  'biology':['Ecology','Evolution','Microbiology','Biochemistry','Neuroscience'],
+  'astronomy':['Black Holes','Exoplanets','The Milky Way','Dark Matter','Space Exploration'],
+};
+
+function getTopicSuggestions(){
+  if(!STATE.quests?.length) return [];
+  const topics=STATE.quests.map(q=>(q.topic||'').toLowerCase().trim()).filter(Boolean);
+  if(!topics.length) return [];
+  const suggestions=new Set();
+  topics.forEach(t=>{ Object.keys(RELATED_TOPICS).forEach(key=>{ if(t.includes(key)||key.includes(t)) RELATED_TOPICS[key].forEach(s=>suggestions.add(s)); }); });
+  topics.forEach(t=>{ Object.keys(TOPIC_EXPANSIONS).forEach(key=>{ if(t.includes(key)) TOPIC_EXPANSIONS[key].forEach(s=>suggestions.add(s)); }); });
+  const studied=new Set(topics.map(t=>t.toLowerCase()));
+  const filtered=[...suggestions].filter(s=>!studied.has(s.toLowerCase()));
+  if(!filtered.length){ const fallback=['The Silk Road','Calculus','Game Theory','Stoicism','The Human Brain','Quantum Computing','Typography','Ancient Egypt']; return fallback.filter(f=>!studied.has(f.toLowerCase())).slice(0,5); }
+  return filtered.sort(()=>Math.random()-0.5).slice(0,6);
+}
+
+function renderTopicSuggestions(){
+  const container=document.getElementById('topic-chip-container');
+  if(!container) return;
+  const suggestions=getTopicSuggestions();
+  if(!suggestions.length){ container.innerHTML=`<div class="text-xs text-on-surface-variant italic font-medium">Complete a quest to unlock suggestions...</div>`; return; }
+  container.innerHTML=suggestions.map(s=>`<button onclick="launchSuggestion('${s.replace(/'/g,"\\'")}') " class="topic-chip bg-surface-container-lowest border-[2px] border-outline-variant/40 rounded-full px-4 py-2 text-xs font-extrabold text-on-surface hover:border-primary hover:bg-primary/10 hover:text-primary flex items-center gap-1.5 shadow-sm"><span class="material-symbols-outlined text-base text-tertiary">auto_fix_high</span>${s}</button>`).join('');
+}
+
+window.launchSuggestion=function(topic){ openSummonScreen(); setTimeout(()=>{ const inp=document.getElementById('summon-topic-input'); if(inp){ inp.value=topic; inp.focus(); } },100); };
+window.refreshTopicSuggestions=function(){ renderTopicSuggestions(); showToast('Suggestions refreshed!'); };
+
 // ── SUMMON SCREEN ───────────────────────────────────
 window.openSummonScreen=function(){
-  const ss=document.getElementById('summon-screen');
-  ss.classList.add('open');
+  const ss=document.getElementById('summon-screen'); ss.classList.add('open');
   document.getElementById('summon-form-side').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('flex');
   document.getElementById('summon-topic-input').value='';
   document.getElementById('summon-objective-input').value='';
 };
-window.closeSummonScreen=function(){
-  document.getElementById('summon-screen').classList.remove('open');
-};
+window.closeSummonScreen=function(){ document.getElementById('summon-screen').classList.remove('open'); };
 
 window.setSummonChapters=function(n){
   STATE.summonChapters=n;
   document.getElementById('summon-chapter-display').textContent=`${n} Chapters`;
-  document.querySelectorAll('.chap-pip').forEach(b=>{
-    const v=parseInt(b.textContent);
-    if(v===n){ b.classList.add('active-pip','bg-primary','text-on-primary','border-primary','shadow-md'); b.classList.remove('border-outline-variant','bg-surface-container-lowest'); }
-    else{ b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary','shadow-md'); b.classList.add('border-outline-variant','bg-surface-container-lowest'); }
-  });
+  document.querySelectorAll('.chap-pip').forEach(b=>{ const v=parseInt(b.textContent); if(v===n){ b.classList.add('active-pip','bg-primary','text-on-primary','border-primary','shadow-md'); b.classList.remove('border-outline-variant','bg-surface-container-lowest','text-on-surface'); } else { b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary','shadow-md'); b.classList.add('border-outline-variant','bg-surface-container-lowest','text-on-surface'); } });
 };
 
 window.doSummonQuest=async function(){
@@ -1354,39 +1860,30 @@ window.doSummonQuest=async function(){
   if(!topic){ showToast('Please enter a topic.'); return; }
   const objective=document.getElementById('summon-objective-input').value.trim();
   const numChapters=STATE.summonChapters||5;
-
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('flex');
   setSummonStatus('Communing with the ancient scrolls...','CRAFTING QUEST NARRATIVE');
-
   try{
     const summonFn=httpsCallable(functions,'summonQuest');
     let questDataText;
     try{ const r=await summonFn({topic,objective,numChapters,modelId:'gemini-2.5-flash'}); questDataText=r.data.result; }
     catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
-
     let parsed=parseJSON(questDataText);
     if(!parsed||typeof parsed!=='object') parsed={};
     setSummonStatus('Summoning the guardian demon...','BINDING DEMON ESSENCE');
     await delay(400);
-
     const chapters=parsed.chapters||parsed.chapterList||[];
     if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
-
     const baseQuest={topic:topic||"Unknown",objective:objective||"",questTitle:parsed.questTitle||parsed.title||`${topic} Mastery`,questNarrative:parsed.questNarrative||"A newly discovered scroll.",bossName:parsed.bossName||"Demon",bossTitle:parsed.bossTitle||"The Unknown",bossLore:parsed.bossLore||"A mysterious entity.",chapters,folderId:'default'};
     const userQuest={...baseQuest,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false};
     if(!STATE.quests) STATE.quests=[];
     STATE.quests.unshift(userQuest); STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
     try{ await saveState(); }catch(e){}
     try{ const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID}; const ref=await addDoc(collection(db,"public_quests"),pubQ); pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ); }catch(e){}
-
     closeSummonScreen();
     showToast(`Quest summoned: "${userQuest.questTitle}"`);
-    window.switchTab('tab-quests');
-    renderQuestGrid();
-    renderTopicSuggestions();
-    window.showQuestScreen(0);
+    window.switchTab('tab-quests'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
   }catch(e){
     console.error(e);
     document.getElementById('summon-form-side').classList.remove('hidden');
@@ -1399,10 +1896,7 @@ window.doSummonQuest=async function(){
 function setSummonStatus(t,s=''){ document.getElementById('summon-gen-status').textContent=t; document.getElementById('summon-gen-step').textContent=s; }
 
 // ── NAV ─────────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 window.showHub=function(){ showScreen('screen-hub'); renderHub(); };
 
 window.showQuestScreen=function(idx){
@@ -1415,27 +1909,18 @@ window.showQuestScreen=function(idx){
   document.getElementById('boss-name-display').textContent=quest.bossName||'Demon';
   document.getElementById('boss-title-display').textContent=quest.bossTitle||'Guardian';
   document.getElementById('boss-lore-text').textContent=quest.bossLore||'A mysterious entity.';
-  updateBossHpDisplay(quest);
-  renderChapterList(quest);
+  updateBossHpDisplay(quest); renderChapterList(quest);
   const chapters=quest.chapters||[];
   const completed=quest.completed||[];
   const allDone=chapters.length>0&&chapters.every((_,i)=>completed[i]);
   const btn=document.getElementById('boss-complete-btn');
   btn.disabled=!allDone;
-  if(quest.defeated){
-    btn.innerHTML='✓ Demon Defeated'; btn.disabled=true;
-    btn.classList.remove('bg-primary','border-primary-dim'); btn.classList.add('bg-secondary','border-secondary-dim');
-  } else if(allDone){
-    btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
-  }
+  if(quest.defeated){ btn.innerHTML='✓ Demon Defeated'; btn.disabled=true; btn.classList.remove('bg-primary','border-primary-dim'); btn.classList.add('bg-secondary','border-secondary-dim'); }
+  else if(allDone){ btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon'; }
   showScreen('screen-quest');
 };
 
-function updateBossHpDisplay(quest){
-  const r=quest.bossHp/quest.bossMaxHp;
-  document.getElementById('boss-hp-fill').style.width=(r*100)+'%';
-  document.getElementById('boss-hp-text').textContent=`${quest.bossHp} / ${quest.bossMaxHp}`;
-}
+function updateBossHpDisplay(quest){ const r=quest.bossHp/quest.bossMaxHp; document.getElementById('boss-hp-fill').style.width=(r*100)+'%'; document.getElementById('boss-hp-text').textContent=`${quest.bossHp} / ${quest.bossMaxHp}`; }
 
 function renderChapterList(quest){
   const list=document.getElementById('chapter-list'); list.innerHTML='';
@@ -1445,17 +1930,7 @@ function renderChapterList(quest){
     const done=completed[i];
     const item=document.createElement('div');
     item.className='flex items-center gap-4 p-5 rounded-2xl border-[3px] cursor-pointer transition-all '+(done?'border-secondary bg-secondary-container/10':'border-outline-variant bg-surface-container-lowest hover:border-primary shadow-sm');
-    item.innerHTML=`
-      <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${done?'bg-secondary':'bg-surface-container-high'}">
-        <span class="material-symbols-outlined text-${done?'on-secondary':'outline'} text-xl">${done?'check_circle':'auto_stories'}</span>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-1">${ch.tag||'CHAPTER '+(i+1)}</p>
-        <p class="font-headline font-extrabold text-base text-on-surface leading-tight mb-1">${ch.title}</p>
-        <p class="text-sm text-on-surface-variant truncate">${ch.summary}</p>
-      </div>
-      ${done?'<span class="text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">READ</span>':''}
-    `;
+    item.innerHTML=`<div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${done?'bg-secondary':'bg-surface-container-high'}"><span class="material-symbols-outlined text-${done?'on-secondary':'outline'} text-xl">${done?'check_circle':'auto_stories'}</span></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-1">${ch.tag||'CHAPTER '+(i+1)}</p><p class="font-headline font-extrabold text-base text-on-surface leading-tight mb-1">${ch.title}</p><p class="text-sm text-on-surface-variant truncate">${ch.summary}</p></div>${done?'<span class="text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">READ</span>':''}`;
     item.addEventListener('click',()=>window.openChapterModal(i));
     list.appendChild(item);
   });
@@ -1467,171 +1942,70 @@ function renderHub(){
   const p=STATE.player;
   const rank=getCurrentRank();
   const nextRank=getNextRank();
-
   startCharCanvas();
-
-  const nm=document.getElementById('char-name');
-  if(nm) nm.textContent=`${p.name||'Companion'} ✎`;
-  const rk=document.getElementById('char-rank');
-  if(rk) rk.textContent=`${rank.name} · ${rank.en}`;
-
+  const nm=document.getElementById('char-name'); if(nm) nm.textContent=`${p.name||'Companion'} ✎`;
+  const rk=document.getElementById('char-rank'); if(rk) rk.textContent=`${rank.name} · ${rank.en}`;
+  const actTags=['📚 Resting','⚡ Awakening','🌱 Growing','✨ Channeling','🛡 Guarding','🌊 Walking','🌤 Soaring','⭐ Astral Drift','💫 Celestial Mode','🐉 Sovereign Form','🌟 Legend Mode'];
+  const actTag=document.getElementById('spirit-activity-tag');
+  if(actTag) actTag.textContent=actTags[Math.min(rank.stageIdx,actTags.length-1)];
   const xpFill=document.getElementById('xp-fill');
-  if(xpFill){
-    const next=nextRank?nextRank.xp:rank.xp;
-    const pct=nextRank?Math.min(100,((p.totalXp-rank.xp)/(next-rank.xp))*100):100;
-    xpFill.style.width=pct+'%';
-  }
-  const xt=document.getElementById('xp-text');
-  if(xt) xt.textContent=`${p.totalXp} / ${nextRank?nextRank.xp:rank.xp} XP`;
-
+  if(xpFill){ const next=nextRank?nextRank.xp:rank.xp; const pct=nextRank?Math.min(100,((p.totalXp-rank.xp)/(next-rank.xp))*100):100; xpFill.style.width=pct+'%'; }
+  const xt=document.getElementById('xp-text'); if(xt) xt.textContent=`${p.totalXp} / ${nextRank?nextRank.xp:rank.xp} XP`;
   const sv=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-  sv('stat-quests',p.questsCreated); sv('stat-chapters',p.chaptersCompleted);
-  sv('stat-bosses',p.bossesDefeated); sv('stat-perfect',p.perfectRuns);
-
-  renderTopicSuggestions();
-  renderQuestGrid();
-  renderLibraryGrid();
+  sv('stat-quests',p.questsCreated); sv('stat-chapters',p.chaptersCompleted); sv('stat-bosses',p.bossesDefeated); sv('stat-perfect',p.perfectRuns);
+  renderTopicSuggestions(); renderQuestGrid(); renderLibraryGrid();
 }
 
 function renderQuestGrid(){
   const grid=document.getElementById('quest-grid'); grid.innerHTML='';
-  if(!STATE.quests?.length){
-    grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">No active quests. Summon one to begin your journey.</div>`;
-    return;
-  }
-
-  if(!STATE.folders || STATE.folders.length === 0) {
-      STATE.folders = [{id: 'default', name: 'My Scrolls'}];
-  }
-
-  STATE.folders.forEach(folder => {
-    const folderQuests = STATE.quests.map((q, i) => ({q, i})).filter(item => (item.q.folderId || 'default') === folder.id);
-    
-    const folderDiv = document.createElement('div');
-    folderDiv.className = 'mb-6';
-    
-    const hasActive = folderQuests.some(item => !item.q.defeated);
-    
-    folderDiv.innerHTML = `
-      <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm">
-        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${folder.name}</div>
-        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${folderQuests.length} Scrolls</span>
-      </button>
-      <div class="${hasActive ? '' : 'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 folder-content transition-all min-h-[60px]" 
-           ondragover="allowDrop(event)" 
-           ondrop="dropQuest(event, '${folder.id}')"
-           ondragenter="this.classList.add('drag-over')" 
-           ondragleave="this.classList.remove('drag-over')">
-      </div>
-    `;
-    const contentDiv = folderDiv.querySelector('.folder-content');
-
-    folderQuests.forEach(({q:quest, i:idx}) => {
+  if(!STATE.quests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">No active quests. Summon one to begin your journey.</div>`; return; }
+  if(!STATE.folders||STATE.folders.length===0) STATE.folders=[{id:'default',name:'My Scrolls'}];
+  STATE.folders.forEach(folder=>{
+    const folderQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.folderId||'default')===folder.id);
+    const folderDiv=document.createElement('div'); folderDiv.className='mb-6';
+    const hasActive=folderQuests.some(item=>!item.q.defeated);
+    folderDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${folder.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${folderQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 folder-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${folder.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    const contentDiv=folderDiv.querySelector('.folder-content');
+    folderQuests.forEach(({q:quest,i:idx})=>{
       const completed=quest.completed||[];
       const chapters=quest.chapters||[];
       const chapDone=completed.filter(Boolean).length;
       const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
-      
       const card=document.createElement('div');
       card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5 cursor-grab';
-      
-      card.setAttribute('draggable', 'true');
-      card.addEventListener('dragstart', (e) => window.dragQuest(e, idx));
-
-      card.innerHTML=`
-        <div class="flex items-center gap-4 mb-4 pointer-events-none">
-          <div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner">
-            <canvas width="56" height="56" class="boss-mini-canvas"></canvas>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p>
-            <p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p>
-          </div>
-        </div>
-        <div class="flex gap-1.5 mb-3 pointer-events-none">
-          ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}
-        </div>
-        <div class="flex items-center gap-4 pointer-events-none">
-          <div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner">
-            <div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div>
-          </div>
-          <span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span>
-        </div>
-      `;
-      const mini=card.querySelector('.boss-mini-canvas');
-      drawBossSprite(mini,quest,hpRatio);
-      
+      card.setAttribute('draggable','true');
+      card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
+      card.innerHTML=`<div class="flex items-center gap-4 mb-4 pointer-events-none"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3 pointer-events-none">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4 pointer-events-none"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
+      const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
       del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>';
       del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1';
-      del.addEventListener('click',(e)=>{
-        e.stopPropagation();
-        if(confirm('Abandon this quest?')){
-          let xpD=0,chD=0;
-          completed.forEach(d=>{ if(d){ chD++; xpD+=20; } });
-          if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; }
-          STATE.player.questsCreated--;
-          STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD);
-          STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD);
-          STATE.player.xp=Math.max(0,STATE.player.xp-xpD);
-          STATE.quests.splice(idx,1);
-          saveState(); renderHub(); showToast("Quest abandoned.");
-        }
-      });
+      del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Abandon this quest?')){ let xpD=0,chD=0; completed.forEach(d=>{ if(d){ chD++; xpD+=20; } }); if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; } STATE.player.questsCreated--; STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD); STATE.player.xp=Math.max(0,STATE.player.xp-xpD); STATE.quests.splice(idx,1); saveState(); renderHub(); showToast("Quest abandoned."); } });
       card.appendChild(del);
       card.addEventListener('click',()=>window.showQuestScreen(idx));
       contentDiv.appendChild(card);
     });
-
     grid.appendChild(folderDiv);
   });
 }
 
 function renderLibraryGrid(){
   const grid=document.getElementById('library-grid'); grid.innerHTML='';
-  if(!STATE.publicQuests?.length){
-    grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">The library is empty. Be the first to share a quest!</div>`;
-    return;
-  }
-  
+  if(!STATE.publicQuests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">The library is empty. Be the first to share a quest!</div>`; return; }
   STATE.publicQuests.forEach((quest,idx)=>{
     if(!quest) return;
     const chapters=quest.chapters||[];
     const card=document.createElement('div');
     card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5';
-    card.innerHTML=`
-      <div class="flex items-center gap-4 mb-3">
-        <div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner">
-          <canvas width="56" height="56" class="boss-mini-canvas"></canvas>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-0.5">${(quest.topic||'Unknown').toUpperCase()}</p>
-          <p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled'}</p>
-        </div>
-      </div>
-      <div class="flex items-center justify-between border-t-2 border-outline-variant/20 pt-3">
-        <span class="text-xs text-on-surface-variant font-bold">${chapters.length} Chapters</span>
-        <span class="text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">+ Add to Quests</span>
-      </div>
-    `;
-    const mini=card.querySelector('.boss-mini-canvas');
-    drawBossSprite(mini,quest,1.0);
-    
-    if(quest.authorId===USER_ID){
-      const del=document.createElement('button');
-      del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>';
-      del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1';
-      del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Remove from library?')) window.deletePublicQuest(quest.docId,idx); });
-      card.appendChild(del);
-    }
+    card.innerHTML=`<div class="flex items-center gap-4 mb-3"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-secondary mb-0.5">${(quest.topic||'Unknown').toUpperCase()}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled'}</p></div></div><div class="flex items-center justify-between border-t-2 border-outline-variant/20 pt-3"><span class="text-xs text-on-surface-variant font-bold">${chapters.length} Chapters</span><span class="text-[10px] font-black uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1 rounded-full">+ Add to Quests</span></div>`;
+    const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,1.0);
+    if(quest.authorId===USER_ID){ const del=document.createElement('button'); del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>'; del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1'; del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Remove from library?')) window.deletePublicQuest(quest.docId,idx); }); card.appendChild(del); }
     card.addEventListener('click',()=>window.copyPublicQuest(idx));
     grid.appendChild(card);
   });
 }
 
-window.deletePublicQuest=async function(docId,idx){
-  try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); renderLibraryGrid(); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); }
-};
+window.deletePublicQuest=async function(docId,idx){ try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); renderLibraryGrid(); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); } };
 
 function renderSettingsCharacters(){
   const list=document.getElementById('character-list'); if(!list) return;
@@ -1639,58 +2013,25 @@ function renderSettingsCharacters(){
   STATE.saves.forEach(s=>{
     if(!s?.player) return;
     const isActive=s.id===STATE.activeSaveId;
-    const ranks=RANKS;
-    let r=ranks[0]; ranks.forEach(x=>{ if(s.player.totalXp>=x.xp) r=x; });
+    const ranks=RANKS; let r=ranks[0]; ranks.forEach(x=>{ if(s.player.totalXp>=x.xp) r=x; });
     const div=document.createElement('div');
     div.className=`flex items-center gap-3 p-4 rounded-xl border-[3px] transition-all ${isActive?'border-primary bg-primary/10':'border-outline-variant/40 hover:border-primary/50'}`;
-    div.innerHTML=`
-      <div class="flex-1 cursor-pointer" onclick="switchCharacter('${s.id}')">
-        <p class="font-headline font-extrabold text-on-surface text-base">${s.player.name}</p>
-        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">${r.name} · ${s.player.totalXp} XP</p>
-      </div>
-      ${isActive?'<span class="text-[9px] font-black uppercase tracking-widest text-primary bg-primary/20 px-2 py-1 rounded-md">ACTIVE</span>':''}
-      <button onclick="deleteCharacter('${s.id}',event)" class="text-outline hover:text-error transition-colors bg-surface-container-lowest p-2 rounded-full shadow-sm">
-        <span class="material-symbols-outlined text-lg">delete</span>
-      </button>
-    `;
+    div.innerHTML=`<div class="flex-1 cursor-pointer" onclick="switchCharacter('${s.id}')"><p class="font-headline font-extrabold text-on-surface text-base">${s.player.name}</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">${r.name} · ${s.player.totalXp} XP</p></div>${isActive?'<span class="text-[9px] font-black uppercase tracking-widest text-primary bg-primary/20 px-2 py-1 rounded-md">ACTIVE</span>':''}<button onclick="deleteCharacter('${s.id}',event)" class="text-outline hover:text-error transition-colors bg-surface-container-lowest p-2 rounded-full shadow-sm"><span class="material-symbols-outlined text-lg">delete</span></button>`;
     list.appendChild(div);
   });
 }
 
-window.switchCharacter=function(id){
-  STATE.activeSaveId=id; syncActiveSaveToState(); saveState();
-  STATE.activeQuestIdx=null; STATE.quizCurrent=0;
-  renderHub(); renderSettingsCharacters(); closeApiModal();
-  showToast(`Switched to ${STATE.player.name}`);
-};
-
-window.deleteCharacter=function(id,event){
-  event.stopPropagation();
-  if(!confirm("Banish this companion forever?")) return;
-  STATE.saves=STATE.saves.filter(s=>s.id!==id);
-  if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.folders=[]; saveState(); closeApiModal(); showScreen('screen-path'); document.getElementById('path-cancel-btn').style.display='none'; }
-  else{ if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); }
-};
-
-window.createNewCharacter=function(){ closeApiModal(); showScreen('screen-path'); document.getElementById('path-cancel-btn').style.display='block'; };
+window.switchCharacter=function(id){ STATE.activeSaveId=id; syncActiveSaveToState(); saveState(); STATE.activeQuestIdx=null; STATE.quizCurrent=0; renderHub(); renderSettingsCharacters(); closeApiModal(); showToast(`Switched to ${STATE.player.name}`); };
+window.deleteCharacter=function(id,event){ event.stopPropagation(); if(!confirm("Banish this companion forever?")) return; STATE.saves=STATE.saves.filter(s=>s.id!==id); if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.folders=[]; saveState(); closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='none'; } else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); } };
+window.createNewCharacter=function(){ closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='block'; };
 
 // ── MODALS ──────────────────────────────────────────
 window.openApiModal=()=>{ renderSettingsCharacters(); document.getElementById('api-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); };
 window.closeApiModal=()=>{ document.getElementById('api-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); };
-window.closeAllModals=()=>{
-  document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));
-  document.getElementById('modal-backdrop').classList.add('hidden');
-};
+window.closeAllModals=()=>{ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); document.getElementById('modal-backdrop').classList.add('hidden'); };
 
 // ── COPY PUBLIC QUEST ────────────────────────────────
-window.copyPublicQuest=function(idx){
-  const pub=STATE.publicQuests[idx];
-  const chapters=pub.chapters||[];
-  const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,folderId:'default'};
-  STATE.quests.unshift(nq); STATE.player.questsCreated++;
-  saveState(); window.switchTab('tab-quests'); renderHub();
-  showToast(`Copied "${nq.questTitle}"!`);
-};
+window.copyPublicQuest=function(idx){ const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,folderId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-quests'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
 
 // ── CHAPTER MODAL ────────────────────────────────────
 window.openChapterModal=function(chapterIdx){
@@ -1708,7 +2049,9 @@ window.openChapterModal=function(chapterIdx){
   if(!quest.chapterContent) quest.chapterContent={};
   if(quest.chapterContent[chapterIdx]){ renderChapterContent(quest.chapterContent[chapterIdx]); }
   else{
-    document.getElementById('chapter-content-area').innerHTML=`<div class="flex flex-col items-center justify-center py-12 gap-4"><div class="gen-spinner"></div><p class="font-headline font-bold text-primary text-sm">Unrolling the ancient scroll...</p></div>`;
+    const tpl=document.getElementById('book-loader-tpl');
+    document.getElementById('chapter-content-area').innerHTML='';
+    document.getElementById('chapter-content-area').appendChild(tpl.content.cloneNode(true));
     loadChapterContent(chapterIdx);
   }
 };
@@ -1723,9 +2066,7 @@ async function loadChapterContent(chapterIdx){
   }catch(e){ document.getElementById('chapter-content-area').innerHTML=`<p class="text-error text-sm font-bold">Failed to load: ${e.message}</p>`; }
 }
 
-function renderChapterContent(html){
-  document.getElementById('chapter-content-area').innerHTML=DOMPurify.sanitize(html);
-}
+function renderChapterContent(html){ document.getElementById('chapter-content-area').innerHTML=DOMPurify.sanitize(html); }
 
 window.markChapterComplete=async function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -1748,72 +2089,26 @@ window.markChapterComplete=async function(){
 
 // ── GAMBIT ───────────────────────────────────────────
 function shouldShowGambit(){ return STATE.player.bossesDefeated>=2||STATE.player.gambitUsed>0; }
-window.tryOpenBattle=function(){
-  if(shouldShowGambit()&&!STATE.quests[STATE.activeQuestIdx].defeated) window.openGambitModal();
-  else window.openBattleModal();
-};
-window.openGambitModal=function(){
-  STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false;
-  document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200);
-  document.getElementById('gambit-slider').value=0;
-  window.updateGambitWager(0);
-  document.getElementById('gambit-result').textContent='';
-  document.getElementById('gambit-coin').textContent='casino';
-  document.getElementById('gambit-coin').style.color='';
-  document.getElementById('gambit-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-};
+window.tryOpenBattle=function(){ if(shouldShowGambit()&&!STATE.quests[STATE.activeQuestIdx].defeated) window.openGambitModal(); else window.openBattleModal(); };
+window.openGambitModal=function(){ STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false; document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200); document.getElementById('gambit-slider').value=0; window.updateGambitWager(0); document.getElementById('gambit-result').textContent=''; document.getElementById('gambit-coin').textContent='casino'; document.getElementById('gambit-coin').style.color=''; document.getElementById('gambit-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); };
 window.closeGambitModal=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); window.openBattleModal(); };
 window.updateGambitWager=function(val){ STATE.gambitWager=parseInt(val)||0; document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0?'No Wager (Safe Path)':`Wagering ${STATE.gambitWager} XP`; };
-window.spinGambitCoin=function(){
-  if(STATE.gambitRevealed) return;
-  STATE.gambitRevealed=true;
-  const coin=document.getElementById('gambit-coin');
-  coin.classList.add('gambit-coin-spin');
-  setTimeout(()=>{
-    coin.classList.remove('gambit-coin-spin');
-    const lucky=Math.random()<0.5;
-    coin.textContent=lucky?'check_circle':'cancel';
-    coin.style.color=lucky?'#006668':'#b41340';
-    document.getElementById('gambit-result').textContent=lucky?'Heaven smiles ☉ — Double XP if you win perfectly!':'The earth is indifferent. Gambit resolved fairly.';
-    STATE.gambitActive=STATE.gambitWager>0;
-  },1500);
-};
-window.proceedAfterGambit=function(){
-  document.getElementById('gambit-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0;
-  if(STATE.gambitWager>0) STATE.player.gambitUsed++;
-  window.openBattleModal();
-};
+window.spinGambitCoin=function(){ if(STATE.gambitRevealed) return; STATE.gambitRevealed=true; const coin=document.getElementById('gambit-coin'); coin.classList.add('gambit-coin-spin'); setTimeout(()=>{ coin.classList.remove('gambit-coin-spin'); const lucky=Math.random()<0.5; coin.textContent=lucky?'check_circle':'cancel'; coin.style.color=lucky?'#006668':'#b41340'; document.getElementById('gambit-result').textContent=lucky?'Heaven smiles ☉ — Double XP if you win perfectly!':'The earth is indifferent. Gambit resolved fairly.'; STATE.gambitActive=STATE.gambitWager>0; },1500); };
+window.proceedAfterGambit=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0; if(STATE.gambitWager>0) STATE.player.gambitUsed++; window.openBattleModal(); };
 
 // ── FATE SCROLL ──────────────────────────────────────
 const FATE_EVENTS=[
-  {text:'+50',bonus:'The ancestors nod in approval.',xp:50,sigil:false},
-  {text:'+80',bonus:'A celestial storm of knowledge!',xp:80,sigil:false},
-  {text:'+100',bonus:'Perfect alignment of heaven and earth.',xp:100,sigil:false},
-  {text:'+20',bonus:'A humble blessing.',xp:20,sigil:false},
-  {text:'+150',bonus:"A dragon's blessing! The realm takes notice.",xp:150,sigil:false},
-  {text:'+60',bonus:'Victory echoes through the scrolls.',xp:60,sigil:false},
+  {text:'+50',bonus:'The ancestors nod in approval.',xp:50},
+  {text:'+80',bonus:'A celestial storm of knowledge!',xp:80},
+  {text:'+100',bonus:'Perfect alignment of heaven and earth.',xp:100},
+  {text:'+20',bonus:'A humble blessing.',xp:20},
+  {text:'+150',bonus:"A dragon's blessing! The realm takes notice.",xp:150},
+  {text:'+60',bonus:'Victory echoes through the scrolls.',xp:60},
 ];
-let fateScrollRevealed=false, pendingFateEvent=null;
+let fateScrollRevealed=false,pendingFateEvent=null;
 
-function openFateScrollModal(){
-  fateScrollRevealed=false; pendingFateEvent=FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
-  document.getElementById('fate-reveal-area').style.display='none';
-  document.getElementById('fate-scroll-icon').style.display='flex';
-  document.getElementById('fate-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-}
-window.revealFateScroll=function(){
-  if(fateScrollRevealed) return; fateScrollRevealed=true;
-  document.getElementById('fate-scroll-icon').style.display='none';
-  document.getElementById('fate-reveal-area').style.display='flex';
-  document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text;
-  document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus;
-  if(pendingFateEvent.xp>0){ STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; }
-  checkRankUp(); saveState();
-};
+function openFateScrollModal(){ fateScrollRevealed=false; pendingFateEvent=FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)]; document.getElementById('fate-reveal-area').style.display='none'; document.getElementById('fate-scroll-icon').style.display='flex'; document.getElementById('fate-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); }
+window.revealFateScroll=function(){ if(fateScrollRevealed) return; fateScrollRevealed=true; document.getElementById('fate-scroll-icon').style.display='none'; document.getElementById('fate-reveal-area').style.display='flex'; document.getElementById('fate-reveal-text').textContent=pendingFateEvent.text; document.getElementById('fate-bonus-text').textContent=pendingFateEvent.bonus; if(pendingFateEvent.xp>0){ STATE.player.xp+=pendingFateEvent.xp; STATE.player.totalXp+=pendingFateEvent.xp; } checkRankUp(); saveState(); };
 window.closeFateModal=function(){ document.getElementById('fate-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); renderHub(); };
 
 // ── BOSS BATTLE ──────────────────────────────────────
@@ -1840,32 +2135,22 @@ window.openBattleModal=async function(){
     }catch(e){ document.getElementById('quiz-question').textContent='Error: '+e.message; return; }
   }
 
-  if(!(quest.quiz.questions||[]).length){
-    document.getElementById('quiz-question').textContent='The demon cowers. You win!';
-    STATE.quizScore=5; quest.quiz.questions=new Array(5); finishQuiz(quest); return;
-  }
+  if(!(quest.quiz.questions||[]).length){ document.getElementById('quiz-question').textContent='The demon cowers. You win!'; STATE.quizScore=5; quest.quiz.questions=new Array(5); finishQuiz(quest); return; }
   STATE.quizCurrent=0; STATE.quizScore=0; renderQuizQuestion(quest);
 };
 
 function renderQuizQuestion(quest){
   const questions=quest.quiz.questions||[];
   const q=questions[STATE.quizCurrent]; if(!q) return;
-  
-  // Update streak/progress HUD
   document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`;
-  
   document.getElementById('quiz-question').textContent=q.question||'...';
   document.getElementById('quiz-feedback').textContent='';
   const opts=document.getElementById('quiz-options'); opts.innerHTML='';
-  
-  const labels = ['A','B','C','D'];
+  const labels=['A','B','C','D'];
   (q.options||[]).forEach((opt,i)=>{
     const btn=document.createElement('button');
     btn.className='flex items-center gap-4 bg-surface-container-lowest p-3 rounded-2xl border-[3px] border-outline-variant hover:border-primary group transition-all active:translate-y-1 active:border-b-0 border-b-[5px] text-left w-full shadow-sm';
-    btn.innerHTML=`
-      <span class="w-12 h-12 flex-shrink-0 rounded-full bg-surface-container-high flex items-center justify-center font-extrabold text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors text-lg">${labels[i]||(i+1)}</span>
-      <span class="font-body font-bold text-sm md:text-base text-on-surface">${opt}</span>
-    `;
+    btn.innerHTML=`<span class="w-12 h-12 flex-shrink-0 rounded-full bg-surface-container-high flex items-center justify-center font-extrabold text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors text-lg">${labels[i]||(i+1)}</span><span class="font-body font-bold text-sm md:text-base text-on-surface">${opt}</span>`;
     btn.addEventListener('click',()=>answerQuestion(i,quest));
     opts.appendChild(btn);
   });
@@ -1878,41 +2163,13 @@ function answerQuestion(chosen,quest){
   const correct=q.correct;
   document.querySelectorAll('#quiz-options button').forEach(o=>o.disabled=true);
   const optNodes=document.querySelectorAll('#quiz-options button');
-  
-  // Style correct answer
-  if(optNodes[correct]) {
-    optNodes[correct].classList.replace('bg-surface-container-lowest', 'bg-primary-container/10');
-    optNodes[correct].classList.replace('border-outline-variant', 'border-primary');
-    const spanIcon = optNodes[correct].querySelector('span:first-child');
-    if(spanIcon) spanIcon.className = 'w-12 h-12 flex-shrink-0 rounded-full bg-primary flex items-center justify-center font-extrabold text-on-primary text-lg';
-    const spanText = optNodes[correct].querySelector('span:last-child');
-    if(spanText) spanText.classList.add('text-primary');
-  }
-  
+  if(optNodes[correct]){ optNodes[correct].classList.replace('bg-surface-container-lowest','bg-primary-container/10'); optNodes[correct].classList.replace('border-outline-variant','border-primary'); const s=optNodes[correct].querySelector('span:first-child'); if(s) s.className='w-12 h-12 flex-shrink-0 rounded-full bg-primary flex items-center justify-center font-extrabold text-on-primary text-lg'; }
   const isRight=chosen===correct;
-  // Style wrong answer if picked
-  if(!isRight&&optNodes[chosen]) {
-    optNodes[chosen].classList.replace('bg-surface-container-lowest', 'bg-error/10');
-    optNodes[chosen].classList.replace('border-outline-variant', 'border-error');
-    const spanIcon = optNodes[chosen].querySelector('span:first-child');
-    if(spanIcon) spanIcon.className = 'w-12 h-12 flex-shrink-0 rounded-full bg-error flex items-center justify-center font-extrabold text-on-error text-lg';
-    const spanText = optNodes[chosen].querySelector('span:last-child');
-    if(spanText) spanText.classList.add('text-error');
-  }
-
+  if(!isRight&&optNodes[chosen]){ optNodes[chosen].classList.replace('bg-surface-container-lowest','bg-error/10'); optNodes[chosen].classList.replace('border-outline-variant','border-error'); const s=optNodes[chosen].querySelector('span:first-child'); if(s) s.className='w-12 h-12 flex-shrink-0 rounded-full bg-error flex items-center justify-center font-extrabold text-on-error text-lg'; }
   document.getElementById('quiz-feedback').textContent=isRight?`✓ Correct — ${q.explanation||''}`:`✗ Incorrect — ${q.explanation||''}`;
-  if(isRight) {
-    STATE.quizScore++;
-    document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`;
-  }
-  
+  if(isRight){ STATE.quizScore++; document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`; }
   const dmg=isRight?Math.ceil(100/questions.length):0;
-  if(dmg>0){
-    quest.bossHp=Math.max(0,quest.bossHp-dmg);
-    showDamageFloat(dmg);
-    const bc=document.getElementById('battle-boss-canvas');
-    bc.style.transform='translateX(-6px)'; setTimeout(()=>bc.style.transform='scale(1.05)',150); setTimeout(()=>bc.style.transform='',400);
-  }
+  if(dmg>0){ quest.bossHp=Math.max(0,quest.bossHp-dmg); showDamageFloat(dmg); const bc=document.getElementById('battle-boss-canvas'); bc.style.transform='translateX(-6px)'; setTimeout(()=>bc.style.transform='scale(1.05)',150); setTimeout(()=>bc.style.transform='',400); }
   updateBattleHp(quest); saveState();
   setTimeout(()=>{ STATE.quizCurrent++; if(STATE.quizCurrent>=questions.length) finishQuiz(quest); else renderQuizQuestion(quest); },1800);
 }
@@ -1925,62 +2182,22 @@ function finishQuiz(quest){
   document.getElementById('quiz-container').style.display='none';
   document.getElementById('finishing-blow').classList.remove('hidden');
   document.getElementById('finishing-blow').classList.add('flex');
-
-  if(perfect){
-    document.getElementById('finishing-text').textContent='⚡ FINAL STRIKE ⚡';
-    document.getElementById('victory-lore').textContent=`Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name}. The knowledge sealed within surges free.`;
-    STATE.player.perfectRuns++; STATE.player.xp+=50; STATE.player.totalXp+=50;
-    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp+=STATE.gambitWager; STATE.player.totalXp+=STATE.gambitWager; STATE.gambitActive=false; showToast(`🎰 Gambit pays off! +${STATE.gambitWager} XP!`); }
-  } else {
-    document.getElementById('finishing-text').textContent='⚔ BATTLE END ⚔';
-    document.getElementById('victory-lore').textContent=`${STATE.quizScore}/${qLen} correct. ${quest.bossName} is weakened but not defeated. Study further.`;
-    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager); STATE.gambitActive=false; showToast(`⚠ Gambit lost! -${STATE.gambitWager} XP`); }
-    if(STATE.quizScore>=Math.ceil(qLen*0.6)) quest.bossHp=0;
-  }
-
-  if(quest.bossHp===0&&!quest.defeated){
-    quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100;
-    checkRankUp();
-  } else if(quest.bossHp>0){ quest.bossHp=100; }
+  if(perfect){ document.getElementById('finishing-text').textContent='⚡ FINAL STRIKE ⚡'; document.getElementById('victory-lore').textContent=`Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name}. The knowledge sealed within surges free.`; STATE.player.perfectRuns++; STATE.player.xp+=50; STATE.player.totalXp+=50; if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp+=STATE.gambitWager; STATE.player.totalXp+=STATE.gambitWager; STATE.gambitActive=false; showToast(`🎰 Gambit pays off! +${STATE.gambitWager} XP!`); } }
+  else { document.getElementById('finishing-text').textContent='⚔ BATTLE END ⚔'; document.getElementById('victory-lore').textContent=`${STATE.quizScore}/${qLen} correct. ${quest.bossName} is weakened but not defeated. Study further.`; if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager); STATE.gambitActive=false; showToast(`⚠ Gambit lost! -${STATE.gambitWager} XP`); } if(STATE.quizScore>=Math.ceil(qLen*0.6)) quest.bossHp=0; }
+  if(quest.bossHp===0&&!quest.defeated){ quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100; checkRankUp(); } else if(quest.bossHp>0){ quest.bossHp=100; }
   updateBattleHp(quest); saveState();
 }
 
-window.claimVictory=function(){
-  const quest=STATE.quests[STATE.activeQuestIdx];
-  document.getElementById('battle-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  const btn=document.getElementById('boss-complete-btn');
-  if(quest.defeated){ btn.innerHTML='✓ Demon Defeated'; btn.disabled=true; btn.classList.replace('bg-primary','bg-secondary'); }
-  updateBossHpDisplay(quest); renderHub();
-  if(quest.defeated) setTimeout(()=>openFateScrollModal(),800);
-  else showToast('Battle concluded. Study harder.');
-};
+window.claimVictory=function(){ const quest=STATE.quests[STATE.activeQuestIdx]; document.getElementById('battle-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); const btn=document.getElementById('boss-complete-btn'); if(quest.defeated){ btn.innerHTML='✓ Demon Defeated'; btn.disabled=true; btn.classList.replace('bg-primary','bg-secondary'); } updateBossHpDisplay(quest); renderHub(); if(quest.defeated) setTimeout(()=>openFateScrollModal(),800); else showToast('Battle concluded. Study harder.'); };
 
-function updateBattleHp(quest){
-  const r=quest.bossHp/quest.bossMaxHp;
-  document.getElementById('battle-hp-fill').style.width=(r*100)+'%';
-  document.getElementById('battle-hp-text').textContent=`${quest.bossHp}/${quest.bossMaxHp}`;
-}
+function updateBattleHp(quest){ const r=quest.bossHp/quest.bossMaxHp; document.getElementById('battle-hp-fill').style.width=(r*100)+'%'; document.getElementById('battle-hp-text').textContent=`${quest.bossHp}/${quest.bossMaxHp}`; }
 
-function showDamageFloat(val){
-  const el=document.getElementById('damage-floater');
-  el.textContent=`-${val}`;
-  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-}
+function showDamageFloat(val){ const el=document.getElementById('damage-floater'); el.textContent=`-${val}`; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
 
-function checkRankUp(){
-  const before=getCurrentRankIdx();
-  setTimeout(()=>{
-    const after=getCurrentRankIdx();
-    if(after>before){ const r=getRanks()[after]; showToast(`⚡ Level Up: ${r.name} · ${r.en}!`); }
-  },100);
-}
+function checkRankUp(){ const before=getCurrentRankIdx(); setTimeout(()=>{ const after=getCurrentRankIdx(); if(after>before){ const r=getRanks()[after]; showToast(`⚡ ${r.name} REACHED: ${r.en}! Your companion evolved!`); } },100); }
 
 // ── RENAME ───────────────────────────────────────────
-window.renameCharacter=function(){
-  const n=prompt("New companion name:",STATE.player.name);
-  if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); }
-};
+window.renameCharacter=function(){ const n=prompt("New companion name:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
 
 // ── AI ────────────────────────────────────────────────
 async function callAI({action,payload}){
@@ -1993,22 +2210,10 @@ async function callAI({action,payload}){
   }catch(e){ alert("AI Error:\n"+(e.message||e)); throw e; }
 }
 
-function parseJSON(text){
-  if(!text||typeof text!=='string') return {};
-  try{ return JSON.parse(text); }catch(e){}
-  const c=text.replace(/```json/gi,'').replace(/```/gi,'').trim();
-  try{ return JSON.parse(c); }catch(e){}
-  const m=c.match(/\{[\s\S]*\}/);
-  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
-  return {};
-}
+function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
 
 // ── UTILS ─────────────────────────────────────────────
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500);
-}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 // ── INIT ──────────────────────────────────────────────
@@ -2017,14 +2222,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
 
   onAuthStateChanged(auth,user=>{
-    if(user){ 
-      USER_ID=user.uid; 
-      loadState(); 
-    }
-    else{
-      document.getElementById('loading-text').style.display='none';
-      document.getElementById('auth-buttons').classList.remove('hidden');
-    }
+    if(user){ USER_ID=user.uid; loadState(); }
+    else{ document.getElementById('loading-text').style.display='none'; document.getElementById('auth-buttons').classList.remove('hidden'); }
   });
 });
 </script>
