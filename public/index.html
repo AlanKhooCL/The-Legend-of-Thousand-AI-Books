@@ -1503,20 +1503,18 @@ let charRAF = null;
 
 // Animate path screen monster (stage 0 preview)
 let pathMonRAF = null;
-let pathMonsterTypeId = null; // track which monster is shown on path screen
-
 function startPathMonster() {
   if(pathMonRAF) cancelAnimationFrame(pathMonRAF);
   pathMonRAF = null;
   const canvas = document.getElementById('path-monster-canvas');
   if(!canvas) return;
-  // Pick random type and store it so choosePath can use the same one
+  // Replace canvas with img approach
   const randType = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
-  pathMonsterTypeId = randType.id;
   const map = MONSTER_STAGE_MAPS[randType.id];
   if (!map) return;
   const src = MONSTER_SPRITE_SRCS[map[0]];
   if (src) {
+    // Draw on canvas using a regular img
     const img = new Image();
     img.src = src;
     img.onload = () => {
@@ -1676,8 +1674,6 @@ async function loadState(){
   if(loaded&&STATE.saves?.length>0){
     STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.folders) s.folders=[{id:'default',name:'My Scrolls'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
     syncActiveSaveToState();
-    // Persist any migration fixes (stale monster IDs, etc.)
-    saveState();
     if(btn){ btn.style.display='flex'; }
   } else {
     STATE.player=null;
@@ -1705,22 +1701,8 @@ function syncActiveSaveToState(){
     STATE.folders=s.folders||[{id:'default',name:'My Scrolls'}];
     STATE.quests=(s.quests||[]).filter(Boolean).map(q=>({...q,topic:q.topic||'Unknown',questTitle:q.questTitle||'Forgotten Scroll',bossName:q.bossName||'Unknown',chapters:q.chapters||[],completed:q.completed||[],bossHp:typeof q.bossHp==='number'?q.bossHp:100,bossMaxHp:typeof q.bossMaxHp==='number'?q.bossMaxHp:100,folderId:q.folderId||'default'}));
     STATE.player.questsCreated=STATE.quests.length;
-    // Ensure collection exists and has valid typeIds
-    if(!STATE.player.collection) {
-      STATE.player.collection = defaultCollection();
-    } else {
-      // Migrate: remove any owned monsters with IDs that no longer exist
-      const validIds = new Set(MONSTER_TYPES.map(t => t.id));
-      STATE.player.collection.owned = (STATE.player.collection.owned || [])
-        .filter(m => validIds.has(m.typeId));
-      // If nothing survived migration, give a fresh starter
-      if(STATE.player.collection.owned.length === 0) {
-        STATE.player.collection = defaultCollection();
-      }
-      // Clamp activeIdx
-      const maxIdx = STATE.player.collection.owned.length - 1;
-      if(STATE.player.collection.activeIdx > maxIdx) STATE.player.collection.activeIdx = 0;
-    }
+    // Ensure collection exists
+    if(!STATE.player.collection) STATE.player.collection = defaultCollection();
   }
 }
 
@@ -1779,18 +1761,13 @@ window.choosePath=async function(){
   const input=document.getElementById('path-name-input');
   const name=(input?.value.trim())||'My Companion';
   const newPlayer = defaultPlayer(name);
-  // Use the same monster that was shown on the path screen
-  const starterId = pathMonsterTypeId || MONSTER_TYPES[Math.floor(Math.random()*MONSTER_TYPES.length)].id;
-  newPlayer.collection = {
-    owned: [{ typeId: starterId, nickname: null }],
-    activeIdx: 0,
-  };
+  newPlayer.collection = defaultCollection();
   const newSave={id:Date.now().toString(),player:newPlayer,quests:[],folders:[{id:'default',name:'My Scrolls'}]};
   STATE.saves.push(newSave); STATE.activeSaveId=newSave.id;
   syncActiveSaveToState();
   await saveState();
   showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub();
-  showToast(`Your legend begins with ${MONSTER_TYPES.find(t=>t.id===starterId)?.name||'your companion'}!`);
+  showToast(`Your legend begins!`);
 };
 window.cancelPathSelection=function(){ showScreen('screen-hub'); };
 
