@@ -1,52 +1,56 @@
-# 📜 萬卷書 — Ten Thousand Scrolls
+# 🚀 LearNow (formerly Ten Thousand Scrolls)
 
-**Ten Thousand Scrolls** is an AI-powered, gamified learning application set in an ancient Chinese fantasy (Wuxia) realm. Transform any subject—from Python programming to Ancient Roman history—into an epic quest where knowledge is your weapon against ancient demons.
+**LearNow** is an AI-native, gamified learning engine that transforms any complex academic or professional subject into a structured, narrative-driven adventure. By orchestrating Google’s Gemini models through a multi-stage pipeline, LearNow turns static study material into a progression-based "Quest" where knowledge is the primary weapon used to defeat "Demon Guardians" (subject-matter bosses).
 
-## ✨ Features
+---
 
-* **🤖 AI-Generated Curriculums:** Powered by Google's Vertex AI (Gemini 2.5 Flash/Pro). Enter a topic, and the "Loremaster" generates a multi-chapter learning scroll and a unique Demon Guardian.
-* **⚔️ Choose Your Destiny:** Play as a hot-blooded **Warrior** or a calculating **Scholar**. Your choice dictates your visual evolution, rank titles, and personality quotes as you level up.
-* **👹 Boss Battles (Quiz Mechanics):** Reading the chapters unlocks the boss. Defeat the demon by passing a dynamically generated multiple-choice quiz based on the material you just read.
-* **🎰 Risk & Reward Systems:** * **Celestial Gambit:** Wager your hard-earned XP before a boss fight for a chance to double your rewards—or lose it all.
-  * **Fate Scrolls:** Defeating a boss grants random gacha-style drops, including rare Celestial Sigils.
-* **☁️ Cloud Saves & Realm Library:** Firebase integration ensures your characters and progress sync across devices. Publish your best quests to the Public Realm Library for other scholars to play.
+## 🧠 Core Functionalities & AI Orchestration
 
-## 🛠️ Tech Stack
+The platform's power lies in how it handles the "Instructional-to-Narrative" bridge, ensuring that the gamification never comes at the expense of pedagogical rigor.
 
-* **Frontend:** Pure HTML, CSS, and Vanilla JavaScript (ES Modules). No build steps or heavy frameworks required.
-* **Backend / BaaS:** Firebase Auth (Google Sign-In & Anonymous), Cloud Firestore (NoSQL Database).
-* **AI Engine:** Firebase AI Logic routing to Google Cloud Vertex AI (Gemini models).
+### 1. The Multi-Stage Generation Pipeline
+Rather than using a single prompt to generate a whole course, LearNow uses a sequential chain of specialized AI personas to ensure structural integrity:
 
-## 📱 Mobile-First Development Environment
+* **Step 0: The Disambiguator:** Before a course is built, the AI resolves the user’s input to its precise educational meaning (e.g., resolving "MCP" to "Model Context Protocol") and assigns it a "Domain" (e.g., Computer Science) to set the context for all subsequent steps.
+* **Step 1: Senior Instructional Designer:** A specialized prompt builds a curriculum of exactly 3–10 chapters with a logical progression (Foundations → Core → Applied → Advanced). The system includes a **triple-retry loop** to ensure the AI adheres to the exact chapter count and JSON schema.
+* **Step 2: Creative Game Writer:** This persona wraps the syllabus in a narrative. It is specifically prompted to create "Boss Names" using domain-specific metaphors (e.g., a Networking boss named "The Packet Loss Wraith") to maintain thematic consistency.
+* **Step 3: Curriculum Advisor:** Generates a list of prerequisite topics and "next-step" recommendations to place the current quest within a larger learning path.
 
-This project is built as a single-file architecture (`index.html`), making it incredibly lightweight and perfectly optimized for mobile development. 
+---
 
-To develop and test on the go:
-1. Open this repository in **GitHub Codespaces** directly from your mobile browser.
-2. Edit the `index.html` file.
-3. Use the Codespaces port-forwarding feature to preview your changes live on your device.
+## 🛠️ Deep Dive: Quality & Drift Control
 
-## 🚀 Setup & Deployment
+To produce high-quality output consistently and prevent the "model drift" typical in long-form AI generation, LearNow employs several advanced prompting strategies:
 
-### 1. Firebase Configuration
-To run this project, you will need your own Firebase project configured:
-1. Create a project in the [Firebase Console](https://console.firebase.google.com/).
-2. Enable **Authentication** (Google Sign-In & Anonymous).
-3. Enable **Firestore Database**.
-4. Enable **Vertex AI in Firebase** (requires upgrading to the pay-as-you-go Blaze plan).
-5. Copy your Firebase config object and replace the `firebaseConfig` variable in the `<script type="module">` section of `index.html`.
+### 🎭 Persona-Driven Prompting
+LearNow utilizes a **"Feynman-Gladwell Hybrid"** persona for chapter generation. The system instruction mandates:
+* **Feynman Clarity:** Breaking down complex ideas into simple, intuitive analogies.
+* **Gladwell Narrative:** Engaging, story-driven explanations.
+* **Textbook Precision:** Using real-world tools, protocols, and events instead of placeholder examples.
 
-### 2. Firestore Security Rules
-Ensure your Firestore rules allow for private user saves and a public library:
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    match /public_quests/{document=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
+### 🛡️ Eliminating Instructional Drift
+"Drift" occurs when an AI loses track of what it has already taught. LearNow solves this through **Context Threading**:
+* **State Awareness:** Each time a new chapter is generated, the prompt is injected with a `previousChaptersSummary`.
+* **Negative Constraints:** The AI is explicitly told: *"Already covered (do NOT re-explain): [Summary of previous content]"*. This forces the model to build upon prior knowledge rather than repeating introductory concepts in later stages.
+
+### 🎯 Application-First Assessment
+The quiz engine is prompted as an **"Expert Assessment Designer"**. Key rules include:
+* **No Surface Recall:** Prompts explicitly forbid "Which of the following is NOT..." questions, focusing instead on analytical and applied scenarios.
+* **Plausible Distractors:** All wrong answers must be "plausible to a partial-knower".
+* **Hard Mode Logic:** In "Harder Mode," the AI is instructed to generate a 5th option—a "sophisticated distractor" that sounds expert-level but is subtly incorrect.
+
+---
+
+## 🎮 Gamification Mechanics
+
+* **Boss Battles:** Players must pass a dynamically generated quiz based on the chapter content to "defeat" the boss and progress.
+* **Celestial Gambit:** A high-stakes feature allowing players to wager their earned XP before a boss fight. Success doubles the reward; failure results in total loss.
+* **Evolution System:** Players choose between a **Warrior** or **Scholar** path, which dictates their visual evolution, rank titles, and personality quotes as they level up.
+
+---
+
+## 💻 Tech Stack
+
+* **AI Engine:** Google Vertex AI (Gemini 2.5 Flash/Pro models).
+* **Frontend:** Pure HTML5, Tailwind CSS, and Vanilla JavaScript (ES Modules)—optimized for a "zero-build" mobile development experience.
+* **Backend:** Firebase Functions (Node.js) for AI orchestration and Firebase Auth/Firestore for progress persistence.
