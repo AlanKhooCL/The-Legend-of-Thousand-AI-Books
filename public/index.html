@@ -489,6 +489,17 @@
     50% { transform: translateY(-8px); }
   }
 
+  /* ── STORY OVERLAY ANIMATIONS ── */
+  @keyframes storyBob { 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-10px);} }
+  @keyframes storyAuraPulse { 0%,100%{opacity:0.6;transform:scale(1);} 50%{opacity:1;transform:scale(1.15);} }
+  @keyframes cursorBlink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+  @keyframes particleFly {
+    0%{opacity:0;transform:translateY(0) scale(0);}
+    10%{opacity:1;transform:translateY(-20px) scale(1);}
+    90%{opacity:0.5;}
+    100%{opacity:0;transform:translateY(-120px) scale(0.3);}
+  }
+
   @keyframes deadlinePulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
   .deadline-urgent { animation: deadlinePulse 1.5s ease-in-out infinite; }
 
@@ -1151,6 +1162,46 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     STORY OVERLAY
+═══════════════════════════════════════════ -->
+<div id="story-overlay" class="fixed inset-0 z-[999] bg-black hidden flex-col items-center justify-center px-6" style="opacity:0;transition:opacity 0.8s ease;">
+
+  <!-- Particle field -->
+  <div id="story-particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+  <!-- Monster display -->
+  <div class="relative flex justify-center items-center mb-8 z-10">
+    <div id="story-aura" class="absolute w-48 h-48 rounded-full" style="background:radial-gradient(ellipse,rgba(120,80,255,0.3) 0%,transparent 70%);animation:storyAuraPulse 3s ease-in-out infinite;"></div>
+    <img id="story-monster-img" src="" alt="" width="160" height="160" class="relative z-10" style="image-rendering:pixelated;object-fit:contain;animation:storyBob 2.5s ease-in-out infinite;"/>
+  </div>
+
+  <!-- Act badge -->
+  <div id="story-act-badge" class="z-10 mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-yellow-400/70 hidden"></div>
+
+  <!-- Dialogue box -->
+  <div class="z-10 w-full max-w-lg">
+    <div class="relative bg-surface/95 backdrop-blur-md border-2 border-primary/40 rounded-2xl p-6 shadow-[0_0_40px_rgba(174,29,83,0.3)]">
+      <!-- Decorative corner lines -->
+      <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary rounded-tl-xl"></div>
+      <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-xl"></div>
+      <div class="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-xl"></div>
+      <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-xl"></div>
+      <p id="story-dialogue-text" class="text-base leading-relaxed text-on-surface font-body min-h-[72px]"></p>
+      <div id="story-cursor" class="inline-block w-0.5 h-5 bg-primary ml-0.5 align-middle" style="animation:cursorBlink 0.8s step-end infinite;display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="z-10 mt-6 flex gap-3">
+    <button id="btn-story-next" onclick="storyNext()" class="hidden bubbly-btn bg-surface-container text-on-surface font-headline font-extrabold py-3 px-8 rounded-full border-b-[4px] border-outline-variant shadow-lg text-sm">
+      Next ›
+    </button>
+    <button id="btn-story-cta" onclick="storyCTA()" class="hidden bubbly-btn bg-primary text-on-primary font-headline font-extrabold py-4 px-10 rounded-full border-b-[5px] border-primary-dim shadow-xl">
+    </button>
+  </div>
+</div>
+
 <!-- MODAL BACKDROP -->
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-on-background/60 backdrop-blur-sm hidden"></div>
 
@@ -1416,7 +1467,8 @@ let STATE = {
 
 function defaultPlayer(name) {
   return { name, xp:0, totalXp:0, rank:0,
-    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[] };
+    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[],
+    storyAct: 0 };
 }
 
 // ══════════════════════════════════════
@@ -1701,6 +1753,8 @@ function syncActiveSaveToState(){
       delete STATE.player.collection.owned;
       delete STATE.player.collection.activeIdx;
     }
+    // Story act migration
+    if (typeof STATE.player.storyAct === 'undefined') STATE.player.storyAct = 0;
   }
 }
 
@@ -1748,14 +1802,14 @@ window.choosePath=async function(){
   const input=document.getElementById('path-name-input');
   const name=(input?.value.trim())||'My Companion';
   const newPlayer = defaultPlayer(name);
-  // Use the same monster that was shown on the path screen
   newPlayer.collection = defaultCollection();
   const newSave={id:Date.now().toString(),player:newPlayer,quests:[],curriculums:[{id:'default',name:'My Curriculum'}]};
   STATE.saves.push(newSave); STATE.activeSaveId=newSave.id;
   syncActiveSaveToState();
   await saveState();
-  showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub();
-  showToast('Your legend begins! The Voidling awakens!');
+  // Hide the path screen, play prologue
+  showScreen('screen-hub'); renderHub(); // prepare hub in background
+  startPrologue(); // prologue's CTA will show hub when done
 };
 window.cancelPathSelection=function(){ showScreen('screen-hub'); };
 
@@ -2633,7 +2687,23 @@ function updateBattleHp(quest){ const r=quest.bossHp/quest.bossMaxHp; document.g
 
 function showDamageFloat(val){ const el=document.getElementById('damage-floater'); el.textContent=`-${val}`; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
 
-function checkRankUp(){ const before=getCurrentRankIdx(); setTimeout(()=>{ const after=getCurrentRankIdx(); if(after>before){ const r=getRanks()[after]; showToast(`⚡ ${r.name} REACHED: ${r.en}! Your companion evolved!`); } },100); }
+function checkRankUp(){
+  const before = getCurrentRankIdx();
+  setTimeout(() => {
+    const after = getCurrentRankIdx();
+    if (after > before) {
+      const r = getRanks()[after];
+      showToast(`⚡ ${r.name} REACHED: ${r.en}! Your companion evolved!`);
+      startCharCanvas(); // refresh spirit sprite immediately
+    }
+    // Story triggers
+    const xp = STATE.player.totalXp;
+    const act = STATE.player.storyAct;
+    if      (xp >= 500  && act < 1) playStorySequence(1);
+    else if (xp >= 2000 && act < 2) playStorySequence(2);
+    else if (xp >= 4500 && act < 3) playStorySequence(3);
+  }, 100);
+}
 
 // ── RENAME ───────────────────────────────────────────
 window.renameCharacter=function(){ const n=prompt("New companion name:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
@@ -2850,7 +2920,232 @@ function renderBgCountLabel() {
 }
 
 
-// ── callAI ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  NARRATIVE STORY SYSTEM
+// ══════════════════════════════════════════════════════
+
+const STORY_SCRIPTS = {
+  prologue: {
+    badge: '✦ PROLOGUE',
+    auraColor: 'rgba(120,80,255,0.35)',
+    spriteKey: 's0',
+    lines: [
+      "In the beginning, there was only silence — and the vast, uncharted expanse of the Infinite Library.",
+      "Deep within its forgotten vaults, an ancient force stirs. The Guardian of Ignorance — a being that feeds on confusion, complacency, and the slow decay of untested minds.",
+      "But something else stirs, too. Something small. Something stubborn. A Cosmic Egg, pulsing with unrealised potential...",
+      "That is you — or rather, your companion. Your knowledge is its power. Every scroll you master, every boss you defeat, forges it stronger.",
+      "The Guardian has sealed the Library's inner sanctum. Only a Scholar who truly dedicates themselves to learning can break those seals.",
+      "Your journey begins here. The first chapter awaits.",
+    ],
+    cta: '✦ Enter the Library',
+    ctaAct: 0,
+  },
+  1: {
+    badge: '✦ ACT I · The Shell Cracks',
+    auraColor: 'rgba(80,120,255,0.4)',
+    spriteKey: 's1',
+    lines: [
+      "The knowledge you have consumed resonates through the Voidling. Hairline fractures split its shell — light bleeds through each crack.",
+      "It emerges transformed: a Void Drake. Sleek, sharp-eyed, crackling with potential energy. The Guardian of Ignorance senses the shift and stirs in the deep dark.",
+      "The outer seals of the Library have shattered. But the inner sanctum still holds. Thicker walls. Older chains. The Guardian will not yield without a fight.",
+    ],
+    cta: 'Delve Deeper into the Scrolls',
+    ctaAct: 1,
+  },
+  2: {
+    badge: '✦ ACT II · Wings of Astral Light',
+    auraColor: 'rgba(40,160,220,0.45)',
+    spriteKey: 's2',
+    lines: [
+      "Your relentless pursuit of knowledge has forged something magnificent. Wings of astral light unfurl from the Drake — vast, shimmering, tracing constellations as they move.",
+      "The Guardian is furious. It floods the Library with paradoxes, red herrings, and ancient logical traps — illusions designed to break lesser scholars.",
+      "You are close to the heart of the Realm now. The final seal glows ahead. Do not falter. You did not come this far to stop here.",
+    ],
+    cta: 'Master the Advanced Texts',
+    ctaAct: 2,
+  },
+  3: {
+    badge: '✦ ACT III · The Ascension',
+    auraColor: 'rgba(253,207,80,0.5)',
+    spriteKey: 's3',
+    lines: [
+      "A blinding flash of insight tears through the Library. Every scroll, every chapter, every hard-won understanding crystallises at once. Your companion ascends — the Celestial Wyrm, woven from galaxies and pure knowing.",
+      "The Guardian of Ignorance lets out a final, hollow roar. It reaches for you — and finds nothing to grasp. Wisdom is immune to confusion. It dissolves, slowly, into the light of everything you have learned.",
+      "The Infinite Library is open. Every chamber, every vault, every forgotten corridor of knowledge — all of it, yours.",
+      "But in the Realm of Knowledge, every ending is merely a new beginning. The scrolls multiply. The horizons recede. And that is exactly how it should be.",
+    ],
+    cta: '✦ Continue the Endless Journey',
+    ctaAct: 3,
+  },
+};
+
+let storyState = {
+  lines: [],
+  lineIdx: 0,
+  typing: false,
+  typeTimeout: null,
+  ctaAct: 0,
+  onCTA: null,
+  particleInterval: null,
+};
+
+// ── Typewriter ──────────────────────────────────────
+function typewriterWrite(text, el, cursorEl, speed=28) {
+  return new Promise(resolve => {
+    storyState.typing = true;
+    if (storyState.typeTimeout) clearTimeout(storyState.typeTimeout);
+    el.textContent = '';
+    if (cursorEl) cursorEl.style.display = 'inline-block';
+    let i = 0;
+    function tick() {
+      if (i < text.length) {
+        el.textContent += text[i++];
+        storyState.typeTimeout = setTimeout(tick, speed + (Math.random()*10));
+      } else {
+        storyState.typing = false;
+        if (cursorEl) cursorEl.style.display = 'none';
+        resolve();
+      }
+    }
+    tick();
+  });
+}
+
+// ── Particles ───────────────────────────────────────
+function startStoryParticles(color) {
+  const container = document.getElementById('story-particles');
+  if (!container) return;
+  container.innerHTML = '';
+  storyState.particleInterval = setInterval(() => {
+    const p = document.createElement('div');
+    const size = 2 + Math.random() * 4;
+    const x = Math.random() * 100;
+    const dur = 3 + Math.random() * 4;
+    p.style.cssText = `position:absolute;left:${x}%;bottom:0;width:${size}px;height:${size}px;border-radius:50%;background:${color};opacity:0;animation:particleFly ${dur}s ease forwards;`;
+    container.appendChild(p);
+    setTimeout(() => p.remove(), dur * 1000);
+  }, 200);
+}
+
+function stopStoryParticles() {
+  if (storyState.particleInterval) { clearInterval(storyState.particleInterval); storyState.particleInterval = null; }
+}
+
+// ── Show / Hide overlay ─────────────────────────────
+function showStoryOverlay(script) {
+  const overlay = document.getElementById('story-overlay');
+  const badge = document.getElementById('story-act-badge');
+  const img = document.getElementById('story-monster-img');
+  const aura = document.getElementById('story-aura');
+  const text = document.getElementById('story-dialogue-text');
+  const cursor = document.getElementById('story-cursor');
+  const btnNext = document.getElementById('btn-story-next');
+  const btnCTA = document.getElementById('btn-story-cta');
+
+  // Set up visuals
+  badge.textContent = script.badge;
+  badge.classList.remove('hidden');
+  aura.style.background = `radial-gradient(ellipse,${script.auraColor} 0%,transparent 70%)`;
+  img.src = MONSTER_SPRITE_SRCS[script.spriteKey] || '';
+  text.textContent = '';
+  cursor.style.display = 'none';
+  btnNext.classList.add('hidden');
+  btnCTA.classList.add('hidden');
+
+  // Show overlay
+  overlay.classList.remove('hidden');
+  overlay.style.display = 'flex';
+  setTimeout(() => { overlay.style.opacity = '1'; }, 50);
+
+  startStoryParticles(script.auraColor.replace('0.', '1,').replace('rgba(','rgb(').replace(/,[^,]+\)$/,')'));
+
+  // Load lines
+  storyState.lines = script.lines;
+  storyState.lineIdx = 0;
+  storyState.ctaAct = script.ctaAct;
+  btnCTA.textContent = script.cta;
+
+  // Kick off first line after a brief pause
+  setTimeout(() => storyAdvance(), 600);
+}
+
+async function storyAdvance() {
+  const text = document.getElementById('story-dialogue-text');
+  const cursor = document.getElementById('story-cursor');
+  const btnNext = document.getElementById('btn-story-next');
+  const btnCTA = document.getElementById('btn-story-cta');
+
+  if (storyState.lineIdx < storyState.lines.length) {
+    btnNext.classList.add('hidden');
+    btnCTA.classList.add('hidden');
+    await typewriterWrite(storyState.lines[storyState.lineIdx], text, cursor, 26);
+    storyState.lineIdx++;
+
+    if (storyState.lineIdx < storyState.lines.length) {
+      btnNext.classList.remove('hidden');
+    } else {
+      // Last line — show CTA
+      btnCTA.classList.remove('hidden');
+    }
+  }
+}
+
+window.storyNext = function() {
+  if (storyState.typing) {
+    // Skip typewriter
+    if (storyState.typeTimeout) clearTimeout(storyState.typeTimeout);
+    storyState.typing = false;
+    const text = document.getElementById('story-dialogue-text');
+    const cursor = document.getElementById('story-cursor');
+    text.textContent = storyState.lines[storyState.lineIdx - 1] || '';
+    if (cursor) cursor.style.display = 'none';
+    const btnNext = document.getElementById('btn-story-next');
+    const btnCTA = document.getElementById('btn-story-cta');
+    if (storyState.lineIdx < storyState.lines.length) btnNext.classList.remove('hidden');
+    else btnCTA.classList.remove('hidden');
+    return;
+  }
+  storyAdvance();
+};
+
+window.storyCTA = function() {
+  const act = storyState.ctaAct;
+  // Update story progress
+  STATE.player.storyAct = act;
+  saveState();
+  stopStoryParticles();
+  const overlay = document.getElementById('story-overlay');
+  overlay.style.opacity = '0';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.classList.add('hidden');
+    // After prologue → go to hub; after acts → just continue
+    if (act === 0) {
+      showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub();
+    } else {
+      renderHub();
+    }
+  }, 800);
+};
+
+// ── Trigger acts ────────────────────────────────────
+function playStorySequence(act) {
+  const script = STORY_SCRIPTS[act];
+  if (!script) return;
+  STATE.player.storyAct = act; // mark immediately to prevent re-trigger
+  setTimeout(() => showStoryOverlay(script), 800);
+}
+
+// ── Prologue trigger ────────────────────────────────
+function startPrologue() {
+  showStoryOverlay(STORY_SCRIPTS.prologue);
+}
+
+// ══════════════════════════════════════════════════════
+//  END NARRATIVE SYSTEM
+// ══════════════════════════════════════════════════════
+
+
 async function callAI({action,payload}){
   try{
     const fn=httpsCallable(functions,'communeWithScrolls');
