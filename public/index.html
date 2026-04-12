@@ -1385,6 +1385,7 @@ window.signInGoogle=async()=>{
   try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
   catch(e){ showToast("Google Sign-In failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
 };
+window.signInWithGoogle = window.signInGoogle;
 
 window.signOutUser=async()=>{ try{ await signOut(auth); window.location.reload(); }catch(e){ showToast("Failed to sign out."); } };
 
@@ -2470,7 +2471,7 @@ function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  const firstTab=document.querySelector('.tab-btn[data-target="tab-profile"]');
+  const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
 
   onAuthStateChanged(auth,user=>{
