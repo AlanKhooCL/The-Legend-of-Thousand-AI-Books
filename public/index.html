@@ -1842,13 +1842,19 @@ function renderQuestGrid(){
       let touchMoved = false;
       card.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
       card.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
-      card.addEventListener('touchend', (e) => { if (!touchMoved) { e.preventDefault(); window.showQuestScreen(idx); } });
+      card.addEventListener('touchend', (e) => {
+        if (touchMoved) return;
+        // Don't navigate if the tap was on the delete button or its children
+        if (e.target.closest && e.target.closest('.del-btn')) return;
+        e.preventDefault();
+        window.showQuestScreen(idx);
+      });
       card.innerHTML=`<div class="flex items-center gap-3 mb-3"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
       const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
-      del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>';
-      del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1';
-      del.addEventListener('touchend',(e)=>{ e.stopPropagation(); e.preventDefault(); });
+      del.innerHTML='<span class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors text-lg">close</span>';
+      del.className='del-btn absolute top-3 right-3 z-20 p-2 rounded';
+      del.addEventListener('touchend',(e)=>{ e.stopPropagation(); e.preventDefault(); del.click(); });
       del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Abandon this quest?')){ let xpD=0,chD=0; completed.forEach(d=>{ if(d){ chD++; xpD+=20; } }); if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; } STATE.player.questsCreated--; STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD); STATE.player.xp=Math.max(0,STATE.player.xp-xpD); STATE.quests.splice(idx,1); saveState(); renderHub(); showToast("Quest abandoned."); } });
       card.appendChild(del);
       card.addEventListener('click',()=>window.showQuestScreen(idx));
