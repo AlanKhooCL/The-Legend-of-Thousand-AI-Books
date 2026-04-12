@@ -1585,14 +1585,15 @@ function getTopicSuggestions(){ return []; }
 
 // ── SUMMON SCREEN ───────────────────────────────────
 window.openSummonScreen=function(){
-  const ss=document.getElementById('summon-screen'); ss.classList.add('open');
+  const ss=document.getElementById('summon-screen');
+  ss.style.display='flex';
   document.getElementById('summon-form-side').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('flex');
   document.getElementById('summon-topic-input').value='';
   document.getElementById('summon-objective-input').value='';
 };
-window.closeSummonScreen=function(){ document.getElementById('summon-screen').classList.remove('open'); };
+window.closeSummonScreen=function(){ document.getElementById('summon-screen').style.display='none'; };
 
 window.setSummonChapters=function(n){
   STATE.summonChapters=n;
