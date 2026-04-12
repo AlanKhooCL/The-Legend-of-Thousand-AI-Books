@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+aaa<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
@@ -1286,24 +1286,6 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
 }
 
 // ── PARTICLES ──────────────────────────────────────
-(function initParticles(){
-  const c=document.getElementById('particle-canvas');
-  const ctx=c.getContext('2d');
-  function resize(){ c.width=window.innerWidth; c.height=window.innerHeight; }
-  window.addEventListener('resize',resize); resize();
-  const glyphs=['L','E','A','R','N'];
-  const particles=Array.from({length:28},()=>({
-    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
-    vy:-Math.random()*0.28-0.04, vx:(Math.random()-0.5)*0.1,
-    size:Math.random()*1.2+0.4, life:Math.random()*200, maxLife:150+Math.random()*180,
-    type:Math.floor(Math.random()*3),
-    color:['#ae1d53','#006668','#725800','#ff7198','#fdcf50'][Math.floor(Math.random()*5)],
-    glyph:glyphs[Math.floor(Math.random()*5)],
-  }));
-  
-  tick();
-})();
-
 // ── DRAG AND DROP ──────────────────────────────────
 window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; };
 window.allowDrop=function(ev){ ev.preventDefault(); };
@@ -1323,7 +1305,6 @@ async function loadState(){
       loaded=true;
     }
   }catch(e){ showToast("Could not load data."); }
-  try{ await loadPublicQuests(); }catch(e){}
   const btn=document.getElementById('btn-enter');
   if(loaded&&STATE.saves?.length>0){
     STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
