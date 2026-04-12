@@ -926,7 +926,7 @@ tailwind.config = {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 
@@ -1388,10 +1388,21 @@ window.nukeLibrary=async function(){
 
 // ── AUTH ────────────────────────────────────────────
 window.signInGoogle=async()=>{
-  document.getElementById('auth-buttons').classList.add('hidden');
+  document.getElementById('auth-buttons').style.display='none';
   document.getElementById('loading-text').style.display='flex';
-  try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
-  catch(e){ showToast("Google Sign-In failed."); document.getElementById('auth-buttons').classList.remove('hidden'); document.getElementById('loading-text').style.display='none'; }
+  document.getElementById('loading-text').textContent='> REDIRECTING TO AUTH...';
+  try{
+    // Try redirect first (avoids COOP/popup issues in hosted environments)
+    await signInWithRedirect(auth, new GoogleAuthProvider());
+  } catch(e){
+    // Fallback to popup
+    try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
+    catch(e2){
+      showToast("Sign-In failed. Try again.");
+      document.getElementById('auth-buttons').style.display='flex';
+      document.getElementById('loading-text').style.display='none';
+    }
+  }
 };
 window.signInWithGoogle = window.signInGoogle;
 
@@ -2485,6 +2496,11 @@ function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
   if(firstTab){ firstTab.classList.remove('text-on-surface-variant','border-transparent'); firstTab.classList.add('text-primary','border-primary'); }
+
+  // Handle redirect result first (fires after Google redirects back)
+  getRedirectResult(auth).then(result => {
+    if(result?.user){ /* onAuthStateChanged will handle this */ }
+  }).catch(e => { if(e.code !== 'auth/no-current-user') console.warn('Redirect result:', e.message); });
 
   onAuthStateChanged(auth,async user=>{
     const loadingEl = document.getElementById('loading-text');
