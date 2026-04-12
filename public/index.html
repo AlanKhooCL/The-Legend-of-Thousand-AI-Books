@@ -1301,22 +1301,30 @@ async function loadState(){
     if(snap.exists()){
       const d=snap.data();
       if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
-      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
+      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Operative"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
       loaded=true;
     }
   }catch(e){ showToast("Could not load data."); }
-  const btn=document.getElementById('btn-enter');
-  if(loaded&&STATE.saves?.length>0){
-    STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
-    syncActiveSaveToState();
-    // Persist any migration fixes (stale monster IDs, etc.)
-    saveState();
-    if(btn){ btn.style.display='flex'; }
-  } else {
-    STATE.player=null;
-    if(btn){ btn.style.display='flex'; }
-  }
+
   document.getElementById('loading-text').style.display='none';
+
+  if(loaded && STATE.saves?.length>0){
+    STATE.saves.forEach(s=>{
+      if(!s.player) s.player=defaultPlayer("Operative");
+      if(!s.player.sigils) s.player.sigils=[];
+      if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}];
+      if(!s.player.collection) s.player.collection=defaultCollection();
+    });
+    syncActiveSaveToState();
+    saveState();
+    // Go straight to hub
+    showScreen('screen-hub');
+    window.switchTab('tab-dossier');
+    renderHub();
+  } else {
+    // New user — show path/name screen
+    showScreen('screen-path');
+  }
 }
 
 // ── NAV ──────────────────────────────────────────────
@@ -2474,9 +2482,19 @@ window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
   if(firstTab){ firstTab.classList.remove('text-outline','border-transparent'); firstTab.classList.add('text-primary','border-primary','bg-primary/5'); }
 
-  onAuthStateChanged(auth,user=>{
-    if(user){ USER_ID=user.uid; loadState(); }
-    else{ document.getElementById('loading-text').style.display='none'; document.getElementById('auth-buttons').classList.remove('hidden'); }
+  onAuthStateChanged(auth,async user=>{
+    const loadingEl = document.getElementById('loading-text');
+    const authBtns = document.getElementById('auth-buttons');
+    if(user){
+      USER_ID=user.uid;
+      if(loadingEl) loadingEl.textContent='> LOADING OPERATIVE DATA...';
+      await loadState();
+    } else {
+      USER_ID=null;
+      if(loadingEl) loadingEl.style.display='none';
+      if(authBtns) authBtns.classList.remove('hidden');
+      authBtns.style.display='flex';
+    }
   });
 });
 
