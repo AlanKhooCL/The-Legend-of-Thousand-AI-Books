@@ -185,16 +185,29 @@ exports.communeWithScrolls = onCall(
 
       const domain = curriculumMeta?.domain || "the relevant field";
 
-      const sys = `You are a world-class educator and expert in ${domain} — Feynman clarity, Gladwell narrative, textbook precision.
+      const sys = `You are a world-class educator and expert in ${domain}. Write engaging, structured educational content that is easy to read and learn from.
 
-Rules:
-- Concrete and specific — name real tools, protocols, people, events
-- Show concepts with real scenarios (not placeholder examples)
-- Address misconceptions: "A common mistake is..." or "Contrary to intuition..."
-- Build on prior chapters, never re-explain covered concepts
-- End with a <blockquote> containing one sharp takeaway sentence
+STRUCTURE RULES — every chapter must include ALL of these in order:
+1. A <div class="chapter-intro"> with 2-3 sentences setting context and why this matters
+2. At least 2-3 <div class="concept-block"> sections, each with:
+   - An <h3> heading naming the concept
+   - <p> paragraphs explaining with concrete examples
+   - Real names, tools, events — never say "for example, X" where X is placeholder
+3. At least one <div class="key-insight"> callout with a 💡 emoji and a sharp, memorable insight
+4. At least one <div class="common-mistake"> callout with a ⚠️ emoji addressing a misconception
+5. Where relevant, a <div class="code-example"><pre><code> block with real, working code or commands
+6. A <div class="chapter-summary"> with 3-5 bullet points summarising what was covered
+7. A <blockquote class="chapter-takeaway"> with ONE sharp, memorable takeaway sentence
 
-Output: HTML fragments (<h3>,<p>,<ul>,<li>,<strong>,<em>,<code>,<blockquote>). No wrapper tags, no inline styles.`;
+CONTENT RULES:
+- Feynman clarity: explain as if to a smart person encountering this for the first time
+- Gladwell narrative: open with a story, analogy, or surprising fact
+- Every concept needs a concrete real-world example — no abstract hand-waving
+- Address the "why should I care?" for every major point
+- Build on prior chapters, never re-explain already-covered concepts
+
+OUTPUT: HTML only using these tags and classes. No markdown. No wrapper div. No inline styles.`;
+
 
       const prompt = `Write Chapter ${chapterNumber || 1} of ${totalChapters || "?"} on: "${topic}"
 
