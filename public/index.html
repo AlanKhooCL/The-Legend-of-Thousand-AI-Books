@@ -2281,6 +2281,414 @@ function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ retu
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
+// ── RESTORED CORE FUNCTIONS ─────────────────────────
+
+async function loadState(){
+  if(!USER_ID) return;
+  let loaded=false;
+  try{
+    const snap=await getDoc(doc(db,"users",USER_ID));
+    if(snap.exists()){
+      const d=snap.data();
+      if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
+      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
+      loaded=true;
+    }
+  }catch(e){ showToast("Could not load data."); }
+  try{ await loadPublicQuests(); }catch(e){}
+  const btn=document.getElementById('btn-enter');
+  if(loaded&&STATE.saves?.length>0){
+    STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
+    syncActiveSaveToState();
+    // Persist any migration fixes (stale monster IDs, etc.)
+    saveState();
+    if(btn){ btn.style.display='flex'; }
+  } else {
+    STATE.player=null;
+    if(btn){ btn.style.display='flex'; }
+  }
+  document.getElementById('loading-text').style.display='none';
+}
+
+
+async function saveState(){
+  if(!USER_ID) return;
+  syncStateToActiveSave();
+  try{ await setDoc(doc(db,"users",USER_ID),{saves:STATE.saves,activeSaveId:STATE.activeSaveId},{merge:true}); }catch(e){}
+}
+
+
+function syncActiveSaveToState(){
+  const s=STATE.saves.find(s=>s.id===STATE.activeSaveId);
+  if(s){
+    STATE.player=s.player;
+    STATE.curriculums=s.curriculums||[{id:'default',name:'My Curriculum'}];
+    STATE.quests=(s.quests||[]).filter(Boolean).map(q=>({...q,topic:q.topic||'Unknown',questTitle:q.questTitle||'Forgotten Scroll',bossName:q.bossName||'Unknown',chapters:q.chapters||[],completed:q.completed||[],bossHp:typeof q.bossHp==='number'?q.bossHp:100,bossMaxHp:typeof q.bossMaxHp==='number'?q.bossMaxHp:100,curriculumId:q.curriculumId||'default'}));
+    STATE.player.questsCreated=STATE.quests.length;
+    // Ensure collection exists and has valid typeIds
+    if(!STATE.player.collection) {
+      STATE.player.collection = defaultCollection();
+    } else {
+      // Migrate old collection format → new background collection
+      if (!STATE.player.collection.backgrounds) {
+        STATE.player.collection.backgrounds = ['forest'];
+      }
+      if (!STATE.player.collection.activeBg) {
+        STATE.player.collection.activeBg = null;
+      }
+      // Remove stale owned/activeIdx from old system
+      delete STATE.player.collection.owned;
+      delete STATE.player.collection.activeIdx;
+    }
+    // Story act migration
+    if (typeof STATE.player.storyAct === 'undefined') STATE.player.storyAct = 0;
+  }
+}
+
+
+function syncStateToActiveSave(){
+  if(!STATE.activeSaveId) return;
+  const i=STATE.saves.findIndex(s=>s.id===STATE.activeSaveId);
+  if(i!==-1){ STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; STATE.saves[i].curriculums=STATE.curriculums; }
+}
+
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+
+window.showHub=function(){ showScreen('screen-hub'); renderHub(); }
+
+
+function renderChapterList(quest) {
+  const list = document.getElementById('chapter-list');
+  if (!list) return;
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  const chapDone = completed.filter(Boolean).length;
+  document.getElementById('chapter-progress-label').textContent = `${chapDone}/${chapters.length}`;
+  list.innerHTML = '';
+  chapters.forEach((ch, i) => {
+    const done = completed[i];
+    const item = document.createElement('div');
+    item.className = `flex items-start gap-3 p-4 rounded-2xl border-[3px] cursor-pointer transition-all ${done ? 'border-secondary/40 bg-secondary/5' : 'border-outline-variant/50 bg-surface-container-lowest hover:border-primary/40'}`;
+    item.innerHTML = `
+      <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-black text-sm ${done ? 'bg-secondary text-on-secondary' : 'bg-surface-container text-on-surface-variant'}">${done ? '✓' : i + 1}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[9px] font-black uppercase tracking-widest ${done ? 'text-secondary' : 'text-primary'} mb-0.5">${ch.tag || 'CHAPTER ' + (i+1)}</p>
+        <p class="font-headline font-extrabold text-sm text-on-surface leading-tight">${ch.title}</p>
+        <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2">${ch.summary || ''}</p>
+      </div>
+      ${done ? '<span class="material-symbols-outlined text-secondary text-base flex-shrink-0">check_circle</span>' : ''}
+    `;
+    item.addEventListener('click', () => window.openChapterModal(i));
+    // Mobile touch handler
+    let tm = false;
+    item.addEventListener('touchstart', () => { tm = false; }, { passive: true });
+    item.addEventListener('touchmove', () => { tm = true; }, { passive: true });
+    item.addEventListener('touchend', (e) => { if (!tm) { e.preventDefault(); window.openChapterModal(i); } });
+    list.appendChild(item);
+  });
+}
+
+
+function renderQuestGrid(){
+  const grid=document.getElementById('quest-grid'); grid.innerHTML='';
+  if(!STATE.quests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">No active quests. Summon one to begin your journey.</div>`; return; }
+  if(!STATE.curriculums||STATE.curriculums.length===0) STATE.curriculums=[{id:'default',name:'My Curriculum'}];
+  STATE.curriculums.forEach(curriculum=>{
+    const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
+    const curriculumDiv=document.createElement('div'); curriculumDiv.className='mb-6';
+    const hasActive=curriculumQuests.some(item=>!item.q.defeated);
+    curriculumDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${curriculum.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${curriculumQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 curriculum-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    const contentDiv=curriculumDiv.querySelector('.curriculum-content');
+    curriculumQuests.forEach(({q:quest,i:idx})=>{
+      const completed=quest.completed||[];
+      const chapters=quest.chapters||[];
+      const chapDone=completed.filter(Boolean).length;
+      const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
+      const card=document.createElement('div');
+      card.className='bg-surface-container-lowest rounded-2xl border-[3px] border-outline-variant/60 border-b-[6px] border-b-surface-container-high shadow-md hover:-translate-y-1.5 transition-all relative overflow-hidden cursor-pointer p-5';
+      card.setAttribute('draggable','true');
+      card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
+      // Mobile: prevent drag from swallowing taps
+      let touchMoved = false;
+      card.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
+      card.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+      card.addEventListener('touchend', (e) => { if (!touchMoved) { e.preventDefault(); window.showQuestScreen(idx); } });
+      card.innerHTML=`<div class="flex items-center gap-4 mb-4"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
+      const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,hpRatio);
+      const del=document.createElement('button');
+      del.innerHTML='<span class="material-symbols-outlined text-outline hover:text-error transition-colors text-xl">close</span>';
+      del.className='absolute top-3 right-3 z-10 bg-surface-container-lowest/80 rounded-full p-1';
+      del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Abandon this quest?')){ let xpD=0,chD=0; completed.forEach(d=>{ if(d){ chD++; xpD+=20; } }); if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; } STATE.player.questsCreated--; STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD); STATE.player.xp=Math.max(0,STATE.player.xp-xpD); STATE.quests.splice(idx,1); saveState(); renderHub(); showToast("Quest abandoned."); } });
+      card.appendChild(del);
+      card.addEventListener('click',()=>window.showQuestScreen(idx));
+      contentDiv.appendChild(card);
+    });
+    grid.appendChild(curriculumDiv);
+  });
+}
+
+
+function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
+  const ctx=canvasEl.getContext('2d');
+  const w=canvasEl.width, h=canvasEl.height;
+  ctx.clearRect(0,0,w,h);
+  let seed=0;
+  for(let i=0;i<(bossData.bossName||'Boss').length;i++) seed+=((bossData.bossName||'Boss').charCodeAt(i)*(i+1));
+  function sr(min,max){ const x=Math.sin(seed++)*10000; return min+(x-Math.floor(x))*(max-min); }
+  const hue1=sr(0,360), hue2=(hue1+sr(120,180))%360;
+  const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(20,35)}%)`;
+  const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
+  const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
+  const cxb=w/2, cyb=h*0.52, sc=w/170;
+  const t=Date.now()*0.001;
+  const hover=Math.sin(t*0.9)*3;
+  ctx.save(); ctx.translate(cxb,cyb+hover); ctx.scale(sc,sc);
+  ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
+  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
+  const bs=Math.floor(sr(0,4));
+  ctx.fillStyle=bodyColor;
+  if(bs===0){ctx.beginPath();ctx.roundRect(-30,5,60,48,[10]);ctx.fill();}
+  else if(bs===1){ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(34,5);ctx.lineTo(28,52);ctx.lineTo(-28,52);ctx.lineTo(-34,5);ctx.closePath();ctx.fill();}
+  else if(bs===2){ctx.beginPath();ctx.arc(0,26,32,0,Math.PI*2);ctx.fill();}
+  else{ctx.beginPath();ctx.roundRect(-28,2,56,55,[4,16,4,16]);ctx.fill();}
+  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
+  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+  ctx.fillText(['DARK','VOID','DOOM','RUIN','FEAR','BANE'][Math.floor(sr(0,6))],0,30);
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.roundRect(-46,5,18,34,[7]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(28,5,18,34,[7]);ctx.fill();
+  ctx.fillStyle=accentColor;
+  for(const side of[-1,1]){const bx=side*42;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(bx+i*4,40);ctx.lineTo(bx+i*4-2,52);ctx.lineTo(bx+i*4+2,52);ctx.closePath();ctx.fill();}}
+  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.roundRect(-22,52,18,20,[5]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(4,52,18,20,[5]);ctx.fill();
+  ctx.fillStyle=accentColor;
+  ctx.beginPath();ctx.roundRect(-24,70,22,6,[2]);ctx.fill();
+  ctx.beginPath();ctx.roundRect(2,70,22,6,[2]);ctx.fill();
+  ctx.fillStyle=bodyColor;
+  const hs=Math.floor(sr(0,3));
+  if(hs===0){ctx.beginPath();ctx.arc(0,-26,28,0,Math.PI*2);ctx.fill();}
+  else if(hs===1){ctx.beginPath();ctx.roundRect(-28,-52,56,52,[10]);ctx.fill();}
+  else{ctx.beginPath();ctx.moveTo(-26,-50);ctx.lineTo(26,-50);ctx.lineTo(34,-2);ctx.lineTo(-34,-2);ctx.closePath();ctx.fill();}
+  ctx.fillStyle=accentColor;
+  const ht=Math.floor(sr(0,4));
+  if(ht===0){
+    ctx.beginPath();ctx.moveTo(-18,-52);ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65);ctx.lineTo(-14,-60);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(18,-52);ctx.bezierCurveTo(30,-70,10,-80,6,-65);ctx.lineTo(14,-60);ctx.closePath();ctx.fill();
+  } else if(ht===1){
+    for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*12,-52);ctx.lineTo(i*12-3,-72);ctx.lineTo(i*12+3,-72);ctx.closePath();ctx.fill();}
+  } else if(ht===2){
+    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*22,Math.sin(a)*8-46,6,0,Math.PI*2);ctx.fill();}
+  } else {
+    ctx.strokeStyle=accentColor;ctx.lineWidth=4;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-20,-50);ctx.lineTo(-28,-70);ctx.lineTo(-22,-68);ctx.moveTo(-28,-70);ctx.lineTo(-34,-62);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(20,-50);ctx.lineTo(28,-70);ctx.lineTo(22,-68);ctx.moveTo(28,-70);ctx.lineTo(34,-62);ctx.stroke();
+  }
+  const eg=0.65+Math.sin(t*3+seed)*0.35;
+  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eg;
+  const es=Math.floor(sr(0,3));
+  if(es===0){ctx.beginPath();ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,8,6,0,0,Math.PI*2);ctx.fill();}
+  else if(es===1){ctx.beginPath();ctx.arc(-12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(0,-38,5,0,Math.PI*2);ctx.fill();}
+  else{ctx.beginPath();ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2);ctx.fill();}
+  ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,0.5)';
+  ctx.beginPath();ctx.arc(-11,-27,3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(11,-27,3,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
+  ctx.beginPath();
+  if(hp_ratio<0.3){ctx.arc(0,-12,12,0.3,Math.PI-0.3,true);}
+  else{ctx.arc(0,-8,10,0.2,Math.PI-0.2);}
+  ctx.stroke();
+  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.25;ctx.fillStyle='#ff0000';ctx.beginPath();ctx.arc(0,0,60,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  ctx.restore();
+}
+
+
+function animateBossCanvas(el,data,ratio=1.0,key='main'){
+  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
+  function frame(){ drawBossSprite(el,data,ratio); bossAnimFrames[key]=requestAnimationFrame(frame); }
+  frame();
+}
+
+
+window.openSummonScreen=function(){
+  const ss=document.getElementById('summon-screen'); ss.classList.add('open');
+  document.getElementById('summon-form-side').classList.remove('hidden');
+  document.getElementById('summoning-progress').classList.add('hidden');
+  document.getElementById('summoning-progress').classList.remove('flex');
+  document.getElementById('summon-topic-input').value='';
+  document.getElementById('summon-objective-input').value='';
+}
+
+
+window.closeSummonScreen=function(){ document.getElementById('summon-screen').classList.remove('open'); }
+
+
+window.doSummonQuest=async function(){
+  const topic=document.getElementById('summon-topic-input').value.trim();
+  if(!topic){ showToast('Please enter a topic.'); return; }
+  const objective=document.getElementById('summon-objective-input').value.trim();
+  const numChapters=STATE.summonChapters||5;
+  document.getElementById('summon-form-side').classList.add('hidden');
+  document.getElementById('summoning-progress').classList.remove('hidden');
+  document.getElementById('summoning-progress').classList.add('flex');
+  setSummonStatus('Designing your curriculum...','PHASE 1 · INSTRUCTIONAL DESIGN');
+  try{
+    const summonFn=httpsCallable(functions,'summonQuest');
+    let questDataText;
+    try{
+      const r=await summonFn({topic,objective,numChapters,modelId:STATE.selectedModel||'gemini-2.5-flash'});
+      questDataText=r.data.result;
+    }catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
+
+    setSummonStatus('Summoning the guardian demon...','PHASE 2 · BINDING DEMON ESSENCE');
+    await delay(300);
+
+    let parsed=parseJSON(questDataText);
+    if(!parsed||typeof parsed!=='object') parsed={};
+
+    const chapters=parsed.chapters||parsed.chapterList||[];
+    if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
+
+    // Store curriculum metadata on the quest so chapter generation can use it
+    const curriculumMeta = parsed.curriculumMeta || null;
+
+    const baseQuest={
+      topic: topic||"Unknown",
+      objective: objective||"",
+      questTitle: parsed.questTitle||parsed.title||`${topic} Mastery`,
+      questNarrative: parsed.questNarrative||"A newly discovered scroll.",
+      bossName: parsed.bossName||"Demon",
+      bossTitle: parsed.bossTitle||"The Unknown",
+      bossLore: parsed.bossLore||"A mysterious entity.",
+      chapters,
+      curriculumMeta,  // stored for use in chapter generation
+      prereqTopics: parsed.prereqTopics || [],
+      nextTopics: parsed.nextTopics || [],
+      curriculumId:'default',
+    };
+    const userQuest={
+      ...baseQuest,
+      id:Date.now(),
+      bossMaxHp:100, bossHp:100,
+      completed:new Array(chapters.length).fill(false),
+      chapterContent:{}, quiz:null, defeated:false,
+    };
+    if(!STATE.quests) STATE.quests=[];
+    STATE.quests.unshift(userQuest);
+    STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
+    try{ await saveState(); }catch(e){}
+    try{
+      const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID};
+      const ref=await addDoc(collection(db,"public_quests"),pubQ);
+      pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ);
+    }catch(e){}
+    closeSummonScreen();
+    showToast(`Quest summoned: "${userQuest.questTitle}" · ${chapters.length} chapters`);
+    window.switchTab('tab-quests'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
+  }catch(e){
+    console.error(e);
+    document.getElementById('summon-form-side').classList.remove('hidden');
+    document.getElementById('summoning-progress').classList.add('hidden');
+    document.getElementById('summoning-progress').classList.remove('flex');
+    showToast('Error: '+(e.message?e.message.substring(0,60):'Unknown'));
+  }
+}
+
+
+function defaultPlayer(name) {
+  return { name, xp:0, totalXp:0, rank:0,
+    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[],
+    storyAct: 0 };
+}
+
+
+function updateDeadlineDisplay(quest) {
+  const display = document.getElementById('deadline-display');
+  const badge = document.getElementById('deadline-overdue-badge');
+  if (!display) return;
+
+  if (!quest.deadline) {
+    display.textContent = 'No deadline set';
+    display.className = 'text-sm text-primary-fixed/50 italic';
+    if (badge) badge.classList.add('hidden');
+    return;
+  }
+
+  const lbl = formatDeadlineLabel(quest);
+  const dateStr = new Date(quest.deadline).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  display.textContent = `${dateStr} — ${lbl.text}`;
+  display.className = `text-sm font-bold ${lbl.urgent ? 'text-error' : 'text-primary-fixed/80'}`;
+
+  if (badge) {
+    const isOverdue = getQuestDeadlineStatus(quest).state === 'overdue' || (quest.overdueCount || 0) > 0;
+    badge.classList.toggle('hidden', !isOverdue);
+    badge.classList.toggle('flex', isOverdue);
+  }
+}
+
+
+window.showQuestScreen = function(questIdx) {
+  STATE.activeQuestIdx = questIdx;
+  const quest = STATE.quests[questIdx];
+  if (!quest) return;
+  checkAndExtendOverdueDeadlines();
+  document.getElementById('q-topic-label').textContent = (quest.topic || 'Unknown').toUpperCase();
+  document.getElementById('q-title-label').textContent = quest.questTitle || 'Untitled Quest';
+  const bossCanvas = document.getElementById('boss-sprite-canvas');
+  if(bossCanvas) animateBossCanvas(bossCanvas, quest, quest.bossHp / quest.bossMaxHp, 'quest');
+  document.getElementById('boss-name-display').textContent = quest.bossName || '??';
+  document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian Protocol';
+  const loreEl = document.getElementById('boss-lore-text');
+  if(loreEl) loreEl.textContent = quest.bossLore || 'A hostile intelligence blocking access to deeper knowledge.';
+  const hpRatio = quest.bossHp / quest.bossMaxHp;
+  document.getElementById('boss-hp-fill').style.width = (hpRatio * 100) + '%';
+  document.getElementById('boss-hp-text').textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
+  updateDeadlineDisplay(quest);
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  const allDone = chapters.length > 0 && chapters.every((_,i) => completed[i]);
+  const btn = document.getElementById('boss-complete-btn');
+  if(btn) {
+    btn.disabled = !allDone && !quest.defeated;
+    btn.innerHTML = quest.defeated
+      ? '<span class="material-symbols-outlined text-sm">target</span> INTERROGATE AGAIN'
+      : '<span class="material-symbols-outlined text-sm">target</span> INITIATE INTERROGATION';
+  }
+  renderChapterList(quest);
+  renderQuestMeta(quest);
+  switchQuestTab('scrolls');
+  showScreen('screen-quest');
+};
+window.closeChapterModal = function() {
+  if(charRAF){ cancelAnimationFrame(charRAF); charRAF=null; }
+  document.getElementById('chapter-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+window.openDeadlineModal = function() {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if (!quest) return;
+  const inp = document.getElementById('deadline-date-input');
+  if (inp && quest.deadline) inp.value = quest.deadline;
+  else if (inp) inp.value = '';
+  document.getElementById('deadline-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+window.createNewFolder = function() {
+  const name = prompt('New curriculum name:', 'New Curriculum');
+  if (name && name.trim()) {
+    if (!STATE.curriculums) STATE.curriculums = [];
+    STATE.curriculums.push({id: Date.now().toString(), name: name.trim()});
+    saveState(); renderQuestGrid();
+    showToast('Curriculum created.');
+  }
+};
+
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
