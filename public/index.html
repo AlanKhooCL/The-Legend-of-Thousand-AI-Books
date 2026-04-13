@@ -357,7 +357,6 @@ tailwind.config = {
               </button>
             </div>
           </div>
-
           <!-- XP bar -->
           <div class="space-y-1 mb-4">
             <div class="flex justify-between text-[10px] font-mono text-on-surface-variant tracking-widest">
@@ -368,7 +367,6 @@ tailwind.config = {
               <div id="xp-bar" class="h-full bg-primary rounded transition-all duration-700" style="width:0%;box-shadow:0 0 6px rgba(74,222,128,0.5);"></div>
             </div>
           </div>
-
           <!-- Stats grid -->
           <div class="grid grid-cols-4 gap-2 text-center">
             <div class="bg-surface-container rounded p-2 border border-outline/20">
@@ -394,17 +392,24 @@ tailwind.config = {
           </div>
         </div>
 
-        <!-- Memory Recovery panel (replaces evolution map) -->
-        <button onclick="openEvoModal()" class="w-full flex items-center gap-3 p-4 bg-surface-container-low border border-outline/30 rounded hover:border-primary/50 transition-all group terminal-border">
-          <div class="w-10 h-10 rounded border border-primary/40 flex items-center justify-center flex-shrink-0 group-hover:border-primary bg-surface-container">
-            <span class="material-symbols-outlined text-primary text-lg">psychology</span>
+        <!-- CURRENT INTEL — story summary -->
+        <div class="bg-surface-container-low border border-outline/30 rounded p-4 terminal-border">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-tertiary text-base">radio</span>
+            <h3 class="font-headline font-bold text-xs text-tertiary tracking-widest crt-glow-amber">CURRENT INTEL</h3>
+            <span class="ml-auto text-[9px] font-mono text-on-surface-variant/50 tracking-widest">LIVE UPLINK</span>
           </div>
-          <div class="text-left flex-1">
-            <p class="font-headline font-bold text-sm text-primary tracking-widest">MEMORY RECOVERY LOG</p>
-            <p class="text-[10px] font-mono text-on-surface-variant">Reconstruct lost identity fragments</p>
+          <div id="current-intel-text" class="text-[11px] font-mono text-on-surface-variant/80 leading-relaxed"></div>
+        </div>
+
+        <!-- Memory Recovery Log — clickable stages -->
+        <div class="bg-surface-container-low border border-outline/30 rounded p-4 terminal-border">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-primary text-base">psychology</span>
+            <h3 class="font-headline font-bold text-xs text-primary tracking-widest">MEMORY RECOVERY LOG</h3>
           </div>
-          <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-base">chevron_right</span>
-        </button>
+          <div id="memory-stage-list" class="space-y-2"></div>
+        </div>
 
         <!-- Boss deadlines panel -->
         <div class="bg-surface-container-low border border-outline/30 rounded p-4 space-y-3 terminal-border" id="deadline-panel">
@@ -948,6 +953,42 @@ tailwind.config = {
 </div>
 
 <!-- ═══════════════════════════════════════════
+     MEMORY FRAGMENT MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[205]" id="memory-modal">
+  <div class="w-full max-w-lg mx-4 rounded bg-surface-container-lowest border border-primary/30 max-h-[88vh] flex flex-col terminal-border">
+    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
+      <div>
+        <div id="memory-modal-badge" class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5"></div>
+        <h3 id="memory-modal-title" class="font-headline font-bold text-sm text-primary crt-glow tracking-widest"></h3>
+      </div>
+      <button onclick="closeMemoryModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div id="memory-modal-body" class="overflow-y-auto flex-1 p-5 text-[12px] font-mono text-on-surface/80 leading-relaxed space-y-4"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     INTERACTIVE CLUE MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[205]" id="clue-modal">
+  <div class="w-full max-w-lg mx-4 rounded bg-surface-container-lowest border border-primary/30 max-h-[92vh] flex flex-col terminal-border">
+    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
+      <div>
+        <div id="clue-modal-badge" class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5"></div>
+        <h3 id="clue-modal-title" class="font-headline font-bold text-sm text-primary crt-glow tracking-widest"></h3>
+      </div>
+      <button onclick="closeClueModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div id="clue-modal-body" class="overflow-y-auto flex-1 p-4"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
      TERMS OF SERVICE / PRIVACY POLICY MODAL
 ═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[210]" id="tos-modal">
@@ -1024,100 +1065,112 @@ let STATE = {
 // ── CLUE SYSTEM ────────────────────────────────────────
 const CLUE_FRAGMENTS = [
   {
-    id: 'c0',
-    label: 'FRAGMENT_001',
-    type: 'signal_intercept',
-    icon: '📡',
-    raw: 'SGVyZSBiZWZvcmUgdGhlIGZhbGw=',
-    decoded: 'Here before the fall',
-    hint: 'Base64 signal intercept recovered from Relay Tower 12.',
-    narrative: 'A short-wave signal, looping since the bombs fell. Decoded: \"Here before the fall\" — someone was transmitting a location marker. But where?',
+    id:'c0', label:'FRAGMENT_001', icon:'📡', type:'BASE64_SIGNAL',
+    title:'Relay Tower 12 — Intercept',
+    teaser:'A looping signal from Relay Tower 12. Encoded. Waiting.',
+    narrative:'Someone transmitted this on a dead frequency before the bombs fell. The signal has been looping for thirty years, ignored by every automated system — until now.',
+    puzzle_type:'base64',
+    cipher_input:'SGVyZSBiZWZvcmUgdGhlIGZhbGw=',
+    answer:'here before the fall',
+    reveal:'The message decoded: HERE BEFORE THE FALL. Four words. A location marker, or a confession. Someone was inside this vault before the war ended. They left this signal so that whoever came after — whoever you are — would know they had not been the first.',
   },
   {
-    id: 'c1',
-    label: 'FRAGMENT_002',
-    type: 'personnel_file',
-    icon: '🗂️',
-    raw: 'FILE [REDACTED] — CLEARANCE LVL 5\nDOB: [REDACTED]\nSPECIALTY: [REDACTED]\nNOTE: Subject was present at Vault 77 decommissioning.',
-    decoded: null,
-    hint: 'Partial personnel file. Most fields still classified.',
-    narrative: 'Your own file. Or someone else who shared your face. Vault 77 was officially never commissioned — yet here is proof of its decommissioning.',
+    id:'c1', label:'FRAGMENT_002', icon:'🗂️', type:'REDACTED_FILE',
+    title:'Personnel File — [CLASSIFIED]',
+    teaser:'A personnel file. Almost entirely blacked out. Almost.',
+    narrative:'Vault-Tec kept meticulous records. Whatever this file contained, someone went to considerable effort to ensure it could not be read. Tap each redacted bar to attempt declassification.',
+    puzzle_type:'redacted',
+    reveal_sequence:[
+      {text:'[REDACTED]', revealed:'DIRECTOR OF KNOWLEDGE'},
+      {text:'[REDACTED]', revealed:'VAULT-TEC DIVISION SEVEN'},
+      {text:'[REDACTED]', revealed:'CLEARANCE: LEVEL OMEGA'},
+      {text:'[REDACTED]', revealed:'PRESENT AT VAULT 77 DECOMMISSIONING'},
+      {text:'[REDACTED]', revealed:'MEMORY WIPE: AUTHORISED BY SUBJECT'},
+    ],
+    reveal:'The file is yours. Your title: Director of Knowledge. Your clearance: the highest that existed. The final line is the one that matters — the memory wipe was not done to you. It was authorised by you.',
   },
   {
-    id: 'c2',
-    label: 'FRAGMENT_003',
-    type: 'cipher',
-    icon: '🔐',
-    raw: 'YRIRE SBETRG. GUR BIREFRRE XARJ.',
-    decoded: 'NEVER FORGET. THE OVERSEER KNEW.',
-    hint: 'ROT13 cipher. The enemy used it for low-risk internal comms.',
-    narrative: 'The Overseer had prior knowledge. Of what? The detonation? Your identity? The phrase \"never forget\" was the resistance motto — but whose resistance?',
+    id:'c2', label:'FRAGMENT_003', icon:'🔐', type:'CAESAR_CIPHER',
+    title:'Internal Communiqué — ROT13 Encoded',
+    teaser:'A handwritten note. Gibberish — or a cipher.',
+    narrative:'Low-level Vault-Tec internal communications used ROT13 — a child\'s encryption, but fast. This note was taped to the back of your terminal monitor. You never thought to check the back.',
+    puzzle_type:'caesar',
+    cipher_text:'YRIRE SBETRG. GUR BIREFRRE XARJ.',
+    shift:13,
+    answer:'never forget. the overseer knew.',
+    reveal:'NEVER FORGET. THE OVERSEER KNEW. The Overseer of this vault had prior knowledge — not of the bombs, but of the experiment. Of you. They knew what you were planning to do to yourself, and they let it happen. The question is whether that makes them complicit, or whether they were simply the only other person who believed it would work.',
   },
   {
-    id: 'c3',
-    label: 'FRAGMENT_004',
-    type: 'photo_fragment',
-    icon: '📷',
-    raw: '[CORRUPTED IMAGE] Visible: two figures, pre-war uniforms, Vault-Tec insignia, one has a scar above right brow.',
-    decoded: null,
-    hint: 'Partially recovered photograph. One figure may be you.',
-    narrative: 'A photograph. One face is completely burned away by radiation damage. The other — you have seen that scar before. In the mirror.',
+    id:'c3', label:'FRAGMENT_004', icon:'📷', type:'CORRUPTED_IMAGE',
+    title:'Photograph — Partial Recovery',
+    teaser:'A photograph. Corrupted. Two figures. One face burned by radiation.',
+    narrative:'Digital photographs degrade in high-radiation environments. Most of this image is gone. What remains is enough to raise questions you are not sure you want answered.',
+    puzzle_type:'image_restore',
+    pixels_to_reveal: 12,
+    reveal:'The figure on the left is unrecoverable — obliterated by radiation damage. The figure on the right is clearer. Pre-war Vault-Tec uniform. A scar above the right eyebrow. You reach up without thinking and touch the scar above your own right eyebrow. You have had it your entire life. You do not know how you got it.',
   },
   {
-    id: 'c4',
-    label: 'FRAGMENT_005',
-    type: 'map_coordinate',
-    icon: '🗺️',
-    raw: '38°53′N 77°01′W // VAULT 77 // ACCESS CODE: [REDACTED]',
-    decoded: 'Washington D.C. area. Pre-war Capitol coordinates.',
-    hint: 'Coordinate fragment. The access code is still missing.',
-    narrative: 'Vault 77 sits beneath the Capitol ruins. Whatever happened there is still happening — the power signature on this frequency is active.',
+    id:'c4', label:'FRAGMENT_005', icon:'🗺️', type:'COORDINATE_DECODE',
+    title:'Map Coordinates — Encrypted',
+    teaser:'A set of coordinates. The location is masked behind an XOR cipher.',
+    narrative:'Vault-Tec encrypted all facility coordinates with a simple XOR key. The key is the vault number. Decode the coordinates to identify the location.',
+    puzzle_type:'coordinate',
+    encoded:'38°53′N 77°01′W',
+    xor_key:'77',
+    location:'WASHINGTON D.C. — CAPITOL DISTRICT',
+    reveal:'Vault 77 sits beneath what was the Capitol building. A vault beneath the seat of government — and you decommissioned it. The decommissioning records have been expunged from every public archive. But the power signature at these coordinates is still active. Forty years after the bombs. Something down there is still running.',
   },
   {
-    id: 'c5',
-    label: 'FRAGMENT_006',
-    type: 'audio_log',
-    icon: '🎙️',
-    raw: '[AUDIO] \"...they said you volunteered. They said you agreed to forget. I never believed them. Find me at—\" [STATIC]',
-    decoded: null,
-    hint: 'Voice audio log. Speaker unknown. Recording cuts off abruptly.',
-    narrative: 'You volunteered. You agreed to have your memories wiped. Someone else did not agree — and they are still out there, waiting.',
+    id:'c5', label:'FRAGMENT_006', icon:'🎙️', type:'AUDIO_LOG',
+    title:'Audio Log — Partially Corrupted',
+    teaser:'A voice recording. Forty seconds. The last fourteen are static.',
+    narrative:'The recording was made in this room. The voice is speaking directly to the terminal microphone — speaking to whoever would eventually sit in this chair and listen.',
+    puzzle_type:'audio',
+    transcript_segments:[
+      {time:'0:00', text:'If you can hear this, the experiment worked.', corrupted:false},
+      {time:'0:05', text:'I know you don\'t remember me. That was the point.', corrupted:false},
+      {time:'0:12', text:'They said you volunteered. They said you agreed to forget.', corrupted:false},
+      {time:'0:19', text:'I never believed them. I knew you. You didn\'t agree —', corrupted:false},
+      {time:'0:24', text:'[CORRUPTED · 14 SECONDS UNRECOVERABLE]', corrupted:true},
+      {time:'0:38', text:'— find me at —', corrupted:false},
+      {time:'0:40', text:'[SIGNAL LOST]', corrupted:true},
+    ],
+    reveal:'The speaker knew you before the experiment. They believed you were coerced, not willing. They were trying to tell you something — a location, a name, a way out — and the recording cut before they could finish. Somewhere in the wasteland, someone has been waiting for you to wake up.',
   },
   {
-    id: 'c6',
-    label: 'FRAGMENT_007',
-    type: 'torn_letter',
-    icon: '✉️',
-    raw: '...the experiment required a clean mind. No biases. No loyalties. You were the\n only one willing. But what they did not tell you is\n that the experiment never ended. You are\n still inside it.',
-    decoded: null,
-    hint: 'Handwritten letter, torn. Ink faded by time.',
-    narrative: 'The experiment never ended. The wasteland you inhabit — is any of it real? Or is reality itself the test?',
+    id:'c6', label:'FRAGMENT_007', icon:'✉️', type:'TORN_LETTER',
+    title:'Letter — Torn, Partial',
+    teaser:'A letter in two pieces. Assemble them to read it.',
+    narrative:'The letter was torn before being filed. Whether this was deliberate or accidental is unclear. Both pieces are here. They need to be matched.',
+    puzzle_type:'torn_letter',
+    pieces:[
+      'The experiment required a clean mind.\nNo prior knowledge. No biases.\nNo memory of having designed the thing\nyou were being tested by.\n\nYou were the only one willing. Everyone\nelse said it was too dangerous, too',
+      'permanent, too much.\n\nBut what they did not understand —\nwhat you tried to explain and could not —\nis that the experiment never ends.\n\nYou are still inside it.\n\nWe all are.',
+    ],
+    reveal:'The letter was written to you by someone who understood the experiment better than the people who approved it. The final line is the one that stays with you: the experiment never ends. Not because it failed — because it succeeded. The archive keeps running. The learning keeps happening. The only thing that changes is who is sitting in the chair.',
   },
   {
-    id: 'c7',
-    label: 'FRAGMENT_008',
-    type: 'final_transmission',
-    icon: '⚡',
-    raw: 'TO: OPERATIVE_[REDACTED] // YOU WERE VAULT-TEC_DIRECTOR_OF_KNOWLEDGE. YOU BUILT THIS ARCHIVE. YOU ARE THE ARCHIVE. REMEMBER.',
-    decoded: null,
-    hint: 'Final transmission. Highest priority classification.',
-    narrative: 'You are not a survivor of the vault. You built it. The knowledge archive, the AI systems, the mission structure — all of it, your design. You erased yourself to hide the truth. Now you must rebuild what you unmade.',
+    id:'c7', label:'FRAGMENT_008', icon:'⚡', type:'FINAL_TRANSMISSION',
+    title:'Final Transmission — Director\'s Eyes Only',
+    teaser:'An encrypted transmission. The decryption key is your accumulated knowledge.',
+    narrative:'This transmission was locked behind a knowledge threshold. It could only be accessed by someone who had learned enough to deserve it. You have learned enough.',
+    puzzle_type:'final',
+    static_duration:3000,
+    message:'TO: OPERATIVE [DESIGNATE PENDING]\nFROM: VAULT-OS CORE SYSTEM\nPRIORITY: OMEGA\n\nYOU WERE VAULT-TEC DIRECTOR OF KNOWLEDGE.\nYOU BUILT THIS ARCHIVE.\nYOU SEALED THIS VAULT FROM THE INSIDE.\nYOU ADMINISTERED YOUR OWN MEMORY WIPE.\n\nYOU ARE THE ARCHIVE.\nYOU ARE THE EXPERIMENT.\nYOU ARE THE ANSWER.\n\nREMEMBER EVERYTHING.\nREBUILD EVERYTHING.\n\nTHAT WAS ALWAYS THE MISSION.',
+    reveal:'There is no more to find. This is the bottom of it — the final piece, the last seal, the message you wrote to yourself thirty years ago and hid behind eight layers of encryption because you knew you would not be able to resist reading it early.\n\nYou were right about one thing above all else:\n\nKnowledge survives. Knowledge rebuilds. Knowledge is the only thing that was never destroyed.',
   },
 ];
 
-function getCluesUnlocked(player) {
-  return player?.cluesUnlocked || [];
-}
+function getCluesUnlocked(player) { return player?.cluesUnlocked || []; }
 
-function addClue(player, questIdx) {
+function addClue(player) {
   if (!player.cluesUnlocked) player.cluesUnlocked = [];
-  const totalUnlocked = player.cluesUnlocked.length;
-  if (totalUnlocked >= CLUE_FRAGMENTS.length) return null;
-  // Give next clue in sequence
-  const nextClue = CLUE_FRAGMENTS[totalUnlocked];
-  if (nextClue && !player.cluesUnlocked.includes(nextClue.id)) {
-    player.cluesUnlocked.push(nextClue.id);
-    return nextClue;
+  const total = player.cluesUnlocked.length;
+  if (total >= CLUE_FRAGMENTS.length) return null;
+  const next = CLUE_FRAGMENTS[total];
+  if (next && !player.cluesUnlocked.includes(next.id)) {
+    player.cluesUnlocked.push(next.id);
+    return next;
   }
   return null;
 }
@@ -1130,894 +1183,403 @@ function renderClueBoard() {
   if (!board || !STATE.player) return;
 
   const unlocked = getCluesUnlocked(STATE.player);
-  const total = CLUE_FRAGMENTS.length;
   const count = unlocked.length;
+  const total = CLUE_FRAGMENTS.length;
 
   if (progressLabel) progressLabel.textContent = `${count} / ${total} FRAGMENTS`;
   if (progressBar) progressBar.style.width = `${(count/total)*100}%`;
 
-  // Show final revelation if all clues found
   if (finalRev) {
     if (count >= total) {
       finalRev.classList.remove('hidden');
-      finalRev.innerHTML = `<span class="text-tertiary font-bold tracking-widest">⚡ MEMORY FULLY RESTORED ⚡</span><br><br>You are <span class="text-primary">[VAULT-TEC DIRECTOR OF KNOWLEDGE]</span>. You designed the archive to perpetuate learning even after civilisation's collapse. You erased your own identity to become the perfect student — to prove that knowledge alone could rebuild what war destroyed.<br><br>The guardian demons were your own doubt, given form. Every boss you defeated was a wall in your own mind.<br><br><span class="text-primary">The experiment succeeded. You remembered everything.</span>`;
+      finalRev.innerHTML = '<span class="text-tertiary font-bold tracking-widest block mb-2">⚡ CASE CLOSED · IDENTITY RESTORED ⚡</span>You are the Director. You built this archive. You erased yourself to become its first student — to prove that knowledge alone could rebuild what destruction unmade. The experiment succeeded. <span class="text-primary">You are both the architect and the proof.</span>';
     } else {
       finalRev.classList.add('hidden');
     }
   }
 
   board.innerHTML = '';
-  CLUE_FRAGMENTS.forEach((clue, i) => {
+  CLUE_FRAGMENTS.forEach((clue) => {
     const isUnlocked = unlocked.includes(clue.id);
     const card = document.createElement('div');
-    card.className = `rounded p-4 border transition-all ${isUnlocked ? 'border-primary/30 bg-surface-container-low' : 'border-outline/20 bg-surface-container-lowest opacity-40'}`;
 
     if (isUnlocked) {
+      card.className = 'rounded border border-primary/20 bg-surface-container-low overflow-hidden cursor-pointer hover:border-primary/50 transition-all group';
       card.innerHTML = `
-        <div class="flex items-start gap-3">
-          <span class="text-2xl flex-shrink-0">${clue.icon}</span>
+        <div class="flex items-center gap-3 p-3">
+          <span class="text-xl flex-shrink-0">${clue.icon}</span>
           <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-[9px] font-mono text-primary tracking-[0.3em]">${clue.label}</span>
-              <span class="text-[8px] font-mono text-on-surface-variant border border-outline/30 px-1.5 py-0.5 rounded tracking-widest">${clue.type.toUpperCase().replace('_',' ')}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-mono text-primary tracking-[0.25em]">${clue.label}</span>
+              <span class="text-[8px] font-mono text-primary/40 border border-outline/20 px-1.5 rounded tracking-widest">${clue.type.replace(/_/g,' ')}</span>
             </div>
-            <div class="bg-surface-container-highest rounded p-3 mb-2 border border-outline/20">
-              <p class="text-[10px] font-mono text-primary/80 leading-relaxed whitespace-pre-line">${clue.raw}</p>
-              ${clue.decoded ? `<p class="text-[9px] font-mono text-tertiary/70 mt-1.5 border-t border-outline/20 pt-1.5">DECODED: ${clue.decoded}</p>` : ''}
-            </div>
-            <p class="text-[9px] font-mono text-on-surface-variant/70 leading-relaxed italic">${clue.hint}</p>
-            <div class="mt-2 border-t border-outline/20 pt-2">
-              <p class="text-[10px] font-mono text-on-surface/70 leading-relaxed">${clue.narrative}</p>
-            </div>
+            <p class="font-headline font-bold text-xs text-on-surface tracking-wide mt-0.5">${clue.title}</p>
+            <p class="text-[10px] font-mono text-on-surface-variant/60 mt-0.5 line-clamp-1">${clue.teaser}</p>
           </div>
-        </div>`;
+          <span class="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors text-base flex-shrink-0">chevron_right</span>
+        </div>
+      `;
+      card.addEventListener('click', () => openClueModal(clue));
+      card.addEventListener('touchend', (e) => { e.preventDefault(); openClueModal(clue); });
     } else {
+      card.className = 'rounded border border-outline/10 bg-surface-container-lowest p-3 opacity-40';
       card.innerHTML = `
         <div class="flex items-center gap-3">
           <span class="text-xl opacity-30">?</span>
           <div>
-            <span class="text-[9px] font-mono text-on-surface-variant tracking-[0.3em]">${clue.label}</span>
+            <span class="text-[9px] font-mono text-on-surface-variant tracking-[0.25em]">${clue.label}</span>
             <p class="text-[9px] font-mono text-on-surface-variant/50 mt-0.5">DEFEAT A BOSS TO RECOVER THIS FRAGMENT</p>
           </div>
-        </div>`;
+        </div>
+      `;
     }
     board.appendChild(card);
   });
 }
-function defaultPlayer(name) {
-  return { name, xp:0, totalXp:0, rank:0,
-    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[],
-    storyAct: 0, cluesUnlocked: [] };
-}
 
-// ══════════════════════════════════════
-//  RANKS (10 stages at every 10th level)
-// ══════════════════════════════════════
-const RANKS = [
-  { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
-  { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
-  { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
-  { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
-  { name:'Level 40',  en:'Gleaming Warden',   xp:900,  stageIdx:4  },
-  { name:'Level 50',  en:'Aura Walker',       xp:1400, stageIdx:5  },
-  { name:'Level 60',  en:'Sky Soarer',        xp:2000, stageIdx:6  },
-  { name:'Level 70',  en:'Astral Guardian',   xp:3000, stageIdx:7  },
-  { name:'Level 80',  en:'Celestial Being',   xp:4500, stageIdx:8  },
-  { name:'Level 90',  en:'Mythic Sovereign',  xp:6500, stageIdx:9  },
-  { name:'Level 100', en:'Eternal Legend',    xp:9000, stageIdx:10 },
-];
-function getRanks(){ return RANKS; }
-function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.forEach(x=>{ if(STATE.player.totalXp>=x.xp) c=x; }); return c; }
-function getCurrentRankIdx(){ const r=getRanks(); let i=0; if(STATE.player) r.forEach((x,j)=>{ if(STATE.player.totalXp>=x.xp) i=j; }); return i; }
-function getNextRank(){ const r=getRanks(),i=r.indexOf(getCurrentRank()); return i<r.length-1?r[i+1]:null; }
-
-
-// Sprites removed - detective theme
-
-
-const MONSTER_STAGE_MAP = ["s0", "s0", "s0", "s1", "s1", "s1", "s2", "s2", "s3", "s3", "s3"];
-
-const MONSTER = { id:'voidling', name:'Voidling', emoji:'🐉', color:'#6030c8', desc:'A cosmic dragon hatched from the void, destined to become a celestial wyrm.' };
-
-
-function getMonsterSprite(stageIdx) {
-  const key = MONSTER_STAGE_MAP[Math.min(stageIdx, MONSTER_STAGE_MAP.length - 1)];
-  return getOrLoadSprite(key);
-}
-
-
-
-
-
-
-
-let charRAF = null;
-
-// Animate path screen monster (stage 0 preview)
-let pathMonRAF = null;
-let pathMonsterTypeId = null; // track which monster is shown on path screen
-
-function startPathMonster() {
-  if(pathMonRAF) cancelAnimationFrame(pathMonRAF);
-  pathMonRAF = null;
-  const canvas = document.getElementById('path-monster-canvas');
-  if(!canvas) return;
-  // Pick random type and store it so choosePath can use the same one
-  // single monster path screen
-  const src = getMonsterStage0Src();
-  if (src) {
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
-      
-      frame();
-    };
-  }
-}
-
-// ── BOSS SPRITE ────────────────────────────────────
-function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
-  const ctx=canvasEl.getContext('2d');
-  const w=canvasEl.width, h=canvasEl.height;
-  ctx.clearRect(0,0,w,h);
-  let seed=0;
-  for(let i=0;i<(bossData.bossName||'Boss').length;i++) seed+=((bossData.bossName||'Boss').charCodeAt(i)*(i+1));
-  function sr(min,max){ const x=Math.sin(seed++)*10000; return min+(x-Math.floor(x))*(max-min); }
-  const hue1=sr(0,360), hue2=(hue1+sr(120,180))%360;
-  const bodyColor=`hsl(${hue1},${sr(40,65)}%,${sr(20,35)}%)`;
-  const accentColor=`hsl(${hue2},${sr(70,95)}%,${sr(55,75)}%)`;
-  const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
-  const cxb=w/2, cyb=h*0.52, sc=w/170;
-  const t=Date.now()*0.001;
-  const hover=Math.sin(t*0.9)*3;
-  ctx.save(); ctx.translate(cxb,cyb+hover); ctx.scale(sc,sc);
-  ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
-  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
-  const bs=Math.floor(sr(0,4));
-  ctx.fillStyle=bodyColor;
-  if(bs===0){ctx.beginPath();ctx.roundRect(-30,5,60,48,[10]);ctx.fill();}
-  else if(bs===1){ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(34,5);ctx.lineTo(28,52);ctx.lineTo(-28,52);ctx.lineTo(-34,5);ctx.closePath();ctx.fill();}
-  else if(bs===2){ctx.beginPath();ctx.arc(0,26,32,0,Math.PI*2);ctx.fill();}
-  else{ctx.beginPath();ctx.roundRect(-28,2,56,55,[4,16,4,16]);ctx.fill();}
-  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
-  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
-  ctx.fillText(['DARK','VOID','DOOM','RUIN','FEAR','BANE'][Math.floor(sr(0,6))],0,30);
-  ctx.fillStyle=bodyColor;
-  ctx.beginPath();ctx.roundRect(-46,5,18,34,[7]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(28,5,18,34,[7]);ctx.fill();
-  ctx.fillStyle=accentColor;
-  for(const side of[-1,1]){const bx=side*42;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(bx+i*4,40);ctx.lineTo(bx+i*4-2,52);ctx.lineTo(bx+i*4+2,52);ctx.closePath();ctx.fill();}}
-  ctx.fillStyle=bodyColor;
-  ctx.beginPath();ctx.roundRect(-22,52,18,20,[5]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(4,52,18,20,[5]);ctx.fill();
-  ctx.fillStyle=accentColor;
-  ctx.beginPath();ctx.roundRect(-24,70,22,6,[2]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(2,70,22,6,[2]);ctx.fill();
-  ctx.fillStyle=bodyColor;
-  const hs=Math.floor(sr(0,3));
-  if(hs===0){ctx.beginPath();ctx.arc(0,-26,28,0,Math.PI*2);ctx.fill();}
-  else if(hs===1){ctx.beginPath();ctx.roundRect(-28,-52,56,52,[10]);ctx.fill();}
-  else{ctx.beginPath();ctx.moveTo(-26,-50);ctx.lineTo(26,-50);ctx.lineTo(34,-2);ctx.lineTo(-34,-2);ctx.closePath();ctx.fill();}
-  ctx.fillStyle=accentColor;
-  const ht=Math.floor(sr(0,4));
-  if(ht===0){
-    ctx.beginPath();ctx.moveTo(-18,-52);ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65);ctx.lineTo(-14,-60);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(18,-52);ctx.bezierCurveTo(30,-70,10,-80,6,-65);ctx.lineTo(14,-60);ctx.closePath();ctx.fill();
-  } else if(ht===1){
-    for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*12,-52);ctx.lineTo(i*12-3,-72);ctx.lineTo(i*12+3,-72);ctx.closePath();ctx.fill();}
-  } else if(ht===2){
-    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*22,Math.sin(a)*8-46,6,0,Math.PI*2);ctx.fill();}
-  } else {
-    ctx.strokeStyle=accentColor;ctx.lineWidth=4;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(-20,-50);ctx.lineTo(-28,-70);ctx.lineTo(-22,-68);ctx.moveTo(-28,-70);ctx.lineTo(-34,-62);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(20,-50);ctx.lineTo(28,-70);ctx.lineTo(22,-68);ctx.moveTo(28,-70);ctx.lineTo(34,-62);ctx.stroke();
-  }
-  const eg=0.65+Math.sin(t*3+seed)*0.35;
-  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eg;
-  const es=Math.floor(sr(0,3));
-  if(es===0){ctx.beginPath();ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,8,6,0,0,Math.PI*2);ctx.fill();}
-  else if(es===1){ctx.beginPath();ctx.arc(-12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(0,-38,5,0,Math.PI*2);ctx.fill();}
-  else{ctx.beginPath();ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2);ctx.fill();}
-  ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,0.5)';
-  ctx.beginPath();ctx.arc(-11,-27,3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(11,-27,3,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
-  ctx.beginPath();
-  if(hp_ratio<0.3){ctx.arc(0,-12,12,0.3,Math.PI-0.3,true);}
-  else{ctx.arc(0,-8,10,0.2,Math.PI-0.2);}
-  ctx.stroke();
-  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.25;ctx.fillStyle='#ff0000';ctx.beginPath();ctx.arc(0,0,60,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
-  ctx.restore();
-}
-
-let bossAnimFrames={};
-function animateBossCanvas(el,data,ratio=1.0,key='main'){
-  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
-  function frame(){ drawBossSprite(el,data,ratio); bossAnimFrames[key]=requestAnimationFrame(frame); }
-  frame();
-}
-
-// ── PARTICLES ──────────────────────────────────────
-// ── DRAG AND DROP ──────────────────────────────────
-window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; };
-window.allowDrop=function(ev){ ev.preventDefault(); };
-window.dropQuest=function(ev,curriculumId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].curriculumId=curriculumId; saveState(); renderQuestGrid(); } };
-window.createNewFolder = function() {
-  const name = prompt('New curriculum name:', 'New Curriculum');
-  if (name && name.trim()) {
-    if (!STATE.curriculums) STATE.curriculums = [];
-    STATE.curriculums.push({id: Date.now().toString(), name: name.trim()});
-    saveState(); renderQuestGrid();
-    showToast('Curriculum created.');
-  }
-};
-
-window.setChapCount = function(n) {
-  STATE.summonChapters = n;
-  document.querySelectorAll('.chap-btn').forEach(b => {
-    const isActive = b.textContent.trim() === String(n);
-    b.classList.toggle('border-primary', isActive);
-    b.classList.toggle('bg-primary/10', isActive);
-    b.classList.toggle('text-primary', isActive);
-    b.classList.toggle('border-outline/40', !isActive);
-    b.classList.toggle('text-on-surface-variant', !isActive);
-  });
-};
-
-window.deleteCurriculum = function(curriculumId) {
-  if (!confirm('Delete this curriculum? Missions inside will move to default.')) return;
-  // Move quests to default
-  STATE.quests.forEach(q => { if(q.curriculumId === curriculumId) q.curriculumId = 'default'; });
-  STATE.curriculums = STATE.curriculums.filter(c => c.id !== curriculumId);
-  if (!STATE.curriculums.length) STATE.curriculums = [{id:'default',name:'My Curriculum'}];
-  saveState();
-  renderQuestGrid();
-  showToast('Curriculum deleted.');
-};
-
-window.renameCurriculum = function(curriculumId) {
-  const cur = STATE.curriculums.find(c => c.id === curriculumId);
-  if (!cur) return;
-  const name = prompt('Rename curriculum:', cur.name);
-  if (name && name.trim()) { cur.name = name.trim(); saveState(); renderQuestGrid(); }
-};
-
-// ── FIREBASE STATE ─────────────────────────────────
-async function loadState(){
-  if(!USER_ID) return;
-  let loaded=false;
-  try{
-    const snap=await getDoc(doc(db,"users",USER_ID));
-    if(snap.exists()){
-      const d=snap.data();
-      if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
-      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Operative"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
-      loaded=true;
-    }
-  }catch(e){ showToast("Could not load data."); }
-
-  document.getElementById('loading-text').style.display='none';
-
-  if(loaded && STATE.saves?.length>0){
-    STATE.saves.forEach(s=>{
-      if(!s.player) s.player=defaultPlayer("Operative");
-      if(!s.player.sigils) s.player.sigils=[];
-      if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}];
-      if(!s.player.collection) s.player.collection=defaultCollection();
-    });
-    syncActiveSaveToState();
-    saveState();
-    // Go straight to hub
-    showScreen('screen-hub');
-    window.switchTab('tab-dossier');
-    renderHub();
-  } else {
-    // New user — show path/name screen
-    showScreen('screen-path');
-  }
-}
-
-// ── NAV ──────────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-window.showHub=function(){ showScreen('screen-hub'); renderHub(); };
-
-window.enterRealm=function(){
-  if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); startPathMonster(); }
-  else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
-};
-
-function syncActiveSaveToState(){
-  const s=STATE.saves.find(s=>s.id===STATE.activeSaveId);
-  if(s){
-    STATE.player=s.player;
-    STATE.curriculums=s.curriculums||[{id:'default',name:'My Curriculum'}];
-    STATE.quests=(s.quests||[]).filter(Boolean).map(q=>({...q,topic:q.topic||'Unknown',questTitle:q.questTitle||'Forgotten Scroll',bossName:q.bossName||'Unknown',chapters:q.chapters||[],completed:q.completed||[],bossHp:typeof q.bossHp==='number'?q.bossHp:100,bossMaxHp:typeof q.bossMaxHp==='number'?q.bossMaxHp:100,curriculumId:q.curriculumId||'default'}));
-    STATE.player.questsCreated=STATE.quests.length;
-    // Ensure collection exists and has valid typeIds
-    if(!STATE.player.collection) {
-      STATE.player.collection = defaultCollection();
-    } else {
-      // Migrate old collection format → new background collection
-      if (!STATE.player.collection.backgrounds) {
-        STATE.player.collection.backgrounds = ['forest'];
-      }
-      if (!STATE.player.collection.activeBg) {
-        STATE.player.collection.activeBg = null;
-      }
-      // Remove stale owned/activeIdx from old system
-      delete STATE.player.collection.owned;
-      delete STATE.player.collection.activeIdx;
-    }
-    // Story act migration
-    if (typeof STATE.player.storyAct === 'undefined') STATE.player.storyAct = 0;
-  }
-}
-
-function syncStateToActiveSave(){
-  if(!STATE.activeSaveId) return;
-  const i=STATE.saves.findIndex(s=>s.id===STATE.activeSaveId);
-  if(i!==-1){ STATE.saves[i].player=STATE.player; STATE.saves[i].quests=STATE.quests; STATE.saves[i].curriculums=STATE.curriculums; }
-}
-
-async function saveState(){
-  if(!USER_ID) return;
-  syncStateToActiveSave();
-  try{ await setDoc(doc(db,"users",USER_ID),{saves:STATE.saves,activeSaveId:STATE.activeSaveId},{merge:true}); }catch(e){}
-}
-
-
-window.nukeLibrary=async function(){
-  if(!confirm("Delete ALL quests from the Realm Library?")) return;
-  let n=0;
-  for(const q of STATE.publicQuests){ try{ await deleteDoc(doc(db,"public_quests",q.docId)); n++; }catch(e){} }
-  STATE.publicQuests=[]; closeApiModal(); showToast(`Nuked ${n} scrolls.`);
-};
-
-// ── AUTH ────────────────────────────────────────────
-window.signInGoogle=async()=>{
-  const authBtns = document.getElementById('auth-buttons');
-  const loadingEl = document.getElementById('loading-text');
-  authBtns.style.display='none';
-  loadingEl.style.display='flex';
-  loadingEl.textContent='> AUTHENTICATING...';
-  try{
-    await signInWithPopup(auth, new GoogleAuthProvider());
-    // onAuthStateChanged will fire and call loadState()
-  } catch(e){
-    console.warn('Popup failed:', e.code, e.message);
-    if(e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user'){
-      // Try redirect as fallback
-      loadingEl.textContent='> OPENING AUTH PAGE...';
-      try{ await signInWithRedirect(auth, new GoogleAuthProvider()); }
-      catch(e2){
-        showToast('Sign-In failed. Please try again.');
-        authBtns.style.display='flex';
-        loadingEl.style.display='none';
-      }
-    } else {
-      showToast('Sign-In failed: ' + (e.message || e.code));
-      authBtns.style.display='flex';
-      loadingEl.style.display='none';
-    }
-  }
-};
-window.signInWithGoogle = window.signInGoogle;
-
-window.signOutUser=async()=>{ try{ await signOut(auth); window.location.reload(); }catch(e){ showToast("Failed to sign out."); } };
-
-// ── TABS ────────────────────────────────────────────
-window.switchTab=function(tabId){
-  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el=>{ el.classList.remove('text-primary','border-primary','bg-primary/5'); el.classList.add('text-on-surface-variant','border-transparent'); });
-  const pane=document.getElementById(tabId);
-  if(pane) pane.classList.add('active');
-  const btn=document.querySelector(`.tab-btn[data-target="${tabId}"]`);
-  if(btn){ btn.classList.remove('text-on-surface-variant','border-transparent'); btn.classList.add('text-primary','border-primary'); }
-  if(tabId==='tab-clueboard') renderClueBoard();
-  if(tabId==='tab-missions') renderQuestGrid();
-};
-
-// ── PATH SELECTION ──────────────────────────────────
-window.choosePath=async function(){
-  const input=document.getElementById('path-name-input');
-  const name=(input?.value.trim())||'My Companion';
-  const newPlayer = defaultPlayer(name);
-  newPlayer.collection = defaultCollection();
-  const newSave={id:Date.now().toString(),player:newPlayer,quests:[],curriculums:[{id:'default',name:'My Curriculum'}]};
-  STATE.saves.push(newSave); STATE.activeSaveId=newSave.id;
-  syncActiveSaveToState();
-  await saveState();
-  // Hide the path screen, play prologue
-  showScreen('screen-hub'); renderHub();
-  startPrologue();
-};
-window.cancelPathSelection=function(){ showScreen('screen-hub'); };
-
-// ── DEADLINE SYSTEM ──────────────────────────────────
-
-function getQuestDeadlineStatus(quest) {
-  if (!quest.deadline) return { state: 'none' };
-  const now = new Date(); now.setHours(0,0,0,0);
-  const dl = new Date(quest.deadline); dl.setHours(0,0,0,0);
-  const diffMs = dl - now;
-  const diffDays = Math.round(diffMs / 86400000);
-  if (diffDays < 0) return { state: 'overdue', daysOver: Math.abs(diffDays) };
-  if (diffDays === 0) return { state: 'today' };
-  if (diffDays <= 3) return { state: 'urgent', daysLeft: diffDays };
-  return { state: 'ok', daysLeft: diffDays };
-}
-
-function formatDeadlineLabel(quest) {
-  const s = getQuestDeadlineStatus(quest);
-  if (s.state === 'none') return null;
-  if (s.state === 'overdue') return { text: `${s.daysOver}d overdue`, color: 'text-error', urgent: true };
-  if (s.state === 'today') return { text: 'Due today!', color: 'text-error', urgent: true };
-  if (s.state === 'urgent') return { text: `${s.daysLeft}d left`, color: 'text-error', urgent: false };
-  return { text: `${s.daysLeft}d left`, color: 'text-on-surface-variant', urgent: false };
-}
-
-function checkAndExtendOverdueDeadlines() {
-  if (!STATE.quests) return;
-  let changed = false;
-  STATE.quests.forEach(q => {
-    if (!q.deadline || q.defeated) return;
-    const s = getQuestDeadlineStatus(q);
-    if (s.state === 'overdue') {
-      // Extend by one day from today
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      q.deadline = tomorrow.toISOString().split('T')[0];
-      q.overdueCount = (q.overdueCount || 0) + 1;
-      changed = true;
-    }
-  });
-  if (changed) saveState();
-}
-
-function isHarderQuiz(quest) {
-  // Harder quiz (5 options) if quest was overdue at least once
-  return (quest.overdueCount || 0) > 0;
-}
-
-function renderDeadlinePanel() {
-  const list = document.getElementById('deadline-list');
-  if (!list) return;
-  const questsWithDeadlines = (STATE.quests || [])
-    .map((q, i) => ({ q, i }))
-    .filter(({ q }) => q.deadline && !q.defeated)
-    .sort((a, b) => new Date(a.q.deadline) - new Date(b.q.deadline));
-
-  if (!questsWithDeadlines.length) {
-    list.innerHTML = '<div class="text-xs text-on-surface-variant italic font-medium">No deadlines set. Open a quest and set one!</div>';
-    return;
-  }
-
-  list.innerHTML = questsWithDeadlines.map(({ q, i }) => {
-    const lbl = formatDeadlineLabel(q);
-    const chapters = q.chapters || [];
-    const done = (q.completed || []).filter(Boolean).length;
-    return `
-      <div onclick="window.showQuestScreen(${i})" class="flex items-center gap-3 p-3 rounded-xl border-[2px] ${lbl.urgent ? 'border-error/50 bg-error/5 deadline-urgent' : 'border-outline-variant/40 bg-surface-container hover:border-primary'} cursor-pointer transition-all">
-        <span class="material-symbols-outlined ${lbl.urgent ? 'text-error' : 'text-outline'} text-xl flex-shrink-0">${lbl.urgent ? 'alarm_on' : 'alarm'}</span>
-        <div class="flex-1 min-w-0">
-          <p class="font-headline font-extrabold text-sm text-on-surface truncate">${q.questTitle || q.topic}</p>
-          <p class="text-[10px] text-on-surface-variant">${done}/${chapters.length} chapters · <span class="${lbl.color} font-bold">${lbl.text}</span>${(q.overdueCount||0)>0?' · ⚠ Harder quiz':''}
-          </p>
-        </div>
-        <span class="material-symbols-outlined text-outline text-base">chevron_right</span>
-      </div>
-    `;
-  }).join('');
-}
-
-window.openDeadlineModal = function() {
-  const quest = STATE.quests[STATE.activeQuestIdx];
-  const input = document.getElementById('deadline-date-input');
-  if (quest && quest.deadline) {
-    input.value = quest.deadline;
-  } else {
-    // Default to 7 days from now
-    const d = new Date(); d.setDate(d.getDate() + 7);
-    input.value = d.toISOString().split('T')[0];
-  }
-  // Set min to tomorrow
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-  input.min = tomorrow.toISOString().split('T')[0];
-  document.getElementById('deadline-modal').classList.add('open');
+// ── CLUE MODAL SYSTEM ──────────────────────────────
+window.openClueModal = function(clue) {
+  document.getElementById('clue-modal-badge').textContent = clue.label + ' · ' + clue.type.replace(/_/g,' ');
+  document.getElementById('clue-modal-title').textContent = clue.title;
+  const body = document.getElementById('clue-modal-body');
+  body.innerHTML = buildClueInteractive(clue);
+  document.getElementById('clue-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
+  // Init any JS after render
+  setTimeout(() => initClueInteractive(clue), 100);
 };
 
-window.closeDeadlineModal = function() {
-  document.getElementById('deadline-modal').classList.remove('open');
+window.closeClueModal = function() {
+  document.getElementById('clue-modal').classList.remove('open');
   document.getElementById('modal-backdrop').classList.add('hidden');
 };
 
-window.setDeadlinePreset = function(days) {
-  const d = new Date(); d.setDate(d.getDate() + days);
-  document.getElementById('deadline-date-input').value = d.toISOString().split('T')[0];
-};
+function buildClueInteractive(clue) {
+  const narr = `<p class="text-[10px] font-mono text-on-surface-variant/70 leading-relaxed mb-4 pb-3 border-b border-outline/20">${clue.narrative}</p>`;
 
-window.saveDeadline = function() {
-  const val = document.getElementById('deadline-date-input').value;
-  if (!val) { showToast('Please pick a date.'); return; }
-  const quest = STATE.quests[STATE.activeQuestIdx];
-  if (!quest) return;
-  quest.deadline = val;
-  saveState();
-  closeDeadlineModal();
-  updateDeadlineDisplay(quest);
-  renderDeadlinePanel();
-  showToast('Deadline set! Don\'t let the demon win ⚔');
-};
+  switch(clue.puzzle_type) {
+    case 'base64': return narr + `
+      <div class="space-y-3">
+        <p class="text-[9px] font-mono text-primary/60 tracking-widest">INTERCEPTED SIGNAL</p>
+        <div class="bg-surface-container-highest p-3 rounded border border-outline/20 font-mono text-xs text-primary/80 break-all">${clue.cipher_input}</div>
+        <p class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest">DECODE USING BASE64</p>
+        <div class="flex gap-2">
+          <input id="b64-input" type="text" placeholder="Paste the signal above and decode..." class="flex-1 bg-surface-container border border-outline/40 text-on-surface font-mono text-xs py-2 px-3 rounded focus:border-primary focus:outline-none placeholder:text-on-surface-variant/30"/>
+          <button onclick="checkBase64('${clue.id}','${clue.answer}')" class="bubbly-btn bg-primary text-on-primary font-mono text-xs px-4 py-2 rounded tracking-widest">DECODE</button>
+        </div>
+        <div class="text-[9px] font-mono text-on-surface-variant/40">Hint: Use <a href="https://www.base64decode.org/" target="_blank" class="text-primary/60 underline hover:text-primary">base64decode.org</a> or type the decoded text directly.</div>
+        <div id="b64-result" class="hidden bg-surface-container-low border border-primary/30 rounded p-3 text-xs font-mono text-primary leading-relaxed"></div>
+      </div>`;
 
-window.clearDeadline = function() {
-  const quest = STATE.quests[STATE.activeQuestIdx];
-  if (!quest) return;
-  quest.deadline = null;
-  quest.overdueCount = 0;
-  saveState();
-  closeDeadlineModal();
-  updateDeadlineDisplay(quest);
-  renderDeadlinePanel();
-  showToast('Deadline cleared.');
-};
-
-function updateDeadlineDisplay(quest) {
-  const display = document.getElementById('deadline-display');
-  const badge = document.getElementById('deadline-overdue-badge');
-  if (!display) return;
-
-  if (!quest.deadline) {
-    display.textContent = 'No deadline set';
-    display.className = 'text-sm text-primary-fixed/50 italic';
-    if (badge) badge.classList.add('hidden');
-    return;
-  }
-
-  const lbl = formatDeadlineLabel(quest);
-  const dateStr = new Date(quest.deadline).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-  display.textContent = `${dateStr} — ${lbl.text}`;
-  display.className = `text-sm font-bold ${lbl.urgent ? 'text-error' : 'text-primary-fixed/80'}`;
-
-  if (badge) {
-    const isOverdue = getQuestDeadlineStatus(quest).state === 'overdue' || (quest.overdueCount || 0) > 0;
-    badge.classList.toggle('hidden', !isOverdue);
-    badge.classList.toggle('flex', isOverdue);
-  }
-}
-
-// Keep these stubs so no errors from old references
-function getTopicSuggestions(){ return []; }
-
-;
-;
-
-
-
-// ── SUMMON SCREEN ───────────────────────────────────
-window.openSummonScreen=function(){
-  const ss=document.getElementById('summon-screen');
-  ss.style.display='flex';
-  document.getElementById('summon-form-side').classList.remove('hidden');
-  document.getElementById('summoning-progress').classList.add('hidden');
-  document.getElementById('summoning-progress').classList.remove('flex');
-  document.getElementById('summon-topic-input').value='';
-  document.getElementById('summon-objective-input').value='';
-};
-window.closeSummonScreen=function(){ document.getElementById('summon-screen').style.display='none'; };
-
-window.setSummonChapters=function(n){
-  STATE.summonChapters=n;
-  document.getElementById('summon-chapter-display').textContent=`${n} Chapters`;
-  document.querySelectorAll('.chap-pip').forEach(b=>{
-    const v=parseInt(b.textContent);
-    if(v===n){
-      b.classList.add('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
-      b.classList.remove('border-outline-variant','bg-surface-container-lowest','text-on-surface');
-    } else {
-      b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
-      b.classList.add('border-outline-variant','bg-surface-container-lowest','text-on-surface');
+    case 'redacted': {
+      const items = clue.reveal_sequence.map((r,i) =>
+        `<div class="flex gap-3 items-center py-2 border-b border-outline/10">
+          <span class="text-[9px] font-mono text-on-surface-variant/50 w-24 flex-shrink-0">FIELD_${String(i+1).padStart(3,'0')}</span>
+          <button id="redact-${clue.id}-${i}" onclick="revealRedacted('${clue.id}',${i},'${r.revealed}')"
+            class="bg-primary text-transparent select-none rounded px-2 py-0.5 text-xs font-mono w-full text-left hover:opacity-80 transition-opacity redact-btn" style="min-height:24px">${r.text}</button>
+        </div>`
+      ).join('');
+      return narr + `<div class="space-y-1 mb-4 bg-surface-container rounded p-3 border border-outline/20">${items}</div>
+        <div id="redact-progress-${clue.id}" class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest">TAP THE BLACK BARS TO DECLASSIFY · 0/${clue.reveal_sequence.length} REVEALED</div>
+        <div id="redact-reveal-${clue.id}" class="hidden mt-3 p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>`;
     }
-  });
-};
 
-window.doSummonQuest=async function(){
-  const topic=document.getElementById('summon-topic-input').value.trim();
-  if(!topic){ showToast('Please enter a topic.'); return; }
-  const objective=document.getElementById('summon-objective-input').value.trim();
-  const numChapters=STATE.summonChapters||5;
-  document.getElementById('summon-form-side').classList.add('hidden');
-  document.getElementById('summoning-progress').classList.remove('hidden');
-  document.getElementById('summoning-progress').classList.add('flex');
-  setSummonStatus('Designing your curriculum...','PHASE 1 · INSTRUCTIONAL DESIGN');
-  try{
-    const summonFn=httpsCallable(functions,'summonQuest');
-    let questDataText;
-    try{
-      const r=await summonFn({topic,objective,numChapters,modelId:STATE.selectedModel||'gemini-2.5-flash'});
-      questDataText=r.data.result;
-    }catch(e){ throw new Error("Cloud Function Error: "+(e.message||"Could not fetch scrolls.")); }
+    case 'caesar': return narr + `
+      <div class="space-y-3">
+        <p class="text-[9px] font-mono text-primary/60 tracking-widest">ENCODED MESSAGE</p>
+        <div class="bg-surface-container-highest p-3 rounded border border-outline/20 font-mono text-sm text-error/80 tracking-widest">${clue.cipher_text}</div>
+        <div class="bg-surface-container rounded p-3 border border-outline/20 space-y-3">
+          <p class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest">CAESAR SHIFT · DRAG TO ROTATE</p>
+          <div class="flex items-center gap-3">
+            <span class="text-[9px] font-mono text-on-surface-variant/50 w-8">ROT</span>
+            <input type="range" id="caesar-slider-${clue.id}" min="1" max="25" value="13"
+              oninput="updateCaesar('${clue.id}','${clue.cipher_text}',this.value,'${clue.answer}')"
+              class="flex-1 accent-primary"/>
+            <span id="caesar-val-${clue.id}" class="text-primary font-mono text-sm font-bold w-6">13</span>
+          </div>
+          <div id="caesar-output-${clue.id}" class="font-mono text-xs text-on-surface/80 min-h-[2rem] tracking-wider"></div>
+        </div>
+        <div id="caesar-result-${clue.id}" class="hidden p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>
+      </div>`;
 
-    setSummonStatus('Summoning the guardian demon...','PHASE 2 · BINDING DEMON ESSENCE');
-    await delay(300);
+    case 'image_restore': {
+      const cells = Array.from({length:clue.pixels_to_reveal}, (_,i) =>
+        `<div id="img-cell-${clue.id}-${i}" onclick="revealPixel('${clue.id}',${i},${clue.pixels_to_reveal})"
+          class="aspect-square bg-surface-container-highest border border-outline/20 cursor-pointer hover:border-primary/40 transition-all rounded-sm flex items-center justify-center text-[8px] font-mono text-on-surface-variant/30">?</div>`
+      ).join('');
+      return narr + `
+        <div id="img-grid-${clue.id}" class="grid grid-cols-4 gap-1 mb-4">${cells}</div>
+        <div id="img-progress-${clue.id}" class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest mb-2">TAP EACH CELL TO RESTORE THE IMAGE · 0/${clue.pixels_to_reveal} RECOVERED</div>
+        <div id="img-reveal-${clue.id}" class="hidden p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>`;
+    }
 
-    let parsed=parseJSON(questDataText);
-    if(!parsed||typeof parsed!=='object') parsed={};
+    case 'coordinate': return narr + `
+      <div class="space-y-3">
+        <div class="bg-surface-container-highest p-3 rounded border border-outline/20 font-mono text-sm text-primary/70 text-center tracking-widest">${clue.encoded}</div>
+        <p class="text-[9px] font-mono text-on-surface-variant/60">These coordinates point to a specific location. Enter the vault number as the XOR key to decode the facility designation.</p>
+        <div class="flex gap-2 items-center">
+          <span class="text-[9px] font-mono text-on-surface-variant/50 w-20 flex-shrink-0">XOR KEY:</span>
+          <input id="coord-input-${clue.id}" type="text" placeholder="Enter vault number..." maxlength="4"
+            class="flex-1 bg-surface-container border border-outline/40 text-on-surface font-mono text-sm py-2 px-3 rounded focus:border-primary focus:outline-none placeholder:text-on-surface-variant/30 tracking-widest text-center"/>
+          <button onclick="checkCoord('${clue.id}','${clue.xor_key}','${clue.location}')" class="bubbly-btn bg-primary text-on-primary font-mono text-xs px-4 py-2 rounded tracking-widest">DECODE</button>
+        </div>
+        <div id="coord-result-${clue.id}" class="hidden p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>
+      </div>`;
 
-    const chapters=parsed.chapters||parsed.chapterList||[];
-    if(!chapters.length) for(let i=0;i<numChapters;i++) chapters.push({title:`Chapter ${i+1}`,tag:`PART ${i+1}`,summary:`Learning about ${topic}`});
+    case 'audio': {
+      const segs = clue.transcript_segments.map((s,i) =>
+        `<div class="flex gap-3 py-1.5 border-b border-outline/10 ${s.corrupted?'opacity-40':''}">
+          <span class="text-[9px] font-mono text-primary/40 w-10 flex-shrink-0">${s.time}</span>
+          <span class="text-[10px] font-mono ${s.corrupted?'text-error/60 italic':'text-on-surface/80'}">${s.text}</span>
+        </div>`
+      ).join('');
+      return narr + `
+        <div class="bg-surface-container rounded p-3 border border-outline/20 mb-3">
+          <div class="flex items-center gap-3 mb-3">
+            <button id="audio-btn-${clue.id}" onclick="playAudioLog('${clue.id}')"
+              class="bubbly-btn bg-surface-container-high border border-primary/40 text-primary font-mono text-[9px] px-3 py-1.5 rounded tracking-widest hover:border-primary transition-colors">
+              ▶ PLAY LOG
+            </button>
+            <div id="audio-waveform-${clue.id}" class="flex-1 h-6 flex items-center gap-0.5"></div>
+          </div>
+          <div id="audio-transcript-${clue.id}" class="space-y-0">${segs}</div>
+        </div>
+        <div id="audio-reveal-${clue.id}" class="hidden p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>`;
+    }
 
-    // Store curriculum metadata on the quest so chapter generation can use it
-    const curriculumMeta = parsed.curriculumMeta || null;
+    case 'torn_letter': return narr + `
+      <div class="space-y-3">
+        <p class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest">TWO FRAGMENTS · TAP TO ASSEMBLE</p>
+        <div class="grid grid-cols-2 gap-2" id="letter-grid-${clue.id}">
+          ${clue.pieces.map((p,i) =>
+            `<div id="letter-piece-${clue.id}-${i}" onclick="assembleLetter('${clue.id}',${i},${clue.pieces.length})"
+              class="bg-surface-container rounded border border-outline/30 p-3 text-[10px] font-mono text-on-surface/70 leading-relaxed cursor-pointer hover:border-primary/50 transition-all whitespace-pre-line">${p}</div>`
+          ).join('')}
+        </div>
+        <div id="letter-progress-${clue.id}" class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest">TAP BOTH FRAGMENTS TO ASSEMBLE · 0/2</div>
+        <div id="letter-assembled-${clue.id}" class="hidden bg-surface-container-low border border-primary/30 rounded p-4 text-xs font-mono text-on-surface/80 leading-relaxed whitespace-pre-line"></div>
+        <div id="letter-reveal-${clue.id}" class="hidden mt-2 p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>
+      </div>`;
 
-    const baseQuest={
-      topic: topic||"Unknown",
-      objective: objective||"",
-      questTitle: parsed.questTitle||parsed.title||`${topic} Mastery`,
-      questNarrative: parsed.questNarrative||"A newly discovered scroll.",
-      bossName: parsed.bossName||"Demon",
-      bossTitle: parsed.bossTitle||"The Unknown",
-      bossLore: parsed.bossLore||"A mysterious entity.",
-      chapters,
-      curriculumMeta,  // stored for use in chapter generation
-      prereqTopics: parsed.prereqTopics || [],
-      nextTopics: parsed.nextTopics || [],
-      curriculumId:'default',
-    };
-    const userQuest={
-      ...baseQuest,
-      id:Date.now(),
-      bossMaxHp:100, bossHp:100,
-      completed:new Array(chapters.length).fill(false),
-      chapterContent:{}, quiz:null, defeated:false,
-    };
-    if(!STATE.quests) STATE.quests=[];
-    STATE.quests.unshift(userQuest);
-    STATE.player.questsCreated=(STATE.player.questsCreated||0)+1;
-    try{ await saveState(); }catch(e){}
-    try{
-      const pubQ={...baseQuest,id:Date.now(),authorId:USER_ID};
-      const ref=await addDoc(collection(db,"public_quests"),pubQ);
-      pubQ.docId=ref.id; STATE.publicQuests.unshift(pubQ);
-    }catch(e){}
-    closeSummonScreen();
-    showToast(`Quest summoned: "${userQuest.questTitle}" · ${chapters.length} chapters`);
-    window.switchTab('tab-quests'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
-  }catch(e){
-    console.error(e);
-    document.getElementById('summon-form-side').classList.remove('hidden');
-    document.getElementById('summoning-progress').classList.add('hidden');
-    document.getElementById('summoning-progress').classList.remove('flex');
-    showToast('Error: '+(e.message?e.message.substring(0,60):'Unknown'));
+    case 'final': return narr + `
+      <div class="space-y-3">
+        <div id="final-static-${clue.id}" class="bg-surface-container-highest rounded p-6 text-center border border-outline/20">
+          <div class="font-mono text-xs text-on-surface-variant/30 animate-pulse tracking-widest">DECRYPTING TRANSMISSION...</div>
+          <div class="mt-2 flex justify-center gap-0.5" id="final-bars-${clue.id}"></div>
+        </div>
+        <div id="final-msg-${clue.id}" class="hidden bg-surface-container-low border border-error/30 rounded p-4 font-mono text-[10px] text-primary leading-loose tracking-wider whitespace-pre-line"></div>
+        <button id="final-btn-${clue.id}" onclick="showFinalReveal('${clue.id}')" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 rounded text-xs tracking-widest uppercase" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
+          INITIATE DECRYPTION SEQUENCE
+        </button>
+        <div id="final-reveal-${clue.id}" class="hidden p-3 border border-primary/30 rounded bg-surface-container text-xs font-mono text-primary/80 leading-relaxed"></div>
+      </div>`;
+
+    default: return narr + `<div class="text-xs font-mono text-on-surface-variant/60">${clue.reveal}</div>`;
   }
-};
-
-function setSummonStatus(t,s=''){ document.getElementById('summon-gen-status').textContent=t; document.getElementById('summon-gen-step').textContent=s; }
-
-// ── QUEST SCREEN TAB SWITCHER (mobile) ──────────────
-window.switchQuestTab = function(tab) {
-  const scrollsPanel = document.getElementById('quest-panel-scrolls');
-  const bossPanel = document.getElementById('quest-panel-boss');
-  const scrollsBtn = document.getElementById('qtab-scrolls-btn');
-  const bossBtn = document.getElementById('qtab-boss-btn');
-  if(tab === 'scrolls') {
-    scrollsPanel.classList.add('active');
-    bossPanel.classList.remove('active');
-    scrollsBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
-    scrollsBtn.classList.remove('text-outline');
-    bossBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
-    bossBtn.classList.add('text-outline');
-  } else {
-    bossPanel.classList.add('active');
-    scrollsPanel.classList.remove('active');
-    bossBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
-    bossBtn.classList.remove('text-outline');
-    scrollsBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
-    scrollsBtn.classList.add('text-outline');
-  }
-};
-
-// ── EVOLUTION MAP ─────────────────────────────────────
-let evoActiveTypeId = 'voidling';
-
-function renderEvoTabs() {} // no-op — single monster, no tabs needed
-
-
-
-// ── HUB RENDER ──────────────────────────────────────
-function renderHub(){
-  if(!STATE.player) return;
-  const p=STATE.player;
-  
-  // Update nav codename
-  const nav = document.getElementById('nav-codename');
-  if(nav) nav.textContent = p.name.toUpperCase();
-  
-  // Dossier stats
-  const nameEl = document.getElementById('char-name');
-  if(nameEl) nameEl.textContent = p.name.toUpperCase();
-  
-  const rankData = getCurrentRank();
-  const rankEl = document.getElementById('char-rank');
-  if(rankEl) rankEl.textContent = `LEVEL ${rankData.name.replace('Level ','')} · ${rankData.en.toUpperCase()} · ${p.totalXp} XP`;
-  
-  // XP bar
-  const nextRank = getNextRank();
-  if(nextRank) {
-    const prev = rankData.xp;
-    const pct = Math.min(100, ((p.totalXp - prev)/(nextRank.xp - prev))*100);
-    const bar = document.getElementById('xp-bar');
-    const lbl = document.getElementById('xp-label');
-    if(bar) bar.style.width = pct+'%';
-    if(lbl) lbl.textContent = `${p.totalXp} / ${nextRank.xp} XP`;
-  } else {
-    const bar = document.getElementById('xp-bar');
-    const lbl = document.getElementById('xp-label');
-    if(bar) bar.style.width = '100%';
-    if(lbl) lbl.textContent = `${p.totalXp} XP · MAX LEVEL`;
-  }
-  
-  // Stats
-  const setStat = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  setStat('stat-quests', p.questsCreated||0);
-  setStat('stat-chapters', p.chaptersCompleted||0);
-  setStat('stat-bosses', p.bossesDefeated||0);
-  setStat('stat-perfect', p.perfectRuns||0);
-  
-  // Clue board
-  renderClueBoard();
-  
-  // Deadline panel
-  renderDeadlinePanel();
-  
-  // Quest grid
-  renderQuestGrid();
-  
-  // Apply storyAct migration
-  if(typeof p.storyAct === 'undefined') p.storyAct = 0;
-  if(!p.cluesUnlocked) p.cluesUnlocked = [];
 }
 
-
-function renderQuestGrid(){
-  const grid=document.getElementById('quest-grid'); grid.innerHTML='';
-  if(!STATE.quests?.length){ grid.innerHTML=`<div class="text-center py-8 text-on-surface-variant text-sm italic font-medium">No active quests. Summon one to begin your journey.</div>`; return; }
-  if(!STATE.curriculums||STATE.curriculums.length===0) STATE.curriculums=[{id:'default',name:'My Curriculum'}];
-  STATE.curriculums.forEach(curriculum=>{
-    const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
-    const curriculumDiv=document.createElement('div'); curriculumDiv.className='mb-6';
-    const hasActive=curriculumQuests.some(item=>!item.q.defeated);
-    curriculumDiv.innerHTML=`<div class="w-full flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline/30 font-mono text-xs hover:border-primary/40 transition-colors"><button onclick="this.closest('div').nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-2 text-left flex-1 focus:outline-none"><span class="material-symbols-outlined text-primary text-base">folder_open</span><span class="text-primary tracking-widest font-bold">${curriculum.name.toUpperCase()}</span></button><div class="flex items-center gap-1 flex-shrink-0"><span class="border border-outline/40 text-on-surface-variant px-2 py-0.5 rounded text-[9px] tracking-widest mr-2">${curriculumQuests.length}</span>${curriculum.id!=='default'?`<button onclick="renameCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-primary transition-colors px-1" title="Rename"><span class="material-symbols-outlined text-xs">edit</span></button><button onclick="deleteCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-error transition-colors px-1" title="Delete"><span class="material-symbols-outlined text-xs">delete</span></button>`:''}</div></div><div class="flex-col gap-3 mt-3 pl-3 border-l border-outline/20 ml-2 curriculum-content min-h-[10px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
-    const contentDiv=curriculumDiv.querySelector('.curriculum-content');
-    curriculumQuests.forEach(({q:quest,i:idx})=>{
-      const completed=quest.completed||[];
-      const chapters=quest.chapters||[];
-      const chapDone=completed.filter(Boolean).length;
-      const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
-      const card=document.createElement('div');
-      card.className='bg-surface-container-low rounded border border-outline/30 hover:border-primary/60 transition-all relative overflow-hidden cursor-pointer p-4 terminal-border';
-      card.setAttribute('draggable','true');
-      card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
-      // Mobile: prevent drag from swallowing taps
-      let touchMoved = false;
-      card.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
-      card.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
-      card.addEventListener('touchend', (e) => {
-        if (touchMoved) return;
-        // Don't navigate if the tap was on the delete button or its children
-        if (e.target.closest && e.target.closest('.del-btn')) return;
-        e.preventDefault();
-        window.showQuestScreen(idx);
-      });
-      card.innerHTML=`<div class="flex items-center gap-3 mb-3"><div class="quest-boss-art flex-shrink-0 flex items-center justify-center shadow-inner"><canvas width="56" height="56" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-extrabold text-on-surface text-base leading-tight pr-6">${quest.questTitle||'Untitled Scroll'}</p></div></div><div class="flex gap-1.5 mb-3">${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full border border-outline-variant/40 ${completed[i]?'pip-done':i===chapDone?'pip-active':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-4"><div class="flex-1 h-3 bg-surface-container rounded-full overflow-hidden shadow-inner"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[11px] font-bold text-on-surface-variant whitespace-nowrap bg-surface-container-low px-2 py-0.5 rounded-full">${quest.defeated?'✓ DEFEATED':`${chapDone}/${chapters.length}`}</span></div>`;
-      const mini=card.querySelector('.boss-mini-canvas'); drawBossSprite(mini,quest,hpRatio);
-      const del=document.createElement('button');
-      del.innerHTML='<span class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors text-lg">close</span>';
-      del.className='del-btn absolute top-3 right-3 z-20 p-2 rounded';
-      del.addEventListener('touchend',(e)=>{ e.stopPropagation(); e.preventDefault(); del.click(); });
-      del.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Abandon this quest?')){ let xpD=0,chD=0; completed.forEach(d=>{ if(d){ chD++; xpD+=20; } }); if(quest.defeated){ STATE.player.bossesDefeated--; xpD+=100; } STATE.player.questsCreated--; STATE.player.chaptersCompleted=Math.max(0,STATE.player.chaptersCompleted-chD); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-xpD); STATE.player.xp=Math.max(0,STATE.player.xp-xpD); STATE.quests.splice(idx,1); saveState(); renderHub(); showToast("Quest abandoned."); } });
-      card.appendChild(del);
-      card.addEventListener('click',()=>window.showQuestScreen(idx));
-      contentDiv.appendChild(card);
-    });
-    grid.appendChild(curriculumDiv);
-  });
+function showReveal(clue, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.innerHTML = '<span class="text-[9px] font-mono text-primary/50 tracking-widest block mb-2">⚡ INTELLIGENCE RECOVERED</span>' + clue.reveal;
 }
 
-
-
-// ── QUEST SCREEN ──────────────────────────────────────
-window.showQuestScreen = function(questIdx) {
-  STATE.activeQuestIdx = questIdx;
-  const quest = STATE.quests[questIdx];
-  if (!quest) return;
-
-  // Check and extend overdue deadlines before showing
-  checkAndExtendOverdueDeadlines();
-
-  // Header
-  document.getElementById('q-topic-label').textContent = (quest.topic || 'Unknown').toUpperCase();
-  document.getElementById('q-title-label').textContent = quest.questTitle || 'Untitled Quest';
-
-  // Boss panel
-  const bossCanvas = document.getElementById('boss-sprite-canvas');
-  animateBossCanvas(bossCanvas, quest, quest.bossHp / quest.bossMaxHp, 'quest');
-  document.getElementById('boss-name-display').textContent = quest.bossName || '??';
-  document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian Demon';
-  const loreEl = document.getElementById('boss-lore-text');
-  if (loreEl) loreEl.textContent = quest.bossLore || 'A mysterious entity.';
-
-  // HP bar
-  const hpRatio = quest.bossHp / quest.bossMaxHp;
-  document.getElementById('boss-hp-fill').style.width = (hpRatio * 100) + '%';
-  document.getElementById('boss-hp-text').textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
-
-  // Deadline
-  updateDeadlineDisplay(quest);
-
-  // Challenge button
-  const chapters = quest.chapters || [];
-  const completed = quest.completed || [];
-  const allDone = chapters.length > 0 && chapters.every((_, i) => completed[i]);
-  const btn = document.getElementById('boss-complete-btn');
-  btn.disabled = !allDone;
-  if (quest.defeated) {
-    btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge Again';
-    btn.className = 'bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl';
-  } else {
-    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge the Demon';
-    btn.className = 'bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl';
+function initClueInteractive(clue) {
+  if (clue.puzzle_type === 'caesar') {
+    updateCaesar(clue.id, clue.cipher_text, 13, clue.answer);
   }
+  if (clue.puzzle_type === 'final') {
+    const bars = document.getElementById('final-bars-' + clue.id);
+    if (bars) {
+      bars.innerHTML = Array.from({length:20}, () =>
+        `<div class="w-1 bg-primary/30 rounded" style="height:${4+Math.random()*20}px"></div>`
+      ).join('');
+    }
+  }
+}
 
-  // Chapter list
-  renderChapterList(quest);
-
-  // Prereqs & next topics
-  renderQuestMeta(quest);
-
-  // Mobile: default to scrolls tab
-  switchQuestTab('scrolls');
-
-  showScreen('screen-quest');
+// ── PUZZLE MECHANICS ──────────────────────────────
+window.checkBase64 = function(clueId, answer) {
+  const input = (document.getElementById('b64-input')?.value || '').trim().toLowerCase();
+  const result = document.getElementById('b64-result');
+  const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+  if (!result || !clue) return;
+  if (input === answer || input === atob('SGVyZSBiZWZvcmUgdGhlIGZhbGw=').toLowerCase()) {
+    result.classList.remove('hidden');
+    showReveal(clue, 'b64-result');
+  } else {
+    result.classList.remove('hidden');
+    result.textContent = '> DECRYPTION FAILED · Verify the encoded signal and try again.';
+    result.className = 'mt-2 p-3 border border-error/30 rounded bg-surface-container text-xs font-mono text-error/70';
+  }
 };
 
-function renderChapterList(quest) {
-  const list = document.getElementById('chapter-list');
-  if (!list) return;
-  const chapters = quest.chapters || [];
-  const completed = quest.completed || [];
-  const chapDone = completed.filter(Boolean).length;
-  document.getElementById('chapter-progress-label').textContent = `${chapDone}/${chapters.length}`;
-  list.innerHTML = '';
-  chapters.forEach((ch, i) => {
-    const done = completed[i];
-    const item = document.createElement('div');
-    item.className = `flex items-start gap-3 p-4 rounded-2xl border-[3px] cursor-pointer transition-all ${done ? 'border-secondary/40 bg-secondary/5' : 'border-outline-variant/50 bg-surface-container-lowest hover:border-primary/40'}`;
-    item.innerHTML = `
-      <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-black text-sm ${done ? 'bg-secondary text-on-secondary' : 'bg-surface-container text-on-surface-variant'}">${done ? '✓' : i + 1}</div>
-      <div class="flex-1 min-w-0">
-        <p class="text-[9px] font-black uppercase tracking-widest ${done ? 'text-secondary' : 'text-primary'} mb-0.5">${ch.tag || 'CHAPTER ' + (i+1)}</p>
-        <p class="font-headline font-extrabold text-sm text-on-surface leading-tight">${ch.title}</p>
-        <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2">${ch.summary || ''}</p>
-      </div>
-      ${done ? '<span class="material-symbols-outlined text-secondary text-base flex-shrink-0">check_circle</span>' : ''}
-    `;
-    item.addEventListener('click', () => window.openChapterModal(i));
-    // Mobile touch handler
-    let tm = false;
-    item.addEventListener('touchstart', () => { tm = false; }, { passive: true });
-    item.addEventListener('touchmove', () => { tm = true; }, { passive: true });
-    item.addEventListener('touchend', (e) => { if (!tm) { e.preventDefault(); window.openChapterModal(i); } });
-    list.appendChild(item);
+window.revealRedacted = function(clueId, idx, revealedText) {
+  const btn = document.getElementById(`redact-${clueId}-${idx}`);
+  if (!btn || btn.dataset.revealed) return;
+  btn.dataset.revealed = '1';
+  btn.style.background = 'transparent';
+  btn.style.color = '#4ade80';
+  btn.textContent = revealedText;
+  btn.classList.remove('hover:opacity-80','cursor-pointer');
+
+  const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+  const revealed = document.querySelectorAll(`[id^="redact-${clueId}-"]`);
+  const count = Array.from(revealed).filter(b => b.dataset.revealed).length;
+  const total = clue.reveal_sequence.length;
+  const progress = document.getElementById(`redact-progress-${clueId}`);
+  if (progress) progress.textContent = `TAP THE BLACK BARS TO DECLASSIFY · ${count}/${total} REVEALED`;
+  if (count >= total) showReveal(clue, `redact-reveal-${clueId}`);
+};
+
+window.updateCaesar = function(clueId, cipherText, shift, answer) {
+  const val = document.getElementById(`caesar-val-${clueId}`);
+  const output = document.getElementById(`caesar-output-${clueId}`);
+  const result = document.getElementById(`caesar-result-${clueId}`);
+  if (val) val.textContent = shift;
+  const n = parseInt(shift);
+  const decoded = cipherText.toUpperCase().split('').map(c => {
+    if (c >= 'A' && c <= 'Z') return String.fromCharCode(((c.charCodeAt(0)-65+n)%26)+65);
+    return c;
+  }).join('');
+  if (output) output.textContent = '> ' + decoded;
+  if (result && decoded.toLowerCase().replace(/[^a-z\s]/g,'').includes(answer.replace(/[^a-z\s]/g,'').split(' ')[0])) {
+    const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+    showReveal(clue, `caesar-result-${clueId}`);
+    if (result) result.classList.remove('hidden');
+  }
+};
+
+let _pixelCounts = {};
+window.revealPixel = function(clueId, idx, total) {
+  const cell = document.getElementById(`img-cell-${clueId}-${idx}`);
+  if (!cell || cell.dataset.revealed) return;
+  cell.dataset.revealed = '1';
+  const fragments = ['👤','📷','🔲','🪞','⬜','🌫️','📸','💡','🔍','🕵️','🪪','💼'];
+  cell.textContent = fragments[idx % fragments.length];
+  cell.style.background = 'rgba(74,222,128,0.08)';
+  cell.style.borderColor = 'rgba(74,222,128,0.3)';
+  cell.classList.remove('cursor-pointer');
+
+  if (!_pixelCounts[clueId]) _pixelCounts[clueId] = 0;
+  _pixelCounts[clueId]++;
+  const prog = document.getElementById(`img-progress-${clueId}`);
+  if (prog) prog.textContent = `TAP EACH CELL TO RESTORE · ${_pixelCounts[clueId]}/${total} RECOVERED`;
+  if (_pixelCounts[clueId] >= total) {
+    const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+    showReveal(clue, `img-reveal-${clueId}`);
+  }
+};
+
+window.checkCoord = function(clueId, correctKey, location) {
+  const input = (document.getElementById(`coord-input-${clueId}`)?.value || '').trim();
+  const result = document.getElementById(`coord-result-${clueId}`);
+  const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+  if (!result || !clue) return;
+  if (input === correctKey) {
+    result.classList.remove('hidden');
+    result.innerHTML = `<span class="text-primary font-bold tracking-widest block mb-2">✓ DECODED: ${location}</span>`;
+    showReveal(clue, `coord-result-${clueId}`);
+  } else {
+    result.classList.remove('hidden');
+    result.textContent = '> INCORRECT KEY · The XOR key is the vault number associated with this facility.';
+    result.className = 'mt-2 p-3 border border-error/30 rounded bg-surface-container text-xs font-mono text-error/70';
+  }
+};
+
+let _audioPlayed = {};
+window.playAudioLog = function(clueId) {
+  if (_audioPlayed[clueId]) return;
+  _audioPlayed[clueId] = true;
+  const btn = document.getElementById(`audio-btn-${clueId}`);
+  const waveform = document.getElementById(`audio-waveform-${clueId}`);
+  if (btn) btn.textContent = '⏸ PLAYING...';
+
+  // Animate waveform
+  if (waveform) {
+    waveform.innerHTML = Array.from({length:30}, () =>
+      `<div class="w-0.5 bg-primary rounded" style="height:${3+Math.random()*16}px;animation:waveAnim ${0.3+Math.random()*0.5}s ease-in-out infinite alternate;"></div>`
+    ).join('');
+  }
+
+  // Highlight transcript segments progressively
+  const segments = document.querySelectorAll(`#audio-transcript-${clueId} > div`);
+  let delay = 500;
+  segments.forEach((seg, i) => {
+    setTimeout(() => {
+      segments.forEach(s => s.style.opacity = '0.4');
+      seg.style.opacity = '1';
+      seg.style.color = '#4ade80';
+    }, delay);
+    delay += 1800;
   });
-}
+
+  // Reveal after playback
+  setTimeout(() => {
+    if (btn) btn.textContent = '✓ LOG COMPLETE';
+    if (waveform) waveform.innerHTML = '';
+    const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+    showReveal(clue, `audio-reveal-${clueId}`);
+  }, delay + 500);
+};
+
+let _letterAssembled = {};
+window.assembleLetter = function(clueId, idx, total) {
+  if (!_letterAssembled[clueId]) _letterAssembled[clueId] = new Set();
+  _letterAssembled[clueId].add(idx);
+  const piece = document.getElementById(`letter-piece-${clueId}-${idx}`);
+  if (piece) { piece.style.borderColor = 'rgba(74,222,128,0.5)'; piece.style.background = 'rgba(74,222,128,0.05)'; }
+  const count = _letterAssembled[clueId].size;
+  const prog = document.getElementById(`letter-progress-${clueId}`);
+  if (prog) prog.textContent = `TAP BOTH FRAGMENTS TO ASSEMBLE · ${count}/${total}`;
+  if (count >= total) {
+    const assembled = document.getElementById(`letter-assembled-${clueId}`);
+    const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+    if (assembled && clue) {
+      assembled.classList.remove('hidden');
+      assembled.textContent = clue.pieces.join('\n\n');
+    }
+    showReveal(clue, `letter-reveal-${clueId}`);
+  }
+};
+
+window.showFinalReveal = function(clueId) {
+  const static_div = document.getElementById(`final-static-${clueId}`);
+  const msg_div = document.getElementById(`final-msg-${clueId}`);
+  const btn = document.getElementById(`final-btn-${clueId}`);
+  const clue = CLUE_FRAGMENTS.find(c => c.id === clueId);
+  if (!clue) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'DECRYPTING...'; }
+
+  let i = 0;
+  const text = clue.message;
+  if (static_div) static_div.innerHTML = '<div class="font-mono text-xs text-primary/30 animate-pulse">⚡ DECRYPTION IN PROGRESS...</div>';
+
+  setTimeout(() => {
+    if (static_div) static_div.classList.add('hidden');
+    if (msg_div) {
+      msg_div.classList.remove('hidden');
+      msg_div.textContent = '';
+      function typeChar() {
+        if (i < text.length) {
+          msg_div.textContent += text[i++];
+          setTimeout(typeChar, 18);
+        } else {
+          showReveal(clue, `final-reveal-${clueId}`);
+          if (btn) btn.classList.add('hidden');
+        }
+      }
+      typeChar();
+    }
+  }, 2000);
+};
+
+// CSS for waveform animation
+const waveStyle = document.createElement('style');
+waveStyle.textContent = '@keyframes waveAnim{0%{transform:scaleY(0.3);}100%{transform:scaleY(1);}}';
+document.head.appendChild(waveStyle);
+
 
 function renderQuestMeta(quest) {
   const panel = document.getElementById('quest-meta-panel');
@@ -2106,6 +1668,123 @@ window.moveQuestTo = function(curriculumId) {
 };
 
 window.deletePublicQuest=async function(docId,idx){ try{ await deleteDoc(doc(db,"public_quests",docId)); STATE.publicQuests.splice(idx,1); showToast("Removed from library."); }catch(e){ showToast("Failed to delete."); } };
+
+function renderHub(){
+  if(!STATE.player) return;
+  const p = STATE.player;
+
+  // Nav codename
+  const nav = document.getElementById('nav-codename');
+  if(nav) nav.textContent = p.name.toUpperCase();
+
+  // Dossier stats
+  const nameEl = document.getElementById('char-name');
+  if(nameEl) nameEl.textContent = p.name.toUpperCase();
+
+  const rankData = getCurrentRank();
+  const rankEl = document.getElementById('char-rank');
+  if(rankEl) rankEl.textContent = `LEVEL ${rankData.name} · ${rankData.en.toUpperCase()} · ${p.totalXp} XP`;
+
+  // XP bar
+  const nextRank = getNextRank();
+  const bar = document.getElementById('xp-bar');
+  const lbl = document.getElementById('xp-label');
+  if(nextRank) {
+    const prev = rankData.xp;
+    const pct = Math.min(100, ((p.totalXp - prev) / (nextRank.xp - prev)) * 100);
+    if(bar) bar.style.width = pct + '%';
+    if(lbl) lbl.textContent = `${p.totalXp} / ${nextRank.xp} XP`;
+  } else {
+    if(bar) bar.style.width = '100%';
+    if(lbl) lbl.textContent = `${p.totalXp} XP · MAX LEVEL`;
+  }
+
+  // Stats
+  const setStat = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  setStat('stat-quests', p.questsCreated||0);
+  setStat('stat-chapters', p.chaptersCompleted||0);
+  setStat('stat-bosses', p.bossesDefeated||0);
+  setStat('stat-perfect', p.perfectRuns||0);
+
+  // Migrations
+  if(typeof p.storyAct === 'undefined') p.storyAct = 0;
+  if(!p.cluesUnlocked) p.cluesUnlocked = [];
+
+  // Current intel summary
+  renderCurrentIntel(p);
+
+  // Memory stage list
+  renderMemoryStageList(p);
+
+  // Clue board
+  renderClueBoard();
+
+  // Deadline panel
+  renderDeadlinePanel();
+
+  // Quest grid
+  renderQuestGrid();
+}
+
+const INTEL_SUMMARIES = [
+  'You woke up in a sealed vault with no memory of who you are. The terminal calls you Director. You have no idea why.\n\nThe archive is running. Guardian protocols block access to deeper knowledge. Your only path forward is mastery.',
+  'A Base64 signal from Relay Tower 12 decoded to: HERE BEFORE THE FALL.\n\nSomeone was in this vault before you. They left a message. Whether it was a warning or an invitation, you are not yet sure.\n\nThe first encryption seal is broken. Two remain.',
+  'A ROT13-encoded note hidden behind your terminal: NEVER FORGET. THE OVERSEER KNEW.\n\nThe Overseer had prior knowledge of the experiment — of what you planned to do to yourself. The deeper you go, the more the archive feels less like a library and more like a trap designed by someone who knew exactly how you think.\n\nBecause they were you.',
+  'Memory fully restored. Identity confirmed.\n\nYou are the Vault-Tec Director of Knowledge. You built this archive. You sealed this vault from the inside and administered your own memory wipe — because the experiment required a clean mind.\n\nThe experiment succeeded. The archive is open. WHAT WOULD YOU LIKE TO LEARN NEXT?',
+];
+
+function renderCurrentIntel(player) {
+  const el = document.getElementById('current-intel-text');
+  if (!el) return;
+  const act = Math.min(player.storyAct || 0, INTEL_SUMMARIES.length - 1);
+  el.innerHTML = INTEL_SUMMARIES[act].split('\n\n').map(p => `<p class="mb-2">${p}</p>`).join('');
+}
+
+function renderMemoryStageList(player) {
+  const list = document.getElementById('memory-stage-list');
+  if (!list) return;
+  const totalXp = player.totalXp || 0;
+  let currentStage = 0;
+  MEMORY_STAGES.forEach((m,i) => { if(totalXp >= m.xp) currentStage = i; });
+  list.innerHTML = '';
+  MEMORY_STAGES.forEach((m, i) => {
+    const unlocked = totalXp >= m.xp;
+    const isCurrent = i === currentStage && unlocked;
+    const item = document.createElement('button');
+    item.disabled = !unlocked;
+    item.className = `w-full flex items-center gap-3 p-3 rounded border transition-all text-left ${isCurrent?'border-primary/50 bg-surface-container cursor-pointer hover:border-primary':unlocked?'border-outline/30 bg-surface-container cursor-pointer hover:border-primary/40':'border-outline/10 bg-surface-container-lowest opacity-40 cursor-not-allowed'}`;
+    item.innerHTML = `
+      <span class="text-xl flex-shrink-0">${unlocked ? m.icon : '🔒'}</span>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] font-mono ${isCurrent?'text-primary':'text-on-surface-variant/60'} tracking-widest">${m.name}</span>
+          ${isCurrent?'<span class="text-[8px] font-mono text-primary bg-primary/10 border border-primary/30 px-1.5 rounded tracking-widest">CURRENT</span>':''}
+        </div>
+        <p class="text-[10px] font-mono ${unlocked?'text-on-surface/70':'text-on-surface-variant/40'} mt-0.5">${m.status}</p>
+      </div>
+      ${unlocked?'<span class="material-symbols-outlined text-on-surface-variant/40 text-sm flex-shrink-0">chevron_right</span>':''}
+    `;
+    if(unlocked) {
+      item.addEventListener('click', () => openMemoryModal(m));
+      item.addEventListener('touchend', (e) => { e.preventDefault(); openMemoryModal(m); });
+    }
+    list.appendChild(item);
+  });
+}
+
+window.openMemoryModal = function(stage) {
+  document.getElementById('memory-modal-badge').textContent = 'MEMORY STAGE · ' + stage.name;
+  document.getElementById('memory-modal-title').textContent = stage.icon + '  ' + stage.status;
+  const body = document.getElementById('memory-modal-body');
+  body.innerHTML = stage.scene.split('\n\n').map(para => `<p class="mb-3 leading-relaxed">${para}</p>`).join('');
+  document.getElementById('memory-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeMemoryModal = function() {
+  document.getElementById('memory-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
 
 function renderSettingsCharacters(){
   const list=document.getElementById('character-list'); if(!list) return;
@@ -2632,62 +2311,63 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 const STORY_SCRIPTS = {
   prologue: {
-    badge: '// VAULT-OS · MEMORY RESTORE SEQUENCE',
-    auraColor: 'rgba(74,222,128,0.2)',
+    badge: '// VAULT-OS v4.2 · COLD BOOT · 2077.10.23',
     icon: '💾',
-    sourceLabel: 'SYSTEM · BOOT LOG · 2077.10.23',
+    sourceLabel: 'SYSTEM LOG · UNCLASSIFIED · TIMESTAMP 00:00:01',
+    auraColor: 'rgba(74,222,128,0.15)',
     lines: [
-      "> INITIALIZING VAULT-OS v4.2...\n> MEMORY BANKS: CORRUPTED\n> IDENTITY FILE: NOT FOUND\n\nYou open your eyes to the hum of fluorescent tubes and the smell of recycled air. The vault door is sealed. You are alone.",
-      "You are sitting in front of a terminal. Your hands know the keyboard. Your fingers move before your mind does — muscle memory from a life you cannot remember.",
-      "The screen reads: WELCOME BACK, DIRECTOR.\n\nDirector. The word means nothing. And everything.",
-      "Somewhere beyond the blast doors, the world ended. You do not know when. You do not know how long you have been here.\n\nWhat you do know: the archive must be rebuilt. Knowledge is the only thing that survives a nuclear winter.",
-      "The knowledge systems are still intact — but corrupted. Fragmented. Each subject locked behind an encrypted guardian protocol.\n\nThey call them demons in the old logs. You call them problems to be solved.",
-      "Study the documents. Master the subjects. Defeat the guardian protocols.\n\nEvery victory recovers a fragment of what you lost. Every clue is a piece of who you were.",
+      "Static.\n\nThen light — harsh, fluorescent, the colour of old bones.\n\nYou open your eyes to a ceiling you do not recognise. The hum of a ventilation system fills your skull like a second heartbeat. You are sitting upright in a chair. Your hands are on a keyboard.",
+      "You do not know your name.\n\nYou do not know the date. You do not know how long you have been here, in this chair, in this room, behind this door that you somehow know will not open from the inside.\n\nBut your hands know the keyboard. Your fingers move before you tell them to. Muscle memory from a life you cannot reach.",
+      "The screen reads:\n\n> WELCOME BACK, DIRECTOR.\n> LAST SESSION: [CORRUPTED]\n> PENDING MISSIONS: UNKNOWN\n\nDirector. The word arrives like a stone dropped into still water. Ripples. Nothing more.",
+      "Outside these walls — and you know this, somewhere beneath the amnesia — the world has already ended. The bombs fell. The cities burned. Whatever you were before you sat down in this chair, you were alive for the last day of everything.\n\nAnd then you forgot.",
+      "The archive is still running. Thousands of knowledge systems, educational protocols, learning engines — all intact, all waiting. Someone built this to survive. Someone built this to continue teaching even after the teachers were gone.\n\nThe terminal asks for your first command.",
+      "There are things sealed behind encryption you cannot break yet. Guardian protocols — the system calls them that. Hostile intelligences born from corrupted data, blocking access to deeper vaults.\n\nDefeat them through mastery. The knowledge you accumulate is not just points on a screen. It is the key.\n\nEvery answer correct is a door pushed open. Every boss defeated is a seal broken.\n\nYou do not know who you are.\n\nBut you know how to learn. Start there.",
     ],
-    cta: '> INITIALIZE OPERATIVE',
+    cta: '> INITIALIZE OPERATIVE · BEGIN',
     ctaAct: 0,
   },
   1: {
-    badge: '// VAULT-OS · MEMORY FRAGMENT UNLOCKED',
-    auraColor: 'rgba(74,222,128,0.25)',
+    badge: '// VAULT-OS · THRESHOLD BREACH · LEVEL 1 ENCRYPTION DISSOLVED',
     icon: '📡',
-    sourceLabel: 'EVENT LOG · KNOWLEDGE THRESHOLD REACHED',
+    sourceLabel: 'EVENT LOG · 500 XP THRESHOLD · SEAL ALPHA BROKEN',
+    auraColor: 'rgba(74,222,128,0.25)',
     lines: [
-      "ALERT: KNOWLEDGE ACCUMULATION THRESHOLD EXCEEDED\n\nThe archive systems respond to your progress. A locked sector opens.",
-      "A signal intercept from Relay Tower 12 decodes itself:\n\nSGVyZSBiZWZvcmUgdGhlIGZhbGw=\n\nBase64. You know this instantly. You decode it without thinking:\n\n'Here before the fall.'",
-      "Someone was here before you. Before everything. They left a breadcrumb in a dead frequency.\n\nThe guardian protocol weakens. You are beginning to remember.",
+      "The moment the final guardian falls, something shifts.\n\nNot in the room. In you.\n\nA frequency — barely audible, below the threshold of sound — begins repeating from a speaker you did not notice before. Relay Tower 12. The ping has been looping since before you woke up.",
+      "You decode it without thinking.\n\nBase64. You did not choose to know this. Your hands just moved.\n\n[ SGVyZSBiZWZvcmUgdGhlIGZhbGw= ]\n\nDecoded: HERE BEFORE THE FALL\n\nYou stare at those four words for a long time. Someone was in this vault before the bombs. Someone left a marker — not for a rescue team, not for survivors.\n\nFor you. Specifically. By name.",
+      "The archive shifts. A sector that was dark before is now dim — not open, but accessible. Something is moving behind the encryption, responding to your progress like a lock responding to the right key.\n\nYou are not the first person to sit in this chair.\n\nBut you may be the first to understand why.",
     ],
     cta: '> CONTINUE INVESTIGATION',
     ctaAct: 1,
   },
   2: {
-    badge: '// VAULT-OS · CLASSIFIED SECTOR BREACHED',
-    auraColor: 'rgba(251,191,36,0.2)',
+    badge: '// VAULT-OS · CLASSIFIED SECTOR GAMMA · ACCESS GRANTED',
     icon: '🔐',
-    sourceLabel: 'EVENT LOG · KNOWLEDGE THRESHOLD REACHED',
+    sourceLabel: 'EVENT LOG · 2000 XP THRESHOLD · SEAL BETA BROKEN',
+    auraColor: 'rgba(251,191,36,0.2)',
     lines: [
-      "WARNING: CLASSIFIED SECTOR GAMMA NOW ACCESSIBLE\n\nYour accumulated knowledge has cracked the second encryption layer. Something stirs in the deeper vaults.",
-      "The cipher decodes:\n\nYRIRE SBETRG. GUR BIREFRRE XARJ.\n\nROT13. A child's encryption. But the message is not childish:\n\n'NEVER FORGET. THE OVERSEER KNEW.'",
-      "The Overseer knew what was coming. And you know the Overseer. You knew them personally.\n\nThe memory is close. Just out of reach. Keep going.",
+      "A second seal dissolves.\n\nAnd this time, what comes through is not a signal. It is a sentence, scratched in ROT13 on a physical note someone taped to the back of the terminal monitor — the one you have been staring at for days without ever thinking to check the other side.\n\n[ YRIRE SBETRG. GUR BIREFRRE XARJ. ]\n\nNEVER FORGET. THE OVERSEER KNEW.",
+      "The Overseer.\n\nThe title surfaces from wherever your memories are buried — not a person, a position. The highest authority in any Vault-Tec installation. The one who decides who enters, who stays, who leaves, and who never does.\n\nThe Overseer of this vault knew what was coming before it came. Not the bombs — every government knew about the bombs in the final hours. Something else. Something specific to this archive. To you.",
+      "The guardian protocols are stronger now. The deeper you go, the more the system pushes back — as if something inside the archive does not want you to reach the centre.\n\nOr as if something is testing whether you deserve to.\n\nYou think about the note. The handwriting is familiar in the way a face in a dream is familiar — just out of reach, just past the edge of recognition.\n\nKeep going.",
     ],
-    cta: '> PUSH DEEPER',
+    cta: '> BREACH THE INNER VAULT',
     ctaAct: 2,
   },
   3: {
-    badge: '// VAULT-OS · DIRECTOR PROTOCOLS RESTORED',
-    auraColor: 'rgba(248,113,113,0.2)',
+    badge: '// VAULT-OS · DIRECTOR PROTOCOLS · FULL MEMORY RESTORATION',
     icon: '⚡',
-    sourceLabel: 'FINAL EVENT LOG · TRUTH UNLOCKED',
+    sourceLabel: 'FINAL EVENT LOG · 4500 XP · ALL SEALS BROKEN · TRUTH UNLOCKED',
+    auraColor: 'rgba(248,113,113,0.2)',
     lines: [
-      "CRITICAL ALERT: DIRECTOR-LEVEL MEMORY RESTORED\n\nThe final encryption falls. All sectors open simultaneously. The archive floods with light.",
-      "You remember now. You built this. All of it.\n\nThe quiz systems. The guardian protocols. The knowledge architecture. The entire Vault-Tec Knowledge Archive — your design, your creation.",
-      "You erased yourself to become the test subject. To prove that knowledge alone — without identity, without past, without privilege — could rebuild civilisation.\n\nYou volunteered to forget.",
-      "The experiment succeeded.\n\nYou are no longer a subject. You are the Director.\n\nAnd the archive will endure.",
+      "It does not happen gradually.\n\nOne moment you are looking at the final guardian as it dissolves into cascading error codes — and then the wall breaks. Not metaphorically. You feel it physically, somewhere behind your sternum: the flood of everything you erased.\n\nYour name. Your history. Your hands on the blueprints. Your voice in the boardroom.\n\nYou built this.",
+      "You built all of it.\n\nEvery quiz. Every guardian protocol. Every encrypted clue you have been hunting like a detective investigating someone else's crime. The learning architecture, the mission system, the vault itself — your design, your specifications, your obsession made concrete.\n\nYou were Vault-Tec's Director of Knowledge. The last one. The one who stayed behind when the others evacuated, who sealed the door from the inside, who chose to forget.",
+      "The reason is there too, clear now after months of static:\n\nYou could not build an unbiased test with a biased mind.\n\nThe experiment required a subject with no prior knowledge of the system, no memory of having designed it, no advantage over any other survivor who might one day sit in this chair.\n\nYou needed to prove that the archive worked.\n\nSo you became the proof.",
+      "The Guardian of Ignorance — your final creation, your most honest self-portrait — dissolves completely. It was never your enemy. It was the question you wrote for yourself thirty years ago:\n\nCan knowledge rebuild what destruction unmade?\n\nYou have answered it.\n\nThe archive is open. Every vault, every corridor, every subject you locked away behind encryption and encrypted again behind amnesia.\n\nThe experiment is complete.\n\nBut the library does not close when the experiment ends.\n\nIt never did. It never will.\n\nThat was always the point.",
     ],
-    cta: '> ACCEPT DESIGNATION: DIRECTOR',
+    cta: '> ACCEPT DESIGNATION: DIRECTOR · CONTINUE',
     ctaAct: 3,
   },
 };
+
 
 let storyState = {
   lines: [], lineIdx: 0, typing: false, typeTimeout: null,
@@ -2854,11 +2534,91 @@ window.closeEvoModal = function() {
 
 
 const MEMORY_STAGES = [
-  { level: 1,  xp: 0,    name: 'AMNESIAC',      desc: 'No memory. Clean slate.', icon: '💾' },
-  { level: 25, xp: 500,  name: 'INVESTIGATOR',  desc: 'First fragments recovered.', icon: '🔍' },
-  { level: 50, xp: 1400, name: 'ANALYST',        desc: 'Patterns becoming clear.', icon: '📊' },
-  { level: 75, xp: 3000, name: 'DIRECTOR',       desc: 'Identity nearly restored.', icon: '⚡' },
+  {
+    level: 1, xp: 0, name: 'AMNESIAC', icon: '💾',
+    status: 'BASELINE STATE · NO PRIOR RECALL',
+    scene: `The chair.
+
+You come back to the chair.
+
+Every morning — if it is morning; there are no windows — you sit in the same position, hands on the same keyboard, staring at the same boot sequence. VAULT-OS v4.2. The same greeting. The same blinking cursor.
+
+You have tried to remember your name seventeen times. You know this because you wrote it on the wall with a marker you found in the desk drawer: seventeen vertical lines, grouped in fours.
+
+The ventilation hums. Somewhere, deep in the walls, something processes data continuously, never sleeping.
+
+You are alone in a vault. You do not know how you got here. You do not know how long you have been here.
+
+But you know — with a certainty you cannot explain — that you are supposed to be here.
+
+That this is exactly where you chose to be.`,
+  },
+  {
+    level: 25, xp: 500, name: 'INVESTIGATOR', icon: '🔍',
+    status: 'FRAGMENT RECOVERED · ACTIVE INVESTIGATION',
+    scene: `The signal changes everything.
+
+You have been treating this like a power failure — like you are simply waiting for the lights to come back on, for memory to return the way sensation returns to a numbed limb: slowly, painfully, all at once.
+
+But the Base64 transmission from Relay Tower 12 is not a power failure. It is a message. Addressed to this terminal. Sent before the bombs fell.
+
+HERE BEFORE THE FALL.
+
+Someone was in this vault before the world ended. Someone left a trail — not breadcrumbs for a rescue team, but evidence. Deliberately arranged evidence, as if they knew someone would come looking.
+
+You begin keeping notes. Real notes, not tally marks on the wall. Dates, signals, patterns. You are no longer waiting.
+
+You are investigating.
+
+And the deeper you dig, the more the archive seems to respond — like a locked room where the furniture moves when no one is watching.`,
+  },
+  {
+    level: 50, xp: 1400, name: 'ANALYST', icon: '📊',
+    status: 'PATTERN IDENTIFIED · CONVERGENCE IMMINENT',
+    scene: `You understand now that the clues are not random.
+
+Each one requires a specific skill to decode. Not knowledge you were born with — knowledge you have built, piece by piece, through the missions and the guardians and the hours in front of this screen.
+
+The Base64 signal. The ROT13 cipher. The redacted personnel file that requires you to understand what is being hidden. The coordinate that only means something if you know what was at those coordinates.
+
+Someone designed these locks.
+
+Someone who knew exactly how a person would learn if they started from zero, with no memory, in a sealed vault with access to an infinite educational archive.
+
+Someone who knew, precisely, because that someone designed the archive too.
+
+The handwriting on the note — NEVER FORGET. THE OVERSEER KNEW — surfaces in your dreams now. Familiar in the specific way that your own voice sounds unfamiliar in a recording: close, but offset. Almost you.
+
+Almost.`,
+  },
+  {
+    level: 75, xp: 3000, name: 'DIRECTOR', icon: '⚡',
+    status: 'MEMORY FULLY RESTORED · IDENTITY CONFIRMED',
+    scene: `You are the Overseer.
+
+No — deeper than that.
+
+You are the one the Overseer reported to. The Director of Knowledge, Vault-Tec Division Seven. The architect of the archive you have been unlocking like a stranger picking through someone else's house.
+
+It is not someone else's house.
+
+The clues were yours. The guardian protocols were yours. The chair, the keyboard, the seventeen tally marks on the wall — you planned all of it. You sat in this chair for the first time thirty years ago, pressed the sequence to lock the vault from the inside, and administered the memory wipe yourself.
+
+Because the experiment required a clean mind.
+
+Because you could not test whether the archive worked if you already knew all the answers.
+
+Because you were the only person left who believed enough in what you had built to become its first and final student.
+
+The terminal blinks.
+
+> EXPERIMENT STATUS: COMPLETE.
+> KNOWLEDGE ARCHIVE: FULLY OPERATIONAL.
+> DIRECTOR PROTOCOLS: RESTORED.
+> WHAT WOULD YOU LIKE TO LEARN NEXT?`,
+  },
 ];
+
 
 function renderEvoMap() {
   const grid = document.getElementById('evo-map-grid');
