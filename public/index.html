@@ -2281,6 +2281,277 @@ function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ retu
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
+// ── NAVIGATION & GAME FUNCTIONS ─────────────────────
+const RANKS = [
+  { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
+  { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
+  { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
+  { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
+  { name:'Level 40',  en:'Gleaming Warden',   xp:900,  stageIdx:4  },
+  { name:'Level 50',  en:'Aura Walker',       xp:1400, stageIdx:5  },
+  { name:'Level 60',  en:'Sky Soarer',        xp:2000, stageIdx:6  },
+  { name:'Level 70',  en:'Astral Guardian',   xp:3000, stageIdx:7  },
+  { name:'Level 80',  en:'Celestial Being',   xp:4500, stageIdx:8  },
+  { name:'Level 90',  en:'Mythic Sovereign',  xp:6500, stageIdx:9  },
+  { name:'Level 100', en:'Eternal Legend',    xp:9000, stageIdx:10 },
+];
+
+
+
+window.switchTab=function(tabId){
+  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>{ el.classList.remove('text-primary','border-primary','bg-primary/5'); el.classList.add('text-outline','border-transparent'); });
+  document.getElementById(tabId).classList.add('active');
+  const btn=document.querySelector(`.tab-btn[data-target="${tabId}"]`);
+  if(btn){ btn.classList.remove('text-outline','border-transparent'); btn.classList.add('text-primary','border-primary','bg-primary/5'); }
+}
+
+
+window.switchQuestTab = function(tab) {
+  const scrollsPanel = document.getElementById('quest-panel-scrolls');
+  const bossPanel = document.getElementById('quest-panel-boss');
+  const scrollsBtn = document.getElementById('qtab-scrolls-btn');
+  const bossBtn = document.getElementById('qtab-boss-btn');
+  if(tab === 'scrolls') {
+    scrollsPanel.classList.add('active');
+    bossPanel.classList.remove('active');
+    scrollsBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
+    scrollsBtn.classList.remove('text-outline');
+    bossBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
+    bossBtn.classList.add('text-outline');
+  } else {
+    bossPanel.classList.add('active');
+    scrollsPanel.classList.remove('active');
+    bossBtn.classList.add('bg-primary','text-on-primary','shadow-sm');
+    bossBtn.classList.remove('text-outline');
+    scrollsBtn.classList.remove('bg-primary','text-on-primary','shadow-sm');
+    scrollsBtn.classList.add('text-outline');
+  }
+}
+
+
+window.choosePath=async function(){
+  const input=document.getElementById('path-name-input');
+  const name=(input?.value.trim())||'My Companion';
+  const newPlayer = defaultPlayer(name);
+  newPlayer.collection = defaultCollection();
+  const newSave={id:Date.now().toString(),player:newPlayer,quests:[],curriculums:[{id:'default',name:'My Curriculum'}]};
+  STATE.saves.push(newSave); STATE.activeSaveId=newSave.id;
+  syncActiveSaveToState();
+  await saveState();
+  // Hide the path screen, play prologue
+  showScreen('screen-hub'); renderHub(); // prepare hub in background
+  startPrologue(); // prologue's CTA will show hub when done
+}
+
+
+window.cancelPathSelection=function(){ showScreen('screen-hub'); }
+
+
+window.allowDrop=function(ev){ ev.preventDefault(); }
+
+
+window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; }
+
+
+window.dropQuest=function(ev,curriculumId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].curriculumId=curriculumId; saveState(); renderQuestGrid(); } }
+
+
+window.createNewCurriculum=function(){ const name=prompt("Enter new curriculum name:"); if(name&&name.trim()){ if(!STATE.curriculums) STATE.curriculums=[]; STATE.curriculums.push({id:Date.now().toString(),name:name.trim()}); saveState(); renderQuestGrid(); } }
+
+
+function checkAndExtendOverdueDeadlines() {
+  if (!STATE.quests) return;
+  let changed = false;
+  STATE.quests.forEach(q => {
+    if (!q.deadline || q.defeated) return;
+    const s = getQuestDeadlineStatus(q);
+    if (s.state === 'overdue') {
+      // Extend by one day from today
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      q.deadline = tomorrow.toISOString().split('T')[0];
+      q.overdueCount = (q.overdueCount || 0) + 1;
+      changed = true;
+    }
+  });
+  if (changed) saveState();
+}
+
+
+function getQuestDeadlineStatus(quest) {
+  if (!quest.deadline) return { state: 'none' };
+  const now = new Date(); now.setHours(0,0,0,0);
+  const dl = new Date(quest.deadline); dl.setHours(0,0,0,0);
+  const diffMs = dl - now;
+  const diffDays = Math.round(diffMs / 86400000);
+  if (diffDays < 0) return { state: 'overdue', daysOver: Math.abs(diffDays) };
+  if (diffDays === 0) return { state: 'today' };
+  if (diffDays <= 3) return { state: 'urgent', daysLeft: diffDays };
+  return { state: 'ok', daysLeft: diffDays };
+}
+
+
+function formatDeadlineLabel(quest) {
+  const s = getQuestDeadlineStatus(quest);
+  if (s.state === 'none') return null;
+  if (s.state === 'overdue') return { text: `${s.daysOver}d overdue`, color: 'text-error', urgent: true };
+  if (s.state === 'today') return { text: 'Due today!', color: 'text-error', urgent: true };
+  if (s.state === 'urgent') return { text: `${s.daysLeft}d left`, color: 'text-error', urgent: false };
+  return { text: `${s.daysLeft}d left`, color: 'text-on-surface-variant', urgent: false };
+}
+
+
+function isHarderQuiz(quest) {
+  // Harder quiz (5 options) if quest was overdue at least once
+  return (quest.overdueCount || 0) > 0;
+}
+
+
+function renderDeadlinePanel() {
+  const list = document.getElementById('deadline-list');
+  if (!list) return;
+  const questsWithDeadlines = (STATE.quests || [])
+    .map((q, i) => ({ q, i }))
+    .filter(({ q }) => q.deadline && !q.defeated)
+    .sort((a, b) => new Date(a.q.deadline) - new Date(b.q.deadline));
+
+  if (!questsWithDeadlines.length) {
+    list.innerHTML = '<div class="text-xs text-on-surface-variant italic font-medium">No deadlines set. Open a quest and set one!</div>';
+    return;
+  }
+
+  list.innerHTML = questsWithDeadlines.map(({ q, i }) => {
+    const lbl = formatDeadlineLabel(q);
+    const chapters = q.chapters || [];
+    const done = (q.completed || []).filter(Boolean).length;
+    return `
+      <div onclick="window.showQuestScreen(${i})" class="flex items-center gap-3 p-3 rounded-xl border-[2px] ${lbl.urgent ? 'border-error/50 bg-error/5 deadline-urgent' : 'border-outline-variant/40 bg-surface-container hover:border-primary'} cursor-pointer transition-all">
+        <span class="material-symbols-outlined ${lbl.urgent ? 'text-error' : 'text-outline'} text-xl flex-shrink-0">${lbl.urgent ? 'alarm_on' : 'alarm'}</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-headline font-extrabold text-sm text-on-surface truncate">${q.questTitle || q.topic}</p>
+          <p class="text-[10px] text-on-surface-variant">${done}/${chapters.length} chapters · <span class="${lbl.color} font-bold">${lbl.text}</span>${(q.overdueCount||0)>0?' · ⚠ Harder quiz':''}
+          </p>
+        </div>
+        <span class="material-symbols-outlined text-outline text-base">chevron_right</span>
+      </div>
+    `;
+  }).join('');
+}
+
+
+window.clearDeadline = function() {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if (!quest) return;
+  quest.deadline = null;
+  quest.overdueCount = 0;
+  saveState();
+  closeDeadlineModal();
+  updateDeadlineDisplay(quest);
+  renderDeadlinePanel();
+  showToast('Deadline cleared.');
+}
+
+
+window.closeDeadlineModal = function() {
+  document.getElementById('deadline-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+}
+
+
+window.saveDeadline = function() {
+  const val = document.getElementById('deadline-date-input').value;
+  if (!val) { showToast('Please pick a date.'); return; }
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if (!quest) return;
+  quest.deadline = val;
+  saveState();
+  closeDeadlineModal();
+  updateDeadlineDisplay(quest);
+  renderDeadlinePanel();
+  showToast('Deadline set! Don\'t let the demon win ⚔');
+}
+
+
+window.setDeadlinePreset = function(days) {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  document.getElementById('deadline-date-input').value = d.toISOString().split('T')[0];
+}
+
+
+function getCurrentRank(){ const r=getRanks(); let c=r[0]; if(STATE.player) r.forEach(x=>{ if(STATE.player.totalXp>=x.xp) c=x; }); return c; }
+
+
+function getCurrentRankIdx(){ const r=getRanks(); let i=0; if(STATE.player) r.forEach((x,j)=>{ if(STATE.player.totalXp>=x.xp) i=j; }); return i; }
+
+
+function getNextRank(){ const r=getRanks(),i=r.indexOf(getCurrentRank()); return i<r.length-1?r[i+1]:null; }
+
+
+function getRanks(){ return RANKS; }
+
+
+function startPathMonster() {
+  if(pathMonRAF) cancelAnimationFrame(pathMonRAF);
+  pathMonRAF = null;
+  const canvas = document.getElementById('path-monster-canvas');
+  if(!canvas) return;
+  // Pick random type and store it so choosePath can use the same one
+  // single monster path screen
+  const src = getMonsterStage0Src();
+  if (src) {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      function frame() {
+        const t = Date.now() * 0.001;
+        ctx.clearRect(0,0,W,H);
+        ctx.imageSmoothingEnabled = false;
+        const scale = Math.min(W/img.naturalWidth, H/img.naturalHeight) * 0.85;
+        const dw = img.naturalWidth*scale, dh = img.naturalHeight*scale;
+        const bob = Math.sin(t*1.8)*4;
+        ctx.drawImage(img, (W-dw)/2, (H-dh)/2+bob, dw, dh);
+        pathMonRAF = requestAnimationFrame(frame);
+      }
+      frame();
+    };
+  }
+}
+
+
+function setSummonStatus(t,s=''){ document.getElementById('summon-gen-status').textContent=t; document.getElementById('summon-gen-step').textContent=s; }
+
+
+window.setSummonChapters=function(n){
+  STATE.summonChapters=n;
+  document.getElementById('summon-chapter-display').textContent=`${n} Chapters`;
+  document.querySelectorAll('.chap-pip').forEach(b=>{
+    const v=parseInt(b.textContent);
+    if(v===n){
+      b.classList.add('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
+      b.classList.remove('border-outline-variant','bg-surface-container-lowest','text-on-surface');
+    } else {
+      b.classList.remove('active-pip','bg-primary','text-on-primary','border-primary','shadow-md');
+      b.classList.add('border-outline-variant','bg-surface-container-lowest','text-on-surface');
+    }
+  });
+}
+
+
+window.enterRealm=function(){
+  if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); startPathMonster(); }
+  else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
+}
+
+
+window.nukeLibrary=async function(){
+  if(!confirm("Delete ALL quests from the Realm Library?")) return;
+  let n=0;
+  for(const q of STATE.publicQuests){ try{ await deleteDoc(doc(db,"public_quests",q.docId)); n++; }catch(e){} }
+  STATE.publicQuests=[]; closeApiModal(); showToast(`Nuked ${n} scrolls.`);
+}
 // ── RESTORED CORE FUNCTIONS ─────────────────────────
 
 async function loadState(){
