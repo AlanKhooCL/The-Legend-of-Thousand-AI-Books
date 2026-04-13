@@ -175,7 +175,29 @@ tailwind.config = {
 .tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#0d120d; border:1px solid rgba(74,222,128,0.3); color:#d4f5d4; border-radius:6px; padding:8px 12px; font-size:11px; white-space:nowrap; max-width:240px; white-space:normal; z-index:50; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
 .tip-wrap:hover .tip-box, .tip-btn:focus + .tip-box { display:block; }
 
-/* ── SCROLLBAR ── */
+/* ── CHAPTER CONTENT STYLES ── */
+.chapter-content { font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.8; color: rgba(212,245,212,0.85); }
+.chapter-content h3 { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #4ade80; text-transform: uppercase; letter-spacing: 0.15em; margin: 1.5rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(74,222,128,0.2); }
+.chapter-content p { margin: 0.75rem 0; }
+.chapter-content strong { color: #4ade80; font-weight: 700; }
+.chapter-content em { color: #86efac; font-style: italic; }
+.chapter-content ul, .chapter-content ol { margin: 0.75rem 0 0.75rem 1.25rem; space-y: 0.5rem; }
+.chapter-content li { margin: 0.4rem 0; padding-left: 0.25rem; }
+.chapter-content ul li::marker { color: #4ade80; }
+.chapter-content ol li::marker { color: #4ade80; font-weight: 700; }
+.chapter-content pre { background: rgba(5,9,5,0.8); border: 1px solid rgba(74,222,128,0.2); border-left: 3px solid #4ade80; border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.chapter-content code { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #86efac; background: rgba(74,222,128,0.08); padding: 0.1rem 0.3rem; border-radius: 3px; }
+.chapter-content pre code { background: none; padding: 0; color: #4ade80; font-size: 12px; }
+.chapter-content blockquote, .chapter-content .chapter-takeaway { background: rgba(5,46,22,0.4); border-left: 3px solid #fbbf24; padding: 0.75rem 1rem; margin: 1.25rem 0; border-radius: 0 4px 4px 0; color: #fbbf24; font-style: italic; }
+.chapter-content .chapter-intro { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.15); border-radius: 4px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; color: rgba(212,245,212,0.7); font-size: 12px; }
+.chapter-content .concept-block { margin: 1.25rem 0; padding: 0; }
+.chapter-content .key-insight { background: rgba(5,46,22,0.5); border: 1px solid rgba(74,222,128,0.3); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
+.chapter-content .key-insight::before { content: '💡 KEY INSIGHT'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #4ade80; margin-bottom: 0.4rem; font-family: 'Orbitron', monospace; }
+.chapter-content .common-mistake { background: rgba(28,0,0,0.4); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
+.chapter-content .common-mistake::before { content: '⚠️ COMMON MISTAKE'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #f87171; margin-bottom: 0.4rem; font-family: 'Orbitron', monospace; }
+.chapter-content .code-example { margin: 1rem 0; }
+.chapter-content .chapter-summary { background: rgba(5,9,5,0.6); border: 1px solid rgba(74,222,128,0.15); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
+.chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(74,222,128,0.6); margin-bottom: 0.5rem; font-family: 'Orbitron', monospace; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #050905; }
 ::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 2px; }
@@ -782,7 +804,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-sm">close</span>
       </button>
     </div>
-    <div id="chapter-content-area" class="overflow-y-auto flex-1 p-5 prose prose-invert prose-sm max-w-none font-mono text-on-surface/90 leading-relaxed text-xs"></div>
+    <div id="chapter-content-area" class="overflow-y-auto flex-1 p-5 max-w-none text-on-surface/90 leading-relaxed chapter-content"></div>
     <template id="book-loader-tpl">
       <div class="flex flex-col items-center justify-center py-12 gap-4">
         <div class="book-loader"><div class="page"></div><div class="page"></div><div class="page"></div></div>
