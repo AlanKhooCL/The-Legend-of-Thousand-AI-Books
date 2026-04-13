@@ -1459,19 +1459,29 @@ window.nukeLibrary=async function(){
 
 // ── AUTH ────────────────────────────────────────────
 window.signInGoogle=async()=>{
-  document.getElementById('auth-buttons').style.display='none';
-  document.getElementById('loading-text').style.display='flex';
-  document.getElementById('loading-text').textContent='> REDIRECTING TO AUTH...';
+  const authBtns = document.getElementById('auth-buttons');
+  const loadingEl = document.getElementById('loading-text');
+  authBtns.style.display='none';
+  loadingEl.style.display='flex';
+  loadingEl.textContent='> AUTHENTICATING...';
   try{
-    // Try redirect first (avoids COOP/popup issues in hosted environments)
-    await signInWithRedirect(auth, new GoogleAuthProvider());
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    // onAuthStateChanged will fire and call loadState()
   } catch(e){
-    // Fallback to popup
-    try{ await signInWithPopup(auth,new GoogleAuthProvider()); }
-    catch(e2){
-      showToast("Sign-In failed. Try again.");
-      document.getElementById('auth-buttons').style.display='flex';
-      document.getElementById('loading-text').style.display='none';
+    console.warn('Popup failed:', e.code, e.message);
+    if(e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user'){
+      // Try redirect as fallback
+      loadingEl.textContent='> OPENING AUTH PAGE...';
+      try{ await signInWithRedirect(auth, new GoogleAuthProvider()); }
+      catch(e2){
+        showToast('Sign-In failed. Please try again.');
+        authBtns.style.display='flex';
+        loadingEl.style.display='none';
+      }
+    } else {
+      showToast('Sign-In failed: ' + (e.message || e.code));
+      authBtns.style.display='flex';
+      loadingEl.style.display='none';
     }
   }
 };
@@ -2575,23 +2585,21 @@ window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
   if(firstTab){ firstTab.classList.remove('text-on-surface-variant','border-transparent'); firstTab.classList.add('text-primary','border-primary'); }
 
-  // Handle redirect result first (fires after Google redirects back)
-  getRedirectResult(auth).then(result => {
-    if(result?.user){ /* onAuthStateChanged will handle this */ }
-  }).catch(e => { if(e.code !== 'auth/no-current-user') console.warn('Redirect result:', e.message); });
+  // Check for redirect result first (handles cases where popup wasn't available)
+  getRedirectResult(auth).catch(()=>{});
 
   onAuthStateChanged(auth,async user=>{
     const loadingEl = document.getElementById('loading-text');
     const authBtns = document.getElementById('auth-buttons');
     if(user){
       USER_ID=user.uid;
-      if(loadingEl) loadingEl.textContent='> LOADING OPERATIVE DATA...';
+      if(loadingEl){ loadingEl.style.display='flex'; loadingEl.textContent='> LOADING OPERATIVE DATA...'; }
+      if(authBtns) authBtns.style.display='none';
       await loadState();
     } else {
       USER_ID=null;
       if(loadingEl) loadingEl.style.display='none';
-      if(authBtns) authBtns.classList.remove('hidden');
-      authBtns.style.display='flex';
+      if(authBtns){ authBtns.classList.remove('hidden'); authBtns.style.display='flex'; }
     }
   });
 });
