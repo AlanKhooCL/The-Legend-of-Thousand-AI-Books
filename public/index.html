@@ -2291,23 +2291,28 @@ async function loadState(){
     if(snap.exists()){
       const d=snap.data();
       if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
-      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Hero"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
+      else{ const os={id:Date.now().toString(),player:d.player||defaultPlayer("Operative"),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]}; STATE.saves=[os]; STATE.activeSaveId=os.id; }
       loaded=true;
     }
   }catch(e){ showToast("Could not load data."); }
-  try{ await loadPublicQuests(); }catch(e){}
-  const btn=document.getElementById('btn-enter');
-  if(loaded&&STATE.saves?.length>0){
-    STATE.saves.forEach(s=>{ if(!s.player) s.player=defaultPlayer("Hero"); if(!s.player.sigils) s.player.sigils=[]; if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}]; if(!s.player.collection) s.player.collection=defaultCollection(); });
-    syncActiveSaveToState();
-    // Persist any migration fixes (stale monster IDs, etc.)
-    saveState();
-    if(btn){ btn.style.display='flex'; }
-  } else {
-    STATE.player=null;
-    if(btn){ btn.style.display='flex'; }
-  }
+
   document.getElementById('loading-text').style.display='none';
+
+  if(loaded && STATE.saves?.length>0){
+    STATE.saves.forEach(s=>{
+      if(!s.player) s.player=defaultPlayer("Operative");
+      if(!s.player.sigils) s.player.sigils=[];
+      if(!s.curriculums) s.curriculums=[{id:'default',name:'My Curriculum'}];
+      if(!s.player.collection) s.player.collection=defaultCollection();
+    });
+    syncActiveSaveToState();
+    saveState();
+    showScreen('screen-hub');
+    window.switchTab('tab-dossier');
+    renderHub();
+  } else {
+    showScreen('screen-path');
+  }
 }
 
 
