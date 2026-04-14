@@ -1639,10 +1639,10 @@ window.openMoveModal = function() {
   list.innerHTML = curriculums.map(c => {
     const isCurrent = c.id === currentId;
     return `<button onclick="moveQuestTo('${c.id}')" ${isCurrent ? 'disabled' : ''}
-      class="w-full flex items-center gap-3 p-3 rounded-xl border-[2px] text-left transition-all ${isCurrent ? 'border-secondary/40 bg-secondary/5 opacity-60 cursor-not-allowed' : 'border-outline-variant/40 hover:border-secondary hover:bg-secondary/5 cursor-pointer'}">
-      <span class="material-symbols-outlined text-secondary text-lg">folder_open</span>
-      <span class="font-headline font-extrabold text-sm text-on-surface flex-1">${c.name}</span>
-      ${isCurrent ? '<span class="text-[9px] font-black text-secondary uppercase tracking-wide">Current</span>' : ''}
+      class="w-full flex items-center gap-3 p-3 rounded border text-left transition-all font-mono text-xs ${isCurrent ? 'border-primary/30 bg-primary/5 opacity-60 cursor-not-allowed' : 'border-outline/30 hover:border-primary hover:bg-primary/5 cursor-pointer'}">
+      <span class="material-symbols-outlined text-primary text-base">folder_open</span>
+      <span class="text-on-surface flex-1 tracking-widest">${c.name.toUpperCase()}</span>
+      ${isCurrent ? '<span class="text-[9px] font-mono text-primary tracking-widest">CURRENT</span>' : ''}
     </button>`;
   }).join('');
 
@@ -2283,6 +2283,23 @@ function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 let evoActiveTypeId = "voidling";
 
+window.deleteCurriculum = function(curriculumId) {
+  if(!confirm('Delete this curriculum? Missions inside will move to default.')) return;
+  STATE.quests.forEach(q => { if(q.curriculumId === curriculumId) q.curriculumId = 'default'; });
+  STATE.curriculums = STATE.curriculums.filter(c => c.id !== curriculumId);
+  if(!STATE.curriculums.length) STATE.curriculums = [{id:'default',name:'My Curriculum'}];
+  saveState(); renderQuestGrid();
+  showToast('Curriculum deleted.');
+};
+
+window.renameCurriculum = function(curriculumId) {
+  const cur = STATE.curriculums.find(c => c.id === curriculumId);
+  if(!cur) return;
+  const name = prompt('Rename curriculum:', cur.name);
+  if(name && name.trim()) { cur.name = name.trim(); saveState(); renderQuestGrid(); }
+};
+
+
 // ── NAVIGATION & GAME FUNCTIONS ─────────────────────
 const RANKS = [
   { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
@@ -2680,7 +2697,7 @@ function renderQuestGrid(){
     const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
     const curriculumDiv=document.createElement('div'); curriculumDiv.className='mb-6';
     const hasActive=curriculumQuests.some(item=>!item.q.defeated);
-    curriculumDiv.innerHTML=`<button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full flex justify-between items-center bg-surface-container-low p-4 rounded-2xl border-[3px] border-outline-variant/40 font-headline font-extrabold text-base hover:border-primary transition-colors focus:outline-none shadow-sm"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">folder_open</span> ${curriculum.name}</div><span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">${curriculumQuests.length} Scrolls</span></button><div class="${hasActive?'':'hidden'} flex-col gap-4 mt-4 pl-4 border-l-[3px] border-outline-variant/30 ml-4 curriculum-content transition-all min-h-[60px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    curriculumDiv.innerHTML=`<div class="w-full flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline/30 font-mono text-xs hover:border-primary/40 transition-colors"><button onclick="this.closest('div').nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-2 flex-1 focus:outline-none min-w-0"><span class="material-symbols-outlined text-primary text-base">folder_open</span><span class="text-primary tracking-widest font-bold flex-1 text-left">${curriculum.name.toUpperCase()}</span></button><div class="flex items-center gap-1 flex-shrink-0"><span class="border border-outline/40 text-on-surface-variant px-2 py-0.5 rounded text-[9px] tracking-widest mr-1">${curriculumQuests.length}</span>${curriculum.id!=='default'?`<button onclick="renameCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-primary transition-colors p-1" title="Rename"><span class="material-symbols-outlined text-xs">edit</span></button><button onclick="deleteCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-error transition-colors p-1" title="Delete"><span class="material-symbols-outlined text-xs">delete</span></button>`:''}</div></div><div class="flex-col gap-3 mt-3 pl-3 border-l border-outline/20 ml-2 curriculum-content min-h-[10px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
     const contentDiv=curriculumDiv.querySelector('.curriculum-content');
     curriculumQuests.forEach(({q:quest,i:idx})=>{
       const completed=quest.completed||[];
