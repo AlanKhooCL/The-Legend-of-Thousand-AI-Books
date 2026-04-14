@@ -1610,7 +1610,7 @@ function renderQuestMeta(quest) {
 window.launchNextTopic = function(topic) {
   showHub();
   setTimeout(() => {
-    switchTab('tab-quests');
+    switchTab('tab-missions');
     openSummonScreen();
     setTimeout(() => {
       const inp = document.getElementById('summon-topic-input');
@@ -1810,7 +1810,7 @@ window.closeApiModal=()=>{ document.getElementById('api-modal').classList.remove
 window.closeAllModals=()=>{ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); document.getElementById('modal-backdrop').classList.add('hidden'); };
 
 // ── COPY PUBLIC QUEST ────────────────────────────────
-window.copyPublicQuest=function(idx){ return; const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,curriculumId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-quests'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
+window.copyPublicQuest=function(idx){ return; const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,curriculumId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-missions'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
 
 // ── CHAPTER MODAL ────────────────────────────────────
 window.openChapterModal=function(chapterIdx){
@@ -2542,7 +2542,7 @@ window.setSummonChapters=function(n){
 
 window.enterRealm=function(){
   if(!STATE.player||!STATE.saves?.length){ showScreen('screen-path'); startPathMonster(); }
-  else{ showScreen('screen-hub'); window.switchTab('tab-profile'); renderHub(); }
+  else{ showScreen('screen-hub'); window.switchTab('tab-dossier'); renderHub(); }
 }
 
 
@@ -2857,7 +2857,7 @@ window.doSummonQuest=async function(){
     }catch(e){}
     closeSummonScreen();
     showToast(`Quest summoned: "${userQuest.questTitle}" · ${chapters.length} chapters`);
-    window.switchTab('tab-quests'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
+    window.switchTab('tab-missions'); renderQuestGrid(); renderTopicSuggestions(); window.showQuestScreen(0);
   }catch(e){
     console.error(e);
     document.getElementById('summon-form-side').classList.remove('hidden');
