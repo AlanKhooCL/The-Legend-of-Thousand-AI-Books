@@ -454,7 +454,7 @@ tailwind.config = {
           <div class="grid grid-cols-2 gap-y-2 gap-x-3">
             <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
               <span class="text-base flex-shrink-0">📖</span>
-              <span>Read chapters → <span class="text-primary">+Caps</span></span>
+              <span>Read chapters → <span class="text-primary">+Caps +Mats</span></span>
             </div>
             <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
               <span class="text-base flex-shrink-0">⚔️</span>
@@ -2378,7 +2378,7 @@ const ROOM_DEFS = {
   water:    { name:'WATER TREAT.',  icon:'💧', desc:'Purifies water for drinking.',                    cost:{caps:35,materials:12},  produces:{water:4},       requires:{power:3},  maxDwellers:3, color:'rgba(86,180,233,0.12)',  upgradeMult:1.7 },
   library:  { name:'DATA LIBRARY',  icon:'📚', desc:'Boosts XP gain from missions. +15% per level.',  cost:{caps:60,materials:20},  produces:{xpBonus:0.15},  requires:{power:4},  maxDwellers:4, color:'rgba(74,222,128,0.08)',  upgradeMult:1.5 },
   armory:   { name:'ARMORY',        icon:'⚔️',  desc:'Dwellers here improve boss battle outcomes.',   cost:{caps:80,materials:30},  produces:{battleBonus:1}, requires:{power:5},  maxDwellers:4, color:'rgba(248,113,113,0.1)',  upgradeMult:2   },
-  workshop: { name:'WORKSHOP',      icon:'🔩', desc:'Produces materials for building and upgrades.',   cost:{caps:50,materials:5},   produces:{materials:2},   requires:{power:4},  maxDwellers:3, color:'rgba(255,200,50,0.1)',   upgradeMult:1.8 },
+  workshop: { name:'WORKSHOP',      icon:'🔩', desc:'Produces materials for building and upgrades.',   cost:{caps:30,materials:0},   produces:{materials:2},   requires:{power:3},  maxDwellers:3, color:'rgba(255,200,50,0.1)',   upgradeMult:1.8 },
   medbay:   { name:'MED BAY',       icon:'🏥', desc:'Boosts morale. Dwellers recover faster.',        cost:{caps:70,materials:25},  produces:{happiness:5},   requires:{power:5},  maxDwellers:3, color:'rgba(150,250,150,0.08)', upgradeMult:1.6 },
   reactor:  { name:'REACTOR CORE',  icon:'☢️',  desc:'Generates massive power. Requires materials.',  cost:{caps:120,materials:50}, produces:{power:8},       requires:{power:0},  maxDwellers:2, color:'rgba(74,222,128,0.18)',  upgradeMult:2.5 },
   academy:  { name:'ACADEMY',       icon:'🎓', desc:'Doubles caps earned from reading chapters.',      cost:{caps:100,materials:40}, produces:{capsBonus:2},   requires:{power:6},  maxDwellers:5, color:'rgba(253,207,80,0.1)',   upgradeMult:1.8 },
@@ -2527,7 +2527,10 @@ function renderVaultGrid() {
           <div style="font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.5);margin-top:1px">👤 ${room.dwellers||0}/${def?.maxDwellers||2}</div>
         `;
         cell.addEventListener('click', () => openRoomDetail(room, row, col));
-        cell.addEventListener('touchend', e => { e.preventDefault(); openRoomDetail(room, row, col); });
+        let cellTouchMoved = false;
+        cell.addEventListener('touchstart', () => { cellTouchMoved = false; }, { passive: true });
+        cell.addEventListener('touchmove', () => { cellTouchMoved = true; }, { passive: true });
+        cell.addEventListener('touchend', e => { if (!cellTouchMoved) { e.preventDefault(); openRoomDetail(room, row, col); } });
         rowDiv.appendChild(cell);
       } else {
         const slot = document.createElement('div');
@@ -2535,7 +2538,10 @@ function renderVaultGrid() {
         slot.style.minHeight = '80px';
         slot.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:22px;opacity:0.25">➕</span><span style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.2);letter-spacing:0.1em">EMPTY</span></div>`;
         slot.addEventListener('click', () => openBuildMenu(row, col));
-        slot.addEventListener('touchend', e => { e.preventDefault(); openBuildMenu(row, col); });
+        let slotTouchMoved = false;
+        slot.addEventListener('touchstart', () => { slotTouchMoved = false; }, { passive: true });
+        slot.addEventListener('touchmove', () => { slotTouchMoved = true; }, { passive: true });
+        slot.addEventListener('touchend', e => { if (!slotTouchMoved) { e.preventDefault(); openBuildMenu(row, col); } });
         rowDiv.appendChild(slot);
       }
     }
@@ -2808,10 +2814,11 @@ function awardLearningResources(type, data) {
 
   switch(type) {
     case 'chapter': {
-      // Reading a chapter = caps
+      // Reading a chapter = caps + small mats
       const base = 5;
       const earned = Math.floor(base * capsBonus);
       v.caps += earned;
+      v.materials += 1;
       showFloatOnElement('res-caps', `+${earned} 💰`);
       break;
     }
@@ -2826,10 +2833,13 @@ function awardLearningResources(type, data) {
       break;
     }
     case 'perfect_run': {
-      // Perfect quiz = rare materials
-      const mats = 3 + Math.floor(Math.random() * 3);
+      // Perfect quiz = bonus materials + caps
+      const mats = 5 + Math.floor(Math.random() * 5);
+      const bonusCaps = Math.floor(15 * getVaultBonus('capsBonus'));
       v.materials += mats;
+      v.caps += bonusCaps;
       showFloatOnElement('res-materials', `+${mats} 🔩`);
+      setTimeout(() => showFloatOnElement('res-caps', `+${bonusCaps} 💰`), 300);
       break;
     }
     case 'dweller_gained': {
@@ -3509,9 +3519,9 @@ function defaultPlayer(name) {
     storyAct: 0,
     // Vault resources
     vault: {
-      caps: 50,          // currency (from chapter reads)
-      power: 10,         // from boss defeats
-      materials: 5,      // from perfect runs
+      caps: 100,         // currency (from chapter reads)
+      power: 15,         // from boss defeats
+      materials: 20,     // from perfect runs + chapter reading
       food: 20,          // passive
       water: 20,         // passive
       dwellers: 2,       // from chapter completions
