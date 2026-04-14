@@ -932,7 +932,7 @@ tailwind.config = {
     <div class="p-5 space-y-4">
       <div>
         <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mb-2">AI MODEL</p>
-        <select id="model-selector" onchange="STATE.selectedModel=this.value;saveState()" class="w-full bg-surface-container border border-outline/40 text-on-surface font-mono py-2 px-3 rounded text-xs focus:border-primary focus:outline-none">
+        <select id="model-selector" onchange="if(typeof STATE!=='undefined'){STATE.selectedModel=this.value;saveState();}" class="w-full bg-surface-container border border-outline/40 text-on-surface font-mono py-2 px-3 rounded text-xs focus:border-primary focus:outline-none">
           <option value="gemini-2.5-flash">gemini-2.5-flash (default)</option>
           <option value="gemini-2.5-pro">gemini-2.5-pro (slower, smarter)</option>
         </select>
@@ -2964,6 +2964,143 @@ window.createNewFolder = function() {
     showToast('Curriculum created.');
   }
 };
+
+// ── GLOBAL FUNCTION EXPOSURE ─────────────────────────
+// Auth functions
+window.signInGoogle = async function() {
+  const authBtns = document.getElementById('auth-buttons');
+  const loadingEl = document.getElementById('loading-text');
+  if(authBtns) authBtns.style.display = 'none';
+  if(loadingEl) { loadingEl.style.display = 'flex'; loadingEl.textContent = '> AUTHENTICATING...'; }
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch(e) {
+    console.warn('Popup failed:', e.code);
+    if(e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
+      if(loadingEl) loadingEl.textContent = '> OPENING AUTH PAGE...';
+      try { await signInWithRedirect(auth, new GoogleAuthProvider()); } catch(e2) {
+        showToast('Sign-In failed. Please try again.');
+        if(authBtns) authBtns.style.display = 'flex';
+        if(loadingEl) loadingEl.style.display = 'none';
+      }
+    } else {
+      showToast('Sign-In failed: ' + (e.message || e.code));
+      if(authBtns) authBtns.style.display = 'flex';
+      if(loadingEl) loadingEl.style.display = 'none';
+    }
+  }
+};
+window.signInWithGoogle = window.signInGoogle;
+
+window.signOutUser = async function() {
+  try { await signOut(auth); window.location.reload(); }
+  catch(e) { showToast('Failed to sign out.'); }
+};
+
+// Save state (exposed to window for inline handlers)
+window.saveStateGlobal = function() { if(typeof saveState === 'function') saveState(); };
+
+// Chapter count selector
+window.setChapCount = function(n) {
+  if(typeof STATE !== 'undefined') STATE.summonChapters = n;
+  document.querySelectorAll('.chap-btn').forEach(b => {
+    const active = b.textContent.trim() === String(n);
+    b.classList.toggle('border-primary', active);
+    b.classList.toggle('bg-primary/10', active);
+    b.classList.toggle('text-primary', active);
+    b.classList.toggle('border-outline/40', !active);
+    b.classList.toggle('text-on-surface-variant', !active);
+  });
+};
+
+// New character / path screen
+window.showNewCharacter = function() {
+  closeApiModal();
+  const cancelBtn = document.getElementById('path-cancel-btn');
+  if(cancelBtn) cancelBtn.style.display = 'block';
+  showScreen('screen-path');
+};
+
+// Close all modals helper
+window.closeAllModals = function() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+  const bd = document.getElementById('modal-backdrop');
+  if(bd) bd.classList.add('hidden');
+};
+
+// Open/close API settings modal
+window.openApiModal = function() {
+  renderSettingsCharacters();
+  const ms = document.getElementById('model-selector');
+  if(ms && typeof STATE !== 'undefined') ms.value = STATE.selectedModel || 'gemini-2.5-flash';
+  document.getElementById('api-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+window.closeApiModal = function() {
+  document.getElementById('api-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+// Evo / Memory modal
+// Gambit / fate modal helpers
+window.openGambitModal = function() {
+  STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false;
+  const sl = document.getElementById('gambit-slider');
+  if(sl) { sl.max = Math.min(STATE.player.totalXp, 200); sl.value = 0; }
+  window.updateGambitWager(0);
+  document.getElementById('gambit-result').textContent = '';
+  document.getElementById('gambit-coin').textContent = 'casino';
+  document.getElementById('gambit-coin').style.color = '';
+  document.getElementById('gambit-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+window.closeGambitModal = function() {
+  document.getElementById('gambit-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+  window.openBattleModal();
+};
+window.openFateScrollModal = function() {
+  const FATE_EVENTS = [
+    {text:'+50',bonus:'The archive acknowledges your progress.',xp:50},
+    {text:'+80',bonus:'A classified sector unlocks briefly.',xp:80},
+    {text:'+100',bonus:'Perfect alignment. The Director smiles.',xp:100},
+    {text:'+20',bonus:'A small data packet recovered.',xp:20},
+    {text:'+150',bonus:'Deep vault access granted. Rare intel.',xp:150},
+    {text:'+60',bonus:'Guardian protocol weakened further.',xp:60},
+  ];
+  window._fateEvent = FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
+  window._fateRevealed = false;
+  const ri = document.getElementById('fate-reveal-area');
+  const fi = document.getElementById('fate-scroll-icon');
+  if(ri) { ri.style.display='none'; ri.classList.add('hidden'); }
+  if(fi) fi.style.display='flex';
+  document.getElementById('fate-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+window.revealFateScroll = function() {
+  if(window._fateRevealed) return;
+  window._fateRevealed = true;
+  const ev = window._fateEvent;
+  document.getElementById('fate-scroll-icon').style.display = 'none';
+  const ri = document.getElementById('fate-reveal-area');
+  if(ri) { ri.classList.remove('hidden'); ri.style.display='flex'; }
+  document.getElementById('fate-reveal-text').textContent = ev.text;
+  document.getElementById('fate-bonus-text').textContent = ev.bonus;
+  if(ev.xp > 0) { STATE.player.xp += ev.xp; STATE.player.totalXp += ev.xp; }
+  checkRankUp(); saveState();
+};
+window.closeFateModal = function() {
+  document.getElementById('fate-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+  renderHub();
+};
+
+// Rename character
+window.renameCharacter = function() {
+  const n = prompt('New operative codename:', STATE.player.name);
+  if(n && n.trim()) { STATE.player.name = n.trim(); saveState(); renderHub(); }
+};
+
 
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
