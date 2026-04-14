@@ -204,6 +204,24 @@ tailwind.config = {
 
 /* ── CLUE BOARD PARTICLE ── */
 @keyframes particleDrift { 0%{opacity:0;transform:translateY(0) scale(0);} 15%{opacity:0.8;transform:translateY(-15px) scale(1);} 100%{opacity:0;transform:translateY(-80px) scale(0.2);} }
+
+/* ── VAULT SIMULATION ── */
+.vault-row{display:flex;border-bottom:1px solid rgba(74,222,128,0.08);min-height:64px;}
+.vault-row:last-child{border-bottom:none;}
+.vault-corridor{width:28px;flex-shrink:0;background:rgba(5,46,22,0.3);border-right:1px solid rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;}
+.vault-corridor span{font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.3);writing-mode:vertical-rl;letter-spacing:0.2em;}
+.vault-room{flex:1;position:relative;cursor:pointer;transition:all 0.2s;border-right:1px solid rgba(74,222,128,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;min-height:64px;}
+.vault-room:last-child{border-right:none;}
+.vault-room:hover{background:rgba(74,222,128,0.06);}
+.vault-slot-empty{flex:1;min-height:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-right:1px dashed rgba(74,222,128,0.08);transition:all 0.2s;opacity:0.4;}
+.vault-slot-empty:hover{background:rgba(74,222,128,0.04);border-color:rgba(74,222,128,0.2);opacity:0.8;}
+.vault-slot-empty:last-child{border-right:none;}
+@keyframes capsFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-30px);}}
+.caps-float{position:fixed;font-size:11px;font-family:'Share Tech Mono',monospace;color:#4ade80;pointer-events:none;z-index:9999;animation:capsFloat 1.2s ease-out forwards;}
+@keyframes vaultPulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+.vault-room.active-prod{animation:vaultPulse 3s ease-in-out infinite;}
+.no-scrollbar::-webkit-scrollbar{display:none;}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
 </style>
 </head>
 <body class="font-body text-on-surface bg-surface overflow-x-hidden">
@@ -318,107 +336,160 @@ tailwind.config = {
 
   <!-- Tab bar -->
   <div class="flex-shrink-0 bg-surface-container-lowest border-b border-outline/20 z-20 flex">
-    <button onclick="switchTab('tab-dossier')" data-target="tab-dossier"
+    <button onclick="switchTab('tab-vault')" data-target="tab-vault"
             class="tab-btn flex-1 py-3 font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-b-2 border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">person_search</span>DOSSIER
+      <span class="material-symbols-outlined text-lg">domain</span>VAULT
     </button>
     <button onclick="switchTab('tab-missions')" data-target="tab-missions"
             class="tab-btn flex-1 py-3 font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-b-2 border-transparent transition-all flex flex-col items-center gap-0.5">
       <span class="material-symbols-outlined text-lg">folder_open</span>MISSIONS
-    </button>
-    <button onclick="switchTab('tab-clueboard')" data-target="tab-clueboard"
-            class="tab-btn flex-1 py-3 font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-b-2 border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">find_in_page</span>CASE_FILE
     </button>
   </div>
 
   <!-- Tab content -->
   <div class="flex-1 overflow-hidden">
 
-    <!-- ── DOSSIER TAB (was Spirit) ── -->
-    <div id="tab-dossier" class="tab-pane h-full overflow-y-auto">
-      <div class="px-4 pt-4 pb-28 max-w-lg mx-auto space-y-4">
+    <!-- ── VAULT TAB ── -->
+    <div id="tab-vault" class="tab-pane h-full overflow-y-auto">
+      <div class="pb-28">
 
-        <!-- Operative profile card -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-5 terminal-border relative overflow-hidden">
-          <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at top left, rgba(74,222,128,0.04) 0%, transparent 60%);"></div>
-          <div class="flex items-center gap-4 mb-4">
-            <div class="w-16 h-16 bg-surface-container border border-outline/40 rounded flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-3xl text-primary">person_search</span>
+        <!-- Resource bar -->
+        <div class="sticky top-0 z-10 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/20 px-3 py-2">
+          <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">⚡</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">POWER</div>
+                <div id="res-power" class="text-xs font-mono text-primary font-bold leading-none">0</div>
+              </div>
             </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">💰</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">CAPS</div>
+                <div id="res-caps" class="text-xs font-mono text-primary font-bold leading-none">0</div>
+              </div>
+            </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">🍖</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">FOOD</div>
+                <div id="res-food" class="text-xs font-mono text-primary font-bold leading-none">0</div>
+              </div>
+            </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">💧</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">WATER</div>
+                <div id="res-water" class="text-xs font-mono text-primary font-bold leading-none">0</div>
+              </div>
+            </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">🔩</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">MATS</div>
+                <div id="res-materials" class="text-xs font-mono text-primary font-bold leading-none">0</div>
+              </div>
+            </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">👤</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">DWELLERS</div>
+                <div id="res-dwellers" class="text-xs font-mono text-primary font-bold leading-none">0/0</div>
+              </div>
+            </div>
+            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="text-sm">😊</span>
+              <div>
+                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">MORALE</div>
+                <div id="res-happiness" class="text-xs font-mono text-primary font-bold leading-none">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vault cross-section -->
+        <div class="px-3 pt-3">
+          <div class="flex items-center justify-between mb-2">
             <div>
-              <div class="text-[10px] font-mono text-on-surface-variant tracking-widest mb-1">OPERATIVE CODENAME</div>
-              <div id="char-name" class="font-headline font-black text-xl text-primary crt-glow tracking-widest cursor-pointer hover:opacity-70" onclick="renameCharacter()"></div>
-              <div id="char-rank" class="text-[10px] font-mono text-on-surface-variant tracking-widest mt-0.5"></div>
+              <span class="text-[9px] font-mono text-primary/50 tracking-widest">VAULT 77 · CROSS-SECTION</span>
             </div>
-            <div class="ml-auto">
-              <button onclick="renameCharacter()" class="text-on-surface-variant hover:text-primary transition-colors">
-                <span class="material-symbols-outlined text-sm">edit</span>
-              </button>
+            <button onclick="openBuildMenu()" class="bubbly-btn flex items-center gap-1.5 bg-primary text-on-primary font-mono text-[9px] px-3 py-1.5 rounded tracking-widest uppercase">
+              <span class="material-symbols-outlined text-xs">add</span> BUILD
+            </button>
+          </div>
+
+          <!-- Vault entrance -->
+          <div class="bg-surface-container-lowest border border-outline/30 rounded-t-lg px-4 py-2 flex items-center justify-between mb-0">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-5 bg-surface-container-high border border-primary/30 rounded flex items-center justify-center">
+                <div class="w-4 h-3 bg-primary/20 border border-primary/40 rounded-sm"></div>
+              </div>
+              <span class="text-[9px] font-mono text-primary/50 tracking-widest">VAULT ENTRANCE · SECTOR 00</span>
+            </div>
+            <span class="text-[8px] font-mono text-on-surface-variant/40">SECURE</span>
+          </div>
+
+          <!-- Room grid -->
+          <div id="vault-grid" class="border border-outline/30 border-t-0 rounded-b-lg overflow-hidden bg-surface-container-lowest">
+            <!-- Rows generated by JS -->
+          </div>
+        </div>
+
+        <!-- Stats panel -->
+        <div class="px-3 mt-3 grid grid-cols-2 gap-2">
+          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
+            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">OPERATIVE</div>
+            <div id="vault-operative-name" class="font-headline font-black text-sm text-primary tracking-widest"></div>
+            <div id="vault-operative-rank" class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5"></div>
+            <div class="mt-2 space-y-1">
+              <div class="flex justify-between text-[9px] font-mono text-on-surface-variant/60">
+                <span>KNOWLEDGE XP</span><span id="vault-xp" class="text-primary">0</span>
+              </div>
+              <div class="h-1.5 bg-surface-container-highest rounded overflow-hidden">
+                <div id="vault-xp-bar" class="h-full bg-primary rounded transition-all" style="width:0%"></div>
+              </div>
             </div>
           </div>
-          <!-- XP bar -->
-          <div class="space-y-1 mb-4">
-            <div class="flex justify-between text-[10px] font-mono text-on-surface-variant tracking-widest">
-              <span>KNOWLEDGE_LEVEL</span>
-              <span id="xp-label" class="text-primary">0 / 0 XP</span>
-            </div>
-            <div class="h-2 bg-surface-container-highest rounded overflow-hidden border border-outline/20">
-              <div id="xp-bar" class="h-full bg-primary rounded transition-all duration-700" style="width:0%;box-shadow:0 0 6px rgba(74,222,128,0.5);"></div>
-            </div>
-          </div>
-          <!-- Stats grid -->
-          <div class="grid grid-cols-4 gap-2 text-center">
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">folder_open</span>
-              <div class="text-[8px] font-mono text-on-surface-variant mt-0.5 tracking-widest">MISSIONS</div>
-              <div id="stat-quests" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">menu_book</span>
-              <div class="text-[8px] font-mono text-on-surface-variant mt-0.5 tracking-widest">DOCS_READ</div>
-              <div id="stat-chapters" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">skull</span>
-              <div class="text-[8px] font-mono text-on-surface-variant mt-0.5 tracking-widest">NEUTRALISED</div>
-              <div id="stat-bosses" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">verified</span>
-              <div class="text-[8px] font-mono text-on-surface-variant mt-0.5 tracking-widest">PERFECT</div>
-              <div id="stat-perfect" class="font-headline font-black text-sm text-on-surface">0</div>
+          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
+            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">VAULT STATUS</div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-mono">
+                <span class="text-on-surface-variant/60">MISSIONS</span>
+                <span id="vault-stat-quests" class="text-on-surface">0</span>
+              </div>
+              <div class="flex justify-between text-[9px] font-mono">
+                <span class="text-on-surface-variant/60">DOCS READ</span>
+                <span id="vault-stat-chapters" class="text-on-surface">0</span>
+              </div>
+              <div class="flex justify-between text-[9px] font-mono">
+                <span class="text-on-surface-variant/60">THREATS DEFEATED</span>
+                <span id="vault-stat-bosses" class="text-on-surface">0</span>
+              </div>
+              <div class="flex justify-between text-[9px] font-mono">
+                <span class="text-on-surface-variant/60">PERFECT RUNS</span>
+                <span id="vault-stat-perfect" class="text-on-surface">0</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- CURRENT INTEL — story summary -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-4 terminal-border">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="material-symbols-outlined text-tertiary text-base">radio</span>
-            <h3 class="font-headline font-bold text-xs text-tertiary tracking-widest crt-glow-amber">CURRENT INTEL</h3>
-            <span class="ml-auto text-[9px] font-mono text-on-surface-variant/50 tracking-widest">LIVE UPLINK</span>
-          </div>
-          <div id="current-intel-text" class="text-[11px] font-mono text-on-surface-variant/80 leading-relaxed"></div>
-        </div>
-
-        <!-- Memory Recovery Log — clickable stages -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-4 terminal-border">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="material-symbols-outlined text-primary text-base">psychology</span>
-            <h3 class="font-headline font-bold text-xs text-primary tracking-widest">MEMORY RECOVERY LOG</h3>
-          </div>
-          <div id="memory-stage-list" class="space-y-2"></div>
-        </div>
-
-        <!-- Boss deadlines panel -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-4 space-y-3 terminal-border" id="deadline-panel">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-error text-base crt-glow-red">alarm</span>
-            <h3 class="font-headline font-bold text-sm text-error tracking-widest">TARGET_DEADLINES</h3>
-          </div>
-          <div id="deadline-list">
-            <div class="text-[10px] font-mono text-on-surface-variant italic">No active timers. Assign a deadline to a mission.</div>
+        <!-- Resource earning guide -->
+        <div class="px-3 mt-3">
+          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
+            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">HOW TO EARN RESOURCES</div>
+            <div class="grid grid-cols-2 gap-2 text-[9px] font-mono text-on-surface-variant/70">
+              <div class="flex items-center gap-1.5"><span>📖</span> Read chapters → <span class="text-primary">+Caps</span></div>
+              <div class="flex items-center gap-1.5"><span>⚔️</span> Defeat bosses → <span class="text-primary">+Power</span></div>
+              <div class="flex items-center gap-1.5"><span>🎯</span> Perfect runs → <span class="text-primary">+Materials</span></div>
+              <div class="flex items-center gap-1.5"><span>🏠</span> Build rooms → <span class="text-primary">+Dwellers</span></div>
+            </div>
           </div>
         </div>
 
@@ -458,41 +529,7 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- ── CASE FILE TAB (replaces backdrop/library) ── -->
-    <div id="tab-clueboard" class="tab-pane h-full overflow-y-auto">
-      <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-4">
-
-        <!-- Header -->
-        <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
-          <div class="font-headline text-[10px] tracking-[0.3em] text-primary/60 mb-1">CLASSIFICATION: EYES ONLY</div>
-          <h2 class="font-headline font-black text-xl text-primary crt-glow tracking-widest">CASE FILE ALPHA</h2>
-          <p class="text-on-surface-variant text-[10px] font-mono mt-2 leading-relaxed">
-            Clue fragments recovered from neutralised threats. Cross-reference to reconstruct the truth.
-          </p>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-4">
-          <div class="flex justify-between items-center text-[10px] font-mono text-on-surface-variant mb-2 tracking-widest">
-            <span>INVESTIGATION PROGRESS</span>
-            <span id="clue-progress-label" class="text-primary">0 / 8 FRAGMENTS</span>
-          </div>
-          <div class="h-2 bg-surface-container-highest rounded overflow-hidden border border-outline/20">
-            <div id="clue-progress-bar" class="h-full bg-primary transition-all duration-700" style="width:0%;box-shadow:0 0 6px rgba(74,222,128,0.4);"></div>
-          </div>
-          <div id="final-revelation" class="hidden mt-3 p-3 border border-tertiary/40 rounded bg-surface-container text-xs font-mono text-tertiary crt-glow-amber leading-relaxed"></div>
-        </div>
-
-        <!-- Clue grid -->
-        <div id="clue-board" class="space-y-3"></div>
-
-        <!-- Locked message -->
-        <div class="text-center text-[10px] font-mono text-on-surface-variant/50 mt-4 leading-relaxed">
-          Defeat mission bosses to recover fragments.<br/>Each clue is a piece of the truth.
-        </div>
-
-      </div>
-    </div>
+    
 
   </div>
 </div>
@@ -1007,6 +1044,62 @@ tailwind.config = {
       <button onclick="closeTosModal()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 rounded text-xs tracking-widest uppercase" style="box-shadow:0 0 15px rgba(74,222,128,0.15);">
         ACKNOWLEDGED
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BUILD MENU MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[205]" id="build-menu">
+  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[88vh] flex flex-col terminal-border">
+    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
+      <div>
+        <div class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5">VAULT CONSTRUCTION</div>
+        <h3 class="font-headline font-bold text-sm text-primary crt-glow tracking-widest">BUILD ROOM</h3>
+      </div>
+      <button onclick="closeBuildMenu()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div class="p-3 bg-surface-container border-b border-outline/20 flex gap-3 text-[9px] font-mono flex-shrink-0">
+      <span>💰 <span id="bm-caps" class="text-primary font-bold">0</span> caps</span>
+      <span>🔩 <span id="bm-mats" class="text-primary font-bold">0</span> mats</span>
+      <span>⚡ <span id="bm-power" class="text-primary font-bold">0</span> power</span>
+    </div>
+    <div id="build-menu-list" class="overflow-y-auto flex-1 p-3 space-y-2"></div>
+    <div id="build-slot-info" class="hidden p-3 border-t border-outline/20 text-[9px] font-mono text-on-surface-variant/60 flex-shrink-0"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ROOM DETAIL MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay z-[205]" id="room-detail-modal">
+  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 terminal-border">
+    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
+      <div>
+        <div id="rdm-badge" class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5"></div>
+        <h3 id="rdm-title" class="font-headline font-bold text-sm text-primary crt-glow tracking-widest"></h3>
+      </div>
+      <button onclick="closeRoomDetail()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div id="rdm-stats" class="grid grid-cols-2 gap-2 text-[9px] font-mono"></div>
+      <div id="rdm-dweller-section" class="space-y-2">
+        <div class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest">ASSIGNED DWELLERS</div>
+        <div id="rdm-dwellers" class="flex gap-1 flex-wrap"></div>
+        <div class="flex gap-2">
+          <button id="rdm-assign-btn" onclick="assignDweller()" class="flex-1 bg-primary/10 border border-primary/40 text-primary font-mono text-[9px] py-1.5 rounded hover:bg-primary/20 transition-colors tracking-widest">+ ASSIGN</button>
+          <button id="rdm-remove-btn" onclick="removeDweller()" class="flex-1 bg-surface-container border border-outline/30 text-on-surface-variant font-mono text-[9px] py-1.5 rounded hover:border-error/40 hover:text-error transition-colors tracking-widest">- REMOVE</button>
+        </div>
+      </div>
+      <div class="flex gap-2 pt-1">
+        <button id="rdm-upgrade-btn" onclick="upgradeRoom()" class="flex-1 bubbly-btn bg-primary text-on-primary font-headline font-bold py-2 rounded text-[9px] tracking-widest uppercase"></button>
+        <button onclick="demolishRoom()" class="bg-surface-container border border-error/30 text-error/70 font-mono text-[9px] px-3 py-2 rounded hover:bg-error/10 transition-colors tracking-widest">DEMOLISH</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1710,11 +1803,8 @@ function renderHub(){
   if(typeof p.storyAct === 'undefined') p.storyAct = 0;
   if(!p.cluesUnlocked) p.cluesUnlocked = [];
 
-  // Current intel summary
-  renderCurrentIntel(p);
-
-  // Memory stage list
-  renderMemoryStageList(p);
+  // Vault tab
+  if(document.getElementById('tab-vault')?.classList.contains('active')) renderVaultTab();
 
   // Clue board
   renderClueBoard();
@@ -2054,17 +2144,15 @@ function finishQuiz(quest){
   if(quest.bossHp===0){
     if(!wasAlreadyDefeated){
       quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100; checkRankUp();
-      // Award clue fragment
-      const newClue = addClue(STATE.player, STATE.activeQuestIdx);
-      if(newClue) {
-        quest._newClue = newClue;
-        // Show clue in battle modal
-        const clueSection = document.getElementById('clue-reveal-section');
+      // Award vault resources
+      awardLearningResources('boss_defeat', {perfect});
+      if(perfect) awardLearningResources('perfect_run');
+      // Show resource gain in battle modal
+      const clueSection = document.getElementById('clue-reveal-section');
+      if(clueSection) {
+        clueSection.classList.remove('hidden');
         const clueContent = document.getElementById('clue-reveal-content');
-        if(clueSection && clueContent) {
-          clueSection.classList.remove('hidden');
-          clueContent.innerHTML = `<span class="text-[9px] tracking-widest text-primary/60">${newClue.label} · ${newClue.type.replace('_',' ').toUpperCase()}</span><br><span class="text-lg mr-1">${newClue.icon}</span><br><span class="text-primary/80 whitespace-pre-line">${newClue.raw}</span><br><span class="text-on-surface-variant/60 text-[9px] mt-1 block">${newClue.hint}</span>`;
-        }
+        if(clueContent) clueContent.innerHTML = `<div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">⚡ VAULT RESOURCES ACQUIRED</div><div class="flex gap-4 text-sm">${perfect?'<span>⚡+12 💰+40 🔩+3</span>':'<span>⚡+8 💰+20</span>'}</div><div class="text-[9px] font-mono text-on-surface-variant/50 mt-1">Resources added to your vault</div>`;
       }
     } else {
       STATE.player.xp+=30; STATE.player.totalXp+=30; checkRankUp();
@@ -2300,7 +2388,552 @@ window.renameCurriculum = function(curriculumId) {
 };
 
 
-// ── NAVIGATION & GAME FUNCTIONS ─────────────────────
+
+// ══════════════════════════════════════════════════════
+//  VAULT SIMULATION ENGINE
+// ══════════════════════════════════════════════════════
+
+const ROOM_DEFS = {
+  power:    { name:'POWER GRID',    icon:'⚡', desc:'Generates power for all vault systems.',          cost:{caps:30,materials:10},  produces:{power:3},       requires:{power:0},  maxDwellers:3, color:'rgba(74,222,128,0.12)',  upgradeMult:1.8 },
+  quarters: { name:'LIVING QTRS',   icon:'🏠', desc:'Housing for dwellers. Increases capacity.',       cost:{caps:40,materials:15},  produces:{maxDwellers:2}, requires:{power:2},  maxDwellers:2, color:'rgba(86,180,233,0.1)',   upgradeMult:2   },
+  cafeteria:{ name:'CAFETERIA',     icon:'🍖', desc:'Produces food. Keeps dwellers healthy.',          cost:{caps:35,materials:12},  produces:{food:4},        requires:{power:3},  maxDwellers:3, color:'rgba(255,160,50,0.1)',   upgradeMult:1.7 },
+  water:    { name:'WATER TREAT.',  icon:'💧', desc:'Purifies water for drinking.',                    cost:{caps:35,materials:12},  produces:{water:4},       requires:{power:3},  maxDwellers:3, color:'rgba(86,180,233,0.12)',  upgradeMult:1.7 },
+  library:  { name:'DATA LIBRARY',  icon:'📚', desc:'Boosts XP gain from missions. +15% per level.',  cost:{caps:60,materials:20},  produces:{xpBonus:0.15},  requires:{power:4},  maxDwellers:4, color:'rgba(74,222,128,0.08)',  upgradeMult:1.5 },
+  armory:   { name:'ARMORY',        icon:'⚔️',  desc:'Dwellers here improve boss battle outcomes.',   cost:{caps:80,materials:30},  produces:{battleBonus:1}, requires:{power:5},  maxDwellers:4, color:'rgba(248,113,113,0.1)',  upgradeMult:2   },
+  workshop: { name:'WORKSHOP',      icon:'🔩', desc:'Produces materials for building and upgrades.',   cost:{caps:50,materials:5},   produces:{materials:2},   requires:{power:4},  maxDwellers:3, color:'rgba(255,200,50,0.1)',   upgradeMult:1.8 },
+  medbay:   { name:'MED BAY',       icon:'🏥', desc:'Boosts morale. Dwellers recover faster.',        cost:{caps:70,materials:25},  produces:{happiness:5},   requires:{power:5},  maxDwellers:3, color:'rgba(150,250,150,0.08)', upgradeMult:1.6 },
+  reactor:  { name:'REACTOR CORE',  icon:'☢️',  desc:'Generates massive power. Requires materials.',  cost:{caps:120,materials:50}, produces:{power:8},       requires:{power:0},  maxDwellers:2, color:'rgba(74,222,128,0.18)',  upgradeMult:2.5 },
+  academy:  { name:'ACADEMY',       icon:'🎓', desc:'Doubles caps earned from reading chapters.',      cost:{caps:100,materials:40}, produces:{capsBonus:2},   requires:{power:6},  maxDwellers:5, color:'rgba(253,207,80,0.1)',   upgradeMult:1.8 },
+};
+
+const VAULT_ROWS = 4;
+const VAULT_COLS = 4;
+
+function getVault() {
+  if (!STATE.player.vault) {
+    STATE.player.vault = defaultPlayer(STATE.player.name).vault;
+  }
+  return STATE.player.vault;
+}
+
+function ensureVaultMigrated() {
+  const v = getVault();
+  if (!v.rooms) v.rooms = [];
+  if (typeof v.caps === 'undefined') v.caps = 50;
+  if (typeof v.power === 'undefined') v.power = 10;
+  if (typeof v.materials === 'undefined') v.materials = 5;
+  if (typeof v.food === 'undefined') v.food = 20;
+  if (typeof v.water === 'undefined') v.water = 20;
+  if (typeof v.dwellers === 'undefined') v.dwellers = 2;
+  if (typeof v.maxDwellers === 'undefined') v.maxDwellers = 10;
+  if (typeof v.happiness === 'undefined') v.happiness = 75;
+  if (typeof v.lastTick === 'undefined') v.lastTick = Date.now();
+}
+
+// ── Passive resource tick ────────────────────────────
+function vaultTick() {
+  if (!STATE.player?.vault) return;
+  ensureVaultMigrated();
+  const v = STATE.player.vault;
+  const now = Date.now();
+  const elapsed = Math.min((now - (v.lastTick || now)) / 1000, 300); // cap at 5min
+  v.lastTick = now;
+
+  if (elapsed < 1) return;
+
+  // Calculate production from rooms
+  let foodProd = 0, waterProd = 0, matProd = 0, powerProd = 0, happyProd = 0;
+  let totalPowerNeeded = 0;
+  (v.rooms || []).forEach(r => {
+    const def = ROOM_DEFS[r.type];
+    if (!def) return;
+    const lvl = r.level || 1;
+    const dwellerEff = Math.max(0.3, (r.dwellers || 0) / def.maxDwellers);
+    if (def.produces.food)      foodProd += def.produces.food * lvl * dwellerEff;
+    if (def.produces.water)     waterProd += def.produces.water * lvl * dwellerEff;
+    if (def.produces.materials) matProd += def.produces.materials * lvl * dwellerEff;
+    if (def.produces.power)     powerProd += def.produces.power * lvl * dwellerEff;
+    if (def.produces.happiness) happyProd += def.produces.happiness * lvl * dwellerEff;
+    if (r.type !== 'power' && r.type !== 'reactor') totalPowerNeeded += lvl;
+  });
+
+  const powerSufficient = v.power + powerProd * (elapsed / 60) >= totalPowerNeeded;
+  const eff = powerSufficient ? 1 : 0.4;
+
+  v.food = Math.min(999, (v.food || 0) + foodProd * (elapsed / 60) * eff);
+  v.water = Math.min(999, (v.water || 0) + waterProd * (elapsed / 60) * eff);
+  v.materials = Math.min(9999, (v.materials || 0) + matProd * (elapsed / 60) * eff);
+  v.power = Math.max(0, Math.min(999, (v.power || 0) + powerProd * (elapsed / 60)));
+
+  // Happiness drift
+  const targetHappy = Math.min(100, Math.max(10,
+    40 +
+    (v.food > 10 ? 15 : 0) +
+    (v.water > 10 ? 15 : 0) +
+    happyProd * 0.5 +
+    (powerSufficient ? 10 : -20)
+  ));
+  v.happiness = v.happiness + (targetHappy - v.happiness) * 0.05;
+}
+
+// ── Vault render ────────────────────────────────────
+function renderVaultTab() {
+  if (!STATE.player) return;
+  ensureVaultMigrated();
+  const v = STATE.player.vault;
+
+  // Update resource bar
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('res-power',    Math.floor(v.power));
+  set('res-caps',     Math.floor(v.caps));
+  set('res-food',     Math.floor(v.food));
+  set('res-water',    Math.floor(v.water));
+  set('res-materials',Math.floor(v.materials));
+  set('res-dwellers', `${v.dwellers}/${v.maxDwellers}`);
+  set('res-happiness',Math.floor(v.happiness) + '%');
+
+  // Update stats
+  set('vault-operative-name', STATE.player.name.toUpperCase());
+  const rank = getCurrentRank();
+  set('vault-operative-rank', `${rank.name} · ${rank.en}`);
+  set('vault-xp', STATE.player.totalXp);
+  const nextRank = getNextRank();
+  const bar = document.getElementById('vault-xp-bar');
+  if (bar && nextRank) {
+    const pct = Math.min(100, ((STATE.player.totalXp - rank.xp) / (nextRank.xp - rank.xp)) * 100);
+    bar.style.width = pct + '%';
+  }
+  set('vault-stat-quests',   STATE.player.questsCreated || 0);
+  set('vault-stat-chapters', STATE.player.chaptersCompleted || 0);
+  set('vault-stat-bosses',   STATE.player.bossesDefeated || 0);
+  set('vault-stat-perfect',  STATE.player.perfectRuns || 0);
+
+  renderVaultGrid();
+}
+
+function renderVaultGrid() {
+  const grid = document.getElementById('vault-grid');
+  if (!grid || !STATE.player) return;
+  const v = STATE.player.vault;
+  const rooms = v.rooms || [];
+
+  // Build room map: key = `${row},${col}`
+  const roomMap = {};
+  rooms.forEach(r => { roomMap[`${r.y},${r.x}`] = r; });
+
+  grid.innerHTML = '';
+  for (let row = 0; row < VAULT_ROWS; row++) {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'vault-row';
+
+    // Corridor label
+    const corridor = document.createElement('div');
+    corridor.className = 'vault-corridor';
+    corridor.innerHTML = `<span>B${row + 1}</span>`;
+    rowDiv.appendChild(corridor);
+
+    for (let col = 0; col < VAULT_COLS; col++) {
+      const room = roomMap[`${row},${col}`];
+      if (room) {
+        const def = ROOM_DEFS[room.type];
+        const cell = document.createElement('div');
+        cell.className = `vault-room level-${room.level} active-prod`;
+        cell.style.background = def?.color || 'rgba(74,222,128,0.08)';
+        const prodStr = getProdString(def, room.level);
+        cell.innerHTML = `
+          <div class="vault-room-icon">${def?.icon || '?'}</div>
+          <div class="vault-room-name">${def?.name || room.type}</div>
+          <div class="vault-room-level" style="font-family:'Orbitron',monospace;font-size:7px;color:rgba(74,222,128,0.5)">LVL ${room.level}</div>
+          <div style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.8)">${prodStr}</div>
+          <div style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.4)">👤 ${room.dwellers||0}/${def?.maxDwellers||2}</div>
+        `;
+        cell.addEventListener('click', () => openRoomDetail(room, row, col));
+        cell.addEventListener('touchend', e => { e.preventDefault(); openRoomDetail(room, row, col); });
+        rowDiv.appendChild(cell);
+      } else {
+        const slot = document.createElement('div');
+        slot.className = 'vault-slot-empty';
+        slot.innerHTML = `<span style="font-size:18px;opacity:0.3">➕</span>`;
+        slot.addEventListener('click', () => openBuildMenu(row, col));
+        slot.addEventListener('touchend', e => { e.preventDefault(); openBuildMenu(row, col); });
+        rowDiv.appendChild(slot);
+      }
+    }
+    grid.appendChild(rowDiv);
+  }
+}
+
+function getProdString(def, level) {
+  if (!def?.produces) return '';
+  const p = def.produces;
+  const lvl = level || 1;
+  if (p.power)      return `+${(p.power * lvl).toFixed(0)} ⚡/min`;
+  if (p.food)       return `+${(p.food * lvl).toFixed(0)} 🍖/min`;
+  if (p.water)      return `+${(p.water * lvl).toFixed(0)} 💧/min`;
+  if (p.materials)  return `+${(p.materials * lvl).toFixed(0)} 🔩/min`;
+  if (p.happiness)  return `+${(p.happiness * lvl).toFixed(0)} 😊`;
+  if (p.maxDwellers)return `+${p.maxDwellers * lvl} 👤 cap`;
+  if (p.xpBonus)    return `+${(p.xpBonus * lvl * 100).toFixed(0)}% XP`;
+  if (p.capsBonus)  return `x${(p.capsBonus * lvl).toFixed(1)} 💰`;
+  if (p.battleBonus)return `⚔️ +${p.battleBonus * lvl} ATK`;
+  return '';
+}
+
+// ── Build menu ──────────────────────────────────────
+let _buildSlot = null;
+
+window.openBuildMenu = function(row, col) {
+  _buildSlot = (row !== undefined) ? {row, col} : null;
+  ensureVaultMigrated();
+  const v = STATE.player.vault;
+
+  document.getElementById('bm-caps').textContent = Math.floor(v.caps);
+  document.getElementById('bm-mats').textContent = Math.floor(v.materials);
+  document.getElementById('bm-power').textContent = Math.floor(v.power);
+
+  const totalPower = (v.rooms||[]).reduce((sum, r) => {
+    const def = ROOM_DEFS[r.type];
+    return sum + (def?.produces?.power || 0) * r.level;
+  }, 0);
+  const usedPower = (v.rooms||[]).reduce((sum, r) => {
+    if (r.type === 'power' || r.type === 'reactor') return sum;
+    return sum + r.level;
+  }, 0);
+
+  const list = document.getElementById('build-menu-list');
+  list.innerHTML = '';
+
+  Object.entries(ROOM_DEFS).forEach(([type, def]) => {
+    const canAfford = v.caps >= def.cost.caps && v.materials >= (def.cost.materials || 0);
+    const hasPower = (def.requires?.power || 0) <= (totalPower - usedPower);
+    const buildable = canAfford && hasPower;
+
+    const card = document.createElement('div');
+    card.className = `room-card p-3 rounded border transition-all ${buildable ? 'border-outline/30 bg-surface-container cursor-pointer hover:border-primary/60 hover:bg-primary/5' : 'border-outline/10 bg-surface-container-lowest opacity-40 cursor-not-allowed'}`;
+    card.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">${def.icon}</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] font-mono text-primary/80 font-bold tracking-widest">${def.name}</span>
+            <span class="text-[9px] font-mono text-on-surface-variant/50">${getProdString(def, 1)}</span>
+          </div>
+          <p class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5">${def.desc}</p>
+          <div class="flex gap-3 mt-1 text-[8px] font-mono">
+            <span class="${v.caps >= def.cost.caps ? 'text-primary' : 'text-error'}">💰 ${def.cost.caps}</span>
+            <span class="${v.materials >= (def.cost.materials||0) ? 'text-primary' : 'text-error'}">🔩 ${def.cost.materials||0}</span>
+            ${def.requires?.power ? `<span class="${hasPower ? 'text-primary' : 'text-error'}">⚡ needs ${def.requires.power}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    if (buildable) {
+      card.addEventListener('click', () => buildRoom(type));
+      card.addEventListener('touchend', e => { e.preventDefault(); buildRoom(type); });
+    }
+    list.appendChild(card);
+  });
+
+  const info = document.getElementById('build-slot-info');
+  if (_buildSlot) {
+    info.classList.remove('hidden');
+    info.textContent = `PLACING IN SECTOR B${_buildSlot.row+1} · COLUMN ${_buildSlot.col+1}`;
+  } else {
+    info.classList.add('hidden');
+  }
+
+  document.getElementById('build-menu').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeBuildMenu = function() {
+  document.getElementById('build-menu').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+window.buildRoom = function(type) {
+  const def = ROOM_DEFS[type];
+  if (!def) return;
+  const v = STATE.player.vault;
+  if (v.caps < def.cost.caps || v.materials < (def.cost.materials||0)) {
+    showToast('Insufficient resources.');
+    return;
+  }
+
+  // Find slot
+  let row = _buildSlot?.row, col = _buildSlot?.col;
+  if (row === undefined) {
+    // Find first empty slot
+    const roomMap = {};
+    (v.rooms||[]).forEach(r => { roomMap[`${r.y},${r.x}`] = true; });
+    outer: for (let r = 0; r < VAULT_ROWS; r++) {
+      for (let c = 0; c < VAULT_COLS; c++) {
+        if (!roomMap[`${r},${c}`]) { row = r; col = c; break outer; }
+      }
+    }
+  }
+  if (row === undefined) { showToast('No empty slots available.'); return; }
+
+  v.caps -= def.cost.caps;
+  v.materials -= (def.cost.materials || 0);
+  v.rooms = v.rooms || [];
+  v.rooms.push({ id: `r${Date.now()}`, type, level: 1, x: col, y: row, dwellers: 0, maxDwellers: def.maxDwellers });
+
+  // Update maxDwellers if quarters
+  if (def.produces.maxDwellers) v.maxDwellers += def.produces.maxDwellers;
+
+  saveState();
+  closeBuildMenu();
+  renderVaultGrid();
+  renderVaultResourceBar();
+  showToast(`${def.icon} ${def.name} constructed!`);
+  floatText(`-${def.cost.caps} 💰`, document.getElementById('res-caps'));
+};
+
+function renderVaultResourceBar() {
+  const v = getVault();
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('res-power', Math.floor(v.power));
+  set('res-caps', Math.floor(v.caps));
+  set('res-food', Math.floor(v.food));
+  set('res-water', Math.floor(v.water));
+  set('res-materials', Math.floor(v.materials));
+  set('res-dwellers', `${v.dwellers}/${v.maxDwellers}`);
+  set('res-happiness', Math.floor(v.happiness) + '%');
+  set('bm-caps', Math.floor(v.caps));
+  set('bm-mats', Math.floor(v.materials));
+  set('bm-power', Math.floor(v.power));
+}
+
+// ── Room detail ─────────────────────────────────────
+let _activeRoom = null;
+
+window.openRoomDetail = function(room, row, col) {
+  _activeRoom = room;
+  const def = ROOM_DEFS[room.type];
+  const v = getVault();
+
+  document.getElementById('rdm-badge').textContent = `SECTOR B${(row||0)+1} · COL ${(col||0)+1} · LVL ${room.level}`;
+  document.getElementById('rdm-title').textContent = (def?.icon || '') + '  ' + (def?.name || room.type);
+
+  const stats = document.getElementById('rdm-stats');
+  stats.innerHTML = `
+    <div class="bg-surface-container rounded p-2 border border-outline/20">
+      <div class="text-on-surface-variant/50 mb-0.5">PRODUCTION</div>
+      <div class="text-primary font-bold">${getProdString(def, room.level)}</div>
+    </div>
+    <div class="bg-surface-container rounded p-2 border border-outline/20">
+      <div class="text-on-surface-variant/50 mb-0.5">DWELLERS</div>
+      <div class="text-primary font-bold">${room.dwellers||0} / ${def?.maxDwellers||2}</div>
+    </div>
+  `;
+
+  // Dweller dots
+  const dw = document.getElementById('rdm-dwellers');
+  dw.innerHTML = '';
+  for (let i = 0; i < (def?.maxDwellers||2); i++) {
+    const dot = document.createElement('div');
+    dot.className = `w-6 h-6 rounded-full border ${i < (room.dwellers||0) ? 'bg-primary border-primary' : 'bg-surface-container border-outline/30'}`;
+    dot.innerHTML = i < (room.dwellers||0) ? '<span class="text-on-primary text-[10px] flex items-center justify-center h-full">👤</span>' : '';
+    dw.appendChild(dot);
+  }
+
+  // Upgrade button
+  const upgBtn = document.getElementById('rdm-upgrade-btn');
+  const upgCost = getUpgradeCost(room, def);
+  const canUpgrade = v.caps >= upgCost.caps && v.materials >= upgCost.materials;
+  upgBtn.textContent = `UPGRADE LVL ${room.level} → ${room.level+1}  (💰${upgCost.caps} 🔩${upgCost.materials})`;
+  upgBtn.disabled = !canUpgrade;
+  upgBtn.style.opacity = canUpgrade ? '1' : '0.4';
+
+  document.getElementById('room-detail-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeRoomDetail = function() {
+  document.getElementById('room-detail-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+function getUpgradeCost(room, def) {
+  const mult = Math.pow(def?.upgradeMult || 2, room.level);
+  return { caps: Math.floor(30 * mult), materials: Math.floor(10 * mult) };
+}
+
+window.upgradeRoom = function() {
+  if (!_activeRoom) return;
+  const def = ROOM_DEFS[_activeRoom.type];
+  const v = getVault();
+  const cost = getUpgradeCost(_activeRoom, def);
+  if (v.caps < cost.caps || v.materials < cost.materials) { showToast('Insufficient resources.'); return; }
+  v.caps -= cost.caps;
+  v.materials -= cost.materials;
+  _activeRoom.level++;
+  if (def?.produces?.maxDwellers) v.maxDwellers += def.produces.maxDwellers;
+  saveState();
+  closeRoomDetail();
+  renderVaultGrid();
+  renderVaultResourceBar();
+  showToast(`${def?.icon} ${def?.name} upgraded to LVL ${_activeRoom.level}!`);
+};
+
+window.demolishRoom = function() {
+  if (!_activeRoom || !confirm('Demolish this room? Resources will be partially refunded.')) return;
+  const def = ROOM_DEFS[_activeRoom.type];
+  const v = getVault();
+  v.rooms = v.rooms.filter(r => r.id !== _activeRoom.id);
+  // Refund 40%
+  v.caps += Math.floor(def?.cost.caps * 0.4 * _activeRoom.level);
+  v.materials += Math.floor((def?.cost.materials||0) * 0.4 * _activeRoom.level);
+  if (def?.produces?.maxDwellers) { v.maxDwellers = Math.max(2, v.maxDwellers - def.produces.maxDwellers * _activeRoom.level); }
+  // Remove excess dwellers
+  v.dwellers = Math.min(v.dwellers, v.maxDwellers);
+  saveState();
+  closeRoomDetail();
+  renderVaultGrid();
+  renderVaultResourceBar();
+  showToast('Room demolished. Resources partially refunded.');
+};
+
+window.assignDweller = function() {
+  if (!_activeRoom) return;
+  const def = ROOM_DEFS[_activeRoom.type];
+  const v = getVault();
+  const freeDwellers = v.maxDwellers - v.dwellers;
+  if (freeDwellers <= 0) { showToast('No available dwellers. Build quarters to expand capacity.'); return; }
+  if ((_activeRoom.dwellers||0) >= (def?.maxDwellers||2)) { showToast('Room is at full capacity.'); return; }
+  _activeRoom.dwellers = (_activeRoom.dwellers||0) + 1;
+  v.dwellers = (v.dwellers||0) + 1;
+  saveState();
+  openRoomDetail(_activeRoom, _activeRoom.y, _activeRoom.x);
+  renderVaultGrid();
+};
+
+window.removeDweller = function() {
+  if (!_activeRoom || !(_activeRoom.dwellers > 0)) return;
+  _activeRoom.dwellers--;
+  getVault().dwellers = Math.max(0, (getVault().dwellers||1) - 1);
+  saveState();
+  openRoomDetail(_activeRoom, _activeRoom.y, _activeRoom.x);
+  renderVaultGrid();
+};
+
+// ── Resource rewards from learning ──────────────────
+function awardLearningResources(type, data) {
+  if (!STATE.player?.vault) return;
+  ensureVaultMigrated();
+  const v = STATE.player.vault;
+  const xpBonus = getVaultBonus('xpBonus');
+  const capsBonus = getVaultBonus('capsBonus');
+
+  switch(type) {
+    case 'chapter': {
+      // Reading a chapter = caps
+      const base = 5;
+      const earned = Math.floor(base * capsBonus);
+      v.caps += earned;
+      showFloatOnElement('res-caps', `+${earned} 💰`);
+      break;
+    }
+    case 'boss_defeat': {
+      // Boss defeat = power cores + caps
+      const powerEarned = 8 + (data?.perfect ? 4 : 0);
+      const capsEarned = Math.floor(20 * capsBonus);
+      v.power += powerEarned;
+      v.caps += capsEarned;
+      showFloatOnElement('res-power', `+${powerEarned} ⚡`);
+      setTimeout(() => showFloatOnElement('res-caps', `+${capsEarned} 💰`), 400);
+      break;
+    }
+    case 'perfect_run': {
+      // Perfect quiz = rare materials
+      const mats = 3 + Math.floor(Math.random() * 3);
+      v.materials += mats;
+      showFloatOnElement('res-materials', `+${mats} 🔩`);
+      break;
+    }
+    case 'dweller_gained': {
+      // Earning a dweller (every 5 chapters)
+      if (v.dwellers < v.maxDwellers) {
+        // Free dweller - auto-assign to empty room or keep unassigned
+        v.dwellers++;
+        showToast('👤 New Vault Dweller joined!');
+      }
+      break;
+    }
+  }
+  saveState();
+  if (document.getElementById('tab-vault')?.classList.contains('active')) {
+    renderVaultResourceBar();
+  }
+}
+
+function getVaultBonus(bonusType) {
+  const v = getVault();
+  let bonus = 1;
+  (v.rooms || []).forEach(r => {
+    const def = ROOM_DEFS[r.type];
+    if (def?.produces?.[bonusType]) bonus += def.produces[bonusType] * r.level;
+  });
+  return bonus;
+}
+
+function showFloatOnElement(elementId, text) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const float = document.createElement('div');
+  float.className = 'caps-float';
+  float.textContent = text;
+  float.style.left = rect.left + 'px';
+  float.style.top = (rect.top - 10) + 'px';
+  document.body.appendChild(float);
+  setTimeout(() => float.remove(), 1300);
+}
+
+function floatText(text, el) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const div = document.createElement('div');
+  div.className = 'caps-float';
+  div.textContent = text;
+  div.style.left = rect.left + 'px';
+  div.style.top = (rect.top - 5) + 'px';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 1300);
+}
+
+// ── Vault passive tick loop ──────────────────────────
+let _vaultTickInterval = null;
+function startVaultTick() {
+  if (_vaultTickInterval) return;
+  _vaultTickInterval = setInterval(() => {
+    if (!STATE.player) return;
+    vaultTick();
+    if (document.getElementById('tab-vault')?.classList.contains('active')) {
+      renderVaultResourceBar();
+      renderVaultGrid();
+    }
+  }, 10000); // tick every 10 seconds
+}
+
+// ── Hook into learning events ────────────────────────
+// Patch markChapterComplete
+const _origMarkChapter = window.markChapterComplete;
+window.markChapterComplete = async function() {
+  await _origMarkChapter?.call(this, ...arguments);
+  awardLearningResources('chapter');
+  // Every 5 chapters, earn a dweller
+  if (STATE.player && (STATE.player.chaptersCompleted % 5 === 0)) {
+    awardLearningResources('dweller_gained');
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  END VAULT SIMULATION ENGINE
+// ══════════════════════════════════════════════════════
+
+
 const RANKS = [
   { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
   { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
@@ -2598,7 +3231,7 @@ async function loadState(){
     syncActiveSaveToState();
     saveState();
     showScreen('screen-hub');
-    window.switchTab('tab-dossier');
+    window.switchTab('tab-vault');
     renderHub();
   } else {
     showScreen('screen-path');
@@ -2890,9 +3523,27 @@ window.doSummonQuest=async function(){
 
 
 function defaultPlayer(name) {
-  return { name, xp:0, totalXp:0, rank:0,
+  return {
+    name, xp:0, totalXp:0, rank:0,
     questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[],
-    storyAct: 0 };
+    storyAct: 0,
+    // Vault resources
+    vault: {
+      caps: 50,          // currency (from chapter reads)
+      power: 10,         // from boss defeats
+      materials: 5,      // from perfect runs
+      food: 20,          // passive
+      water: 20,         // passive
+      dwellers: 2,       // from chapter completions
+      maxDwellers: 10,
+      happiness: 75,
+      rooms: [
+        { id:'r0', type:'power',    level:1, x:0, y:2, w:2, dwellers:1, maxDwellers:2 },
+        { id:'r1', type:'quarters', level:1, x:2, y:2, w:2, dwellers:1, maxDwellers:2 },
+      ],
+      lastTick: Date.now(),
+    }
+  };
 }
 
 
@@ -3133,8 +3784,9 @@ window.renameCharacter = function() {
 
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  const firstTab=document.querySelector('.tab-btn[data-target="tab-dossier"]');
+  const firstTab=document.querySelector('.tab-btn[data-target="tab-vault"]');
   if(firstTab){ firstTab.classList.remove('text-on-surface-variant','border-transparent'); firstTab.classList.add('text-primary','border-primary'); }
+  startVaultTick();
 
   // Check for redirect result first (handles cases where popup wasn't available)
   getRedirectResult(auth).catch(()=>{});
@@ -3339,7 +3991,7 @@ window.storyCTA = function() {
   stopStoryParticles();
   const overlay = document.getElementById('story-overlay');
   if (overlay) overlay.style.display = 'none';
-  if (act === 0) { showScreen('screen-hub'); window.switchTab('tab-dossier'); renderHub(); }
+  if (act === 0) { showScreen('screen-hub'); window.switchTab('tab-vault'); renderHub(); renderVaultTab(); }
   else { renderHub(); }
 };
 
