@@ -2281,6 +2281,8 @@ function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ retu
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
+let evoActiveTypeId = "voidling";
+
 // ── NAVIGATION & GAME FUNCTIONS ─────────────────────
 const RANKS = [
   { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
@@ -2784,6 +2786,8 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   ctx.restore();
 }
 
+
+let bossAnimFrames = {};
 
 function animateBossCanvas(el,data,ratio=1.0,key='main'){
   if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
