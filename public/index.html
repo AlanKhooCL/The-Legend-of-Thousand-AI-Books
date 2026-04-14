@@ -2792,17 +2792,8 @@ function animateBossCanvas(el,data,ratio=1.0,key='main'){
 }
 
 
-window.openSummonScreen=function(){
-  const ss=document.getElementById('summon-screen'); ss.classList.add('open');
-  document.getElementById('summon-form-side').classList.remove('hidden');
-  document.getElementById('summoning-progress').classList.add('hidden');
-  document.getElementById('summoning-progress').classList.remove('flex');
-  document.getElementById('summon-topic-input').value='';
-  document.getElementById('summon-objective-input').value='';
-}
 
 
-window.closeSummonScreen=function(){ document.getElementById('summon-screen').classList.remove('open'); }
 
 
 window.doSummonQuest=async function(){
@@ -2967,6 +2958,23 @@ window.createNewFolder = function() {
 
 // ── GLOBAL FUNCTION EXPOSURE ─────────────────────────
 // Auth functions
+window.openSummonScreen = function() {
+  const ss = document.getElementById('summon-screen');
+  if(ss) ss.style.display = 'flex';
+  const form = document.getElementById('summon-form-side');
+  const prog = document.getElementById('summoning-progress');
+  if(form) form.classList.remove('hidden');
+  if(prog) { prog.classList.add('hidden'); prog.classList.remove('flex'); }
+  const ti = document.getElementById('summon-topic-input');
+  const oi = document.getElementById('summon-objective-input');
+  if(ti) ti.value = '';
+  if(oi) oi.value = '';
+};
+
+window.closeSummonScreen = function() {
+  const ss = document.getElementById('summon-screen');
+  if(ss) ss.style.display = 'none';
+};
 window.signInGoogle = async function() {
   const authBtns = document.getElementById('auth-buttons');
   const loadingEl = document.getElementById('loading-text');
