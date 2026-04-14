@@ -351,144 +351,122 @@ tailwind.config = {
 
     <!-- ── VAULT TAB ── -->
     <div id="tab-vault" class="tab-pane h-full overflow-y-auto">
-      <div class="pb-28">
+      <div class="pb-24">
 
-        <!-- Resource bar -->
-        <div class="sticky top-0 z-10 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/20 px-3 py-2">
-          <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">⚡</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">POWER</div>
-                <div id="res-power" class="text-xs font-mono text-primary font-bold leading-none">0</div>
-              </div>
+        <!-- Sticky resource grid - 2x4 layout, thumb-friendly -->
+        <div class="sticky top-0 z-10 bg-surface-container-lowest/98 backdrop-blur-md border-b border-outline/20">
+          <div class="grid grid-cols-4 divide-x divide-outline/10">
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">⚡</span>
+              <div id="res-power" class="text-[11px] font-mono text-primary font-bold leading-none">0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">POWER</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">💰</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">CAPS</div>
-                <div id="res-caps" class="text-xs font-mono text-primary font-bold leading-none">0</div>
-              </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">💰</span>
+              <div id="res-caps" class="text-[11px] font-mono text-primary font-bold leading-none">0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">CAPS</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">🍖</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">FOOD</div>
-                <div id="res-food" class="text-xs font-mono text-primary font-bold leading-none">0</div>
-              </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">🔩</span>
+              <div id="res-materials" class="text-[11px] font-mono text-primary font-bold leading-none">0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">MATS</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">💧</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">WATER</div>
-                <div id="res-water" class="text-xs font-mono text-primary font-bold leading-none">0</div>
-              </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">👤</span>
+              <div id="res-dwellers" class="text-[11px] font-mono text-primary font-bold leading-none">0/0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">PEOPLE</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">🔩</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">MATS</div>
-                <div id="res-materials" class="text-xs font-mono text-primary font-bold leading-none">0</div>
-              </div>
+          </div>
+          <div class="grid grid-cols-4 divide-x divide-outline/10 border-t border-outline/10">
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">🍖</span>
+              <div id="res-food" class="text-[11px] font-mono text-primary font-bold leading-none">0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">FOOD</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">👤</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">DWELLERS</div>
-                <div id="res-dwellers" class="text-xs font-mono text-primary font-bold leading-none">0/0</div>
-              </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">💧</span>
+              <div id="res-water" class="text-[11px] font-mono text-primary font-bold leading-none">0</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">WATER</div>
             </div>
-            <div class="w-px h-6 bg-outline/20 flex-shrink-0"></div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <span class="text-sm">😊</span>
-              <div>
-                <div class="text-[8px] font-mono text-on-surface-variant/60 tracking-widest leading-none">MORALE</div>
-                <div id="res-happiness" class="text-xs font-mono text-primary font-bold leading-none">0%</div>
-              </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5">
+              <span class="text-base leading-none">😊</span>
+              <div id="res-happiness" class="text-[11px] font-mono text-primary font-bold leading-none">0%</div>
+              <div class="text-[7px] font-mono text-on-surface-variant/50 tracking-widest leading-none">MORALE</div>
+            </div>
+            <div class="py-2 px-1 flex flex-col items-center gap-0.5 justify-center">
+              <button onclick="openBuildMenu()" class="bubbly-btn bg-primary text-on-primary font-mono text-[9px] px-3 py-1 rounded tracking-widest">+ BUILD</button>
             </div>
           </div>
         </div>
 
-        <!-- Vault cross-section -->
-        <div class="px-3 pt-3">
+        <!-- Vault entrance header -->
+        <div class="mx-3 mt-3 bg-surface-container-lowest border border-outline/30 rounded-t px-3 py-1.5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-4 bg-primary/10 border border-primary/30 rounded-sm flex items-center justify-center">
+              <div class="w-3 h-2 bg-primary/30 rounded-sm"></div>
+            </div>
+            <span class="text-[8px] font-mono text-primary/40 tracking-widest">VAULT 77 · SECTOR OVERVIEW</span>
+          </div>
+          <span class="text-[8px] font-mono text-on-surface-variant/30 tracking-widest">SECURE</span>
+        </div>
+
+        <!-- Vault grid - 3 cols for mobile readability -->
+        <div id="vault-grid" class="mx-3 border border-outline/30 border-t-0 rounded-b overflow-hidden bg-surface-container-lowest"></div>
+
+        <!-- Operative quick stats -->
+        <div class="mx-3 mt-3 bg-surface-container-low border border-outline/30 rounded p-3">
           <div class="flex items-center justify-between mb-2">
             <div>
-              <span class="text-[9px] font-mono text-primary/50 tracking-widest">VAULT 77 · CROSS-SECTION</span>
+              <div id="vault-operative-name" class="font-headline font-black text-sm text-primary crt-glow tracking-widest"></div>
+              <div id="vault-operative-rank" class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5"></div>
             </div>
-            <button onclick="openBuildMenu()" class="bubbly-btn flex items-center gap-1.5 bg-primary text-on-primary font-mono text-[9px] px-3 py-1.5 rounded tracking-widest uppercase">
-              <span class="material-symbols-outlined text-xs">add</span> BUILD
-            </button>
-          </div>
-
-          <!-- Vault entrance -->
-          <div class="bg-surface-container-lowest border border-outline/30 rounded-t-lg px-4 py-2 flex items-center justify-between mb-0">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-5 bg-surface-container-high border border-primary/30 rounded flex items-center justify-center">
-                <div class="w-4 h-3 bg-primary/20 border border-primary/40 rounded-sm"></div>
-              </div>
-              <span class="text-[9px] font-mono text-primary/50 tracking-widest">VAULT ENTRANCE · SECTOR 00</span>
-            </div>
-            <span class="text-[8px] font-mono text-on-surface-variant/40">SECURE</span>
-          </div>
-
-          <!-- Room grid -->
-          <div id="vault-grid" class="border border-outline/30 border-t-0 rounded-b-lg overflow-hidden bg-surface-container-lowest">
-            <!-- Rows generated by JS -->
-          </div>
-        </div>
-
-        <!-- Stats panel -->
-        <div class="px-3 mt-3 grid grid-cols-2 gap-2">
-          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
-            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">OPERATIVE</div>
-            <div id="vault-operative-name" class="font-headline font-black text-sm text-primary tracking-widest"></div>
-            <div id="vault-operative-rank" class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5"></div>
-            <div class="mt-2 space-y-1">
-              <div class="flex justify-between text-[9px] font-mono text-on-surface-variant/60">
-                <span>KNOWLEDGE XP</span><span id="vault-xp" class="text-primary">0</span>
-              </div>
-              <div class="h-1.5 bg-surface-container-highest rounded overflow-hidden">
-                <div id="vault-xp-bar" class="h-full bg-primary rounded transition-all" style="width:0%"></div>
-              </div>
+            <div class="text-right">
+              <div class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest">KNOWLEDGE XP</div>
+              <div id="vault-xp" class="text-sm font-mono text-primary font-bold">0</div>
             </div>
           </div>
-          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
-            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">VAULT STATUS</div>
-            <div class="space-y-1.5">
-              <div class="flex justify-between text-[9px] font-mono">
-                <span class="text-on-surface-variant/60">MISSIONS</span>
-                <span id="vault-stat-quests" class="text-on-surface">0</span>
-              </div>
-              <div class="flex justify-between text-[9px] font-mono">
-                <span class="text-on-surface-variant/60">DOCS READ</span>
-                <span id="vault-stat-chapters" class="text-on-surface">0</span>
-              </div>
-              <div class="flex justify-between text-[9px] font-mono">
-                <span class="text-on-surface-variant/60">THREATS DEFEATED</span>
-                <span id="vault-stat-bosses" class="text-on-surface">0</span>
-              </div>
-              <div class="flex justify-between text-[9px] font-mono">
-                <span class="text-on-surface-variant/60">PERFECT RUNS</span>
-                <span id="vault-stat-perfect" class="text-on-surface">0</span>
-              </div>
+          <div class="h-1.5 bg-surface-container-highest rounded overflow-hidden">
+            <div id="vault-xp-bar" class="h-full bg-primary rounded transition-all" style="width:0%"></div>
+          </div>
+          <div class="grid grid-cols-4 gap-1 mt-3">
+            <div class="text-center bg-surface-container rounded p-1.5">
+              <div class="text-[8px] font-mono text-on-surface-variant/50">MISSIONS</div>
+              <div id="vault-stat-quests" class="text-xs font-mono text-primary font-bold">0</div>
+            </div>
+            <div class="text-center bg-surface-container rounded p-1.5">
+              <div class="text-[8px] font-mono text-on-surface-variant/50">DOCS</div>
+              <div id="vault-stat-chapters" class="text-xs font-mono text-primary font-bold">0</div>
+            </div>
+            <div class="text-center bg-surface-container rounded p-1.5">
+              <div class="text-[8px] font-mono text-on-surface-variant/50">THREATS</div>
+              <div id="vault-stat-bosses" class="text-xs font-mono text-primary font-bold">0</div>
+            </div>
+            <div class="text-center bg-surface-container rounded p-1.5">
+              <div class="text-[8px] font-mono text-on-surface-variant/50">PERFECT</div>
+              <div id="vault-stat-perfect" class="text-xs font-mono text-primary font-bold">0</div>
             </div>
           </div>
         </div>
 
-        <!-- Resource earning guide -->
-        <div class="px-3 mt-3">
-          <div class="bg-surface-container-low border border-outline/30 rounded p-3">
-            <div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">HOW TO EARN RESOURCES</div>
-            <div class="grid grid-cols-2 gap-2 text-[9px] font-mono text-on-surface-variant/70">
-              <div class="flex items-center gap-1.5"><span>📖</span> Read chapters → <span class="text-primary">+Caps</span></div>
-              <div class="flex items-center gap-1.5"><span>⚔️</span> Defeat bosses → <span class="text-primary">+Power</span></div>
-              <div class="flex items-center gap-1.5"><span>🎯</span> Perfect runs → <span class="text-primary">+Materials</span></div>
-              <div class="flex items-center gap-1.5"><span>🏠</span> Build rooms → <span class="text-primary">+Dwellers</span></div>
+        <!-- How to earn resources -->
+        <div class="mx-3 mt-3 bg-surface-container-low border border-outline/30 rounded p-3">
+          <div class="text-[9px] font-mono text-primary/50 tracking-widest mb-2">HOW TO EARN RESOURCES</div>
+          <div class="grid grid-cols-2 gap-y-2 gap-x-3">
+            <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
+              <span class="text-base flex-shrink-0">📖</span>
+              <span>Read chapters → <span class="text-primary">+Caps</span></span>
+            </div>
+            <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
+              <span class="text-base flex-shrink-0">⚔️</span>
+              <span>Defeat bosses → <span class="text-primary">+Power</span></span>
+            </div>
+            <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
+              <span class="text-base flex-shrink-0">🎯</span>
+              <span>Perfect runs → <span class="text-primary">+Materials</span></span>
+            </div>
+            <div class="flex items-center gap-2 text-[9px] font-mono text-on-surface-variant/70">
+              <span class="text-base flex-shrink-0">📚</span>
+              <span>Every 5 docs → <span class="text-primary">+Dweller</span></span>
             </div>
           </div>
         </div>
@@ -2407,7 +2385,7 @@ const ROOM_DEFS = {
 };
 
 const VAULT_ROWS = 4;
-const VAULT_COLS = 4;
+const VAULT_COLS = 3;
 
 function getVault() {
   if (!STATE.player.vault) {
@@ -2539,13 +2517,14 @@ function renderVaultGrid() {
         const cell = document.createElement('div');
         cell.className = `vault-room level-${room.level} active-prod`;
         cell.style.background = def?.color || 'rgba(74,222,128,0.08)';
+        cell.style.minHeight = '80px';
         const prodStr = getProdString(def, room.level);
         cell.innerHTML = `
-          <div class="vault-room-icon">${def?.icon || '?'}</div>
-          <div class="vault-room-name">${def?.name || room.type}</div>
-          <div class="vault-room-level" style="font-family:'Orbitron',monospace;font-size:7px;color:rgba(74,222,128,0.5)">LVL ${room.level}</div>
-          <div style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.8)">${prodStr}</div>
-          <div style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.4)">👤 ${room.dwellers||0}/${def?.maxDwellers||2}</div>
+          <div style="font-size:26px;line-height:1;margin-bottom:3px">${def?.icon || '?'}</div>
+          <div style="font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.8);text-align:center;letter-spacing:0.08em;text-transform:uppercase;line-height:1.2;padding:0 2px">${def?.name || room.type}</div>
+          <div style="font-size:7px;font-family:'Orbitron',monospace;color:rgba(74,222,128,0.5);margin-top:2px">LVL ${room.level}</div>
+          <div style="font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.9);margin-top:1px;font-weight:bold">${prodStr}</div>
+          <div style="font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.5);margin-top:1px">👤 ${room.dwellers||0}/${def?.maxDwellers||2}</div>
         `;
         cell.addEventListener('click', () => openRoomDetail(room, row, col));
         cell.addEventListener('touchend', e => { e.preventDefault(); openRoomDetail(room, row, col); });
@@ -2553,7 +2532,8 @@ function renderVaultGrid() {
       } else {
         const slot = document.createElement('div');
         slot.className = 'vault-slot-empty';
-        slot.innerHTML = `<span style="font-size:18px;opacity:0.3">➕</span>`;
+        slot.style.minHeight = '80px';
+        slot.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-size:22px;opacity:0.25">➕</span><span style="font-size:7px;font-family:'Share Tech Mono',monospace;color:rgba(74,222,128,0.2);letter-spacing:0.1em">EMPTY</span></div>`;
         slot.addEventListener('click', () => openBuildMenu(row, col));
         slot.addEventListener('touchend', e => { e.preventDefault(); openBuildMenu(row, col); });
         rowDiv.appendChild(slot);
@@ -2609,20 +2589,20 @@ window.openBuildMenu = function(row, col) {
     const buildable = canAfford && hasPower;
 
     const card = document.createElement('div');
-    card.className = `room-card p-3 rounded border transition-all ${buildable ? 'border-outline/30 bg-surface-container cursor-pointer hover:border-primary/60 hover:bg-primary/5' : 'border-outline/10 bg-surface-container-lowest opacity-40 cursor-not-allowed'}`;
+    card.className = `room-card p-3 rounded border transition-all ${buildable ? 'border-outline/30 bg-surface-container cursor-pointer hover:border-primary/60 active:bg-primary/10' : 'border-outline/10 bg-surface-container-lowest opacity-40 cursor-not-allowed'}`;
     card.innerHTML = `
       <div class="flex items-center gap-3">
-        <span class="text-2xl">${def.icon}</span>
+        <span class="text-3xl flex-shrink-0">${def.icon}</span>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between">
-            <span class="text-[9px] font-mono text-primary/80 font-bold tracking-widest">${def.name}</span>
-            <span class="text-[9px] font-mono text-on-surface-variant/50">${getProdString(def, 1)}</span>
+          <div class="flex items-start justify-between gap-1">
+            <span class="text-[10px] font-mono text-primary/90 font-bold tracking-widest leading-tight">${def.name}</span>
+            <span class="text-[9px] font-mono text-primary/60 flex-shrink-0">${getProdString(def, 1)}</span>
           </div>
-          <p class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5">${def.desc}</p>
-          <div class="flex gap-3 mt-1 text-[8px] font-mono">
-            <span class="${v.caps >= def.cost.caps ? 'text-primary' : 'text-error'}">💰 ${def.cost.caps}</span>
-            <span class="${v.materials >= (def.cost.materials||0) ? 'text-primary' : 'text-error'}">🔩 ${def.cost.materials||0}</span>
-            ${def.requires?.power ? `<span class="${hasPower ? 'text-primary' : 'text-error'}">⚡ needs ${def.requires.power}</span>` : ''}
+          <p class="text-[9px] font-mono text-on-surface-variant/60 mt-0.5 leading-relaxed">${def.desc}</p>
+          <div class="flex gap-3 mt-1.5 text-[9px] font-mono font-bold">
+            <span class="${v.caps >= def.cost.caps ? 'text-primary' : 'text-error'}">💰 ${def.cost.caps} caps</span>
+            <span class="${v.materials >= (def.cost.materials||0) ? 'text-primary' : 'text-error'}">🔩 ${def.cost.materials||0} mats</span>
+            ${def.requires?.power ? `<span class="${hasPower ? 'text-on-surface-variant/50' : 'text-error'}">⚡ ${def.requires.power} req</span>` : ''}
           </div>
         </div>
       </div>
