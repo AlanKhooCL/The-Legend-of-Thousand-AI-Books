@@ -1838,6 +1838,116 @@ window.renameCharacter = function() {
 };
 
 
+// ── CORE FIREBASE & NAVIGATION ────────────────────────
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+
+window.showHub = function(){ showScreen('screen-hub'); renderHub(); };
+
+function defaultPlayer(name){
+  return { name, xp:0, totalXp:0, rank:0,
+    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[] };
+}
+
+function defaultCollection(){ return { backgrounds:[], activeBg:null }; }
+
+function syncStateToActiveSave(){
+  if(!STATE.activeSaveId) return;
+  const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
+  if(s){ s.player=STATE.player; s.quests=STATE.quests; s.curriculums=STATE.curriculums; }
+}
+
+function syncActiveSaveToState(){
+  const s = STATE.saves.find(s=>s.id===STATE.activeSaveId);
+  if(s){
+    STATE.player = s.player;
+    STATE.curriculums = s.curriculums || [{id:'default',name:'My Curriculum'}];
+    STATE.quests = (s.quests||[]).filter(Boolean).map(q=>({
+      ...q,
+      topic: q.topic||'Unknown',
+      questTitle: q.questTitle||'Forgotten Scroll',
+      bossName: q.bossName||'Unknown',
+      chapters: q.chapters||[],
+      completed: q.completed||[],
+      bossHp: typeof q.bossHp==='number'?q.bossHp:100,
+      bossMaxHp: typeof q.bossMaxHp==='number'?q.bossMaxHp:100,
+      curriculumId: q.curriculumId||'default',
+    }));
+    STATE.player.questsCreated = STATE.quests.length;
+    if(!STATE.player.collection) STATE.player.collection = defaultCollection();
+    if(!STATE.player.sigils) STATE.player.sigils = [];
+    // Clean up stale fields from old systems
+    delete STATE.player.storyAct;
+    delete STATE.player.cluesUnlocked;
+    if(STATE.player.collection?.owned) delete STATE.player.collection.owned;
+    if(STATE.player.collection?.activeIdx !== undefined) delete STATE.player.collection.activeIdx;
+  }
+}
+
+async function saveState(){
+  if(!USER_ID) return;
+  syncStateToActiveSave();
+  try{ await setDoc(doc(db,'users',USER_ID),{saves:STATE.saves,activeSaveId:STATE.activeSaveId},{merge:true}); }catch(e){}
+}
+
+async function loadState(){
+  if(!USER_ID) return;
+  let loaded = false;
+  try{
+    const snap = await getDoc(doc(db,'users',USER_ID));
+    if(snap.exists()){
+      const d = snap.data();
+      if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
+      else{
+        const os={id:Date.now().toString(),player:d.player||defaultPlayer('Operative'),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]};
+        STATE.saves=[os]; STATE.activeSaveId=os.id;
+      }
+      loaded = true;
+    }
+  }catch(e){ showToast('Could not load data.'); }
+
+  document.getElementById('loading-text').style.display = 'none';
+
+  if(loaded && STATE.saves?.length>0){
+    STATE.saves.forEach(s=>{
+      if(!s.player) s.player = defaultPlayer('Operative');
+      if(!s.curriculums) s.curriculums = [{id:'default',name:'My Curriculum'}];
+      if(!s.player.collection) s.player.collection = defaultCollection();
+    });
+    syncActiveSaveToState();
+    saveState();
+    showScreen('screen-hub');
+    window.switchTab('tab-profile');
+    renderHub();
+  } else {
+    showScreen('screen-path');
+  }
+}
+
+window.cancelPathSelection = function(){
+  document.getElementById('path-cancel-btn').style.display = 'none';
+  showScreen('screen-hub');
+};
+
+window.choosePath = async function(){
+  const input = document.getElementById('path-name-input');
+  const name = (input?.value.trim()) || 'Operative';
+  const newPlayer = defaultPlayer(name);
+  newPlayer.collection = defaultCollection();
+  const newSave = {id:Date.now().toString(), player:newPlayer, quests:[], curriculums:[{id:'default',name:'My Curriculum'}]};
+  STATE.saves.push(newSave); STATE.activeSaveId = newSave.id;
+  syncActiveSaveToState();
+  await saveState();
+  showScreen('screen-hub');
+  window.switchTab('tab-profile');
+  renderHub();
+  showToast('Operative initialized. Welcome to Vault 77.');
+};
+
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
   const firstTab=document.querySelector('.tab-btn[data-target="tab-profile"]');
