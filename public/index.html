@@ -1104,19 +1104,28 @@ function renderChapterList(quest) {
   const list = document.getElementById('chapter-list');
   if(!list) return;
   const chapters = quest.chapters || [];
-  const completed = quest.completed || [];
   list.innerHTML = '';
+
+  if(!chapters.length) {
+    list.innerHTML = '<div class="text-center py-6 text-on-surface-variant/50 text-xs font-mono italic">No chapters found for this mission.<br>This may be an older mission — try creating a new one.</div>';
+    return;
+  }
+
+  const completed = quest.completed || [];
   chapters.forEach((ch, i) => {
-    const done = completed[i];
+    const done = !!completed[i];
+    // ch might be a string (old format) or object (new format)
+    const title = typeof ch === 'string' ? ch : (ch.title || ch.chapterTitle || `Chapter ${i+1}`);
+    const tag = typeof ch === 'string' ? 'CHAPTER' : (ch.tag || ch.chapterTag || 'PART');
     const item = document.createElement('div');
     item.className = `flex items-center gap-3 p-3 rounded border cursor-pointer transition-all ${done ? 'border-primary/30 bg-primary/5' : 'border-outline/30 bg-surface-container hover:border-primary/40'}`;
     item.innerHTML = `
       <div class="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${done ? 'border-primary bg-primary' : 'border-outline/40'}">
-        ${done ? '<span class="material-symbols-outlined text-on-primary text-sm">check</span>' : `<span class="text-[10px] font-mono text-on-surface-variant/60">${i+1}</span>`}
+        ${done ? '<span class="material-symbols-outlined text-on-primary" style="font-size:14px">check</span>' : `<span class="text-[10px] font-mono text-on-surface-variant/60">${i+1}</span>`}
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-xs font-mono font-bold text-on-surface truncate">${ch.title || `Chapter ${i+1}`}</p>
-        <p class="text-[9px] font-mono text-on-surface-variant/50">${ch.tag || ''}</p>
+        <p class="text-xs font-mono font-bold text-on-surface truncate">${title}</p>
+        <p class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest">${tag}</p>
       </div>
       <span class="material-symbols-outlined text-on-surface-variant/40 text-sm">chevron_right</span>
     `;
@@ -2135,9 +2144,12 @@ window.doSummonQuest = async function() {
     setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
     const parsed = parseJSON(raw);
     if(!parsed) throw new Error('Invalid response from AI');
+    console.log('[summon] parsed keys:', Object.keys(parsed));
+    console.log('[summon] chapters count:', (parsed.chapters||[]).length);
 
     // chapters come as full objects {chapterNumber,title,tag,summary,...}
     const rawChapters = parsed.chapters || parsed.finalChapters || [];
+    console.log('[summon] rawChapters[0]:', JSON.stringify(rawChapters[0]||{}));
     const chapters = rawChapters.map((ch, i) => ({
       title: ch.title || ch.chapterTitle || `Chapter ${i+1}`,
       tag: ch.tag || ch.chapterTag || 'PART',
