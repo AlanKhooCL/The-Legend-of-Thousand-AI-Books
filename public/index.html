@@ -995,18 +995,18 @@ function animateBossCanvas(el, data, ratio=1.0, key='default') {
 window.switchQuestTab = function(tab) {
   const scrolls = document.getElementById('quest-panel-scrolls');
   const boss = document.getElementById('quest-panel-boss');
-  const scrollBtn = document.getElementById('tab-scrolls-btn');
-  const bossBtn = document.getElementById('tab-boss-btn');
+  const scrollBtn = document.getElementById('qtab-scrolls-btn');
+  const bossBtn = document.getElementById('qtab-boss-btn');
   if(tab === 'scrolls') {
     if(scrolls) scrolls.classList.remove('hidden');
     if(boss) boss.classList.add('hidden');
-    if(scrollBtn) { scrollBtn.classList.add('text-primary','border-primary'); scrollBtn.classList.remove('text-on-surface-variant','border-transparent'); }
-    if(bossBtn) { bossBtn.classList.remove('text-primary','border-primary'); bossBtn.classList.add('text-on-surface-variant','border-transparent'); }
+    if(scrollBtn) scrollBtn.classList.add('active');
+    if(bossBtn) bossBtn.classList.remove('active');
   } else {
     if(scrolls) scrolls.classList.add('hidden');
     if(boss) boss.classList.remove('hidden');
-    if(bossBtn) { bossBtn.classList.add('text-primary','border-primary'); bossBtn.classList.remove('text-on-surface-variant','border-transparent'); }
-    if(scrollBtn) { scrollBtn.classList.remove('text-primary','border-primary'); scrollBtn.classList.add('text-on-surface-variant','border-transparent'); }
+    if(bossBtn) bossBtn.classList.add('active');
+    if(scrollBtn) scrollBtn.classList.remove('active');
   }
 };
 
@@ -1203,42 +1203,57 @@ window.showQuestScreen = function(questIdx) {
   const quest = STATE.quests[questIdx];
   if (!quest) return;
 
-  // Check and extend overdue deadlines before showing
   checkAndExtendOverdueDeadlines();
 
   // Header
-  document.getElementById('q-topic-label').textContent = (quest.topic || 'Unknown').toUpperCase();
-  document.getElementById('q-title-label').textContent = quest.questTitle || 'Untitled Quest';
+  const topicEl = document.getElementById('q-topic-label');
+  const titleEl = document.getElementById('q-title-label');
+  if(topicEl) topicEl.textContent = (quest.topic || 'Unknown').toUpperCase();
+  if(titleEl) titleEl.textContent = quest.questTitle || 'Untitled Quest';
 
-  // Boss panel
+  // Boss canvas
   const bossCanvas = document.getElementById('boss-sprite-canvas');
-  animateBossCanvas(bossCanvas, quest, quest.bossHp / quest.bossMaxHp, 'quest');
-  document.getElementById('boss-name-display').textContent = quest.bossName || '??';
-  document.getElementById('boss-title-display').textContent = quest.bossTitle || 'Guardian Demon';
-  const loreEl = document.getElementById('boss-lore-text');
-  if (loreEl) loreEl.textContent = quest.bossLore || 'A mysterious entity.';
+  if(bossCanvas) animateBossCanvas(bossCanvas, quest, quest.bossHp / quest.bossMaxHp, 'quest');
+
+  // Boss info
+  const bossNameEl = document.getElementById('boss-name-display');
+  const bossTitleEl = document.getElementById('boss-title-display');
+  const bossLoreEl = document.getElementById('boss-lore-text');
+  if(bossNameEl) bossNameEl.textContent = quest.bossName || '??';
+  if(bossTitleEl) bossTitleEl.textContent = quest.bossTitle || 'Guardian Protocol';
+  if(bossLoreEl) bossLoreEl.textContent = quest.bossLore || 'A hostile intelligence blocking access to deeper knowledge.';
 
   // HP bar
-  const hpRatio = quest.bossHp / quest.bossMaxHp;
-  document.getElementById('boss-hp-fill').style.width = (hpRatio * 100) + '%';
-  document.getElementById('boss-hp-text').textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
+  const hpRatio = quest.bossMaxHp > 0 ? quest.bossHp / quest.bossMaxHp : 1;
+  const hpFill = document.getElementById('boss-hp-fill');
+  const hpText = document.getElementById('boss-hp-text');
+  if(hpFill) hpFill.style.width = (hpRatio * 100) + '%';
+  if(hpText) hpText.textContent = quest.bossHp + ' / ' + quest.bossMaxHp;
 
   // Deadline
   updateDeadlineDisplay(quest);
 
-  // Challenge button
+  // Boss button
   const chapters = quest.chapters || [];
   const completed = quest.completed || [];
   const allDone = chapters.length > 0 && chapters.every((_, i) => completed[i]);
   const btn = document.getElementById('boss-complete-btn');
-  btn.disabled = !allDone;
-  if (quest.defeated) {
-    btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge Again';
-    btn.className = 'bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl';
-  } else {
-    btn.innerHTML = '<span class="material-symbols-outlined">swords</span> Challenge the Demon';
-    btn.className = 'bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-extrabold rounded-full border-b-[5px] border-primary-dim flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl';
+  if(btn) {
+    if(quest.defeated) {
+      btn.disabled = false;
+      btn.textContent = 'CHALLENGE AGAIN';
+      btn.className = 'bubbly-btn w-full py-3 bg-secondary text-on-secondary font-headline font-bold text-xs rounded tracking-widest uppercase';
+    } else if(allDone) {
+      btn.disabled = false;
+      btn.textContent = 'INITIATE INTERROGATION';
+      btn.className = 'bubbly-btn w-full py-3 bg-primary text-on-primary font-headline font-bold text-xs rounded tracking-widest uppercase';
+    } else {
+      btn.disabled = false; // Allow battle even without all chapters for now
+      btn.textContent = chapters.length > 0
+        ? `CHALLENGE BOSS (${completed.filter(Boolean).length}/${chapters.length} chapters)`
+        : 'INITIATE INTERROGATION';
+      btn.className = 'bubbly-btn w-full py-3 bg-primary/70 text-on-primary font-headline font-bold text-xs rounded tracking-widest uppercase';
+    }
   }
 
   // Chapter list
@@ -1247,11 +1262,11 @@ window.showQuestScreen = function(questIdx) {
   // Prereqs & next topics
   renderQuestMeta(quest);
 
-  // Mobile: default to scrolls tab
+  // Default to scrolls tab
   switchQuestTab('scrolls');
 
   showScreen('screen-quest');
-}
+};
 
 
 function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
