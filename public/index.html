@@ -1887,6 +1887,25 @@ const RANKS = [
   { name:'Level 100', en:'Eternal Legend',    xp:9000, stageIdx:10 },
 ];
 
+function getRanks(){ return RANKS; }
+
+function getCurrentRankIdx(){
+  const xp = STATE.player?.totalXp || 0;
+  let idx = 0;
+  RANKS.forEach((r,i) => { if(xp >= r.xp) idx = i; });
+  return idx;
+}
+
+function getCurrentRank(){
+  return RANKS[getCurrentRankIdx()];
+}
+
+function getNextRank(){
+  const idx = getCurrentRankIdx();
+  return idx < RANKS.length - 1 ? RANKS[idx + 1] : null;
+}
+
+
 
 
 window.switchTab=function(tabId){
