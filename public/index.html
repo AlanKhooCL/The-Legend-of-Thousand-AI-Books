@@ -1635,14 +1635,15 @@ function renderBgGrid() {
 
 
 
-async function callAI({action,payload}){
+async function callAI({action,payload,modelId}){
   try{
-    const fn=httpsCallable(functions,'communeWithScrolls');
-    const r=await fn({action,payload,modelId:STATE.selectedModel});
-    const text=r.data.result;
+    const cfName = action==='summonQuest' ? 'summonQuest' : 'communeWithScrolls';
+    const fn=httpsCallable(functions,cfName);
+    const r=await fn({action,payload,modelId:modelId||STATE.selectedModel});
+    const text=r.data?.result||r.data?.text||r.data;
     if(!text) throw new Error("The scrolls returned empty.");
-    return text;
-  }catch(e){ alert("AI Error:\n"+(e.message||e)); throw e; }
+    return typeof text==='string' ? text : JSON.stringify(text);
+  }catch(e){ showToast("AI Error: "+(e.message||e)); throw e; }
 }
 
 function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
@@ -1939,6 +1940,14 @@ window.launchNextTopic = function(topic) {
     setTimeout(() => { const inp=document.getElementById('summon-topic-input'); if(inp){inp.value=topic;inp.focus();} }, 100);
   }, 100);
 };
+
+window.setSummonStatus = function(status, phase) {
+  const statusEl = document.getElementById('summon-gen-status');
+  const phaseEl = document.getElementById('summon-gen-step');
+  if(statusEl) statusEl.textContent = status || 'Processing...';
+  if(phaseEl && phase) phaseEl.textContent = phase;
+};
+
 
 window.doSummonQuest = async function() {
   const topic = document.getElementById('summon-topic-input')?.value.trim();
