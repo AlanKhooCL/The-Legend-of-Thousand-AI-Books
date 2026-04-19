@@ -2135,25 +2135,43 @@ window.doSummonQuest = async function() {
     setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
     const parsed = parseJSON(raw);
     if(!parsed) throw new Error('Invalid response from AI');
-    const chapters = parsed.chapters || [];
+
+    // chapters come as full objects {chapterNumber,title,tag,summary,...}
+    const rawChapters = parsed.chapters || parsed.finalChapters || [];
+    const chapters = rawChapters.map((ch, i) => ({
+      title: ch.title || ch.chapterTitle || `Chapter ${i+1}`,
+      tag: ch.tag || ch.chapterTag || 'PART',
+      summary: ch.summary || ch.chapterSummary || '',
+      learningOutcomes: ch.learningOutcomes || [],
+      keyConceptsToTeach: ch.keyConceptsToTeach || [],
+      commonMisconceptions: ch.commonMisconceptions || [],
+      chapterNumber: ch.chapterNumber || (i+1),
+    }));
+
     const curriculumMeta = parsed.curriculumMeta || null;
-    const baseQuest = {
-      topic: topic||'Unknown', objective: objective||'',
-      questTitle: parsed.questTitle||parsed.title||`${topic} Mastery`,
-      questNarrative: parsed.questNarrative||'A newly discovered scroll.',
-      bossName: parsed.bossName||'Demon', bossTitle: parsed.bossTitle||'The Unknown',
-      bossLore: parsed.bossLore||'A mysterious entity.',
-      chapters, curriculumMeta,
-      prereqTopics: parsed.prereqTopics||[], nextTopics: parsed.nextTopics||[],
-      curriculumId: 'default',
-    };
     const hpVal = 80 + chapters.length * 10;
     const newQuest = {
-      ...baseQuest, id:Date.now(), bossMaxHp:hpVal, bossHp:hpVal,
-      completed:new Array(chapters.length).fill(false),
-      chapterContent:{}, quiz:null, defeated:false,
-      bossColor:[`#${Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')}`][0],
-      bossShape:Math.floor(Math.random()*8),
+      topic: parsed.resolvedTopic || topic,
+      objective: objective||'',
+      questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
+      questNarrative: parsed.questNarrative || 'A newly discovered scroll.',
+      bossName: parsed.bossName || 'The Unknown',
+      bossTitle: parsed.bossTitle || 'Guardian Protocol',
+      bossLore: parsed.bossLore || 'A hostile intelligence blocking access to deeper knowledge.',
+      chapters,
+      curriculumMeta,
+      prereqTopics: parsed.prereqTopics || [],
+      nextTopics: parsed.nextTopics || [],
+      curriculumId: 'default',
+      id: Date.now(),
+      bossMaxHp: hpVal,
+      bossHp: hpVal,
+      completed: new Array(chapters.length).fill(false),
+      chapterContent: {},
+      quiz: null,
+      defeated: false,
+      bossColor: `#${Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')}`,
+      bossShape: Math.floor(Math.random()*8),
     };
     STATE.quests.unshift(newQuest);
     STATE.player.questsCreated++;
@@ -2164,7 +2182,7 @@ window.doSummonQuest = async function() {
     showToast(`Mission deployed: ${newQuest.questTitle}`);
     setTimeout(()=>window.showQuestScreen(0), 300);
   } catch(e) {
-    showToast('Error: '+(e.message?.substring(0,60)||'Unknown'));
+    showToast('Error: '+(e.message?.substring(0,80)||'Unknown error'));
     document.getElementById('summon-form-side').classList.remove('hidden');
     document.getElementById('summoning-progress').classList.add('hidden');
     document.getElementById('summoning-progress').classList.remove('flex');
