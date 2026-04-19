@@ -979,6 +979,178 @@ function renderQuestGrid(){
 }
 
 
+// ── BOSS ANIMATION ─────────────────────────────────
+let bossAnimFrames = {};
+function animateBossCanvas(el, data, ratio=1.0, key='default') {
+  if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
+  if(!el) return;
+  function frame() {
+    drawBossSprite(el, data, ratio);
+    bossAnimFrames[key] = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ── QUEST SCREEN TABS ──────────────────────────────
+window.switchQuestTab = function(tab) {
+  const scrolls = document.getElementById('quest-panel-scrolls');
+  const boss = document.getElementById('quest-panel-boss');
+  const scrollBtn = document.getElementById('tab-scrolls-btn');
+  const bossBtn = document.getElementById('tab-boss-btn');
+  if(tab === 'scrolls') {
+    if(scrolls) scrolls.classList.remove('hidden');
+    if(boss) boss.classList.add('hidden');
+    if(scrollBtn) { scrollBtn.classList.add('text-primary','border-primary'); scrollBtn.classList.remove('text-on-surface-variant','border-transparent'); }
+    if(bossBtn) { bossBtn.classList.remove('text-primary','border-primary'); bossBtn.classList.add('text-on-surface-variant','border-transparent'); }
+  } else {
+    if(scrolls) scrolls.classList.add('hidden');
+    if(boss) boss.classList.remove('hidden');
+    if(bossBtn) { bossBtn.classList.add('text-primary','border-primary'); bossBtn.classList.remove('text-on-surface-variant','border-transparent'); }
+    if(scrollBtn) { scrollBtn.classList.remove('text-primary','border-primary'); scrollBtn.classList.add('text-on-surface-variant','border-transparent'); }
+  }
+};
+
+function updateBossHpDisplay(quest) {
+  const ratio = quest.bossMaxHp > 0 ? quest.bossHp / quest.bossMaxHp : 0;
+  const fill = document.getElementById('boss-hp-fill');
+  const text = document.getElementById('boss-hp-text');
+  if(fill) fill.style.width = (ratio * 100) + '%';
+  if(text) text.textContent = `${quest.bossHp} / ${quest.bossMaxHp}`;
+}
+
+// ── DEADLINE SYSTEM ────────────────────────────────
+function updateDeadlineDisplay(quest) {
+  const el = document.getElementById('quest-deadline-label');
+  if(!el) return;
+  if(!quest.deadline) { el.textContent = 'No deadline set'; el.className = 'text-[10px] font-mono text-on-surface-variant/50'; return; }
+  const status = getQuestDeadlineStatus(quest);
+  el.textContent = formatDeadlineLabel(quest, status);
+  el.className = `text-[10px] font-mono ${status === 'overdue' ? 'text-error' : status === 'soon' ? 'text-warning' : 'text-on-surface-variant/70'}`;
+}
+
+function getQuestDeadlineStatus(quest) {
+  if(!quest.deadline) return 'none';
+  const now = new Date(); const due = new Date(quest.deadline);
+  const diff = due - now;
+  if(diff < 0) return 'overdue';
+  if(diff < 86400000 * 2) return 'soon';
+  return 'ok';
+}
+
+function formatDeadlineLabel(quest, status) {
+  if(!quest.deadline) return 'No deadline';
+  const due = new Date(quest.deadline);
+  const now = new Date();
+  const diff = Math.abs(due - now);
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  if(status === 'overdue') return `OVERDUE by ${days}d ${hrs}h`;
+  if(days === 0) return `Due in ${hrs}h`;
+  return `Due in ${days}d`;
+}
+
+function isHarderQuiz(quest) {
+  return quest.deadline && getQuestDeadlineStatus(quest) === 'overdue';
+}
+
+function checkAndExtendOverdueDeadlines() {
+  if(!STATE.quests) return;
+  STATE.quests.forEach(q => {
+    if(q.deadline && getQuestDeadlineStatus(q) === 'overdue' && !q.defeated) {
+      // Just flag it — no auto-extend needed
+    }
+  });
+}
+
+window.openDeadlineModal = function() {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if(!quest) return;
+  const inp = document.getElementById('deadline-date-input');
+  if(inp && quest.deadline) inp.value = quest.deadline;
+  else if(inp) inp.value = '';
+  document.getElementById('deadline-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeDeadlineModal = function() {
+  document.getElementById('deadline-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+window.saveDeadline = function() {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if(!quest) return;
+  const val = document.getElementById('deadline-date-input')?.value;
+  if(val) { quest.deadline = val; saveState(); updateDeadlineDisplay(quest); showToast('Deadline saved.'); }
+  closeDeadlineModal();
+};
+
+window.clearDeadline = function() {
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if(!quest) return;
+  delete quest.deadline;
+  saveState(); updateDeadlineDisplay(quest);
+  closeDeadlineModal(); showToast('Deadline cleared.');
+};
+
+window.setDeadlinePreset = function(days) {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  const inp = document.getElementById('deadline-date-input');
+  if(inp) inp.value = d.toISOString().split('T')[0];
+};
+
+// ── CHAPTER LIST ───────────────────────────────────
+function renderChapterList(quest) {
+  const list = document.getElementById('chapter-list');
+  if(!list) return;
+  const chapters = quest.chapters || [];
+  const completed = quest.completed || [];
+  list.innerHTML = '';
+  chapters.forEach((ch, i) => {
+    const done = completed[i];
+    const item = document.createElement('div');
+    item.className = `flex items-center gap-3 p-3 rounded border cursor-pointer transition-all ${done ? 'border-primary/30 bg-primary/5' : 'border-outline/30 bg-surface-container hover:border-primary/40'}`;
+    item.innerHTML = `
+      <div class="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${done ? 'border-primary bg-primary' : 'border-outline/40'}">
+        ${done ? '<span class="material-symbols-outlined text-on-primary text-sm">check</span>' : `<span class="text-[10px] font-mono text-on-surface-variant/60">${i+1}</span>`}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs font-mono font-bold text-on-surface truncate">${ch.title || `Chapter ${i+1}`}</p>
+        <p class="text-[9px] font-mono text-on-surface-variant/50">${ch.tag || ''}</p>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant/40 text-sm">chevron_right</span>
+    `;
+    item.addEventListener('click', () => window.openChapterModal(i));
+    item.addEventListener('touchend', e => { e.preventDefault(); window.openChapterModal(i); });
+    list.appendChild(item);
+  });
+}
+
+// ── DEADLINE PANEL (profile) ───────────────────────
+function renderDeadlinePanel() {
+  const list = document.getElementById('deadline-list');
+  if(!list) return;
+  const withDeadlines = (STATE.quests||[]).filter(q => q.deadline && !q.defeated);
+  if(!withDeadlines.length) {
+    list.innerHTML = '<div class="text-[10px] font-mono text-on-surface-variant/50 italic">No active timers. Assign a deadline to a mission.</div>';
+    return;
+  }
+  list.innerHTML = withDeadlines.map(q => {
+    const status = getQuestDeadlineStatus(q);
+    const label = formatDeadlineLabel(q, status);
+    return `<div class="flex items-center justify-between py-1.5 border-b border-outline/10 last:border-0">
+      <span class="text-[10px] font-mono text-on-surface/80 truncate flex-1 mr-2">${q.questTitle}</span>
+      <span class="text-[10px] font-mono flex-shrink-0 ${status==='overdue'?'text-error':status==='soon'?'text-warning':'text-primary'}">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PATH SCREEN ────────────────────────────────────
+function startPathMonster() {
+  // No-op — path screen monster removed in cleanup
+}
+
+
 function renderHub(){
   if(!STATE.player) return;
   const p = STATE.player;
