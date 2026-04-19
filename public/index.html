@@ -933,6 +933,52 @@ let STATE = {
 
 
 
+function renderQuestGrid(){
+  const grid=document.getElementById('quest-grid');
+  if(!grid) return;
+  grid.innerHTML='';
+  if(!STATE.quests?.length){
+    grid.innerHTML=`<div class="text-center py-10 text-on-surface-variant/50 text-xs font-mono italic">No active missions. Initiate one to begin.</div>`;
+    return;
+  }
+  if(!STATE.curriculums||STATE.curriculums.length===0) STATE.curriculums=[{id:'default',name:'My Curriculum'}];
+  STATE.curriculums.forEach(curriculum=>{
+    const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
+    const curriculumDiv=document.createElement('div');
+    curriculumDiv.className='mb-5';
+    curriculumDiv.innerHTML=`<div class="w-full flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline/30 font-mono text-xs hover:border-primary/40 transition-colors mb-2"><button onclick="this.closest('div').nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-2 flex-1 focus:outline-none text-left"><span class="material-symbols-outlined text-primary text-base">folder_open</span><span class="text-primary tracking-widest font-bold">${curriculum.name.toUpperCase()}</span></button><div class="flex items-center gap-1 flex-shrink-0"><span class="border border-outline/40 text-on-surface-variant px-2 py-0.5 rounded text-[9px] tracking-widest mr-1">${curriculumQuests.length}</span>${curriculum.id!=='default'?`<button onclick="renameCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-xs">edit</span></button><button onclick="deleteCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-xs">delete</span></button>`:''}</div></div>
+    <div class="flex-col gap-3 curriculum-content min-h-[4px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
+    const contentDiv=curriculumDiv.querySelector('.curriculum-content');
+    curriculumQuests.forEach(({q:quest,i:idx})=>{
+      const completed=quest.completed||[];
+      const chapters=quest.chapters||[];
+      const chapDone=completed.filter(Boolean).length;
+      const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
+      const card=document.createElement('div');
+      card.className='bg-surface-container-low rounded border border-outline/30 hover:border-primary/50 transition-all relative overflow-hidden cursor-pointer p-4 mb-2';
+      card.setAttribute('draggable','true');
+      card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
+      let touchMoved=false;
+      card.addEventListener('touchstart',()=>{touchMoved=false;},{passive:true});
+      card.addEventListener('touchmove',()=>{touchMoved=true;},{passive:true});
+      card.addEventListener('touchend',(e)=>{if(!touchMoved&&!e.target.closest('.del-btn')){e.preventDefault();window.showQuestScreen(idx);}});
+      card.innerHTML=`<div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded border border-outline/20 bg-surface-container"><canvas width="40" height="40" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[9px] font-mono font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-bold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p></div></div><div class="flex gap-1 mb-2">${chapters.map((_,i)=>`<div class="flex-1 h-1.5 rounded-full ${completed[i]?'bg-primary':i===chapDone?'bg-primary/30':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-3"><div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[10px] font-mono text-on-surface-variant">${quest.defeated?'✓ DONE':`${chapDone}/${chapters.length}`}</span></div>`;
+      const mini=card.querySelector('.boss-mini-canvas');
+      if(mini) drawBossSprite(mini,quest,hpRatio);
+      const del=document.createElement('button');
+      del.className='del-btn absolute top-2 right-2 z-20 p-1.5 rounded text-on-surface-variant/50 hover:text-error transition-colors';
+      del.innerHTML='<span class="material-symbols-outlined text-sm">close</span>';
+      del.addEventListener('touchend',(e)=>{e.stopPropagation();e.preventDefault();del.click();});
+      del.addEventListener('click',(e)=>{e.stopPropagation();if(confirm('Abandon this mission?')){STATE.quests.splice(idx,1);STATE.player.questsCreated=Math.max(0,STATE.player.questsCreated-1);saveState();renderHub();showToast('Mission abandoned.');}});
+      card.appendChild(del);
+      card.addEventListener('click',()=>window.showQuestScreen(idx));
+      contentDiv.appendChild(card);
+    });
+    grid.appendChild(curriculumDiv);
+  });
+}
+
+
 function renderHub(){
   if(!STATE.player) return;
   const p = STATE.player;
@@ -1835,6 +1881,113 @@ window.closeFateModal = function() {
 window.renameCharacter = function() {
   const n = prompt('New operative codename:', STATE.player.name);
   if(n && n.trim()) { STATE.player.name = n.trim(); saveState(); renderHub(); }
+};
+
+
+// ── RECOVERED GAME FUNCTIONS ────────────────────────
+
+
+
+window.openMoveModal = function() {
+  const list = document.getElementById('move-curriculum-list');
+  if(!list) return;
+  const quest = STATE.quests[STATE.activeQuestIdx];
+  if(!quest) return;
+  const curriculums = STATE.curriculums || [{id:'default',name:'My Curriculum'}];
+  const currentId = quest.curriculumId || 'default';
+  list.innerHTML = curriculums.map(c => {
+    const isCurrent = c.id === currentId;
+    return `<button onclick="moveQuestTo('${c.id}')" ${isCurrent?'disabled':''}
+      class="w-full flex items-center gap-3 p-3 rounded border text-left transition-all font-mono text-xs ${isCurrent?'border-primary/30 bg-primary/5 opacity-60 cursor-not-allowed':'border-outline/30 hover:border-primary hover:bg-primary/5 cursor-pointer'}">
+      <span class="material-symbols-outlined text-primary text-base">folder_open</span>
+      <span class="text-on-surface flex-1 tracking-widest">${c.name.toUpperCase()}</span>
+      ${isCurrent?'<span class="text-[9px] font-mono text-primary tracking-widest">CURRENT</span>':''}
+    </button>`;
+  }).join('');
+  document.getElementById('move-modal').classList.add('open');
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+};
+
+window.closeMoveModal = function() {
+  document.getElementById('move-modal').classList.remove('open');
+  document.getElementById('modal-backdrop').classList.add('hidden');
+};
+
+function renderQuestMeta(quest) {
+  const panel = document.getElementById('quest-meta-panel');
+  const prereqEl = document.getElementById('prereq-chips');
+  const nextEl = document.getElementById('next-topic-chips');
+  if(!panel||!prereqEl||!nextEl) return;
+  const meta = quest.curriculumMeta;
+  const prereqs = meta?.prerequisiteKnowledge || quest.prereqTopics || [];
+  const nextTopics = quest.nextTopics || [];
+  if(!prereqs.length && !nextTopics.length){ panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  prereqEl.innerHTML = prereqs.length
+    ? prereqs.map(t=>`<span class="bg-primary/10 text-primary border border-primary/30 rounded-full px-2.5 py-0.5 text-[10px] font-mono">${t}</span>`).join('')
+    : '<span class="text-[10px] font-mono text-on-surface-variant/50 italic">None required</span>';
+  nextEl.innerHTML = nextTopics.length
+    ? nextTopics.map(t=>`<button onclick="launchNextTopic('${t.replace(/'/g,"\'")}')" class="bg-tertiary/10 text-tertiary border border-tertiary/30 rounded-full px-2.5 py-0.5 text-[10px] font-mono hover:bg-tertiary/20 transition-colors">${t} →</button>`).join('')
+    : '<span class="text-[10px] font-mono text-on-surface-variant/50 italic">Complete quest to unlock</span>';
+}
+
+window.launchNextTopic = function(topic) {
+  showHub();
+  setTimeout(() => {
+    window.switchTab('tab-missions');
+    openSummonScreen();
+    setTimeout(() => { const inp=document.getElementById('summon-topic-input'); if(inp){inp.value=topic;inp.focus();} }, 100);
+  }, 100);
+};
+
+window.doSummonQuest = async function() {
+  const topic = document.getElementById('summon-topic-input')?.value.trim();
+  if(!topic){ showToast('Please enter a topic.'); return; }
+  const objective = document.getElementById('summon-objective-input')?.value.trim();
+  const numChapters = STATE.summonChapters || 5;
+  document.getElementById('summon-form-side').classList.add('hidden');
+  document.getElementById('summoning-progress').classList.remove('hidden');
+  document.getElementById('summoning-progress').classList.add('flex');
+  try {
+    setSummonStatus('ANALYSING SUBJECT MATTER...','PHASE 1 · DISAMBIGUATION');
+    const raw = await callAI({action:'summonQuest',payload:{topic,objective,chapterCount:numChapters},modelId:STATE.selectedModel});
+    setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
+    const parsed = parseJSON(raw);
+    if(!parsed) throw new Error('Invalid response from AI');
+    const chapters = parsed.chapters || [];
+    const curriculumMeta = parsed.curriculumMeta || null;
+    const baseQuest = {
+      topic: topic||'Unknown', objective: objective||'',
+      questTitle: parsed.questTitle||parsed.title||`${topic} Mastery`,
+      questNarrative: parsed.questNarrative||'A newly discovered scroll.',
+      bossName: parsed.bossName||'Demon', bossTitle: parsed.bossTitle||'The Unknown',
+      bossLore: parsed.bossLore||'A mysterious entity.',
+      chapters, curriculumMeta,
+      prereqTopics: parsed.prereqTopics||[], nextTopics: parsed.nextTopics||[],
+      curriculumId: 'default',
+    };
+    const hpVal = 80 + chapters.length * 10;
+    const newQuest = {
+      ...baseQuest, id:Date.now(), bossMaxHp:hpVal, bossHp:hpVal,
+      completed:new Array(chapters.length).fill(false),
+      chapterContent:{}, quiz:null, defeated:false,
+      bossColor:[`#${Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')}`][0],
+      bossShape:Math.floor(Math.random()*8),
+    };
+    STATE.quests.unshift(newQuest);
+    STATE.player.questsCreated++;
+    await saveState();
+    closeSummonScreen();
+    window.switchTab('tab-missions');
+    renderHub();
+    showToast(`Mission deployed: ${newQuest.questTitle}`);
+    setTimeout(()=>window.showQuestScreen(0), 300);
+  } catch(e) {
+    showToast('Error: '+(e.message?.substring(0,60)||'Unknown'));
+    document.getElementById('summon-form-side').classList.remove('hidden');
+    document.getElementById('summoning-progress').classList.add('hidden');
+    document.getElementById('summoning-progress').classList.remove('flex');
+  }
 };
 
 
