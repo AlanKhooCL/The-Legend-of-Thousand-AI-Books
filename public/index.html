@@ -2264,21 +2264,43 @@ function syncActiveSaveToState(){
   if(s){
     STATE.player = s.player;
     STATE.curriculums = s.curriculums || [{id:'default',name:'My Curriculum'}];
-    STATE.quests = (s.quests||[]).filter(Boolean).map(q=>({
-      ...q,
-      topic: q.topic||'Unknown',
-      questTitle: q.questTitle||'Forgotten Scroll',
-      bossName: q.bossName||'Unknown',
-      chapters: q.chapters||[],
-      completed: q.completed||[],
-      bossHp: typeof q.bossHp==='number'?q.bossHp:100,
-      bossMaxHp: typeof q.bossMaxHp==='number'?q.bossMaxHp:100,
-      curriculumId: q.curriculumId||'default',
-    }));
+    STATE.quests = (s.quests||[]).filter(Boolean).map(q=>{
+      // Normalize chapters — handle string arrays, object arrays, or missing
+      const rawChapters = q.chapters || [];
+      const chapters = rawChapters.map((ch, i) => {
+        if(typeof ch === 'string') {
+          // Old format: chapter was just a title string
+          return { title: ch, tag: 'CHAPTER', summary: '' };
+        }
+        if(typeof ch === 'object' && ch !== null) {
+          // New format or partially migrated
+          return {
+            title: ch.title || ch.chapterTitle || `Chapter ${i+1}`,
+            tag: ch.tag || ch.chapterTag || 'CHAPTER',
+            summary: ch.summary || ch.chapterSummary || '',
+            learningOutcomes: ch.learningOutcomes || [],
+            keyConceptsToTeach: ch.keyConceptsToTeach || [],
+            commonMisconceptions: ch.commonMisconceptions || [],
+          };
+        }
+        return { title: `Chapter ${i+1}`, tag: 'CHAPTER', summary: '' };
+      });
+
+      return {
+        ...q,
+        topic: q.topic||'Unknown',
+        questTitle: q.questTitle||'Forgotten Scroll',
+        bossName: q.bossName||'Unknown',
+        chapters,
+        completed: q.completed||new Array(chapters.length).fill(false),
+        bossHp: typeof q.bossHp==='number'?q.bossHp:100,
+        bossMaxHp: typeof q.bossMaxHp==='number'?q.bossMaxHp:100,
+        curriculumId: q.curriculumId||'default',
+      };
+    });
     STATE.player.questsCreated = STATE.quests.length;
     if(!STATE.player.collection) STATE.player.collection = defaultCollection();
     if(!STATE.player.sigils) STATE.player.sigils = [];
-    // Clean up stale fields from old systems
     delete STATE.player.storyAct;
     delete STATE.player.cluesUnlocked;
     if(STATE.player.collection?.owned) delete STATE.player.collection.owned;
@@ -2412,4 +2434,3 @@ window.closeTosModal = function() {
 </script>
 </body>
 </html>
-
