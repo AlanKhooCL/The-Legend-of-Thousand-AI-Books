@@ -470,7 +470,7 @@ tailwind.config = {
   <div class="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-12">
 
     <!-- DOCS PANEL -->
-    <div id="quest-panel-scrolls" class="quest-panel flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-outline/20 lg:col-span-5">
+    <div id="quest-panel-scrolls" class="quest-panel active flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-outline/20 lg:col-span-5">
       <div class="p-4 space-y-4 pb-8">
         <!-- Prereqs / Next Topics -->
         <div id="quest-meta-panel" class="space-y-2 hidden">
@@ -498,7 +498,7 @@ tailwind.config = {
     </div>
 
     <!-- TARGET / BOSS PANEL -->
-    <div id="quest-panel-boss" class="quest-panel hidden lg:flex flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7" style="background: linear-gradient(180deg, #050905 0%, #030603 100%);">
+    <div id="quest-panel-boss" class="quest-panel flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7" style="background: linear-gradient(180deg, #050905 0%, #030603 100%);">
       <div class="flex flex-col items-center p-6 gap-5 flex-1">
         <!-- Boss sprite -->
         <div class="relative w-40 h-40 flex items-center justify-center flex-shrink-0">
@@ -999,13 +999,13 @@ window.switchQuestTab = function(tab) {
   const scrollBtn = document.getElementById('qtab-scrolls-btn');
   const bossBtn = document.getElementById('qtab-boss-btn');
   if(tab === 'scrolls') {
-    if(scrolls) scrolls.classList.remove('hidden');
-    if(boss) boss.classList.add('hidden');
+    if(scrolls) { scrolls.classList.add('active'); scrolls.classList.remove('hidden'); }
+    if(boss) { boss.classList.remove('active'); boss.classList.add('hidden'); }
     if(scrollBtn) scrollBtn.classList.add('active');
     if(bossBtn) bossBtn.classList.remove('active');
   } else {
-    if(scrolls) scrolls.classList.add('hidden');
-    if(boss) boss.classList.remove('hidden');
+    if(scrolls) { scrolls.classList.remove('active'); scrolls.classList.add('hidden'); }
+    if(boss) { boss.classList.add('active'); boss.classList.remove('hidden'); }
     if(bossBtn) bossBtn.classList.add('active');
     if(scrollBtn) scrollBtn.classList.remove('active');
   }
