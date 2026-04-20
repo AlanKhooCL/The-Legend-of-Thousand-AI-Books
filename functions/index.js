@@ -33,8 +33,8 @@ exports.summonQuest = onCall(
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
-    const { topic, objective, numChapters, modelId } = request.data;
-    const chapterCount = Math.max(3, Math.min(10, parseInt(numChapters) || 5));
+    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, modelId } = request.data;
+    const chapterCount = 5; // Fixed 5-chapter structure
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
     const model = getModel(genAI, modelId);
 
@@ -52,18 +52,31 @@ exports.summonQuest = onCall(
     } catch (err) { console.warn("Disambiguation skipped:", err.message); }
 
     // STEP 1 — Curriculum design with retry until exact chapter count
-    const curriculumSys = `You are a senior instructional designer and expert in ${topicDomain || "the relevant field"}. Respond ONLY with valid JSON.`;
+    const priorLevel = priorKnowledge || 'some';
+    const priorInstructions = {
+      none: 'The student has ZERO prior knowledge. Chapter 1 must start from absolute first principles using simple analogies. Build up gradually — never assume familiarity with any concept.',
+      some: 'The student knows the basics but lacks depth. Skip trivial definitions. Focus on the mechanics, nuances, and practical application they are missing.',
+      strong: 'The student is already experienced. SKIP all introductory content. Start immediately with advanced mechanics, subtle edge cases, and expert-level insights that even experienced practitioners miss.',
+    }[priorLevel];
 
-    const buildPrompt = (n) => `Design EXACTLY ${n} chapters for: "${resolvedTopic}"
+    const curriculumSys = `You are a senior instructional designer and expert in ${topicDomain || "the relevant field"}. Respond ONLY with valid JSON.
+Prior knowledge level: ${priorLevel.toUpperCase()} — ${priorInstructions}`;
+
+    const buildPrompt = (n) => `Design EXACTLY 5 chapters for: "${resolvedTopic}"
 ${objective ? `Goal: ${objective}` : ""}
+Prior knowledge: ${priorLevel.toUpperCase()}
 
-RULES:
-- Return EXACTLY ${n} items in "chapters" array — this is mandatory
-- Logical progression: foundations → core → applied → advanced
-- Use correct domain terminology (for MCP: hosts, clients, servers, tools, resources, prompts)
-- Concrete learning outcomes per chapter
+MANDATORY 5-CHAPTER STRUCTURE — follow this exactly:
+Chapter 1 — THE FOUNDATION: Core concept, vocabulary, and mental model. ${priorLevel === 'none' ? 'Start from absolute zero. Use simple analogies.' : priorLevel === 'strong' ? 'Skip the basics — establish the expert mental model and key abstractions.' : 'Cover core vocabulary and the foundational mental model clearly.'}
+Chapter 2 — THE MECHANICS: How it actually works under the hood. Internal logic, key components, and their interactions.
+Chapter 3 — THE APPLICATION: Real-world use cases. Translating theory into practice with concrete examples.
+Chapter 4 — THE TRAPS: Common misconceptions, edge cases, and pitfalls. Crucial for avoiding expert-level mistakes.
+Chapter 5 — THE SYNTHESIS: Tying it all together. High-level patterns, advanced insights, and what mastery looks like.
 
-JSON with EXACTLY ${n} chapters:
+Use domain-specific terminology for ${topicDomain || resolvedTopic}.
+Each chapter needs concrete learning outcomes and specific concepts — no vague generalities.
+
+JSON with EXACTLY 5 chapters:
 {
   "targetAudience": "...",
   "overallObjective": "...",
