@@ -959,18 +959,27 @@ function renderQuestGrid(){
       card.className='bg-surface-container-low rounded border border-outline/30 hover:border-primary/50 transition-all relative overflow-hidden cursor-pointer p-4 mb-2';
       card.setAttribute('draggable','true');
       card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
-      let touchMoved=false;
-      card.addEventListener('touchstart',()=>{touchMoved=false;},{passive:true});
-      card.addEventListener('touchmove',()=>{touchMoved=true;},{passive:true});
-      card.addEventListener('touchend',(e)=>{if(!touchMoved&&!e.target.closest('.del-btn')){e.preventDefault();window.showQuestScreen(idx);}});
+      let touchMoved = false;
+      let touchOnDel = false;
+      card.addEventListener('touchstart', (e) => {
+        touchMoved = false;
+        touchOnDel = !!(e.target.closest && e.target.closest('.del-btn'));
+      }, { passive: true });
+      card.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+      card.addEventListener('touchend', (e) => {
+        if (touchMoved || touchOnDel) return;
+        e.preventDefault();
+        window.showQuestScreen(idx);
+      });
       card.innerHTML=`<div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded border border-outline/20 bg-surface-container"><canvas width="40" height="40" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[9px] font-mono font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-bold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p></div></div><div class="flex gap-1 mb-2">${chapters.map((_,i)=>`<div class="flex-1 h-1.5 rounded-full ${completed[i]?'bg-primary':i===chapDone?'bg-primary/30':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-3"><div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[10px] font-mono text-on-surface-variant">${quest.defeated?'✓ DONE':`${chapDone}/${chapters.length}`}</span></div>`;
       const mini=card.querySelector('.boss-mini-canvas');
       if(mini) drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
       del.className='del-btn absolute top-2 right-2 z-20 p-1.5 rounded text-on-surface-variant/50 hover:text-error transition-colors';
       del.innerHTML='<span class="material-symbols-outlined text-sm">close</span>';
-      del.addEventListener('touchend',(e)=>{e.stopPropagation();e.preventDefault();del.click();});
-      del.addEventListener('click',(e)=>{e.stopPropagation();if(confirm('Abandon this mission?')){STATE.quests.splice(idx,1);STATE.player.questsCreated=Math.max(0,STATE.player.questsCreated-1);saveState();renderHub();showToast('Mission abandoned.');}});
+      del.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+      del.addEventListener('touchend', (e) => { e.stopPropagation(); e.preventDefault(); del.click(); });
+      del.addEventListener('click', (e) => { e.stopPropagation(); if(confirm('Abandon this mission?')){STATE.quests.splice(idx,1);STATE.player.questsCreated=Math.max(0,STATE.player.questsCreated-1);saveState();renderHub();showToast('Mission abandoned.');}});
       card.appendChild(del);
       card.addEventListener('click',()=>window.showQuestScreen(idx));
       contentDiv.appendChild(card);
