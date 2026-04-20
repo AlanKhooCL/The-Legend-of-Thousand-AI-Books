@@ -122,7 +122,18 @@ JSON with EXACTLY 5 chapters:
     try {
       const qTxt = await generate(model,
         `You are a creative game writer for an educational fantasy RPG. Respond ONLY with valid JSON.`,
-        `Create a fantasy quest for learning: "${resolvedTopic}" (domain: ${topicDomain})\nChapters: ${curriculum.chapters.map((c,i)=>`${i+1}. ${c.title}`).join(", ")}\n\nBoss name must use a domain-specific metaphor (e.g. ML→"The Overfitting Specter", MCP→"The Context Fragmentation Daemon", Networking→"The Packet Loss Wraith").\n\nJSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
+        `Generate a quest wrapper for a learning mission on "${resolvedTopic}" (domain: ${topicDomain}).
+Chapters: ${curriculum.chapters.map((c,i)=>`${i+1}. ${c.title}`).join(", ")}
+Prior knowledge level: ${priorLevel}
+
+Requirements:
+- questTitle: A punchy, memorable mission title (e.g. "The Redux Reckoning", "Mastering the Shadow DOM")
+- questNarrative: 2-3 sentences. A COURSE SYNOPSIS — factual and concrete. Describe WHAT the student will learn and WHY it matters. No fantasy fluff. Example: "This mission covers the core mechanics of React state management, from useState fundamentals to complex reducer patterns. By the end, you will confidently architect stateful applications and debug state-related bugs in production."
+- bossName: A domain-specific metaphor boss (e.g. ML→"The Overfitting Specter", SQL→"The N+1 Query Demon", React→"The Stale Closure Wraith")
+- bossTitle: A short menacing subtitle
+- bossLore: 1-2 sentences of lore about the boss as a metaphor for the hardest concept in this subject
+
+JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
         "application/json"
       );
       questWrapper = safeParseJSON(qTxt);
