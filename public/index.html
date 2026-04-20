@@ -1933,17 +1933,19 @@ function showConfirmToast(msg, onConfirm) {
   if(!el || !msgEl) { if(confirm(msg)) onConfirm(); return; }
   msgEl.textContent = msg;
   el.style.display = 'flex';
-  requestAnimationFrame(() => el.classList.add('show'));
+  el.style.opacity = '1';
   window._confirmCallback = onConfirm;
 }
+
 window.confirmToastYes = function() {
   const el = document.getElementById('confirm-toast');
-  if(el) { el.classList.remove('show'); setTimeout(()=>el.style.display='none',300); }
+  if(el) { el.style.opacity = '0'; setTimeout(()=>{ el.style.display='none'; }, 200); }
   if(window._confirmCallback) { window._confirmCallback(); window._confirmCallback = null; }
 };
+
 window.confirmToastNo = function() {
   const el = document.getElementById('confirm-toast');
-  if(el) { el.classList.remove('show'); setTimeout(()=>el.style.display='none',300); }
+  if(el) { el.style.opacity = '0'; setTimeout(()=>{ el.style.display='none'; }, 200); }
   window._confirmCallback = null;
 };
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
