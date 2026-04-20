@@ -205,6 +205,7 @@ tailwind.config = {
 
 .no-scrollbar::-webkit-scrollbar{display:none;}
 .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+.prior-btn{background:transparent;width:100%;}.prior-btn.active-prior{border-color:rgba(74,222,128,0.5)!important;background:rgba(74,222,128,0.05)!important;}
 </style>
 </head>
 <body class="font-body text-on-surface bg-surface overflow-x-hidden">
@@ -575,27 +576,67 @@ tailwind.config = {
 
   <div class="max-w-4xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6 flex-1">
     <!-- Form side -->
-    <div id="summon-form-side" class="flex-1 space-y-5">
+    <div id="summon-form-side" class="flex-1 space-y-4">
+
+      <!-- Step 1: Topic -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">SUBJECT_OF_INVESTIGATION</p>
         <input id="summon-topic-input" type="text" placeholder="e.g. Cold War Cryptography, Quantum Physics..."
                class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
       </div>
+
+      <!-- Step 2: Objective -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
-        <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">MISSION_OBJECTIVE (OPTIONAL)</p>
-        <textarea id="summon-objective-input" placeholder="Why do you need to master this? Define the endgame." rows="3"
+        <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">MISSION_OBJECTIVE <span class="text-on-surface-variant/40">(OPTIONAL)</span></p>
+        <textarea id="summon-objective-input" placeholder="Why do you need to master this? Define the endgame." rows="2"
                   class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm resize-none"></textarea>
       </div>
-      <!-- Chapter count -->
+
+      <!-- Step 3: Pre-assessment -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
-        <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">DOCUMENT_COUNT</p>
-        <div class="flex gap-2 flex-wrap" id="chap-btn-group">
-          <button onclick="setChapCount(3)" class="chap-btn font-mono text-xs px-4 py-2 rounded border border-outline/40 hover:border-primary transition-colors text-on-surface-variant">3</button>
-          <button onclick="setChapCount(5)" class="chap-btn font-mono text-xs px-4 py-2 rounded border border-primary bg-primary/10 text-primary">5</button>
-          <button onclick="setChapCount(7)" class="chap-btn font-mono text-xs px-4 py-2 rounded border border-outline/40 hover:border-primary transition-colors text-on-surface-variant">7</button>
-          <button onclick="setChapCount(10)" class="chap-btn font-mono text-xs px-4 py-2 rounded border border-outline/40 hover:border-primary transition-colors text-on-surface-variant">10</button>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined text-primary text-sm">psychology</span>
+          <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em]">PRIOR KNOWLEDGE</p>
+        </div>
+        <p class="text-[10px] font-mono text-on-surface-variant/70 mb-3 leading-relaxed">How much do you already know about this subject? This calibrates the depth of your 5-chapter mission.</p>
+        <div class="grid grid-cols-3 gap-2" id="prior-knowledge-group">
+          <button onclick="setPriorKnowledge('none')" data-level="none"
+            class="prior-btn p-3 rounded border border-outline/30 text-center transition-all hover:border-primary/60 cursor-pointer">
+            <div class="text-lg mb-1">🌱</div>
+            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">NONE</div>
+            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Start fresh</div>
+          </button>
+          <button onclick="setPriorKnowledge('some')" data-level="some"
+            class="prior-btn p-3 rounded border border-primary/50 bg-primary/5 text-center transition-all hover:border-primary cursor-pointer active-prior">
+            <div class="text-lg mb-1">⚡</div>
+            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">SOME</div>
+            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Know the basics</div>
+          </button>
+          <button onclick="setPriorKnowledge('strong')" data-level="strong"
+            class="prior-btn p-3 rounded border border-outline/30 text-center transition-all hover:border-primary/60 cursor-pointer">
+            <div class="text-lg mb-1">🔥</div>
+            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">STRONG</div>
+            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Skip the 101</div>
+          </button>
+        </div>
+        <!-- Level description -->
+        <div id="prior-knowledge-desc" class="mt-3 text-[9px] font-mono text-on-surface-variant/60 leading-relaxed border-t border-outline/20 pt-3">
+          AI generates 5 chapters balancing foundations with practical depth.
         </div>
       </div>
+
+      <!-- Fixed 5 chapters info -->
+      <div class="flex items-center gap-3 px-1">
+        <div class="flex gap-1">
+          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
+          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
+          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
+          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
+          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
+        </div>
+        <span class="text-[9px] font-mono text-on-surface-variant/40 tracking-widest">5 CHAPTERS · FIXED STRUCTURE</span>
+      </div>
+
       <button onclick="doSummonQuest()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-black py-4 px-6 rounded flex items-center justify-center gap-2 text-sm tracking-widest uppercase" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
         <span class="material-symbols-outlined">rocket_launch</span> DEPLOY MISSION
       </button>
@@ -936,6 +977,7 @@ let STATE = {
   quizData: null, quizCurrent: 0, quizScore: 0,
   gambitWager: 0, gambitActive: false, gambitRevealed: false,
   currentQuestHarder: false,
+  priorKnowledge: 'some',
 };
 
 
@@ -2014,6 +2056,8 @@ window.openSummonScreen = function() {
   const oi = document.getElementById('summon-objective-input');
   if(ti) ti.value = '';
   if(oi) oi.value = '';
+  // Reset prior knowledge to 'some'
+  window.setPriorKnowledge('some');
 };
 
 window.closeSummonScreen = function() {
@@ -2218,18 +2262,38 @@ window.setSummonStatus = function(status, phase) {
   if(phaseEl && phase) phaseEl.textContent = phase;
 };
 
+const PRIOR_KNOWLEDGE_DESCS = {
+  none: 'AI generates 5 chapters that assume zero prior knowledge. Chapter 1 starts from first principles with simple analogies before building up.',
+  some: 'AI generates 5 chapters balancing foundations with practical depth. Skips the very basics but still covers core mechanics clearly.',
+  strong: 'AI generates 5 chapters that skip the 101-level content entirely. Dives immediately into advanced mechanics, nuanced edge cases, and expert-level strategy.',
+};
+
+window.setPriorKnowledge = function(level) {
+  STATE.priorKnowledge = level;
+  document.querySelectorAll('.prior-btn').forEach(btn => {
+    const isActive = btn.dataset.level === level;
+    btn.classList.toggle('border-primary/50', isActive);
+    btn.classList.toggle('bg-primary/5', isActive);
+    btn.classList.toggle('active-prior', isActive);
+    btn.classList.toggle('border-outline/30', !isActive);
+  });
+  const desc = document.getElementById('prior-knowledge-desc');
+  if(desc) desc.textContent = PRIOR_KNOWLEDGE_DESCS[level] || '';
+};
+
 
 window.doSummonQuest = async function() {
   const topic = document.getElementById('summon-topic-input')?.value.trim();
   if(!topic){ showToast('Please enter a topic.'); return; }
   const objective = document.getElementById('summon-objective-input')?.value.trim();
-  const numChapters = STATE.summonChapters || 5;
+  const priorKnowledge = STATE.priorKnowledge || 'some';
+  const numChapters = 5; // Fixed 5-chapter structure
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('flex');
   try {
     setSummonStatus('ANALYSING SUBJECT MATTER...','PHASE 1 · DISAMBIGUATION');
-    const raw = await callAI({action:'summonQuest',payload:{topic,objective,chapterCount:numChapters},modelId:STATE.selectedModel});
+    const raw = await callAI({action:'summonQuest',payload:{topic,objective,chapterCount:numChapters,priorKnowledge},modelId:STATE.selectedModel});
     setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
     const parsed = parseJSON(raw);
     if(!parsed) throw new Error('Invalid response from AI');
