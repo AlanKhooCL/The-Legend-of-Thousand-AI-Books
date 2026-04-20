@@ -884,6 +884,15 @@ tailwind.config = {
 <!-- MODAL BACKDROP -->
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-black/70 backdrop-blur-sm hidden"></div>
 
+<!-- CONFIRM TOAST -->
+<div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--md-sys-color-surface-container-highest,#1a1a1a);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:12px 16px;flex-direction:column;align-items:center;gap:10px;min-width:260px;max-width:90vw;box-shadow:0 4px 24px rgba(0,0,0,0.5);transition:opacity 0.2s;opacity:0;" class="">
+  <div id="confirm-toast-msg" style="font-size:11px;font-family:'Share Tech Mono',monospace;color:rgba(212,245,212,0.9);text-align:center;line-height:1.4;"></div>
+  <div style="display:flex;gap:8px;width:100%;">
+    <button onclick="confirmToastNo()" style="flex:1;padding:8px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:0.1em;color:rgba(212,245,212,0.6);background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:4px;cursor:pointer;">CANCEL</button>
+    <button onclick="confirmToastYes()" style="flex:1;padding:8px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:0.1em;color:#050905;background:#f87171;border:none;border-radius:4px;cursor:pointer;">ABANDON</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container-lowest border border-primary/40 text-primary font-mono text-xs py-3 px-6 rounded tracking-widest opacity-0 transition-opacity duration-300 pointer-events-none crt-glow whitespace-nowrap" style="max-width:90vw;text-align:center;">
   <style>#toast.show{opacity:1;}</style>
@@ -975,11 +984,23 @@ function renderQuestGrid(){
       const mini=card.querySelector('.boss-mini-canvas');
       if(mini) drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
-      del.className='del-btn absolute top-2 right-2 z-20 p-1.5 rounded text-on-surface-variant/50 hover:text-error transition-colors';
-      del.innerHTML='<span class="material-symbols-outlined text-sm">close</span>';
+      del.className='del-btn absolute top-2 right-2 z-20 p-2 rounded text-on-surface-variant/50 hover:text-error transition-colors';
+      del.innerHTML='<span class="material-symbols-outlined text-base">close</span>';
+      const doDelete = () => {
+        STATE.quests.splice(idx, 1);
+        STATE.player.questsCreated = Math.max(0, STATE.player.questsCreated - 1);
+        saveState(); renderHub(); showToast('Mission abandoned.');
+      };
       del.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
-      del.addEventListener('touchend', (e) => { e.stopPropagation(); e.preventDefault(); del.click(); });
-      del.addEventListener('click', (e) => { e.stopPropagation(); if(confirm('Abandon this mission?')){STATE.quests.splice(idx,1);STATE.player.questsCreated=Math.max(0,STATE.player.questsCreated-1);saveState();renderHub();showToast('Mission abandoned.');}});
+      del.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        showConfirmToast(`Abandon "${quest.questTitle}"?`, doDelete);
+      });
+      del.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showConfirmToast(`Abandon "${quest.questTitle}"?`, doDelete);
+      });
       card.appendChild(del);
       card.addEventListener('click',()=>window.showQuestScreen(idx));
       contentDiv.appendChild(card);
@@ -1862,6 +1883,26 @@ function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ retu
 
 // ── UTILS ─────────────────────────────────────────────
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
+
+function showConfirmToast(msg, onConfirm) {
+  const el = document.getElementById('confirm-toast');
+  const msgEl = document.getElementById('confirm-toast-msg');
+  if(!el || !msgEl) { if(confirm(msg)) onConfirm(); return; }
+  msgEl.textContent = msg;
+  el.style.display = 'flex';
+  requestAnimationFrame(() => el.classList.add('show'));
+  window._confirmCallback = onConfirm;
+}
+window.confirmToastYes = function() {
+  const el = document.getElementById('confirm-toast');
+  if(el) { el.classList.remove('show'); setTimeout(()=>el.style.display='none',300); }
+  if(window._confirmCallback) { window._confirmCallback(); window._confirmCallback = null; }
+};
+window.confirmToastNo = function() {
+  const el = document.getElementById('confirm-toast');
+  if(el) { el.classList.remove('show'); setTimeout(()=>el.style.display='none',300); }
+  window._confirmCallback = null;
+};
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 let evoActiveTypeId = "voidling";
