@@ -1031,13 +1031,13 @@ window.switchQuestTab = function(tab) {
   if(tab === 'scrolls') {
     if(scrolls) { scrolls.classList.add('active'); scrolls.classList.remove('hidden'); }
     if(boss) { boss.classList.remove('active'); boss.classList.add('hidden'); }
-    if(scrollBtn) scrollBtn.classList.add('active');
-    if(bossBtn) bossBtn.classList.remove('active');
+    if(scrollBtn) { scrollBtn.classList.add('active','bg-primary','text-on-primary'); scrollBtn.classList.remove('text-on-surface-variant'); }
+    if(bossBtn) { bossBtn.classList.remove('active','bg-primary','text-on-primary'); bossBtn.classList.add('text-on-surface-variant'); }
   } else {
     if(scrolls) { scrolls.classList.remove('active'); scrolls.classList.add('hidden'); }
     if(boss) { boss.classList.add('active'); boss.classList.remove('hidden'); }
-    if(bossBtn) bossBtn.classList.add('active');
-    if(scrollBtn) scrollBtn.classList.remove('active');
+    if(bossBtn) { bossBtn.classList.add('active','bg-primary','text-on-primary'); bossBtn.classList.remove('text-on-surface-variant'); }
+    if(scrollBtn) { scrollBtn.classList.remove('active','bg-primary','text-on-primary'); scrollBtn.classList.add('text-on-surface-variant'); }
   }
 };
 
@@ -1495,26 +1495,28 @@ function renderChapterContent(html){ document.getElementById('chapter-content-ar
 window.markChapterComplete=async function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
   const ci=STATE.activeChapterIdx;
-  if(quest.completed[ci]) return;
+  if(!quest || ci === null || quest.completed[ci]) return;
   quest.completed[ci]=true;
-  STATE.player.chaptersCompleted++; STATE.player.xp+=20; STATE.player.totalXp+=20;
-  checkRankUp(); saveState();
+  STATE.player.chaptersCompleted++;
+  STATE.player.xp+=20;
+  STATE.player.totalXp+=20;
+  checkRankUp();
+  saveState();
   document.getElementById('chapter-complete-btn').style.display='none';
   window.closeChapterModal();
   renderChapterList(quest);
   const chapters=quest.chapters||[];
   const allDone=chapters.length>0&&chapters.every((_,i)=>quest.completed[i]);
   const btn=document.getElementById('boss-complete-btn');
-  btn.disabled=!allDone;
-  if(allDone){
-    btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge the Demon';
-    // On mobile, nudge user to Boss tab
-    if(window.innerWidth < 1024) showToast('All chapters read! Tap "Boss" to challenge the demon 🗡');
-    else showToast('Chapter mastered! +20 XP — Boss is ready to challenge!');
-  } else {
-    showToast('Chapter mastered! +20 XP');
+  if(btn){
+    btn.disabled=false;
+    btn.textContent=allDone?'INITIATE INTERROGATION':`CHALLENGE BOSS (${quest.completed.filter(Boolean).length}/${chapters.length})`;
   }
-  renderTopicSuggestions();
+  if(allDone){
+    showToast('All chapters complete! Challenge the boss 🗡');
+  } else {
+    showToast('Chapter complete! +20 XP');
+  }
 };
 
 // ── GAMBIT ───────────────────────────────────────────
@@ -2491,3 +2493,4 @@ window.closeTosModal = function() {
 </script>
 </body>
 </html>
+
