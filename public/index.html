@@ -1012,6 +1012,7 @@ function renderQuestGrid(){
 
 // ── BOSS ANIMATION ─────────────────────────────────
 let bossAnimFrames = {};
+let charRAF = null;
 function animateBossCanvas(el, data, ratio=1.0, key='default') {
   if(bossAnimFrames[key]) cancelAnimationFrame(bossAnimFrames[key]);
   if(!el) return;
@@ -1443,7 +1444,7 @@ window.openChapterModal=function(chapterIdx){
     loadChapterContent(chapterIdx);
   }
 };
-window.closeChapterModal=()=>{ document.getElementById('chapter-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); };
+window.closeChapterModal=function(){ document.getElementById('chapter-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); };
 
 async function loadChapterContent(chapterIdx){
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -1976,11 +1977,6 @@ window.switchTab=function(tabId){
   if(btn){ btn.classList.remove('text-on-surface-variant','border-transparent'); btn.classList.add('text-primary','border-primary'); }
   if(tabId==='tab-missions') renderQuestGrid();
   if(tabId==='tab-profile') renderHub();
-};
-window.closeChapterModal = function() {
-  if(charRAF){ cancelAnimationFrame(charRAF); charRAF=null; }
-  document.getElementById('chapter-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
 };
 window.openDeadlineModal = function() {
   const quest = STATE.quests[STATE.activeQuestIdx];
