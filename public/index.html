@@ -474,18 +474,16 @@ tailwind.config = {
     <div id="quest-panel-scrolls" class="quest-panel active flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-outline/20 lg:col-span-5">
       <div class="p-4 space-y-4 pb-8">
         <!-- Prereqs / Next Topics -->
-        <div id="quest-meta-panel" class="space-y-2 hidden">
-          <div class="bg-surface-container rounded p-3 border border-outline/20">
-            <p class="text-[9px] font-mono text-primary/70 tracking-widest mb-2 flex items-center gap-1">
-              <span class="material-symbols-outlined text-xs">checklist</span> PREREQUISITES
+        <div id="quest-meta-panel" class="hidden">
+          <div class="bg-surface-container rounded p-4 border border-outline/20 terminal-border">
+            <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-2 flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">description</span> MISSION_SYNOPSIS
             </p>
-            <div id="prereq-chips" class="flex flex-wrap gap-1.5"></div>
-          </div>
-          <div class="bg-surface-container rounded p-3 border border-outline/20">
-            <p class="text-[9px] font-mono text-tertiary/70 tracking-widest mb-2 flex items-center gap-1">
-              <span class="material-symbols-outlined text-xs">arrow_forward</span> LEARN_NEXT
-            </p>
-            <div id="next-topic-chips" class="flex flex-wrap gap-1.5"></div>
+            <p id="quest-synopsis-text" class="text-[11px] font-mono text-on-surface-variant/80 leading-relaxed"></p>
+            <div class="mt-3 pt-3 border-t border-outline/20 flex items-center gap-2">
+              <span class="text-[9px] font-mono text-on-surface-variant/40 tracking-widest">TARGET AUDIENCE ·</span>
+              <span id="quest-audience-text" class="text-[9px] font-mono text-primary/60 tracking-widest"></span>
+            </div>
           </div>
         </div>
 
@@ -2230,20 +2228,16 @@ window.closeMoveModal = function() {
 
 function renderQuestMeta(quest) {
   const panel = document.getElementById('quest-meta-panel');
-  const prereqEl = document.getElementById('prereq-chips');
-  const nextEl = document.getElementById('next-topic-chips');
-  if(!panel||!prereqEl||!nextEl) return;
+  if(!panel) return;
   const meta = quest.curriculumMeta;
-  const prereqs = meta?.prerequisiteKnowledge || quest.prereqTopics || [];
-  const nextTopics = quest.nextTopics || [];
-  if(!prereqs.length && !nextTopics.length){ panel.classList.add('hidden'); return; }
+  const synopsis = quest.questNarrative || meta?.overallObjective || '';
+  const audience = meta?.targetAudience || '';
+  if(!synopsis && !audience) { panel.classList.add('hidden'); return; }
   panel.classList.remove('hidden');
-  prereqEl.innerHTML = prereqs.length
-    ? prereqs.map(t=>`<span class="bg-primary/10 text-primary border border-primary/30 rounded-full px-2.5 py-0.5 text-[10px] font-mono">${t}</span>`).join('')
-    : '<span class="text-[10px] font-mono text-on-surface-variant/50 italic">None required</span>';
-  nextEl.innerHTML = nextTopics.length
-    ? nextTopics.map(t=>`<button onclick="launchNextTopic('${t.replace(/'/g,"\'")}')" class="bg-tertiary/10 text-tertiary border border-tertiary/30 rounded-full px-2.5 py-0.5 text-[10px] font-mono hover:bg-tertiary/20 transition-colors">${t} →</button>`).join('')
-    : '<span class="text-[10px] font-mono text-on-surface-variant/50 italic">Complete quest to unlock</span>';
+  const synopsisEl = document.getElementById('quest-synopsis-text');
+  const audienceEl = document.getElementById('quest-audience-text');
+  if(synopsisEl) synopsisEl.textContent = synopsis;
+  if(audienceEl) audienceEl.textContent = audience.toUpperCase();
 }
 
 window.launchNextTopic = function(topic) {
