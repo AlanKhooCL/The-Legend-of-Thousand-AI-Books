@@ -44,7 +44,26 @@ exports.summonQuest = onCall(
     try {
       const dText = await generate(model,
         `You resolve topic names to their precise educational meaning. Respond ONLY with valid JSON.`,
-        `A user wants to learn: "${topic}"\n${objective ? `Goal: "${objective}"` : ""}\n\nResolve any acronym, abbreviation, or ambiguous term to its most educationally-intended meaning.\n\nExamples:\n- "MCP" (no context) → "Model Context Protocol (MCP) — Anthropic's open standard for connecting AI models to external tools and data sources"\n- "ML" → "Machine Learning (ML)"\n- "TCP" → "TCP (Transmission Control Protocol)"\n- "Renaissance" → keep as-is, not ambiguous\n\nReturn JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":false,"clarification":""}`,
+        `A user wants to learn: "${topic}"
+${objective ? `Goal: "${objective}"` : ""}
+
+Your job: resolve ambiguous acronyms or abbreviations to their full meaning. DO NOT change or reinterpret clear, non-ambiguous topics.
+
+Rules:
+- If the topic is already clear and specific (e.g. "Sales Strategy", "French History", "Leadership", "Negotiation Skills", "Supply Chain Management"), keep it EXACTLY as-is.
+- Only resolve genuine acronyms or abbreviations (e.g. "MCP", "ML", "TCP", "SQL").
+- The domain should reflect the actual field of study, not a default assumption.
+
+Examples:
+- "MCP" (no context) → resolvedTopic: "Model Context Protocol (MCP)", domain: "Software Engineering"
+- "ML" → resolvedTopic: "Machine Learning (ML)", domain: "Artificial Intelligence"
+- "Sales Strategy" → resolvedTopic: "Sales Strategy", domain: "Business & Sales"
+- "Renaissance" → resolvedTopic: "The Renaissance", domain: "History & Culture"
+- "Negotiation" → resolvedTopic: "Negotiation Skills", domain: "Business & Leadership"
+- "Supply Chain" → resolvedTopic: "Supply Chain Management", domain: "Operations & Logistics"
+- "Cold Brew" → resolvedTopic: "Cold Brew Coffee", domain: "Food & Beverage"
+
+Return JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":false,"clarification":""}`,
         "application/json"
       );
       const d = safeParseJSON(dText);
