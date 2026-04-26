@@ -67,7 +67,10 @@ Return JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":fals
         "application/json"
       );
       const d = safeParseJSON(dText);
-      if (d && d.resolvedTopic) { resolvedTopic = d.resolvedTopic; topicDomain = d.domain || ""; }
+      if (d && d.resolvedTopic && d.resolvedTopic !== 'undefined') {
+        resolvedTopic = d.resolvedTopic;
+        topicDomain = d.domain || "";
+      }
     } catch (err) { console.warn("Disambiguation skipped:", err.message); }
 
     // STEP 1 — Curriculum design with retry until exact chapter count
