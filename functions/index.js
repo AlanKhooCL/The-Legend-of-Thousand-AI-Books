@@ -34,6 +34,14 @@ exports.summonQuest = onCall(
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
     const { action, payload: reqPayload = {}, modelId: reqModelId } = request.data;
+
+    // --- DIAGNOSTIC GUARD ---
+    if (!reqPayload.topic) {
+      console.error("FATAL: Topic is missing. Raw request data:", JSON.stringify(request.data));
+      throw new HttpsError("invalid-argument", "Mission topic was lost in transit.");
+    }
+    // ------------------------
+    
     const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, topicDomainHint, modelId } = reqPayload;
     const effectiveModelId = modelId || reqModelId;
     const chapterCount = 5; // Fixed 5-chapter structure
