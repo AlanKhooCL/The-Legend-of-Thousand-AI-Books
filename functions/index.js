@@ -162,7 +162,7 @@ Requirements:
 - bossTitle: A short menacing subtitle
 - bossLore: 1-2 sentences of lore about the boss as a metaphor for the hardest concept in this subject
 
-JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
+Return ONLY these 5 fields. JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
         "application/json"
       );
       questWrapper = safeParseJSON(qTxt);
@@ -201,10 +201,16 @@ JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLor
       }
     } catch (e) { console.warn("Next topics generation failed:", e.message); }
 
+    // Safety net: never let resolvedTopic be "Undefined" or empty
+    if (!resolvedTopic || resolvedTopic.toLowerCase() === 'undefined' || resolvedTopic.trim() === '') {
+      resolvedTopic = topic;
+    }
+
     return {
       result: JSON.stringify({
         ...questWrapper,
-        resolvedTopic, originalTopic: topic,
+        resolvedTopic,  // always use server-side value, overrides anything in questWrapper
+        originalTopic: topic,
         chapters: finalChapters,
         prereqTopics,
         nextTopics,
