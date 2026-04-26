@@ -33,51 +33,29 @@ exports.summonQuest = onCall(
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
-    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, modelId } = request.data;
+    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, topicDomainHint, modelId } = request.data;
     const chapterCount = 5; // Fixed 5-chapter structure
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
     const model = getModel(genAI, modelId);
 
-    // STEP 0 — Disambiguate topic
-    let resolvedTopic = topic;
-    let topicDomain = "";
+    // Topic passes through directly — no disambiguation AI call
+    // Domain is passed from the client or inferred simply
+    let resolvedTopic = topic || "";
+    let topicDomain = topicDomainHint || "";
 
-    // Only call AI for short acronyms (2-6 caps). Everything else passes through unchanged.
-    const looksLikeAcronym = /^[A-Z]{2,6}$/.test(topic.trim());
-
-    if (looksLikeAcronym) {
-      try {
-        const dText = await generate(model,
-          `You resolve acronyms to their full educational meaning. Respond ONLY with valid JSON.`,
-          `Acronym to resolve: "${topic}"
-${objective ? `Goal context: "${objective}"` : ""}
-
-Return the most likely educational expansion. If unsure, return it unchanged.
-Return JSON: {"resolvedTopic":"","domain":""}`,
-          "application/json"
-        );
-        const d = safeParseJSON(dText);
-        if (d && d.resolvedTopic && d.resolvedTopic.toLowerCase() !== 'undefined' && d.resolvedTopic.trim() !== '') {
-          resolvedTopic = d.resolvedTopic;
-          topicDomain = d.domain || "";
-        }
-      } catch (err) { console.warn("Disambiguation skipped:", err.message); }
-    } else {
-      // Plain English — infer domain from keywords without any AI call
-      const t = topic.toLowerCase();
-      if (/sales|market|customer|revenue|pipeline|crm|negotiat|pitch|prospect|close|b2b|b2c/.test(t)) topicDomain = "Business & Sales";
-      else if (/leader|manag|strateg|execut|operat|supply chain|logistic|hr|hiring|team/.test(t)) topicDomain = "Business & Leadership";
-      else if (/financ|invest|stock|portfolio|accounting|budget|tax|valuat|trading/.test(t)) topicDomain = "Finance & Investing";
-      else if (/code|program|software|react|javascript|python|data struc|algorithm|api|database|backend|frontend|devops|cloud/.test(t)) topicDomain = "Software Engineering";
-      else if (/ai|machine learn|deep learn|neural|llm|nlp|prompt|model/.test(t)) topicDomain = "Artificial Intelligence";
-      else if (/design|ux|ui|user experience|figma|product|wireframe/.test(t)) topicDomain = "Design & Product";
-      else if (/history|war|civiliz|empire|revolution|ancient|medieval|renaissance/.test(t)) topicDomain = "History & Culture";
-      else if (/math|calculus|algebra|statistic|probability|geometry|linear/.test(t)) topicDomain = "Mathematics";
-      else if (/physic|chemist|biology|scienc|quantum|molecule|cell|gene/.test(t)) topicDomain = "Natural Sciences";
-      else if (/cook|culinar|bak|recipe|food|wine|coffee|nutrition/.test(t)) topicDomain = "Culinary Arts";
-      else if (/music|guitar|piano|composition|theory|chord|rhythm/.test(t)) topicDomain = "Music";
-      else if (/law|legal|contract|intellectual property|regulation|compliance/.test(t)) topicDomain = "Law & Compliance";
-      else topicDomain = "General Education";
+    // Simple domain inference if not provided
+    if (!topicDomain) {
+      const t = resolvedTopic.toLowerCase();
+      if (/sales|market|customer|revenue|crm|negotiat|pitch|prospect|b2b/.test(t)) topicDomain = "Business & Sales";
+      else if (/leader|manag|strateg|execut|hr|hiring|team/.test(t)) topicDomain = "Business & Leadership";
+      else if (/financ|invest|stock|portfolio|accounting|budget|tax/.test(t)) topicDomain = "Finance";
+      else if (/code|program|software|react|javascript|python|api|database/.test(t)) topicDomain = "Software Engineering";
+      else if (/ai|machine learn|deep learn|neural|llm|nlp/.test(t)) topicDomain = "Artificial Intelligence";
+      else if (/design|ux|ui|product|figma/.test(t)) topicDomain = "Design & Product";
+      else if (/history|war|civiliz|empire|revolution/.test(t)) topicDomain = "History & Culture";
+      else if (/math|calculus|algebra|statistic|probability/.test(t)) topicDomain = "Mathematics";
+      else if (/physic|chemist|biology|scienc|quantum/.test(t)) topicDomain = "Natural Sciences";
+      else topicDomain = resolvedTopic;
     }
 
     // STEP 1 — Curriculum design with retry until exact chapter count
@@ -201,8 +179,8 @@ Return ONLY these 5 fields. JSON: {"questTitle":"","questNarrative":"","bossName
       }
     } catch (e) { console.warn("Next topics generation failed:", e.message); }
 
-    // Safety net: never let resolvedTopic be "Undefined" or empty
-    if (!resolvedTopic || resolvedTopic.toLowerCase() === 'undefined' || resolvedTopic.trim() === '') {
+    // Safety net
+    if (!resolvedTopic || resolvedTopic.toLowerCase().startsWith('undefined') || resolvedTopic.trim() === '') {
       resolvedTopic = topic;
     }
 
