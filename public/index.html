@@ -2292,8 +2292,14 @@ window.doSummonQuest = async function() {
     const raw = await callAI({action:'summonQuest',payload:{topic,objective,chapterCount:numChapters,priorKnowledge},modelId:STATE.selectedModel});
     setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
     const parsed = parseJSON(raw);
-    if(!parsed) throw new Error('Invalid response from AI');
+    if(!parsed || typeof parsed !== 'object') throw new Error('Invalid response from AI');
+
+    // Guard: resolvedTopic may come back as literal "undefined" string
+    const resolvedTopic = (parsed.resolvedTopic && parsed.resolvedTopic !== 'undefined')
+      ? parsed.resolvedTopic : topic;
+
     console.log('[summon] parsed keys:', Object.keys(parsed));
+    console.log('[summon] resolvedTopic:', resolvedTopic);
     console.log('[summon] chapters count:', (parsed.chapters||[]).length);
 
     // chapters come as full objects {chapterNumber,title,tag,summary,...}
@@ -2312,13 +2318,18 @@ window.doSummonQuest = async function() {
     const curriculumMeta = parsed.curriculumMeta || null;
     const hpVal = 80 + chapters.length * 10;
     const newQuest = {
-      topic: parsed.resolvedTopic || topic,
-      objective: objective||'',
-      questTitle: parsed.questTitle || parsed.title || `${topic} Mastery`,
-      questNarrative: parsed.questNarrative || 'A newly discovered scroll.',
-      bossName: parsed.bossName || 'The Unknown',
-      bossTitle: parsed.bossTitle || 'Guardian Protocol',
-      bossLore: parsed.bossLore || 'A hostile intelligence blocking access to deeper knowledge.',
+      topic: resolvedTopic || topic,
+      objective: objective || '',
+      questTitle: (parsed.questTitle && parsed.questTitle !== 'undefined')
+        ? parsed.questTitle : `${resolvedTopic || topic} Mastery`,
+      questNarrative: (parsed.questNarrative && parsed.questNarrative !== 'undefined')
+        ? parsed.questNarrative : `A 5-chapter mission covering ${resolvedTopic || topic}.`,
+      bossName: (parsed.bossName && parsed.bossName !== 'undefined')
+        ? parsed.bossName : 'The Knowledge Guardian',
+      bossTitle: (parsed.bossTitle && parsed.bossTitle !== 'undefined')
+        ? parsed.bossTitle : 'Awaiting Defeat',
+      bossLore: (parsed.bossLore && parsed.bossLore !== 'undefined')
+        ? parsed.bossLore : 'Defeat this guardian by mastering all chapters.',
       chapters,
       curriculumMeta,
       prereqTopics: parsed.prereqTopics || [],
@@ -2549,4 +2560,3 @@ window.closeTosModal = function() {
 </script>
 </body>
 </html>
-
