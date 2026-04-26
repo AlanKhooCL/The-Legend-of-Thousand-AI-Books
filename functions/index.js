@@ -33,10 +33,12 @@ exports.summonQuest = onCall(
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
-    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, topicDomainHint, modelId } = request.data;
+    const { action, payload: reqPayload = {}, modelId: reqModelId } = request.data;
+    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, topicDomainHint, modelId } = reqPayload;
+    const effectiveModelId = modelId || reqModelId;
     const chapterCount = 5; // Fixed 5-chapter structure
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
-    const model = getModel(genAI, modelId);
+    const model = getModel(genAI, effectiveModelId);
 
     // Topic passes through directly — no disambiguation AI call
     // Domain is passed from the client or inferred simply
