@@ -33,67 +33,37 @@ exports.summonQuest = onCall(
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Login required.");
 
-    const { action, payload: reqPayload = {}, modelId: reqModelId } = request.data;
-
-    // --- DIAGNOSTIC GUARD ---
-    if (!reqPayload.topic) {
-      console.error("FATAL: Topic is missing. Raw request data:", JSON.stringify(request.data));
-      throw new HttpsError("invalid-argument", "Mission topic was lost in transit.");
-    }
-    // ------------------------
-    
-    const { topic, objective, chapterCount: rawChapterCount, numChapters, priorKnowledge, topicDomainHint, modelId } = reqPayload;
-    const effectiveModelId = modelId || reqModelId;
-    const chapterCount = 5; // Fixed 5-chapter structure
+    const { topic, objective, numChapters, modelId } = request.data;
+    const chapterCount = Math.max(3, Math.min(10, parseInt(numChapters) || 5));
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY.value());
-    const model = getModel(genAI, effectiveModelId);
+    const model = getModel(genAI, modelId);
 
-    // Topic passes through directly — no disambiguation AI call
-    // Domain is passed from the client or inferred simply
-    let resolvedTopic = topic || "";
-    let topicDomain = topicDomainHint || "";
-
-    // Simple domain inference if not provided
-    if (!topicDomain) {
-      const t = resolvedTopic.toLowerCase();
-      if (/sales|market|customer|revenue|crm|negotiat|pitch|prospect|b2b/.test(t)) topicDomain = "Business & Sales";
-      else if (/leader|manag|strateg|execut|hr|hiring|team/.test(t)) topicDomain = "Business & Leadership";
-      else if (/financ|invest|stock|portfolio|accounting|budget|tax/.test(t)) topicDomain = "Finance";
-      else if (/code|program|software|react|javascript|python|api|database/.test(t)) topicDomain = "Software Engineering";
-      else if (/ai|machine learn|deep learn|neural|llm|nlp/.test(t)) topicDomain = "Artificial Intelligence";
-      else if (/design|ux|ui|product|figma/.test(t)) topicDomain = "Design & Product";
-      else if (/history|war|civiliz|empire|revolution/.test(t)) topicDomain = "History & Culture";
-      else if (/math|calculus|algebra|statistic|probability/.test(t)) topicDomain = "Mathematics";
-      else if (/physic|chemist|biology|scienc|quantum/.test(t)) topicDomain = "Natural Sciences";
-      else topicDomain = resolvedTopic;
-    }
+    // STEP 0 — Disambiguate topic
+    let resolvedTopic = topic;
+    let topicDomain = "";
+    try {
+      const dText = await generate(model,
+        `You resolve topic names to their precise educational meaning. Respond ONLY with valid JSON.`,
+        `A user wants to learn: "${topic}"\n${objective ? `Goal: "${objective}"` : ""}\n\nResolve any acronym, abbreviation, or ambiguous term to its most educationally-intended meaning.\n\nExamples:\n- "MCP" (no context) → "Model Context Protocol (MCP) — Anthropic's open standard for connecting AI models to external tools and data sources"\n- "ML" → "Machine Learning (ML)"\n- "TCP" → "TCP (Transmission Control Protocol)"\n- "Renaissance" → keep as-is, not ambiguous\n\nReturn JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":false,"clarification":""}`,
+        "application/json"
+      );
+      const d = safeParseJSON(dText);
+      if (d && d.resolvedTopic) { resolvedTopic = d.resolvedTopic; topicDomain = d.domain || ""; }
+    } catch (err) { console.warn("Disambiguation skipped:", err.message); }
 
     // STEP 1 — Curriculum design with retry until exact chapter count
-    const priorLevel = priorKnowledge || 'some';
-    const priorInstructions = {
-      none: 'The student has ZERO prior knowledge. Chapter 1 must start from absolute first principles using simple analogies. Build up gradually — never assume familiarity with any concept.',
-      some: 'The student knows the basics but lacks depth. Skip trivial definitions. Focus on the mechanics, nuances, and practical application they are missing.',
-      strong: 'The student is already experienced. SKIP all introductory content. Start immediately with advanced mechanics, subtle edge cases, and expert-level insights that even experienced practitioners miss.',
-    }[priorLevel];
+    const curriculumSys = `You are a senior instructional designer and expert in ${topicDomain || "the relevant field"}. Respond ONLY with valid JSON.`;
 
-    const curriculumSys = `You are a senior instructional designer and expert in ${topicDomain || "the relevant field"}. Respond ONLY with valid JSON.
-Prior knowledge level: ${priorLevel.toUpperCase()} — ${priorInstructions}`;
-
-    const buildPrompt = (n) => `Design EXACTLY 5 chapters for: "${resolvedTopic}"
+    const buildPrompt = (n) => `Design EXACTLY ${n} chapters for: "${resolvedTopic}"
 ${objective ? `Goal: ${objective}` : ""}
-Prior knowledge: ${priorLevel.toUpperCase()}
 
-MANDATORY 5-CHAPTER STRUCTURE — follow this exactly:
-Chapter 1 — THE FOUNDATION: Core concept, vocabulary, and mental model. ${priorLevel === 'none' ? 'Start from absolute zero. Use simple analogies.' : priorLevel === 'strong' ? 'Skip the basics — establish the expert mental model and key abstractions.' : 'Cover core vocabulary and the foundational mental model clearly.'}
-Chapter 2 — THE MECHANICS: How it actually works under the hood. Internal logic, key components, and their interactions.
-Chapter 3 — THE APPLICATION: Real-world use cases. Translating theory into practice with concrete examples.
-Chapter 4 — THE TRAPS: Common misconceptions, edge cases, and pitfalls. Crucial for avoiding expert-level mistakes.
-Chapter 5 — THE SYNTHESIS: Tying it all together. High-level patterns, advanced insights, and what mastery looks like.
+RULES:
+- Return EXACTLY ${n} items in "chapters" array — this is mandatory
+- Logical progression: foundations → core → applied → advanced
+- Use correct domain terminology (for MCP: hosts, clients, servers, tools, resources, prompts)
+- Concrete learning outcomes per chapter
 
-Use domain-specific terminology for ${topicDomain || resolvedTopic}.
-Each chapter needs concrete learning outcomes and specific concepts — no vague generalities.
-
-JSON with EXACTLY 5 chapters:
+JSON with EXACTLY ${n} chapters:
 {
   "targetAudience": "...",
   "overallObjective": "...",
@@ -139,18 +109,7 @@ JSON with EXACTLY 5 chapters:
     try {
       const qTxt = await generate(model,
         `You are a creative game writer for an educational fantasy RPG. Respond ONLY with valid JSON.`,
-        `Generate a quest wrapper for a learning mission on "${resolvedTopic}" (domain: ${topicDomain}).
-Chapters: ${curriculum.chapters.map((c,i)=>`${i+1}. ${c.title}`).join(", ")}
-Prior knowledge level: ${priorLevel}
-
-Requirements:
-- questTitle: A punchy, memorable mission title (e.g. "The Redux Reckoning", "Mastering the Shadow DOM")
-- questNarrative: 2-3 sentences. A COURSE SYNOPSIS — factual and concrete. Describe WHAT the student will learn and WHY it matters. No fantasy fluff. Example: "This mission covers the core mechanics of React state management, from useState fundamentals to complex reducer patterns. By the end, you will confidently architect stateful applications and debug state-related bugs in production."
-- bossName: A domain-specific metaphor boss (e.g. ML→"The Overfitting Specter", SQL→"The N+1 Query Demon", React→"The Stale Closure Wraith")
-- bossTitle: A short menacing subtitle
-- bossLore: 1-2 sentences of lore about the boss as a metaphor for the hardest concept in this subject
-
-Return ONLY these 5 fields. JSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
+        `Create a fantasy quest for learning: "${resolvedTopic}" (domain: ${topicDomain})\nChapters: ${curriculum.chapters.map((c,i)=>`${i+1}. ${c.title}`).join(", ")}\n\nBoss name must use a domain-specific metaphor (e.g. ML→"The Overfitting Specter", MCP→"The Context Fragmentation Daemon", Networking→"The Packet Loss Wraith").\n\nJSON: {"questTitle":"","questNarrative":"","bossName":"","bossTitle":"","bossLore":""}`,
         "application/json"
       );
       questWrapper = safeParseJSON(qTxt);
@@ -189,16 +148,10 @@ Return ONLY these 5 fields. JSON: {"questTitle":"","questNarrative":"","bossName
       }
     } catch (e) { console.warn("Next topics generation failed:", e.message); }
 
-    // Safety net
-    if (!resolvedTopic || resolvedTopic.toLowerCase().startsWith('undefined') || resolvedTopic.trim() === '') {
-      resolvedTopic = topic;
-    }
-
     return {
       result: JSON.stringify({
         ...questWrapper,
-        resolvedTopic,  // always use server-side value, overrides anything in questWrapper
-        originalTopic: topic,
+        resolvedTopic, originalTopic: topic,
         chapters: finalChapters,
         prereqTopics,
         nextTopics,
