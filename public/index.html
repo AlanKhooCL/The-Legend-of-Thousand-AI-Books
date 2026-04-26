@@ -1915,7 +1915,12 @@ async function callAI({action,payload,modelId}){
   try{
     const cfName = action==='summonQuest' ? 'summonQuest' : 'communeWithScrolls';
     const fn=httpsCallable(functions,cfName);
-    const r=await fn({action,payload,modelId:modelId||STATE.selectedModel});
+    // For summonQuest: flatten payload to top level so CF can read topic/objective directly
+    // Also keep payload nested for new CF version
+    const data = action==='summonQuest'
+      ? { action, modelId:modelId||STATE.selectedModel, payload, ...payload }
+      : { action, payload, modelId:modelId||STATE.selectedModel };
+    const r=await fn(data);
     const text=r.data?.result||r.data?.text||r.data;
     if(!text) throw new Error("The scrolls returned empty.");
     return typeof text==='string' ? text : JSON.stringify(text);
@@ -2295,11 +2300,9 @@ window.doSummonQuest = async function() {
     if(!parsed || typeof parsed !== 'object') throw new Error('Invalid response from AI');
 
     // Guard: resolvedTopic may come back as literal "undefined" string
-    const resolvedTopic = (parsed.resolvedTopic && parsed.resolvedTopic !== 'undefined')
-      ? parsed.resolvedTopic : topic;
+    const resolvedTopic = topic; // Always use user's original input — never trust AI-returned resolvedTopic
 
     console.log('[summon] parsed keys:', Object.keys(parsed));
-    console.log('[summon] resolvedTopic:', resolvedTopic);
     console.log('[summon] chapters count:', (parsed.chapters||[]).length);
 
     // chapters come as full objects {chapterNumber,title,tag,summary,...}
