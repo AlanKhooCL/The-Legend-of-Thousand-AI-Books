@@ -41,37 +41,44 @@ exports.summonQuest = onCall(
     // STEP 0 — Disambiguate topic
     let resolvedTopic = topic;
     let topicDomain = "";
-    try {
-      const dText = await generate(model,
-        `You resolve topic names to their precise educational meaning. Respond ONLY with valid JSON.`,
-        `A user wants to learn: "${topic}"
-${objective ? `Goal: "${objective}"` : ""}
 
-Your job: resolve ambiguous acronyms or abbreviations to their full meaning. DO NOT change or reinterpret clear, non-ambiguous topics.
+    // Only call AI for short acronyms (2-6 caps). Everything else passes through unchanged.
+    const looksLikeAcronym = /^[A-Z]{2,6}$/.test(topic.trim());
 
-Rules:
-- If the topic is already clear and specific (e.g. "Sales Strategy", "French History", "Leadership", "Negotiation Skills", "Supply Chain Management"), keep it EXACTLY as-is.
-- Only resolve genuine acronyms or abbreviations (e.g. "MCP", "ML", "TCP", "SQL").
-- The domain should reflect the actual field of study, not a default assumption.
+    if (looksLikeAcronym) {
+      try {
+        const dText = await generate(model,
+          `You resolve acronyms to their full educational meaning. Respond ONLY with valid JSON.`,
+          `Acronym to resolve: "${topic}"
+${objective ? `Goal context: "${objective}"` : ""}
 
-Examples:
-- "MCP" (no context) → resolvedTopic: "Model Context Protocol (MCP)", domain: "Software Engineering"
-- "ML" → resolvedTopic: "Machine Learning (ML)", domain: "Artificial Intelligence"
-- "Sales Strategy" → resolvedTopic: "Sales Strategy", domain: "Business & Sales"
-- "Renaissance" → resolvedTopic: "The Renaissance", domain: "History & Culture"
-- "Negotiation" → resolvedTopic: "Negotiation Skills", domain: "Business & Leadership"
-- "Supply Chain" → resolvedTopic: "Supply Chain Management", domain: "Operations & Logistics"
-- "Cold Brew" → resolvedTopic: "Cold Brew Coffee", domain: "Food & Beverage"
-
-Return JSON: {"resolvedTopic":"","domain":"field/discipline","wasAmbiguous":false,"clarification":""}`,
-        "application/json"
-      );
-      const d = safeParseJSON(dText);
-      if (d && d.resolvedTopic && d.resolvedTopic !== 'undefined') {
-        resolvedTopic = d.resolvedTopic;
-        topicDomain = d.domain || "";
-      }
-    } catch (err) { console.warn("Disambiguation skipped:", err.message); }
+Return the most likely educational expansion. If unsure, return it unchanged.
+Return JSON: {"resolvedTopic":"","domain":""}`,
+          "application/json"
+        );
+        const d = safeParseJSON(dText);
+        if (d && d.resolvedTopic && d.resolvedTopic.toLowerCase() !== 'undefined' && d.resolvedTopic.trim() !== '') {
+          resolvedTopic = d.resolvedTopic;
+          topicDomain = d.domain || "";
+        }
+      } catch (err) { console.warn("Disambiguation skipped:", err.message); }
+    } else {
+      // Plain English — infer domain from keywords without any AI call
+      const t = topic.toLowerCase();
+      if (/sales|market|customer|revenue|pipeline|crm|negotiat|pitch|prospect|close|b2b|b2c/.test(t)) topicDomain = "Business & Sales";
+      else if (/leader|manag|strateg|execut|operat|supply chain|logistic|hr|hiring|team/.test(t)) topicDomain = "Business & Leadership";
+      else if (/financ|invest|stock|portfolio|accounting|budget|tax|valuat|trading/.test(t)) topicDomain = "Finance & Investing";
+      else if (/code|program|software|react|javascript|python|data struc|algorithm|api|database|backend|frontend|devops|cloud/.test(t)) topicDomain = "Software Engineering";
+      else if (/ai|machine learn|deep learn|neural|llm|nlp|prompt|model/.test(t)) topicDomain = "Artificial Intelligence";
+      else if (/design|ux|ui|user experience|figma|product|wireframe/.test(t)) topicDomain = "Design & Product";
+      else if (/history|war|civiliz|empire|revolution|ancient|medieval|renaissance/.test(t)) topicDomain = "History & Culture";
+      else if (/math|calculus|algebra|statistic|probability|geometry|linear/.test(t)) topicDomain = "Mathematics";
+      else if (/physic|chemist|biology|scienc|quantum|molecule|cell|gene/.test(t)) topicDomain = "Natural Sciences";
+      else if (/cook|culinar|bak|recipe|food|wine|coffee|nutrition/.test(t)) topicDomain = "Culinary Arts";
+      else if (/music|guitar|piano|composition|theory|chord|rhythm/.test(t)) topicDomain = "Music";
+      else if (/law|legal|contract|intellectual property|regulation|compliance/.test(t)) topicDomain = "Law & Compliance";
+      else topicDomain = "General Education";
+    }
 
     // STEP 1 — Curriculum design with retry until exact chapter count
     const priorLevel = priorKnowledge || 'some';
