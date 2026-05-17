@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
+
+<link rel="manifest" href="/manifest.json">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="LearNow">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+<meta name="theme-color" content="#4ade80">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2561,5 +2571,21 @@ window.closeTosModal = function() {
 
 
 </script>
+
+<script>
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Vault-Tec Service Worker registered successfully:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
