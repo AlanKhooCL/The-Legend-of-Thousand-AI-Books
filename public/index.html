@@ -220,21 +220,15 @@ tailwind.config = {
 </head>
 <body class="font-body text-on-surface bg-surface overflow-x-hidden">
 
-<!-- Scanlines overlay -->
 <div class="scanlines"></div>
 
-<!-- ═══════════════════════════════════════════
-     TITLE SCREEN
-═══════════════════════════════════════════ -->
 <div id="screen-title" class="screen active fixed inset-0 z-10 flex-col items-center justify-center overflow-hidden bg-surface">
-  <!-- Wasteland BG -->
   <div class="absolute inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMmpqcclGn5HzPoAshwSFT5UfVeqEvsEKQPsMpEeJ95qFj2MAqVX0PCSbhS5Qp5OeoaWB8UmARKfKmNYUzk1h9me7fyjaNHSxdEeimYsREe3CjTji3kD4h6KSY3D83beukKB6bBjvurB5BESwIhusZyEQhmzIqiye0CEVO9iFv-ik7FRXthLExs_JVB1rynVCFGvsj-LdP30pEqAcdTrgcWP0KeR1yfwblH651RIMF1TUg71noyYq4HCeQkMw4-O7mu10JVjj5O25w"
          class="w-full h-full object-cover opacity-20 grayscale" alt="wasteland"/>
     <div class="absolute inset-0" style="background:radial-gradient(ellipse at center, rgba(5,46,22,0.15) 0%, rgba(8,12,8,0.95) 70%);"></div>
   </div>
 
-  <!-- Vault door decorative rings -->
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-5 pointer-events-none">
     <div class="absolute inset-0 rounded-full border-2 border-primary vault-spin"></div>
     <div class="absolute inset-8 rounded-full border border-primary vault-spin-rev"></div>
@@ -242,7 +236,6 @@ tailwind.config = {
   </div>
 
   <div class="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl mx-auto flicker">
-    <!-- Logo -->
     <div class="font-headline text-[10px] tracking-[0.5em] text-primary/60 mb-4 uppercase">
       VAULT-TEC KNOWLEDGE ARCHIVE · EST. 2077
     </div>
@@ -251,16 +244,14 @@ tailwind.config = {
     </h1>
     <div class="font-headline text-sm tracking-[0.3em] text-primary/50 mb-8">V1.0 // CLASSIFIED DATABASE</div>
 
-    <!-- Terminal prompt -->
     <div class="w-full max-w-sm bg-surface-container-low border border-outline/40 rounded p-4 mb-8 text-left terminal-border">
       <div class="text-on-surface-variant text-xs font-mono mb-2">VAULT-OS v4.2 · BOOT SEQUENCE COMPLETE</div>
-      <div class="text-primary text-xs font-mono mb-1">&gt; AUTHENTICATING USER...</div>
+      <div class="text-primary text-xs font-mono mb-1">> AUTHENTICATING USER...</div>
       <div id="auth-loading-msg" class="text-on-surface-variant text-xs font-mono">
-        &gt; AWAITING CREDENTIALS<span class="cursor-blink">_</span>
+        > AWAITING CREDENTIALS<span class="cursor-blink">_</span>
       </div>
     </div>
 
-    <!-- Auth buttons -->
     <div id="auth-buttons" class="hidden flex-col gap-3 w-full max-w-sm">
       <button onclick="signInWithGoogle()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 px-6 rounded flex items-center justify-center gap-3 text-sm tracking-widest uppercase shadow-lg" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
         <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -281,9 +272,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     PATH / NAME SCREEN (Companion naming)
-═══════════════════════════════════════════ -->
 <div id="screen-path" class="screen fixed inset-0 z-10 flex-col items-center justify-center overflow-y-auto bg-surface">
   <div class="fixed inset-0 z-0">
     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KHNKSVDby76END8YXKPuSjWJXDvtLrb1V4a-efG0M8Goo4Nl0s_zrhnsI0p8piLX0_ZgPUtKp2jbtkxwUnfZq8BDjywiS0CZQYoKdtIPlcHL1V9IIaAGyhmZrHsIu52NZwVohGJXMZDKFQesU2qlINCJupAKvm5xV8B99Aq7JfGspxma2Uuz1e3elGWoFIfxw5vqxzOza2jG_uJ6Qcofw7qiolAl8oRG1PiJy_MJL2ZWoriCoQps-8J--AEpGG_UqCSJ5DCVWQM"
@@ -296,7 +284,6 @@ tailwind.config = {
       <h2 class="font-headline font-black text-2xl text-primary crt-glow tracking-widest">SUBJECT IDENTIFIER</h2>
       <p class="text-on-surface-variant text-xs font-mono mt-2 leading-relaxed">Memory banks corrupted. Enter designation for this terminal session.</p>
     </div>
-    <!-- Pip-Boy style display -->
     <div class="w-full bg-surface-container-low border border-outline/40 rounded p-6 terminal-border">
       <div class="text-on-surface-variant text-[10px] font-mono mb-3 tracking-widest">ENTER OPERATIVE CODENAME:</div>
       <input id="path-name-input" type="text" placeholder="e.g. GHOST, CIPHER, ATLAS..."
@@ -310,11 +297,7 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN HUB
-═══════════════════════════════════════════ -->
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
-  <!-- Top bar -->
   <nav class="flex-shrink-0 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/30 z-20 flex justify-between items-center px-4 py-3" style="box-shadow:0 1px 0 rgba(74,222,128,0.1);">
     <div class="font-headline font-black text-sm text-primary crt-glow tracking-widest uppercase">VAULT_LEARN_V1.0</div>
     <div class="flex items-center gap-3">
@@ -328,93 +311,38 @@ tailwind.config = {
     </div>
   </nav>
 
-  <!-- Tab bar -->
-  <div class="flex-shrink-0 bg-surface-container-lowest border-b border-outline/20 z-20 flex">
-    <button onclick="switchTab('tab-profile')" data-target="tab-profile"
-            class="tab-btn flex-1 py-3 font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-b-2 border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">person_search</span>PROFILE
-    </button>
-    <button onclick="switchTab('tab-missions')" data-target="tab-missions"
-            class="tab-btn flex-1 py-3 font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-b-2 border-transparent transition-all flex flex-col items-center gap-0.5">
-      <span class="material-symbols-outlined text-lg">folder_open</span>MISSIONS
-    </button>
-  </div>
-
-  <!-- Tab content -->
   <div class="flex-1 overflow-hidden">
-
-    <!-- ── PROFILE TAB ── -->
-    <div id="tab-profile" class="tab-pane h-full overflow-y-auto">
-      <div class="px-4 pt-4 pb-28 max-w-lg mx-auto space-y-4">
-
-        <!-- Operative card -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-5 terminal-border relative overflow-hidden">
-          <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at top left,rgba(74,222,128,0.04) 0%,transparent 60%);"></div>
-          <div class="flex items-center gap-4 mb-4">
-            <div class="w-16 h-16 bg-surface-container border border-outline/40 rounded flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-3xl text-primary">person_search</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest mb-1">OPERATIVE CODENAME</div>
-              <div id="char-name" class="font-headline font-black text-xl text-primary crt-glow tracking-widest cursor-pointer hover:opacity-70" onclick="renameCharacter()"></div>
-              <div id="char-rank" class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest mt-0.5"></div>
-            </div>
-            <button onclick="renameCharacter()" class="text-on-surface-variant hover:text-primary transition-colors flex-shrink-0">
-              <span class="material-symbols-outlined text-sm">edit</span>
-            </button>
-          </div>
-          <div class="space-y-1 mb-4">
-            <div class="flex justify-between text-[9px] font-mono text-on-surface-variant/60 tracking-widest">
-              <span>KNOWLEDGE LEVEL</span>
-              <span id="xp-label" class="text-primary">0 / 0 XP</span>
-            </div>
-            <div class="h-2 bg-surface-container-highest rounded overflow-hidden border border-outline/20">
-              <div id="xp-bar" class="h-full bg-primary rounded transition-all duration-700" style="width:0%;box-shadow:0 0 6px rgba(74,222,128,0.4);"></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-4 gap-2 text-center">
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">folder_open</span>
-              <div class="text-[7px] font-mono text-on-surface-variant/60 mt-0.5 tracking-widest">MISSIONS</div>
-              <div id="stat-quests" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">menu_book</span>
-              <div class="text-[7px] font-mono text-on-surface-variant/60 mt-0.5 tracking-widest">DOCS_READ</div>
-              <div id="stat-chapters" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">skull</span>
-              <div class="text-[7px] font-mono text-on-surface-variant/60 mt-0.5 tracking-widest">THREATS</div>
-              <div id="stat-bosses" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-            <div class="bg-surface-container rounded p-2 border border-outline/20">
-              <span class="material-symbols-outlined text-primary text-base">verified</span>
-              <div class="text-[7px] font-mono text-on-surface-variant/60 mt-0.5 tracking-widest">PERFECT</div>
-              <div id="stat-perfect" class="font-headline font-black text-sm text-on-surface">0</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Deadlines panel -->
-        <div class="bg-surface-container-low border border-outline/30 rounded p-4 space-y-3 terminal-border" id="deadline-panel">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-error text-base crt-glow-red">alarm</span>
-            <h3 class="font-headline font-bold text-sm text-error tracking-widest">TARGET_DEADLINES</h3>
-          </div>
-          <div id="deadline-list">
-            <div class="text-[10px] font-mono text-on-surface-variant/60 italic">No active timers. Assign a deadline to a mission.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── MISSIONS TAB (was Scrolls) ── -->
-    <div id="tab-missions" class="tab-pane h-full overflow-y-auto">
+    <div id="main-view" class="h-full overflow-y-auto">
       <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-5">
 
-        <!-- New mission summon button -->
+        <div id="commander-stats" class="border border-primary/40 p-4 bg-primary-container/30 rounded terminal-border relative overflow-hidden">
+          <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at top left,rgba(74,222,128,0.06) 0%,transparent 60%);"></div>
+          <div class="relative flex flex-col sm:flex-row justify-between items-center gap-4">
+            
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-surface-container border border-outline/40 rounded flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(74,222,128,0.1)]">
+                <span class="material-symbols-outlined text-2xl text-primary">terminal</span>
+              </div>
+              <div>
+                <div class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest mb-0.5">OPERATIVE CODENAME</div>
+                <div id="display-user-name" class="font-headline font-black text-xl text-primary crt-glow tracking-widest uppercase cursor-pointer hover:opacity-70 transition-opacity" onclick="renameCharacter()">Wastelander</div>
+              </div>
+            </div>
+
+            <div class="flex space-x-6 text-sm font-mono sm:border-l border-outline/30 sm:pl-6 w-full sm:w-auto justify-around sm:justify-end">
+              <div class="flex flex-col items-center">
+                <span class="text-on-surface-variant/60 uppercase text-[9px] tracking-widest">OPEN MISSIONS</span>
+                <span id="stat-open-missions" class="text-2xl text-primary font-bold">0</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="text-on-surface-variant/60 uppercase text-[9px] tracking-widest">COMPLETED</span>
+                <span id="stat-completed-missions" class="text-2xl text-primary font-bold">0</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <button onclick="openSummonScreen()" class="bubbly-btn w-full flex items-center gap-4 p-4 bg-surface-container-low border border-outline/30 rounded hover:border-primary/50 transition-all group">
           <div class="w-12 h-12 rounded border border-outline/40 flex items-center justify-center group-hover:border-primary transition-colors flex-shrink-0 bg-surface-container">
             <span class="material-symbols-outlined text-2xl text-primary group-hover:crt-glow">add_circle</span>
@@ -425,8 +353,7 @@ tailwind.config = {
           </div>
         </button>
 
-        <!-- Curriculum folders -->
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center mt-6">
           <h3 class="font-headline font-bold text-sm text-on-surface tracking-widest flex items-center gap-2">
             ACTIVE_CURRICULA
             <span class="tip-wrap ml-1">
@@ -442,17 +369,10 @@ tailwind.config = {
         <div id="quest-grid" class="space-y-4"></div>
       </div>
     </div>
-
-    
-
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     QUEST SCREEN
-═══════════════════════════════════════════ -->
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
-  <!-- Header -->
   <div class="flex-shrink-0 bg-surface-container-lowest border-b border-outline/30 flex items-center gap-3 px-4 py-3">
     <button onclick="showHub()" class="bg-surface-container border border-outline/40 rounded p-2 flex items-center justify-center hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary text-base">arrow_back</span>
@@ -464,7 +384,6 @@ tailwind.config = {
     <button onclick="openMoveModal()" class="flex-shrink-0 bg-surface-container border border-outline/40 rounded px-3 py-2 flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:border-primary transition-all">
       <span class="material-symbols-outlined text-xs">drive_file_move</span>MOVE
     </button>
-    <!-- Mobile tab switcher -->
     <div class="flex lg:hidden bg-surface-container border border-outline/30 rounded p-1 gap-1 flex-shrink-0">
       <button id="qtab-scrolls-btn" onclick="switchQuestTab('scrolls')"
               class="quest-tab-btn active px-3 py-1.5 rounded text-[9px] font-mono uppercase tracking-widest transition-all bg-primary text-on-primary">
@@ -477,13 +396,10 @@ tailwind.config = {
     </div>
   </div>
 
-  <!-- Body -->
   <div class="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-12">
 
-    <!-- DOCS PANEL -->
     <div id="quest-panel-scrolls" class="quest-panel active flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-outline/20 lg:col-span-5">
       <div class="p-4 space-y-4 pb-8">
-        <!-- Prereqs / Next Topics -->
         <div id="quest-meta-panel" class="hidden">
           <div class="bg-surface-container rounded p-4 border border-outline/20 terminal-border">
             <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-2 flex items-center gap-1">
@@ -506,10 +422,8 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- TARGET / BOSS PANEL -->
     <div id="quest-panel-boss" class="quest-panel flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7" style="background: linear-gradient(180deg, #050905 0%, #030603 100%);">
       <div class="flex flex-col items-center p-6 gap-5 flex-1">
-        <!-- Boss sprite -->
         <div class="relative w-40 h-40 flex items-center justify-center flex-shrink-0">
           <div class="absolute inset-0 rounded" style="background:radial-gradient(ellipse,rgba(248,113,113,0.15) 0%,transparent 70%);"></div>
           <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10"></canvas>
@@ -519,7 +433,6 @@ tailwind.config = {
           <h3 id="boss-name-display" class="font-headline font-extrabold text-2xl text-error crt-glow-red tracking-widest">??</h3>
           <p id="boss-title-display" class="text-[10px] font-mono text-error/50 tracking-widest mt-1">UNKNOWN THREAT</p>
         </div>
-        <!-- HP bar -->
         <div class="w-full space-y-2">
           <div class="flex justify-between text-[10px] font-mono tracking-widest">
             <span class="text-on-surface-variant">THREAT_LEVEL</span>
@@ -529,13 +442,11 @@ tailwind.config = {
             <div id="boss-hp-fill" class="h-full rounded transition-all duration-700" style="width:100%;background:linear-gradient(90deg,#991b1b,#f87171);box-shadow:0 0 6px rgba(248,113,113,0.4);"></div>
           </div>
         </div>
-        <!-- Threat intel -->
         <div class="w-full bg-surface-container border border-outline/20 rounded p-4">
           <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mb-2">THREAT_INTEL</p>
           <p id="boss-lore-text" class="text-xs font-mono text-on-surface-variant/70 italic leading-relaxed">...</p>
         </div>
 
-        <!-- Deadline -->
         <div class="w-full bg-surface-container border border-outline/20 rounded p-4 space-y-2">
           <div class="flex items-center justify-between">
             <p class="text-[9px] font-mono text-on-surface-variant tracking-widest">MISSION_DEADLINE</p>
@@ -553,7 +464,6 @@ tailwind.config = {
           </div>
         </div>
 
-        <!-- Clue preview -->
         <div id="boss-clue-preview" class="w-full bg-surface-container border border-outline/20 rounded p-4 space-y-2 hidden">
           <p class="text-[9px] font-mono text-primary/70 tracking-widest">CLUE_RECOVERED</p>
           <div id="boss-clue-text" class="text-xs font-mono text-primary leading-relaxed clue-card p-3 rounded"></div>
@@ -569,9 +479,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     SUMMON / MISSION BRIEF SCREEN
-═══════════════════════════════════════════ -->
 <div id="summon-screen" class="flex-col items-stretch justify-start overflow-y-auto" style="background:#080c08;position:fixed;inset:0;z-index:50;display:none;">
   <div class="fixed inset-0 z-0 pointer-events-none opacity-5" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(74,222,128,0.1) 30px,rgba(74,222,128,0.1) 31px);"></div>
 
@@ -583,24 +490,20 @@ tailwind.config = {
   </div>
 
   <div class="max-w-4xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6 flex-1">
-    <!-- Form side -->
     <div id="summon-form-side" class="flex-1 space-y-4">
 
-      <!-- Step 1: Topic -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">SUBJECT_OF_INVESTIGATION</p>
         <input id="summon-topic-input" type="text" placeholder="e.g. Cold War Cryptography, Quantum Physics..."
                class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
       </div>
 
-      <!-- Step 2: Objective -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">MISSION_OBJECTIVE <span class="text-on-surface-variant/40">(OPTIONAL)</span></p>
         <textarea id="summon-objective-input" placeholder="Why do you need to master this? Define the endgame." rows="2"
                   class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm resize-none"></textarea>
       </div>
 
-      <!-- Step 3: Pre-assessment -->
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
         <div class="flex items-center gap-2 mb-3">
           <span class="material-symbols-outlined text-primary text-sm">psychology</span>
@@ -627,13 +530,11 @@ tailwind.config = {
             <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Skip the 101</div>
           </button>
         </div>
-        <!-- Level description -->
         <div id="prior-knowledge-desc" class="mt-3 text-[9px] font-mono text-on-surface-variant/60 leading-relaxed border-t border-outline/20 pt-3">
           AI generates 5 chapters balancing foundations with practical depth.
         </div>
       </div>
 
-      <!-- Fixed 5 chapters info -->
       <div class="flex items-center gap-3 px-1">
         <div class="flex gap-1">
           <div class="w-2 h-2 rounded-full bg-primary/40"></div>
@@ -650,7 +551,6 @@ tailwind.config = {
       </button>
     </div>
 
-    <!-- Progress side -->
     <div id="summoning-progress" class="hidden flex-1 flex-col items-center justify-center gap-6 text-center py-12">
       <div class="book-loader">
         <div class="page"></div><div class="page"></div><div class="page"></div>
@@ -666,9 +566,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MOVE TO CURRICULUM MODAL
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="move-modal">
   <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
     <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
@@ -684,9 +581,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     DEADLINE MODAL
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="deadline-modal">
   <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
     <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
@@ -718,9 +612,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     CHAPTER MODAL
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="chapter-modal">
   <div class="glass-dark w-full max-w-2xl mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[90vh] flex flex-col terminal-border" style="background:rgba(5,9,5,0.97);backdrop-filter:blur(12px);">
     <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
@@ -747,12 +638,8 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     BATTLE MODAL (Interrogation)
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="battle-modal">
   <div class="w-full max-w-2xl mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[92vh] overflow-y-auto terminal-border" style="background:rgba(5,9,5,0.97);">
-    <!-- Battle header -->
     <div id="battle-top-section" class="flex items-center gap-4 p-5 border-b border-outline/30">
       <canvas id="battle-boss-canvas" width="80" height="80" class="flex-shrink-0 rounded border border-outline/30"></canvas>
       <div class="flex-1 min-w-0">
@@ -768,19 +655,16 @@ tailwind.config = {
       <div id="quiz-progress-streak" class="text-[10px] font-mono text-on-surface-variant tracking-widest text-right">STREAK: 0</div>
     </div>
 
-    <!-- Quiz section -->
     <div id="quiz-container" class="p-5 flex flex-col gap-4">
       <p id="quiz-question" class="font-mono text-on-surface text-sm leading-relaxed"></p>
       <div id="quiz-options" class="flex flex-col gap-2"></div>
       <p id="quiz-feedback" class="text-xs font-mono text-on-surface-variant min-h-[20px]"></p>
     </div>
 
-    <!-- Finishing blow -->
     <div id="finishing-blow" class="hidden p-6 flex-col items-center gap-4 text-center">
       <div id="damage-floater" class="damage-float"></div>
       <div id="finishing-text" class="font-headline font-black text-xl text-primary crt-glow tracking-widest"></div>
       <p id="victory-lore" class="text-xs font-mono text-on-surface-variant leading-relaxed max-w-md"></p>
-      <!-- Clue reveal section -->
       <div id="clue-reveal-section" class="hidden w-full max-w-md">
         <div class="border border-primary/30 rounded p-4 bg-surface-container text-left">
           <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-2">⚠ CLASSIFIED FRAGMENT RECOVERED</p>
@@ -794,9 +678,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     GAMBIT MODAL (Risk/Reward)
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="gambit-modal">
   <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
     <div class="bg-surface-container p-4 border-b border-outline/30">
@@ -820,9 +701,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     FATE SCROLL MODAL (now: Intel Drop)
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="fate-modal">
   <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border text-center">
     <div class="p-8 space-y-5">
@@ -841,9 +719,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     SETTINGS / API MODAL
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[200]" id="api-modal">
   <div class="w-full max-w-md mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
     <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
@@ -875,9 +750,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     TERMS OF SERVICE / PRIVACY POLICY MODAL
-═══════════════════════════════════════════ -->
 <div class="modal-overlay z-[210]" id="tos-modal">
   <div class="w-full max-w-lg mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[88vh] flex flex-col terminal-border">
     <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
@@ -898,42 +770,8 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     ROOM DETAIL MODAL
-═══════════════════════════════════════════ -->
-<div class="modal-overlay z-[205]" id="room-detail-modal">
-  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 terminal-border">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
-      <div>
-        <div id="rdm-badge" class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5"></div>
-        <h3 id="rdm-title" class="font-headline font-bold text-sm text-primary crt-glow tracking-widest"></h3>
-      </div>
-      <button onclick="closeRoomDetail()" class="text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-sm">close</span>
-      </button>
-    </div>
-    <div class="p-4 space-y-3">
-      <div id="rdm-stats" class="grid grid-cols-2 gap-2 text-[9px] font-mono"></div>
-      <div id="rdm-dweller-section" class="space-y-2">
-        <div class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest">ASSIGNED DWELLERS</div>
-        <div id="rdm-dwellers" class="flex gap-1 flex-wrap"></div>
-        <div class="flex gap-2">
-          <button id="rdm-assign-btn" onclick="assignDweller()" class="flex-1 bg-primary/10 border border-primary/40 text-primary font-mono text-[9px] py-1.5 rounded hover:bg-primary/20 transition-colors tracking-widest">+ ASSIGN</button>
-          <button id="rdm-remove-btn" onclick="removeDweller()" class="flex-1 bg-surface-container border border-outline/30 text-on-surface-variant font-mono text-[9px] py-1.5 rounded hover:border-error/40 hover:text-error transition-colors tracking-widest">- REMOVE</button>
-        </div>
-      </div>
-      <div class="flex gap-2 pt-1">
-        <button id="rdm-upgrade-btn" onclick="upgradeRoom()" class="flex-1 bubbly-btn bg-primary text-on-primary font-headline font-bold py-2 rounded text-[9px] tracking-widest uppercase"></button>
-        <button onclick="demolishRoom()" class="bg-surface-container border border-error/30 text-error/70 font-mono text-[9px] px-3 py-2 rounded hover:bg-error/10 transition-colors tracking-widest">DEMOLISH</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL BACKDROP -->
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-black/70 backdrop-blur-sm hidden"></div>
 
-<!-- CONFIRM TOAST -->
 <div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--md-sys-color-surface-container-highest,#1a1a1a);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:12px 16px;flex-direction:column;align-items:center;gap:10px;min-width:260px;max-width:90vw;box-shadow:0 4px 24px rgba(0,0,0,0.5);transition:opacity 0.2s;opacity:0;" class="">
   <div id="confirm-toast-msg" style="font-size:11px;font-family:'Share Tech Mono',monospace;color:rgba(212,245,212,0.9);text-align:center;line-height:1.4;"></div>
   <div style="display:flex;gap:8px;width:100%;">
@@ -942,7 +780,6 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container-lowest border border-primary/40 text-primary font-mono text-xs py-3 px-6 rounded tracking-widest opacity-0 transition-opacity duration-300 pointer-events-none crt-glow whitespace-nowrap" style="max-width:90vw;text-align:center;">
   <style>#toast.show{opacity:1;}</style>
 </div>
@@ -953,8 +790,6 @@ import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
-
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
@@ -987,11 +822,6 @@ let STATE = {
   currentQuestHarder: false,
   priorKnowledge: 'some',
 };
-
-
-
-
-
 
 function renderQuestGrid(){
   const grid=document.getElementById('quest-grid');
@@ -1058,7 +888,6 @@ function renderQuestGrid(){
     grid.appendChild(curriculumDiv);
   });
 }
-
 
 // ── BOSS ANIMATION ─────────────────────────────────
 let bossAnimFrames = {};
@@ -1223,31 +1052,6 @@ function renderChapterList(quest) {
   });
 }
 
-// ── DEADLINE PANEL (profile) ───────────────────────
-function renderDeadlinePanel() {
-  const list = document.getElementById('deadline-list');
-  if(!list) return;
-  const withDeadlines = (STATE.quests||[]).filter(q => q.deadline && !q.defeated);
-  if(!withDeadlines.length) {
-    list.innerHTML = '<div class="text-[10px] font-mono text-on-surface-variant/50 italic">No active timers. Assign a deadline to a mission.</div>';
-    return;
-  }
-  list.innerHTML = withDeadlines.map(q => {
-    const status = getQuestDeadlineStatus(q);
-    const label = formatDeadlineLabel(q, status);
-    return `<div class="flex items-center justify-between py-1.5 border-b border-outline/10 last:border-0">
-      <span class="text-[10px] font-mono text-on-surface/80 truncate flex-1 mr-2">${q.questTitle}</span>
-      <span class="text-[10px] font-mono flex-shrink-0 ${status==='overdue'?'text-error':status==='soon'?'text-warning':'text-primary'}">${label}</span>
-    </div>`;
-  }).join('');
-}
-
-// ── PATH SCREEN ────────────────────────────────────
-function startPathMonster() {
-  // No-op — path screen monster removed in cleanup
-}
-
-
 function renderHub(){
   if(!STATE.player) return;
   const p = STATE.player;
@@ -1255,32 +1059,19 @@ function renderHub(){
   const nav = document.getElementById('nav-codename');
   if(nav) nav.textContent = p.name.toUpperCase();
 
-  const nameEl = document.getElementById('char-name');
+  const nameEl = document.getElementById('display-user-name');
   if(nameEl) nameEl.textContent = p.name.toUpperCase();
 
-  const rankData = getCurrentRank();
-  const rankEl = document.getElementById('char-rank');
-  if(rankEl) rankEl.textContent = `${rankData.name} · ${rankData.en.toUpperCase()} · ${p.totalXp} XP`;
+  const quests = STATE.quests || [];
+  const completedCount = quests.filter(q => q.defeated).length;
+  const openCount = quests.length - completedCount;
 
-  const nextRank = getNextRank();
-  const bar = document.getElementById('xp-bar');
-  const lbl = document.getElementById('xp-label');
-  if(nextRank) {
-    const pct = Math.min(100, ((p.totalXp - rankData.xp) / (nextRank.xp - rankData.xp)) * 100);
-    if(bar) bar.style.width = pct + '%';
-    if(lbl) lbl.textContent = `${p.totalXp} / ${nextRank.xp} XP`;
-  } else {
-    if(bar) bar.style.width = '100%';
-    if(lbl) lbl.textContent = `${p.totalXp} XP · MAX LEVEL`;
-  }
+  const openEl = document.getElementById('stat-open-missions');
+  if(openEl) openEl.textContent = openCount;
 
-  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('stat-quests',   p.questsCreated||0);
-  set('stat-chapters', p.chaptersCompleted||0);
-  set('stat-bosses',   p.bossesDefeated||0);
-  set('stat-perfect',  p.perfectRuns||0);
+  const compEl = document.getElementById('stat-completed-missions');
+  if(compEl) compEl.textContent = completedCount;
 
-  renderDeadlinePanel();
   renderQuestGrid();
 }
 
@@ -1470,7 +1261,7 @@ window.closeApiModal=()=>{ document.getElementById('api-modal').classList.remove
 window.closeAllModals=()=>{ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); document.getElementById('modal-backdrop').classList.add('hidden'); };
 
 // ── COPY PUBLIC QUEST ────────────────────────────────
-window.copyPublicQuest=function(idx){ return; const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,curriculumId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); window.switchTab('tab-missions'); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
+window.copyPublicQuest=function(idx){ return; const pub=STATE.publicQuests[idx]; const chapters=pub.chapters||[]; const nq={...pub,id:Date.now(),bossMaxHp:100,bossHp:100,completed:new Array(chapters.length).fill(false),chapterContent:{},quiz:null,defeated:false,curriculumId:'default'}; STATE.quests.unshift(nq); STATE.player.questsCreated++; saveState(); renderHub(); showToast(`Copied "${nq.questTitle}"!`); };
 
 // ── CHAPTER MODAL ────────────────────────────────────
 window.openChapterModal=function(chapterIdx){
@@ -1991,7 +1782,7 @@ window.renameCurriculum = function(curriculumId) {
 
 
 const RANKS = [
-  { name:'Level 1',   en:'Tiny Sprout',       xp:0,    stageIdx:0  },
+  { name:'Level 1',   en:'Tiny Sprout',        xp:0,    stageIdx:0  },
   { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
   { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
   { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
@@ -2026,14 +1817,8 @@ function getNextRank(){
 
 
 window.switchTab=function(tabId){
-  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el=>{ el.classList.remove('text-primary','border-primary'); el.classList.add('text-on-surface-variant','border-transparent'); });
-  const pane=document.getElementById(tabId);
-  if(pane) pane.classList.add('active');
-  const btn=document.querySelector(`.tab-btn[data-target="${tabId}"]`);
-  if(btn){ btn.classList.remove('text-on-surface-variant','border-transparent'); btn.classList.add('text-primary','border-primary'); }
-  if(tabId==='tab-missions') renderQuestGrid();
-  if(tabId==='tab-profile') renderHub();
+  // Converted to simple single view re-render
+  renderHub();
 };
 window.openDeadlineModal = function() {
   const quest = STATE.quests[STATE.activeQuestIdx];
@@ -2260,7 +2045,8 @@ function renderQuestMeta(quest) {
 window.launchNextTopic = function(topic) {
   showHub();
   setTimeout(() => {
-    window.switchTab('tab-missions');
+    // legacy switchTab
+    renderHub();
     openSummonScreen();
     setTimeout(() => { const inp=document.getElementById('summon-topic-input'); if(inp){inp.value=topic;inp.focus();} }, 100);
   }, 100);
@@ -2362,7 +2148,6 @@ window.doSummonQuest = async function() {
     STATE.player.questsCreated++;
     await saveState();
     closeSummonScreen();
-    window.switchTab('tab-missions');
     renderHub();
     showToast(`Mission deployed: ${newQuest.questTitle}`);
     setTimeout(()=>window.showQuestScreen(0), 300);
@@ -2480,7 +2265,6 @@ async function loadState(){
     syncActiveSaveToState();
     saveState();
     showScreen('screen-hub');
-    window.switchTab('tab-profile');
     renderHub();
   } else {
     showScreen('screen-path');
@@ -2502,16 +2286,12 @@ window.choosePath = async function(){
   syncActiveSaveToState();
   await saveState();
   showScreen('screen-hub');
-  window.switchTab('tab-profile');
   renderHub();
   showToast('Operative initialized. Welcome to Vault 77.');
 };
 
 // ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  const firstTab=document.querySelector('.tab-btn[data-target="tab-profile"]');
-  if(firstTab){ firstTab.classList.remove('text-on-surface-variant','border-transparent'); firstTab.classList.add('text-primary','border-primary'); }
-
   // Check for redirect result first (handles cases where popup wasn't available)
   getRedirectResult(auth).catch(()=>{});
 
