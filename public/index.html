@@ -91,7 +91,7 @@ tailwind.config = {
 
 /* ── BLINKING CURSOR ── */
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
-.cursor-blink { animation: blink 1s step-end infinite; }
+.cursor-blink { animation: blink 1s -end infinite; }
 @keyframes scan { 0%{transform:translateY(-100%);} 100%{transform:translateY(100vh);} }
 .scan-line { animation: scan 4s linear infinite; }
 
@@ -498,42 +498,18 @@ tailwind.config = {
                class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
       </div>
 
-      <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
+      <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border hidden">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">MISSION_OBJECTIVE <span class="text-on-surface-variant/40">(OPTIONAL)</span></p>
         <textarea id="summon-objective-input" placeholder="Why do you need to master this? Define the endgame." rows="2"
                   class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm resize-none"></textarea>
       </div>
 
-      <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
+<div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border hidden">
         <div class="flex items-center gap-2 mb-3">
           <span class="material-symbols-outlined text-primary text-sm">psychology</span>
           <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em]">PRIOR KNOWLEDGE</p>
         </div>
-        <p class="text-[10px] font-mono text-on-surface-variant/70 mb-3 leading-relaxed">How much do you already know about this subject? This calibrates the depth of your 5-chapter mission.</p>
-        <div class="grid grid-cols-3 gap-2" id="prior-knowledge-group">
-          <button onclick="setPriorKnowledge('none')" data-level="none"
-            class="prior-btn p-3 rounded border border-outline/30 text-center transition-all hover:border-primary/60 cursor-pointer">
-            <div class="text-lg mb-1">🌱</div>
-            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">NONE</div>
-            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Start fresh</div>
-          </button>
-          <button onclick="setPriorKnowledge('some')" data-level="some"
-            class="prior-btn p-3 rounded border border-primary/50 bg-primary/5 text-center transition-all hover:border-primary cursor-pointer active-prior">
-            <div class="text-lg mb-1">⚡</div>
-            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">SOME</div>
-            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Know the basics</div>
-          </button>
-          <button onclick="setPriorKnowledge('strong')" data-level="strong"
-            class="prior-btn p-3 rounded border border-outline/30 text-center transition-all hover:border-primary/60 cursor-pointer">
-            <div class="text-lg mb-1">🔥</div>
-            <div class="text-[9px] font-mono text-primary/70 font-bold tracking-widest">STRONG</div>
-            <div class="text-[8px] font-mono text-on-surface-variant/50 mt-0.5">Skip the 101</div>
-          </button>
         </div>
-        <div id="prior-knowledge-desc" class="mt-3 text-[9px] font-mono text-on-surface-variant/60 leading-relaxed border-t border-outline/20 pt-3">
-          AI generates 5 chapters balancing foundations with practical depth.
-        </div>
-      </div>
 
       <div class="flex items-center gap-3 px-1">
         <div class="flex gap-1">
@@ -1857,7 +1833,7 @@ window.openSummonScreen = function() {
   if(ti) ti.value = '';
   if(oi) oi.value = '';
   // Reset prior knowledge to 'some'
-  window.setPriorKnowledge('some');
+  window.setPriorKnowledge('none');
 };
 
 window.closeSummonScreen = function() {
@@ -2083,7 +2059,7 @@ window.doSummonQuest = async function() {
   const topic = document.getElementById('summon-topic-input')?.value.trim();
   if(!topic){ showToast('Please enter a topic.'); return; }
   const objective = document.getElementById('summon-objective-input')?.value.trim();
-  const priorKnowledge = STATE.priorKnowledge || 'some';
+  const priorKnowledge = STATE.priorKnowledge || 'none';
   const numChapters = 5; // Fixed 5-chapter structure
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
