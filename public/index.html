@@ -812,7 +812,7 @@ const functions = getFunctions(app);
 
 let USER_ID = null;
 let STATE = {
-  selectedModel: 'gemini-2.5-flash',
+  selectedModel: 'gemini-2.5-pro',
   summonChapters: 5,
   saves: [], activeSaveId: null,
   publicQuests: [], quests: [], player: null, curriculums: [],
@@ -1929,7 +1929,7 @@ window.closeAllModals = function() {
 window.openApiModal = function() {
   renderSettingsCharacters();
   const ms = document.getElementById('model-selector');
-  if(ms && typeof STATE !== 'undefined') ms.value = STATE.selectedModel || 'gemini-2.5-flash';
+  if(ms && typeof STATE !== 'undefined') ms.value = STATE.selectedModel || 'gemini-2.5-pro';
   document.getElementById('api-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
 };
