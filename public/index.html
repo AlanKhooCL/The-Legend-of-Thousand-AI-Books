@@ -123,11 +123,19 @@ body::before {
 }
 
 /* ── SCREEN SYSTEM ── */
+ #summon-screen { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    z-index: 500; /* Higher than the hub */
+    background-color: #0a0a0a; /* Force solid Obsidian background */
+    overflow-y: auto;
+} 
 .screen { display: none; }
 .screen.active { display: flex; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
-.modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 600; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
 .modal-overlay.open { display: flex; }
 
 /* ── ANIMATIONS ── */
@@ -475,7 +483,7 @@ body::before {
   </div>
 </div>
 
-<div id="summon-screen" class="flex-col items-stretch justify-start overflow-y-auto" style="background:var(--color-surface);position:fixed;inset:0;z-index:50;display:none;">
+<div id="summon-screen" class="screen flex-col items-stretch justify-start overflow-y-auto">
   <div class="sticky top-0 z-20 w-full px-4 py-4 flex justify-between items-center bg-surface-container/95 backdrop-blur-md border-b-2 border-outline flex-shrink-0 shadow-sm">
     <h1 class="text-xs md:text-sm font-headline text-secondary crt-glow-amber">CREATE NEW QUEST</h1>
     <button onclick="closeSummonScreen()" class="bg-surface-container-highest border-2 border-outline p-2 rounded-lg hover:border-primary transition-colors shadow-sm">
