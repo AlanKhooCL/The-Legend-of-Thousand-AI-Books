@@ -7,14 +7,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="LearNow">
 <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-<meta name="theme-color" content="#3b82f6">
+<meta name="theme-color" content="#dc2626">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEARN_QUEST | NEO-RETRO</title>
+<title>LEARN_QUEST | DARK FANTASY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
+<!-- Typography: Pixel for headers, modern monospace for readability -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
@@ -25,29 +26,29 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        "primary": "#3b82f6", // Arcade Blue
-        "primary-dim": "#1d4ed8",
-        "primary-container": "#1e3a8a",
+        "primary": "#dc2626", // Blood Red
+        "primary-dim": "#991b1b",
+        "primary-container": "#7f1d1d",
         "on-primary": "#ffffff",
-        "secondary": "#fbbf24", // Arcade Gold
-        "secondary-dim": "#d97706",
-        "on-secondary": "#1c1400",
-        "tertiary": "#10b981", // Emerald
-        "tertiary-dim": "#059669",
+        "secondary": "#d97706", // Aged Gold
+        "secondary-dim": "#b45309",
+        "on-secondary": "#ffffff",
+        "tertiary": "#9333ea", // Royal Purple
+        "tertiary-dim": "#7e22ce",
         "on-tertiary": "#ffffff",
-        "error": "#f43f5e", // Rose
-        "error-dim": "#be123c",
+        "error": "#ef4444", // Bright Red
+        "error-dim": "#b91c1c",
         "on-error": "#ffffff",
-        "surface": "#0f172a", // Deep Slate
-        "surface-container-lowest": "#020617",
-        "surface-container-low": "#0f172a",
-        "surface-container": "#1e293b",
-        "surface-container-high": "#334155",
-        "surface-container-highest": "#475569",
-        "on-surface": "#f8fafc",
-        "on-surface-variant": "#94a3b8",
-        "outline": "#475569",
-        "outline-variant": "#334155",
+        "surface": "#0a0a0a", // Obsidian
+        "surface-container-lowest": "#000000",
+        "surface-container-low": "#171717",
+        "surface-container": "#1c1917", // Charcoal Slate
+        "surface-container-high": "#292524",
+        "surface-container-highest": "#44403c",
+        "on-surface": "#fafaf9",
+        "on-surface-variant": "#a8a29e",
+        "outline": "#57534e",
+        "outline-variant": "#44403c",
       },
       fontFamily: {
         "headline": ["'Press Start 2P'", "cursive"],
@@ -71,44 +72,44 @@ body {
     position: relative;
 }
 
-/* Subtle modern ambient glow */
+/* Dark Fantasy ambient glow (Blood Red) */
 body::before {
     content: '';
     position: fixed;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+    background: radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.06) 0%, transparent 60%);
     pointer-events: none;
     z-index: -1;
 }
 
-/* ── HARD TEXT SHADOWS (Replaces CRT Glow) ── */
-.crt-glow { text-shadow: 2px 2px 0px #020617; }
-.crt-glow-amber { text-shadow: 2px 2px 0px #020617; }
-.crt-glow-red { text-shadow: 2px 2px 0px #020617; }
+/* ── HARD TEXT SHADOWS ── */
+.crt-glow { text-shadow: 2px 2px 0px #000000; }
+.crt-glow-amber { text-shadow: 2px 2px 0px #000000; }
+.crt-glow-red { text-shadow: 2px 2px 0px #000000; }
 
-/* ── NEO-BRUTALIST PANELS (Replaces Phosphor Border) ── */
+/* ── NEO-BRUTALIST PANELS ── */
 .terminal-border {
-  background-color: #1e293b; /* surface-container */
-  border: 2px solid #475569; /* outline */
+  background-color: #1c1917; /* surface-container */
+  border: 2px solid #57534e; /* outline */
   border-radius: 12px;
-  box-shadow: 4px 4px 0px 0px #020617;
+  box-shadow: 4px 4px 0px 0px #000000;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .terminal-border:hover {
-  border-color: #64748b;
+  border-color: #78716c;
 }
 
 /* ── NEO-RETRO BUTTONS ── */
 .bubbly-btn {
   border: 2px solid rgba(255,255,255,0.2);
   border-radius: 8px;
-  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), 0px 6px 15px rgba(0,0,0,0.2);
+  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.8), 0px 6px 15px rgba(0,0,0,0.4);
   transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
 }
 .bubbly-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0px 6px 0px 0px rgba(0,0,0,0.5), 0px 8px 20px rgba(0,0,0,0.3);
+  box-shadow: 0px 6px 0px 0px rgba(0,0,0,0.8), 0px 8px 20px rgba(0,0,0,0.5);
 }
 .bubbly-btn:active {
   transform: translateY(4px);
@@ -118,7 +119,7 @@ body::before {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5) !important;
+  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.8) !important;
 }
 
 /* ── SCREEN SYSTEM ── */
@@ -126,7 +127,7 @@ body::before {
 .screen.active { display: flex; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
-.modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(2,6,23,0.85); backdrop-filter: blur(4px); }
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
 .modal-overlay.open { display: flex; }
 
 /* ── ANIMATIONS ── */
@@ -134,9 +135,6 @@ body::before {
 .cursor-blink { animation: blink 1s -end infinite; }
 @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
 .flicker { animation: float 6s ease-in-out infinite; }
-@keyframes vaultSpin { to { transform: rotate(360deg); } }
-.vault-spin { animation: vaultSpin 30s linear infinite; }
-.vault-spin-rev { animation: vaultSpin 20s linear infinite reverse; }
 
 /* ── QUEST PANELS ── */
 .quest-panel { display: none; flex-direction: column; }
@@ -145,21 +143,21 @@ body::before {
 
 /* ── CLUE CARD ── */
 .clue-card {
-  background: rgba(30,41,59,0.8);
-  border: 2px solid #475569;
-  border-left: 4px solid #3b82f6;
+  background: rgba(28,25,23,0.8);
+  border: 2px solid #57534e;
+  border-left: 4px solid #dc2626;
   border-radius: 8px;
 }
 .clue-card.classified {
-  border-left-color: #fbbf24;
-  background: rgba(30,41,59,0.5);
+  border-left-color: #d97706;
+  background: rgba(28,25,23,0.5);
   filter: blur(4px);
   pointer-events: none;
 }
 
 /* ── REDACTED TEXT ── */
 .redacted {
-  background: #475569;
+  background: #57534e;
   color: transparent;
   border-radius: 4px;
   user-select: none;
@@ -167,14 +165,14 @@ body::before {
 
 /* ── BOOK LOADER ── */
 .book-loader { width:60px; height:48px; position:relative; margin:0 auto; }
-.book-loader .page { position:absolute; bottom:0; left:50%; margin-left:-18px; width:36px; height:32px; background:#3b82f6; transform-origin: left center; border-radius:0 4px 4px 0; border: 2px solid #1e3a8a; }
+.book-loader .page { position:absolute; bottom:0; left:50%; margin-left:-18px; width:36px; height:32px; background:#dc2626; transform-origin: left center; border-radius:0 4px 4px 0; border: 2px solid #7f1d1d; }
 .book-loader .page:nth-child(1){animation:pageFlip 1.2s ease-in-out infinite;}
 .book-loader .page:nth-child(2){animation:pageFlip 1.2s ease-in-out 0.15s infinite;}
 .book-loader .page:nth-child(3){animation:pageFlip 1.2s ease-in-out 0.30s infinite;}
 @keyframes pageFlip{0%{transform:rotateY(0deg);}50%{transform:rotateY(-160deg);}100%{transform:rotateY(0deg);}}
 
 /* ── DAMAGE FLOAT ── */
-.damage-float { position:absolute; top:20%; left:50%; transform:translateX(-50%); font-size:2.5rem; font-weight:900; color:#f43f5e; font-family:'Press Start 2P',cursive; pointer-events:none; opacity:0; transition:all 0.1s; text-shadow:4px 4px 0px #020617; }
+.damage-float { position:absolute; top:20%; left:50%; transform:translateX(-50%); font-size:2.5rem; font-weight:900; color:#ef4444; font-family:'Press Start 2P',cursive; pointer-events:none; opacity:0; transition:all 0.1s; text-shadow:4px 4px 0px #000000; }
 .damage-float.show { animation:damageAnim 1.5s ease-out forwards; }
 @keyframes damageAnim{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}100%{opacity:0;transform:translateX(-50%) translateY(-60px) scale(1.4);}}
 
@@ -183,55 +181,55 @@ body::before {
 .gambit-coin-spin { animation: gambitSpin 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
 /* ── DRAG OVER ── */
-.drag-over { border-color: #3b82f6 !important; background: rgba(59,130,246,0.1) !important; }
+.drag-over { border-color: #dc2626 !important; background: rgba(220,38,38,0.1) !important; }
 
-/* ── CHAPTER CONTENT STYLES (NEO-RETRO UPDATE) ── */
-.chapter-content { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.8; color: #f8fafc; }
-.chapter-content h3 { font-family: 'Press Start 2P', cursive; font-size: 12px; line-height: 1.6; color: #3b82f6; text-transform: uppercase; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px dashed #475569; text-shadow: 2px 2px 0px #020617; }
+/* ── CHAPTER CONTENT STYLES ── */
+.chapter-content { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.8; color: #fafaf9; }
+.chapter-content h3 { font-family: 'Press Start 2P', cursive; font-size: 12px; line-height: 1.6; color: #dc2626; text-transform: uppercase; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px dashed #57534e; text-shadow: 2px 2px 0px #000000; }
 .chapter-content p { margin: 1rem 0; }
-.chapter-content strong { color: #60a5fa; font-weight: 800; }
-.chapter-content em { color: #fbbf24; font-style: italic; }
+.chapter-content strong { color: #ef4444; font-weight: 800; }
+.chapter-content em { color: #d97706; font-style: italic; }
 .chapter-content ul, .chapter-content ol { margin: 1rem 0 1rem 1.5rem; }
 .chapter-content li { margin: 0.5rem 0; padding-left: 0.5rem; }
-.chapter-content ul li::marker { color: #3b82f6; }
-.chapter-content ol li::marker { color: #3b82f6; font-weight: 800; }
-.chapter-content pre { background: #020617; border: 2px solid #475569; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.5rem 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-.chapter-content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fbbf24; background: rgba(251,191,36,0.1); padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid rgba(251,191,36,0.2); }
-.chapter-content pre code { background: none; padding: 0; border: none; color: #60a5fa; }
-.chapter-content blockquote, .chapter-content .chapter-takeaway { background: rgba(251,191,36,0.1); border: 2px solid #fbbf24; padding: 1rem 1.25rem; margin: 1.5rem 0; border-radius: 8px; color: #fbbf24; font-weight: bold; box-shadow: 4px 4px 0px 0px rgba(251,191,36,0.2); }
-.chapter-content .chapter-intro { background: rgba(59,130,246,0.1); border: 2px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: #cbd5e1; }
-.chapter-content .key-insight { background: rgba(16,185,129,0.1); border: 2px solid #10b981; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(16,185,129,0.2); }
-.chapter-content .key-insight::before { content: '💡 KEY INSIGHT'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #10b981; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
-.chapter-content .common-mistake { background: rgba(244,63,94,0.1); border: 2px solid #f43f5e; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(244,63,94,0.2); }
-.chapter-content .common-mistake::before { content: '⚠️ COMMON MISTAKE'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #f43f5e; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
-.chapter-content .chapter-summary { background: #1e293b; border: 2px solid #475569; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
-.chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
+.chapter-content ul li::marker { color: #dc2626; }
+.chapter-content ol li::marker { color: #dc2626; font-weight: 800; }
+.chapter-content pre { background: #000000; border: 2px solid #57534e; border-left: 4px solid #dc2626; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.5rem 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
+.chapter-content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #d97706; background: rgba(217,119,6,0.1); padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid rgba(217,119,6,0.2); }
+.chapter-content pre code { background: none; padding: 0; border: none; color: #ef4444; }
+.chapter-content blockquote, .chapter-content .chapter-takeaway { background: rgba(217,119,6,0.1); border: 2px solid #d97706; padding: 1rem 1.25rem; margin: 1.5rem 0; border-radius: 8px; color: #d97706; font-weight: bold; box-shadow: 4px 4px 0px 0px rgba(217,119,6,0.2); }
+.chapter-content .chapter-intro { background: rgba(220,38,38,0.1); border: 2px solid rgba(220,38,38,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: #d6d3d1; }
+.chapter-content .key-insight { background: rgba(147,51,234,0.1); border: 2px solid #9333ea; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(147,51,234,0.2); }
+.chapter-content .key-insight::before { content: '💡 KEY INSIGHT'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #9333ea; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
+.chapter-content .common-mistake { background: rgba(239,68,68,0.1); border: 2px solid #ef4444; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(239,68,68,0.2); }
+.chapter-content .common-mistake::before { content: '⚠️ COMMON MISTAKE'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #ef4444; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
+.chapter-content .chapter-summary { background: #1c1917; border: 2px solid #57534e; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+.chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #a8a29e; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
 
-/* ── SVG DIAGRAM STYLES (NEO-RETRO UPDATE) ── */
+/* ── SVG DIAGRAM STYLES ── */
 .chapter-content svg {
   display: block;
   margin: 2.5rem auto;
   max-width: 100%;
   height: auto;
   overflow: visible;
-  background: #020617;
-  border: 2px solid #475569;
+  background: #000000;
+  border: 2px solid #57534e;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 6px 6px 0px 0px #020617;
+  box-shadow: 6px 6px 0px 0px #000000;
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #020617; }
-::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+::-webkit-scrollbar-track { background: #000000; }
+::-webkit-scrollbar-thumb { background: #57534e; border-radius: 4px; }
 
 .no-scrollbar::-webkit-scrollbar{display:none;}
 .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
 
-/* Tip Wrap (Adjusted for retro) */
+/* Tip Wrap */
 .tip-wrap { position:relative; display:inline-block; }
-.tip-btn { width:18px; height:18px; border-radius:4px; background:rgba(59,130,246,0.15); border:2px solid #3b82f6; font-size:10px; font-weight:700; color:#3b82f6; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-family:'JetBrains Mono';}
-.tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#1e293b; border:2px solid #475569; color:#f8fafc; border-radius:8px; padding:8px 12px; font-size:11px; white-space:nowrap; max-width:240px; white-space:normal; z-index:50; box-shadow:4px 4px 0px 0px #020617; }
+.tip-btn { width:18px; height:18px; border-radius:4px; background:rgba(220,38,38,0.15); border:2px solid #dc2626; font-size:10px; font-weight:700; color:#dc2626; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-family:'JetBrains Mono';}
+.tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#1c1917; border:2px solid #57534e; color:#fafaf9; border-radius:8px; padding:8px 12px; font-size:11px; white-space:nowrap; max-width:240px; white-space:normal; z-index:50; box-shadow:4px 4px 0px 0px #000000; }
 .tip-wrap:hover .tip-box, .tip-btn:focus + .tip-box { display:block; }
 </style>
 </head>
@@ -245,7 +243,7 @@ body::before {
     <h1 class="font-headline text-4xl md:text-6xl text-secondary crt-glow mb-4 uppercase leading-tight">
       LEARN<br>QUEST
     </h1>
-    <div class="font-mono text-xs text-on-surface-variant font-bold tracking-widest mb-10">V2.0 // NEO-RETRO EDITION</div>
+    <div class="font-mono text-xs text-on-surface-variant font-bold tracking-widest mb-10">V2.0 // DARK FANTASY EDITION</div>
 
     <div class="w-full max-w-sm bg-surface-container border border-outline rounded-xl p-6 mb-8 text-left terminal-border">
       <div class="text-on-surface-variant text-xs font-mono font-bold mb-3 tracking-widest">OS BOOT SEQUENCE COMPLETE</div>
@@ -298,7 +296,7 @@ body::before {
     <div class="font-headline text-[10px] md:text-xs text-secondary crt-glow uppercase tracking-wide">LEARN_QUEST</div>
     <div class="flex items-center gap-4">
       <div class="hidden sm:flex items-center gap-2 text-xs font-mono font-bold text-on-surface-variant">
-        <span class="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+        <span class="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(220,38,38,0.8)]"></span>
         <span id="nav-codename" class="tracking-widest text-on-surface"></span>
       </div>
       <button onclick="openApiModal()" class="text-on-surface-variant hover:text-primary transition-colors bg-surface-container-highest p-2 rounded-lg border border-outline shadow-sm">
@@ -311,7 +309,8 @@ body::before {
     <div id="main-view" class="h-full overflow-y-auto">
       <div class="px-4 pt-6 pb-28 max-w-2xl mx-auto space-y-6">
 
-      <div id="commander-stats" class="p-5 md:p-6 terminal-border bg-surface-container relative">
+        <!-- Player Stats Panel (Mobile Optimized) -->
+        <div id="commander-stats" class="p-5 md:p-6 terminal-border bg-surface-container relative">
           <div class="flex flex-col sm:flex-row gap-5 items-start sm:items-center relative z-10">
             
             <div class="flex items-center gap-4 w-full sm:w-auto">
@@ -410,7 +409,7 @@ body::before {
           <span class="material-symbols-outlined text-primary text-xl">menu_book</span> CHAPTERS
           <span class="ml-auto text-[10px] font-mono font-bold text-on-surface bg-surface-container-highest border-2 border-outline px-2 py-1 rounded-md shadow-sm" id="chapter-progress-label"></span>
         </h3>
-        <div id="chapter-diag" style="display:none;font-size:10px;font-family:monospace;color:#f43f5e;background:rgba(244,63,94,0.1);border:2px solid #f43f5e;border-radius:8px;padding:8px;margin-bottom:12px;word-break:break-all;"></div>
+        <div id="chapter-diag" style="display:none;font-size:10px;font-family:monospace;color:#ef4444;background:rgba(239,68,68,0.1);border:2px solid #ef4444;border-radius:8px;padding:8px;margin-bottom:12px;word-break:break-all;"></div>
         <div id="chapter-list" class="space-y-3"></div>
       </div>
     </div>
@@ -418,7 +417,7 @@ body::before {
     <div id="quest-panel-boss" class="quest-panel flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7">
       <div class="flex flex-col items-center p-6 md:p-8 gap-6 flex-1">
         
-        <div class="relative w-48 h-48 bg-surface-container border-4 border-outline rounded-2xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_4px_20px_rgba(0,0,0,0.5),0_8px_0_0_#020617] overflow-hidden">
+        <div class="relative w-48 h-48 bg-surface-container border-4 border-outline rounded-2xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8),0_8px_0_0_#000000] overflow-hidden">
           <div class="absolute inset-0 bg-error/10"></div>
           <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10 scale-125" style="image-rendering: pixelated;"></canvas>
         </div>
@@ -434,8 +433,8 @@ body::before {
             <span class="text-on-surface-variant">HP METER</span>
             <span id="boss-hp-text" class="text-error">100 / 100</span>
           </div>
-          <div class="bg-surface-container-lowest border-2 border-outline rounded-full p-[3px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] h-6">
-            <div id="boss-hp-fill" class="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-error-dim to-error shadow-[0_0_10px_rgba(244,63,94,0.5)]" style="width:100%;"></div>
+          <div class="bg-surface-container-lowest border-2 border-outline rounded-full p-[3px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] h-6">
+            <div id="boss-hp-fill" class="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-error-dim to-error shadow-[0_0_10px_rgba(239,68,68,0.5)]" style="width:100%;"></div>
           </div>
         </div>
 
@@ -524,7 +523,7 @@ body::before {
         <div id="summon-gen-status" class="font-headline text-sm md:text-base text-primary crt-glow leading-relaxed">Processing...</div>
       </div>
       <div class="w-full max-w-xs bg-surface-container-lowest border-2 border-outline rounded-full p-[3px] h-6">
-        <div class="h-full bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width:60%;"></div>
+        <div class="h-full bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.5)]" style="width:60%;"></div>
       </div>
     </div>
   </div>
@@ -611,7 +610,7 @@ body::before {
         <h3 id="battle-title" class="font-headline text-sm md:text-base text-on-surface crt-glow-red truncate"></h3>
         <div class="flex items-center gap-3 mt-3">
           <div class="flex-1 h-3 bg-surface-container-lowest border-2 border-outline rounded-full p-[2px]">
-            <div id="battle-hp-fill" class="h-full rounded-full transition-all duration-700 bg-error shadow-[0_0_8px_rgba(244,63,94,0.6)]" style="width:100%;"></div>
+            <div id="battle-hp-fill" class="h-full rounded-full transition-all duration-700 bg-error shadow-[0_0_8px_rgba(239,68,68,0.6)]" style="width:100%;"></div>
           </div>
           <span id="battle-hp-text" class="text-[10px] font-headline text-error whitespace-nowrap">100/100</span>
         </div>
@@ -669,7 +668,7 @@ body::before {
   <div class="w-full max-w-sm mx-4 terminal-border overflow-hidden bg-surface-container text-center">
     <div class="p-8 md:p-10 space-y-8">
       <div id="fate-scroll-icon" class="flex flex-col items-center gap-5 cursor-pointer" onclick="revealFateScroll()">
-        <div class="w-24 h-24 rounded-2xl border-4 border-primary bg-surface-container-lowest flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.3)] animate-pulse hover:scale-105 transition-transform">
+        <div class="w-24 h-24 rounded-2xl border-4 border-primary bg-surface-container-lowest flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-pulse hover:scale-105 transition-transform">
           <span class="material-symbols-outlined text-5xl text-primary drop-shadow-md">redeem</span>
         </div>
         <p class="text-[10px] font-headline text-on-surface">TAP TO OPEN REWARD</p>
@@ -735,20 +734,19 @@ body::before {
 
 <div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-surface-container-lowest/90 backdrop-blur-sm hidden"></div>
 
-<div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--color-surface-container);border:2px solid var(--color-error);border-radius:12px;padding:16px 20px;flex-direction:column;align-items:center;gap:16px;min-width:280px;max-width:90vw;box-shadow:8px 8px 0px 0px #020617;transition:opacity 0.2s;opacity:0;" class="">
+<div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--color-surface-container);border:2px solid var(--color-error);border-radius:12px;padding:16px 20px;flex-direction:column;align-items:center;gap:16px;min-width:280px;max-width:90vw;box-shadow:8px 8px 0px 0px #000000;transition:opacity 0.2s;opacity:0;" class="">
   <div id="confirm-toast-msg" style="font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:bold;color:var(--color-on-surface);text-align:center;line-height:1.5;"></div>
   <div style="display:flex;gap:12px;width:100%;">
-    <button onclick="confirmToastNo()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:var(--color-on-surface);background:var(--color-surface-container-highest);border:2px solid var(--color-outline);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.5);">CANCEL</button>
-    <button onclick="confirmToastYes()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:#fff;background:var(--color-error);border:2px solid var(--color-error-dim);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.5);">CONFIRM</button>
+    <button onclick="confirmToastNo()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:var(--color-on-surface);background:var(--color-surface-container-highest);border:2px solid var(--color-outline);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.8);">CANCEL</button>
+    <button onclick="confirmToastYes()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:#fff;background:var(--color-error);border:2px solid var(--color-error-dim);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.8);">CONFIRM</button>
   </div>
 </div>
 
-<div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container border-2 border-primary text-primary font-mono font-bold text-xs py-3 px-6 rounded-lg shadow-[4px_4px_0_0_#020617] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap" style="max-width:90vw;text-align:center;">
+<div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container border-2 border-primary text-primary font-mono font-bold text-xs py-3 px-6 rounded-lg shadow-[4px_4px_0_0_#000000] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap" style="max-width:90vw;text-align:center;">
   <style>#toast.show{opacity:1;}</style>
 </div>
 
 <script type="module">
-// Keep exactly the same Javascript imports and logic from your original file.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -810,7 +808,6 @@ function renderQuestGrid(){
       const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
       const card=document.createElement('div');
       
-      // Update card styling to Neo-Retro
       card.className='bg-surface-container-low rounded-xl border-2 border-outline hover:border-secondary transition-all relative overflow-hidden cursor-pointer p-5 mb-3 shadow-sm group';
       
       card.setAttribute('draggable','true');
@@ -840,7 +837,7 @@ function renderQuestGrid(){
         </div>
       </div>
       <div class="flex gap-1.5 mb-4">
-        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full ${completed[i]?'bg-tertiary shadow-[0_0_8px_rgba(16,185,129,0.5)]':i===chapDone?'bg-tertiary/30':'bg-outline-variant'}"></div>`).join('')}
+        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full ${completed[i]?'bg-tertiary shadow-[0_0_8px_rgba(147,51,234,0.5)]':i===chapDone?'bg-tertiary/30':'bg-outline-variant'}"></div>`).join('')}
       </div>
       <div class="flex items-center gap-4 border-t-2 border-outline/30 pt-3">
         <div class="flex-1 h-3 bg-surface-container-lowest border border-outline rounded-full p-[2px]">
@@ -975,7 +972,7 @@ function checkAndExtendOverdueDeadlines() {
   if(!STATE.quests) return;
   STATE.quests.forEach(q => {
     if(q.deadline && getQuestDeadlineStatus(q) === 'overdue' && !q.defeated) {
-      // Just flag it — no auto-extend needed
+      // Flag only
     }
   });
 }
@@ -1036,8 +1033,7 @@ function renderChapterList(quest) {
     const tag = typeof ch === 'string' ? 'CHAPTER' : (ch.tag || ch.chapterTag || 'PART');
     const item = document.createElement('div');
     
-    // Neo-Retro chapter item styles
-    item.className = `flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${done ? 'border-tertiary bg-tertiary/10 shadow-[0_4px_0_0_rgba(16,185,129,0.3)]' : 'border-outline bg-surface-container-highest hover:border-primary shadow-[0_4px_0_0_rgba(71,85,105,0.5)] hover:shadow-[0_4px_0_0_rgba(59,130,246,0.5)]'}`;
+    item.className = `flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${done ? 'border-tertiary bg-tertiary/10 shadow-[0_4px_0_0_rgba(147,51,234,0.3)]' : 'border-outline bg-surface-container-highest hover:border-primary shadow-[0_4px_0_0_rgba(87,83,78,0.5)] hover:shadow-[0_4px_0_0_rgba(220,38,38,0.5)]'}`;
     
     item.innerHTML = `
       <div class="w-10 h-10 rounded-lg border-2 flex-shrink-0 flex items-center justify-center bg-surface-container-lowest ${done ? 'border-tertiary text-tertiary' : 'border-outline text-on-surface-variant'} shadow-inner">
@@ -1163,20 +1159,17 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   const cxb=w/2, cyb=h*0.52, sc=w/170;
   const t=Date.now()*0.001;
   
-  // Neo-Retro: Snap hovering to whole pixels to maintain chunky 8-bit feel
   const rawHover = Math.sin(t*0.9)*5;
   const hover = Math.round(rawHover); 
   
   ctx.save(); ctx.translate(cxb,cyb+hover); ctx.scale(sc,sc);
   
-  // Hard shadow
   ctx.fillStyle=`rgba(0,0,0,${0.3+((1-hp_ratio)*0.2)})`;
   ctx.beginPath(); ctx.ellipse(0,65-hover/sc,40,10,0,0,Math.PI*2); ctx.fill();
   
   const bs=Math.floor(sr(0,4));
   ctx.fillStyle=bodyColor;
-  // Use stroke for the chunky outline
-  ctx.strokeStyle = '#020617';
+  ctx.strokeStyle = '#000000';
   ctx.lineWidth = 6;
   ctx.lineJoin = 'miter';
 
@@ -1216,7 +1209,7 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   else if(es===1){ctx.beginPath();ctx.rect(-12,-28,6,6);ctx.fill();ctx.beginPath();ctx.rect(12,-28,6,6);ctx.fill();ctx.beginPath();ctx.rect(-3,-38,6,6);ctx.fill();}
   else{ctx.beginPath();ctx.rect(-15,-27,12,6);ctx.fill();ctx.beginPath();ctx.rect(3,-27,12,6);ctx.fill();}
   
-  ctx.fillStyle='#020617';
+  ctx.fillStyle='#000000';
   ctx.beginPath();ctx.rect(-11,-27,4,4);ctx.fill();
   ctx.beginPath();ctx.rect(9,-27,4,4);ctx.fill();
   
@@ -1224,7 +1217,7 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   ctx.strokeStyle=accentColor; ctx.lineWidth=4;
   ctx.beginPath(); ctx.moveTo(-10,-10); ctx.lineTo(10,-10); ctx.stroke();
   
-  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.5;ctx.fillStyle='#f43f5e';ctx.beginPath();ctx.rect(-60,-60,120,120);ctx.fill();ctx.globalAlpha=1;}
+  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.5;ctx.fillStyle='#ef4444';ctx.beginPath();ctx.rect(-60,-60,120,120);ctx.fill();ctx.globalAlpha=1;}
   ctx.restore();
 }
 
@@ -1251,7 +1244,7 @@ function renderSettingsCharacters(){
     const ranks=RANKS; let r=ranks[0]; ranks.forEach(x=>{ if(s.player.totalXp>=x.xp) r=x; });
     const div=document.createElement('div');
     
-    div.className=`flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${isActive?'border-primary bg-primary/10 shadow-[0_4px_0_0_rgba(59,130,246,0.3)]':'border-outline bg-surface-container hover:border-primary/50 shadow-sm'}`;
+    div.className=`flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${isActive?'border-primary bg-primary/10 shadow-[0_4px_0_0_rgba(220,38,38,0.3)]':'border-outline bg-surface-container hover:border-primary/50 shadow-sm'}`;
     
     div.innerHTML=`<div class="flex-1 cursor-pointer min-w-0" onclick="switchCharacter('${s.id}')"><p class="font-headline text-on-surface text-sm truncate mb-2">${s.player.name}</p><p class="text-[10px] text-on-surface-variant font-mono font-bold uppercase tracking-widest">${r.name} · ${s.player.totalXp} XP</p></div>${isActive?'<span class="text-[9px] font-headline text-primary bg-primary/20 px-3 py-2 rounded-lg border border-primary/30">ACTIVE</span>':''}<button onclick="deleteCharacter('${s.id}',event)" class="text-on-surface-variant hover:text-error transition-colors bg-surface-container-highest p-3 rounded-lg border border-outline shadow-sm ml-2"><span class="material-symbols-outlined text-base block">delete</span></button>`;
     list.appendChild(div);
@@ -1324,7 +1317,6 @@ async function loadChapterContent(chapterIdx){
         commonMisconceptions: ch.commonMisconceptions || [],
         curriculumMeta: quest.curriculumMeta || null,
         previousChaptersSummary: previousChaptersSummary || '',
-        // The SVG rules - Backend will inject this!
         visualStyle: "svg",
         formattingRules: "Break up text heavily. Use lists. Include exactly one visual diagram using raw inline HTML <svg> code to explain the most complex concept. Use 'currentColor' for all strokes and fills so it inherits the terminal's CSS color. Do not use background colors."
       }
@@ -1384,7 +1376,7 @@ window.tryOpenBattle=function(){
 window.openGambitModal=function(){ STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false; document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200); document.getElementById('gambit-slider').value=0; window.updateGambitWager(0); document.getElementById('gambit-result').textContent=''; document.getElementById('gambit-coin').textContent='casino'; document.getElementById('gambit-coin').style.color=''; document.getElementById('gambit-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); };
 window.closeGambitModal=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); window.openBattleModal(); };
 window.updateGambitWager=function(val){ STATE.gambitWager=parseInt(val)||0; document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0?'No Wager (Safe)':`Wagering ${STATE.gambitWager} EXP`; };
-window.spinGambitCoin=function(){ if(STATE.gambitRevealed) return; STATE.gambitRevealed=true; const coin=document.getElementById('gambit-coin'); coin.classList.add('gambit-coin-spin'); setTimeout(()=>{ coin.classList.remove('gambit-coin-spin'); const lucky=Math.random()<0.5; coin.textContent=lucky?'check_circle':'cancel'; coin.style.color=lucky?'#10b981':'#f43f5e'; document.getElementById('gambit-result').textContent=lucky?'Critical Success! Double EXP if you win perfectly!':'The house wins. Wager lost if defeated.'; STATE.gambitActive=STATE.gambitWager>0; },1500); };
+window.spinGambitCoin=function(){ if(STATE.gambitRevealed) return; STATE.gambitRevealed=true; const coin=document.getElementById('gambit-coin'); coin.classList.add('gambit-coin-spin'); setTimeout(()=>{ coin.classList.remove('gambit-coin-spin'); const lucky=Math.random()<0.5; coin.textContent=lucky?'check_circle':'cancel'; coin.style.color=lucky?'#9333ea':'#ef4444'; document.getElementById('gambit-result').textContent=lucky?'Critical Success! Double EXP if you win perfectly!':'The house wins. Wager lost if defeated.'; STATE.gambitActive=STATE.gambitWager>0; },1500); };
 window.proceedAfterGambit=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0; if(STATE.gambitWager>0) STATE.player.gambitUsed++; window.openBattleModal(); };
 
 // ── FATE SCROLL ──────────────────────────────────────
@@ -1478,7 +1470,7 @@ function renderQuizQuestion(quest){
   
   options.forEach((opt,i)=>{
     const btn=document.createElement('button');
-    btn.className='flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border-2 border-outline hover:border-primary group transition-all text-left w-full shadow-[0_4px_0_0_#020617] hover:shadow-[0_4px_0_0_rgba(59,130,246,0.6)] hover:-translate-y-1 active:translate-y-1 active:shadow-none';
+    btn.className='flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border-2 border-outline hover:border-primary group transition-all text-left w-full shadow-[0_4px_0_0_#000000] hover:shadow-[0_4px_0_0_rgba(220,38,38,0.6)] hover:-translate-y-1 active:translate-y-1 active:shadow-none';
     btn.innerHTML=`<span class="w-10 h-10 flex-shrink-0 rounded-lg bg-surface-container border border-outline flex items-center justify-center font-headline text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors text-sm shadow-sm">${labels[i]||String.fromCharCode(65+i)}</span><span class="font-mono font-bold text-sm text-on-surface leading-tight">${opt}</span>`;
     btn.addEventListener('click',()=>answerQuestion(i,quest));
     opts.appendChild(btn);
@@ -1492,7 +1484,7 @@ function answerQuestion(chosen,quest){
   const correct=q.correct;
   document.querySelectorAll('#quiz-options button').forEach(o=>{
       o.disabled=true;
-      o.classList.remove('hover:-translate-y-1', 'hover:border-primary', 'hover:shadow-[0_4px_0_0_rgba(59,130,246,0.6)]');
+      o.classList.remove('hover:-translate-y-1', 'hover:border-primary', 'hover:shadow-[0_4px_0_0_rgba(220,38,38,0.6)]');
   });
   const optNodes=document.querySelectorAll('#quiz-options button');
   
@@ -1594,7 +1586,6 @@ function showDamageFloat(val){ const el=document.getElementById('damage-floater'
 
 window.renameCharacter=function(){ const n=prompt("New Player Alias:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
 
-
 async function callAI({action,payload,modelId}){
   try{
     const cfName = action==='summonQuest' ? 'summonQuest' : 'communeWithScrolls';
@@ -1609,7 +1600,8 @@ async function callAI({action,payload,modelId}){
   }catch(e){ showToast("System Error: "+(e.message||e)); throw e; }
 }
 
-function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
+function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/
+```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
 
 // ── UTILS ─────────────────────────────────────────────
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
@@ -1793,7 +1785,6 @@ window.setSummonStatus = function(status, phase) {
   if(phaseEl && phase) phaseEl.textContent = phase;
 };
 
-
 window.doSummonQuest = async function() {
   const topic = document.getElementById('summon-topic-input')?.value.trim();
   if(!topic){ showToast('Please enter a target.'); return; }
@@ -1864,7 +1855,6 @@ window.doSummonQuest = async function() {
     document.getElementById('summoning-progress').classList.remove('flex');
   }
 };
-
 
 // ── CORE FIREBASE & NAVIGATION ────────────────────────
 
@@ -2026,8 +2016,8 @@ window.closeTosModal = function() {
 
 </script>
 
+<!-- Register Service Worker for PWA -->
 <script>
-  // Register Service Worker for PWA
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
@@ -2040,6 +2030,5 @@ window.closeTosModal = function() {
     });
   }
 </script>
-
 </body>
 </html>
