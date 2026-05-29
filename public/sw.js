@@ -1,45 +1,33 @@
-const CACHE_NAME = 'learnow-vault-v1';
+const CACHE_NAME = 'learnow-vault-v2'; // Bumped version to v2
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/manifest.json',
-  // Note: Since you use Tailwind CDN, you might not cache CSS locally, 
-  // but if you add local CSS/JS files later, add them here!
+  '/manifest.json'
 ];
 
-// Install Event - Caches static assets
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Opened cache');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)));
 });
 
-// Fetch Event - Serves from cache if offline
+// Network-First strategy to ensure UI updates always appear
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Return cached version if found
-      if (response) {
+    fetch(event.request)
+      .then((response) => {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
         return response;
-      }
-      // Otherwise fetch from network
-      return fetch(event.request);
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
 
-// Activate Event - Cleans up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
+          if (cache !== CACHE_NAME) return caches.delete(cache);
         })
       );
     })
