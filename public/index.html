@@ -3,56 +3,56 @@
 <head>
 
 <link rel="manifest" href="/manifest.json">
-
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="LearNow">
 <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-
-<meta name="theme-color" content="#4ade80">
+<meta name="theme-color" content="#3b82f6">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VAULT-TEC KNOWLEDGE ARCHIVE | LEARN_NOW_V1.0</title>
+<title>LEARN_QUEST | NEO-RETRO</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
 <script id="tailwind-config">
+window.tailwind = window.tailwind || {};
 tailwind.config = {
   darkMode: "class",
   theme: {
     extend: {
       colors: {
-        "primary": "#4ade80",
-        "primary-dim": "#16a34a",
-        "primary-container": "#052e16",
-        "on-primary": "#052e16",
-        "on-primary-container": "#4ade80",
-        "secondary": "#86efac",
-        "secondary-dim": "#15803d",
-        "on-secondary": "#052e16",
-        "tertiary": "#fbbf24",
-        "tertiary-dim": "#d97706",
-        "on-tertiary": "#1c1400",
-        "error": "#f87171",
-        "error-dim": "#991b1b",
-        "on-error": "#1c0000",
-        "surface": "#080c08",
-        "surface-container-lowest": "#050905",
-        "surface-container-low": "#0d120d",
-        "surface-container": "#111611",
-        "surface-container-high": "#1a201a",
-        "surface-container-highest": "#232923",
-        "on-surface": "#d4f5d4",
-        "on-surface-variant": "#7aad7a",
-        "outline": "#2d5a2d",
-        "outline-variant": "#1a3a1a",
+        "primary": "#3b82f6", // Arcade Blue
+        "primary-dim": "#1d4ed8",
+        "primary-container": "#1e3a8a",
+        "on-primary": "#ffffff",
+        "secondary": "#fbbf24", // Arcade Gold
+        "secondary-dim": "#d97706",
+        "on-secondary": "#1c1400",
+        "tertiary": "#10b981", // Emerald
+        "tertiary-dim": "#059669",
+        "on-tertiary": "#ffffff",
+        "error": "#f43f5e", // Rose
+        "error-dim": "#be123c",
+        "on-error": "#ffffff",
+        "surface": "#0f172a", // Deep Slate
+        "surface-container-lowest": "#020617",
+        "surface-container-low": "#0f172a",
+        "surface-container": "#1e293b",
+        "surface-container-high": "#334155",
+        "surface-container-highest": "#475569",
+        "on-surface": "#f8fafc",
+        "on-surface-variant": "#94a3b8",
+        "outline": "#475569",
+        "outline-variant": "#334155",
       },
       fontFamily: {
-        "headline": ["Orbitron", "monospace"],
-        "body": ["IBM Plex Mono", "monospace"],
-        "mono": ["Share Tech Mono", "monospace"],
+        "headline": ["'Press Start 2P'", "cursive"],
+        "body": ["'JetBrains Mono'", "monospace"],
+        "mono": ["'JetBrains Mono'", "monospace"],
       },
     },
   },
@@ -65,44 +65,75 @@ tailwind.config = {
   display: inline-block; vertical-align: middle; line-height: 1;
 }
 
-/* ── SCANLINES ── */
-.scanlines {
-  position: fixed; top:0; left:0; width:100%; height:100%;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
-  pointer-events: none; z-index: 9000; mix-blend-mode: multiply;
+/* ── NEO-RETRO BASE ── */
+body {
+    background-position: center center;
+    position: relative;
 }
 
-/* ── CRT GLOW ── */
-.crt-glow { text-shadow: 0 0 10px rgba(74,222,128,0.8), 0 0 20px rgba(74,222,128,0.4); }
-.crt-glow-amber { text-shadow: 0 0 10px rgba(251,191,36,0.8), 0 0 20px rgba(251,191,36,0.4); }
-.crt-glow-red { text-shadow: 0 0 10px rgba(248,113,113,0.8), 0 0 20px rgba(248,113,113,0.3); }
+/* Subtle modern ambient glow */
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
+}
 
-/* ── PHOSPHOR BORDER ── */
-.terminal-border { box-shadow: 0 0 0 1px rgba(74,222,128,0.2), 0 0 20px rgba(74,222,128,0.05), inset 0 0 30px rgba(0,0,0,0.5); }
-.terminal-border-amber { box-shadow: 0 0 0 1px rgba(251,191,36,0.3), 0 0 20px rgba(251,191,36,0.06), inset 0 0 30px rgba(0,0,0,0.5); }
+/* ── HARD TEXT SHADOWS (Replaces CRT Glow) ── */
+.crt-glow { text-shadow: 2px 2px 0px #020617; }
+.crt-glow-amber { text-shadow: 2px 2px 0px #020617; }
+.crt-glow-red { text-shadow: 2px 2px 0px #020617; }
+
+/* ── NEO-BRUTALIST PANELS (Replaces Phosphor Border) ── */
+.terminal-border {
+  background-color: #1e293b; /* surface-container */
+  border: 2px solid #475569; /* outline */
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px 0px #020617;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.terminal-border:hover {
+  border-color: #64748b;
+}
+
+/* ── NEO-RETRO BUTTONS ── */
+.bubbly-btn {
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5), 0px 6px 15px rgba(0,0,0,0.2);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+}
+.bubbly-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 0px 0px rgba(0,0,0,0.5), 0px 8px 20px rgba(0,0,0,0.3);
+}
+.bubbly-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0px 0px 0px 0px rgba(0,0,0,0);
+}
+.bubbly-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.5) !important;
+}
 
 /* ── SCREEN SYSTEM ── */
 .screen { display: none; }
 .screen.active { display: flex; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
-.modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center; background: rgba(2,6,23,0.85); backdrop-filter: blur(4px); }
 .modal-overlay.open { display: flex; }
 
-/* ── BLINKING CURSOR ── */
+/* ── ANIMATIONS ── */
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 .cursor-blink { animation: blink 1s -end infinite; }
-@keyframes scan { 0%{transform:translateY(-100%);} 100%{transform:translateY(100vh);} }
-.scan-line { animation: scan 4s linear infinite; }
-
-/* ── TERMINAL TYPING ── */
-@keyframes typeIn { from{opacity:0;} to{opacity:1;} }
-
-/* ── BOOT FLICKER ── */
-@keyframes flicker { 0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.4;} 94%{opacity:1;} 97%{opacity:1;} 98%{opacity:0.3;} 99%{opacity:1;} }
-.flicker { animation: flicker 8s infinite; }
-
-/* ── VAULT DOOR ── */
+@keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+.flicker { animation: float 6s ease-in-out infinite; }
 @keyframes vaultSpin { to { transform: rotate(360deg); } }
 .vault-spin { animation: vaultSpin 30s linear infinite; }
 .vault-spin-rev { animation: vaultSpin 20s linear infinite reverse; }
@@ -112,42 +143,38 @@ tailwind.config = {
 .quest-panel.active { display: flex; }
 @media (min-width:1024px) { .quest-panel { display: flex !important; } }
 
-/* ── PROGRESS BARS ── */
-.pip-done { background: #4ade80; box-shadow: 0 0 4px rgba(74,222,128,0.6); }
-.pip-active { background: #fbbf24; box-shadow: 0 0 4px rgba(251,191,36,0.6); animation: blink 1.5s ease-in-out infinite; }
-
 /* ── CLUE CARD ── */
 .clue-card {
-  background: rgba(5,46,22,0.4);
-  border: 1px solid rgba(74,222,128,0.2);
-  border-left: 3px solid #4ade80;
-  font-family: 'Share Tech Mono', monospace;
+  background: rgba(30,41,59,0.8);
+  border: 2px solid #475569;
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
 }
 .clue-card.classified {
   border-left-color: #fbbf24;
-  background: rgba(28,20,0,0.5);
+  background: rgba(30,41,59,0.5);
   filter: blur(4px);
   pointer-events: none;
 }
 
 /* ── REDACTED TEXT ── */
 .redacted {
-  background: #4ade80;
+  background: #475569;
   color: transparent;
-  border-radius: 2px;
+  border-radius: 4px;
   user-select: none;
 }
 
 /* ── BOOK LOADER ── */
 .book-loader { width:60px; height:48px; position:relative; margin:0 auto; }
-.book-loader .page { position:absolute; bottom:0; left:50%; margin-left:-18px; width:36px; height:32px; background:#4ade80; transform-origin: left center; border-radius:0 4px 4px 0; }
+.book-loader .page { position:absolute; bottom:0; left:50%; margin-left:-18px; width:36px; height:32px; background:#3b82f6; transform-origin: left center; border-radius:0 4px 4px 0; border: 2px solid #1e3a8a; }
 .book-loader .page:nth-child(1){animation:pageFlip 1.2s ease-in-out infinite;}
 .book-loader .page:nth-child(2){animation:pageFlip 1.2s ease-in-out 0.15s infinite;}
 .book-loader .page:nth-child(3){animation:pageFlip 1.2s ease-in-out 0.30s infinite;}
 @keyframes pageFlip{0%{transform:rotateY(0deg);}50%{transform:rotateY(-160deg);}100%{transform:rotateY(0deg);}}
 
 /* ── DAMAGE FLOAT ── */
-.damage-float { position:absolute; top:20%; left:50%; transform:translateX(-50%); font-size:2.5rem; font-weight:900; color:#f87171; font-family:'Orbitron',monospace; pointer-events:none; opacity:0; transition:all 0.1s; text-shadow:0 0 10px rgba(248,113,113,0.8); }
+.damage-float { position:absolute; top:20%; left:50%; transform:translateX(-50%); font-size:2.5rem; font-weight:900; color:#f43f5e; font-family:'Press Start 2P',cursive; pointer-events:none; opacity:0; transition:all 0.1s; text-shadow:4px 4px 0px #020617; }
 .damage-float.show { animation:damageAnim 1.5s ease-out forwards; }
 @keyframes damageAnim{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}100%{opacity:0;transform:translateX(-50%) translateY(-60px) scale(1.4);}}
 
@@ -155,228 +182,180 @@ tailwind.config = {
 @keyframes gambitSpin { to { transform: rotate(720deg) scale(1.3); } }
 .gambit-coin-spin { animation: gambitSpin 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
-/* ── BUTTONS ── */
-.bubbly-btn { transition: transform 0.1s ease; }
-.bubbly-btn:active { transform: translateY(2px); }
-
 /* ── DRAG OVER ── */
-.drag-over { border-color: rgba(74,222,128,0.6) !important; background: rgba(74,222,128,0.05) !important; }
+.drag-over { border-color: #3b82f6 !important; background: rgba(59,130,246,0.1) !important; }
 
-/* ── DEADLINE PULSE ── */
-@keyframes deadlinePulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
-.deadline-urgent { animation: deadlinePulse 1.5s ease-in-out infinite; }
+/* ── CHAPTER CONTENT STYLES (NEO-RETRO UPDATE) ── */
+.chapter-content { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.8; color: #f8fafc; }
+.chapter-content h3 { font-family: 'Press Start 2P', cursive; font-size: 12px; line-height: 1.6; color: #3b82f6; text-transform: uppercase; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px dashed #475569; text-shadow: 2px 2px 0px #020617; }
+.chapter-content p { margin: 1rem 0; }
+.chapter-content strong { color: #60a5fa; font-weight: 800; }
+.chapter-content em { color: #fbbf24; font-style: italic; }
+.chapter-content ul, .chapter-content ol { margin: 1rem 0 1rem 1.5rem; }
+.chapter-content li { margin: 0.5rem 0; padding-left: 0.5rem; }
+.chapter-content ul li::marker { color: #3b82f6; }
+.chapter-content ol li::marker { color: #3b82f6; font-weight: 800; }
+.chapter-content pre { background: #020617; border: 2px solid #475569; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.5rem 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+.chapter-content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fbbf24; background: rgba(251,191,36,0.1); padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid rgba(251,191,36,0.2); }
+.chapter-content pre code { background: none; padding: 0; border: none; color: #60a5fa; }
+.chapter-content blockquote, .chapter-content .chapter-takeaway { background: rgba(251,191,36,0.1); border: 2px solid #fbbf24; padding: 1rem 1.25rem; margin: 1.5rem 0; border-radius: 8px; color: #fbbf24; font-weight: bold; box-shadow: 4px 4px 0px 0px rgba(251,191,36,0.2); }
+.chapter-content .chapter-intro { background: rgba(59,130,246,0.1); border: 2px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 13px; color: #cbd5e1; }
+.chapter-content .key-insight { background: rgba(16,185,129,0.1); border: 2px solid #10b981; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(16,185,129,0.2); }
+.chapter-content .key-insight::before { content: '💡 KEY INSIGHT'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #10b981; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
+.chapter-content .common-mistake { background: rgba(244,63,94,0.1); border: 2px solid #f43f5e; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; box-shadow: 4px 4px 0px 0px rgba(244,63,94,0.2); }
+.chapter-content .common-mistake::before { content: '⚠️ COMMON MISTAKE'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #f43f5e; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
+.chapter-content .chapter-summary { background: #1e293b; border: 2px solid #475569; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+.chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem; font-family: 'Press Start 2P', cursive; }
 
-/* ── NARRATIVE OVERLAY ── */
-@keyframes narrativeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
-.narrative-in { animation: narrativeIn 0.4s ease forwards; }
-@keyframes cursorBlink { 0%,100%{opacity:1;} 50%{opacity:0;} }
-#story-cursor { animation: cursorBlink 0.7s step-end infinite; }
-
-/* ── EVO STAGE CARD ── */
-.evo-stage-card { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px; border-radius:8px; border:1px solid rgba(74,222,128,0.15); background:rgba(5,9,5,0.8); text-align:center; transition:all 0.2s; }
-.evo-stage-card.unlocked { border-color:rgba(74,222,128,0.4); background:rgba(5,46,22,0.3); }
-.evo-stage-card.current-stage { border-color:#4ade80; background:rgba(5,46,22,0.5); box-shadow:0 0 12px rgba(74,222,128,0.2); }
-
-/* ── TIP WRAP ── */
-.tip-wrap { position:relative; display:inline-block; }
-.tip-btn { width:18px; height:18px; border-radius:50%; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.3); font-size:10px; font-weight:700; color:#4ade80; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
-.tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#0d120d; border:1px solid rgba(74,222,128,0.3); color:#d4f5d4; border-radius:6px; padding:8px 12px; font-size:11px; white-space:nowrap; max-width:240px; white-space:normal; z-index:50; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
-.tip-wrap:hover .tip-box, .tip-btn:focus + .tip-box { display:block; }
-
-/* ── CHAPTER CONTENT STYLES ── */
-.chapter-content { font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.8; color: rgba(212,245,212,0.85); }
-.chapter-content h3 { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #4ade80; text-transform: uppercase; letter-spacing: 0.15em; margin: 1.5rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(74,222,128,0.2); }
-.chapter-content p { margin: 0.75rem 0; }
-.chapter-content strong { color: #4ade80; font-weight: 700; }
-.chapter-content em { color: #86efac; font-style: italic; }
-.chapter-content ul, .chapter-content ol { margin: 0.75rem 0 0.75rem 1.25rem; space-y: 0.5rem; }
-.chapter-content li { margin: 0.4rem 0; padding-left: 0.25rem; }
-.chapter-content ul li::marker { color: #4ade80; }
-.chapter-content ol li::marker { color: #4ade80; font-weight: 700; }
-.chapter-content pre { background: rgba(5,9,5,0.8); border: 1px solid rgba(74,222,128,0.2); border-left: 3px solid #4ade80; border-radius: 4px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
-.chapter-content code { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #86efac; background: rgba(74,222,128,0.08); padding: 0.1rem 0.3rem; border-radius: 3px; }
-.chapter-content pre code { background: none; padding: 0; color: #4ade80; font-size: 12px; }
-.chapter-content blockquote, .chapter-content .chapter-takeaway { background: rgba(5,46,22,0.4); border-left: 3px solid #fbbf24; padding: 0.75rem 1rem; margin: 1.25rem 0; border-radius: 0 4px 4px 0; color: #fbbf24; font-style: italic; }
-.chapter-content .chapter-intro { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.15); border-radius: 4px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; color: rgba(212,245,212,0.7); font-size: 12px; }
-.chapter-content .concept-block { margin: 1.25rem 0; padding: 0; }
-.chapter-content .key-insight { background: rgba(5,46,22,0.5); border: 1px solid rgba(74,222,128,0.3); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
-.chapter-content .key-insight::before { content: '💡 KEY INSIGHT'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #4ade80; margin-bottom: 0.4rem; font-family: 'Orbitron', monospace; }
-.chapter-content .common-mistake { background: rgba(28,0,0,0.4); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
-.chapter-content .common-mistake::before { content: '⚠️ COMMON MISTAKE'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #f87171; margin-bottom: 0.4rem; font-family: 'Orbitron', monospace; }
-.chapter-content .code-example { margin: 1rem 0; }
-.chapter-content .chapter-summary { background: rgba(5,9,5,0.6); border: 1px solid rgba(74,222,128,0.15); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
-.chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(74,222,128,0.6); margin-bottom: 0.5rem; font-family: 'Orbitron', monospace; }
-
-/* ── SVG DIAGRAM STYLES ── */
+/* ── SVG DIAGRAM STYLES (NEO-RETRO UPDATE) ── */
 .chapter-content svg {
   display: block;
-  margin: 2rem auto;
+  margin: 2.5rem auto;
   max-width: 100%;
   height: auto;
   overflow: visible;
-  background: rgba(5,9,5,0.5);
-  border: 1px solid rgba(74,222,128,0.2);
-  border-radius: 8px;
-  padding: 1rem;
+  background: #020617;
+  border: 2px solid #475569;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 6px 6px 0px 0px #020617;
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #050905; }
-::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 2px; }
-
-/* ── CLUE BOARD PARTICLE ── */
-@keyframes particleDrift { 0%{opacity:0;transform:translateY(0) scale(0);} 15%{opacity:0.8;transform:translateY(-15px) scale(1);} 100%{opacity:0;transform:translateY(-80px) scale(0.2);} }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
 
 .no-scrollbar::-webkit-scrollbar{display:none;}
 .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
-.prior-btn{background:transparent;width:100%;}.prior-btn.active-prior{border-color:rgba(74,222,128,0.5)!important;background:rgba(74,222,128,0.05)!important;}
+
+/* Tip Wrap (Adjusted for retro) */
+.tip-wrap { position:relative; display:inline-block; }
+.tip-btn { width:18px; height:18px; border-radius:4px; background:rgba(59,130,246,0.15); border:2px solid #3b82f6; font-size:10px; font-weight:700; color:#3b82f6; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-family:'JetBrains Mono';}
+.tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#1e293b; border:2px solid #475569; color:#f8fafc; border-radius:8px; padding:8px 12px; font-size:11px; white-space:nowrap; max-width:240px; white-space:normal; z-index:50; box-shadow:4px 4px 0px 0px #020617; }
+.tip-wrap:hover .tip-box, .tip-btn:focus + .tip-box { display:block; }
 </style>
 </head>
 <body class="font-body text-on-surface bg-surface overflow-x-hidden">
 
-<div class="scanlines"></div>
-
 <div id="screen-title" class="screen active fixed inset-0 z-10 flex-col items-center justify-center overflow-hidden bg-surface">
-  <div class="absolute inset-0 z-0">
-    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMmpqcclGn5HzPoAshwSFT5UfVeqEvsEKQPsMpEeJ95qFj2MAqVX0PCSbhS5Qp5OeoaWB8UmARKfKmNYUzk1h9me7fyjaNHSxdEeimYsREe3CjTji3kD4h6KSY3D83beukKB6bBjvurB5BESwIhusZyEQhmzIqiye0CEVO9iFv-ik7FRXthLExs_JVB1rynVCFGvsj-LdP30pEqAcdTrgcWP0KeR1yfwblH651RIMF1TUg71noyYq4HCeQkMw4-O7mu10JVjj5O25w"
-         class="w-full h-full object-cover opacity-20 grayscale" alt="wasteland"/>
-    <div class="absolute inset-0" style="background:radial-gradient(ellipse at center, rgba(5,46,22,0.15) 0%, rgba(8,12,8,0.95) 70%);"></div>
-  </div>
-
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-5 pointer-events-none">
-    <div class="absolute inset-0 rounded-full border-2 border-primary vault-spin"></div>
-    <div class="absolute inset-8 rounded-full border border-primary vault-spin-rev"></div>
-    <div class="absolute inset-16 rounded-full border border-primary vault-spin" style="animation-duration:25s"></div>
-  </div>
-
   <div class="relative z-10 flex flex-col items-center text-center px-6 max-w-2xl mx-auto flicker">
-    <div class="font-headline text-[10px] tracking-[0.5em] text-primary/60 mb-4 uppercase">
-      VAULT-TEC KNOWLEDGE ARCHIVE · EST. 2077
+    <div class="font-headline text-[10px] text-primary mb-6 uppercase">
+      ARCHIVE SYSTEM // EST. 198X
     </div>
-    <h1 class="font-headline font-black text-4xl md:text-6xl text-primary crt-glow tracking-wider mb-2 uppercase">
-      LEARN_NOW
+    <h1 class="font-headline text-4xl md:text-6xl text-secondary crt-glow mb-4 uppercase leading-tight">
+      LEARN<br>QUEST
     </h1>
-    <div class="font-headline text-sm tracking-[0.3em] text-primary/50 mb-8">V1.0 // CLASSIFIED DATABASE</div>
+    <div class="font-mono text-xs text-on-surface-variant font-bold tracking-widest mb-10">V2.0 // NEO-RETRO EDITION</div>
 
-    <div class="w-full max-w-sm bg-surface-container-low border border-outline/40 rounded p-4 mb-8 text-left terminal-border">
-      <div class="text-on-surface-variant text-xs font-mono mb-2">VAULT-OS v4.2 · BOOT SEQUENCE COMPLETE</div>
-      <div class="text-primary text-xs font-mono mb-1">> AUTHENTICATING USER...</div>
-      <div id="auth-loading-msg" class="text-on-surface-variant text-xs font-mono">
+    <div class="w-full max-w-sm bg-surface-container border border-outline rounded-xl p-6 mb-8 text-left terminal-border">
+      <div class="text-on-surface-variant text-xs font-mono font-bold mb-3 tracking-widest">OS BOOT SEQUENCE COMPLETE</div>
+      <div class="text-primary text-xs font-mono font-bold mb-2 tracking-widest">> AUTHENTICATING USER...</div>
+      <div id="auth-loading-msg" class="text-on-surface-variant text-xs font-mono font-bold tracking-widest">
         > AWAITING CREDENTIALS<span class="cursor-blink">_</span>
       </div>
     </div>
 
-    <div id="auth-buttons" class="hidden flex-col gap-3 w-full max-w-sm">
-      <button onclick="signInWithGoogle()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 px-6 rounded flex items-center justify-center gap-3 text-sm tracking-widest uppercase shadow-lg" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
+    <div id="auth-buttons" class="hidden flex-col gap-4 w-full max-w-sm">
+      <button onclick="signInWithGoogle()" class="bubbly-btn w-full bg-primary text-on-primary font-headline py-4 px-6 rounded-lg flex items-center justify-center gap-3 text-xs uppercase">
         <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        <span>ACCESS VIA GOOGLE ID</span>
+        <span>ACCESS VIA GOOGLE</span>
       </button>
-      <div class="text-center text-on-surface-variant text-[10px] font-mono tracking-widest">
+      <div class="text-center text-on-surface-variant text-[10px] font-mono font-bold tracking-widest">
         — SECURE AUTHENTICATION REQUIRED —
       </div>
-      <p class="text-center text-[9px] font-mono text-on-surface-variant/50 leading-relaxed px-2">
+      <p class="text-center text-[10px] font-mono text-on-surface-variant/70 leading-relaxed px-2">
         By signing in, you agree to our
-        <button onclick="openTosModal('tos')" class="text-primary/70 hover:text-primary underline underline-offset-2 transition-colors">Terms of Service</button>
+        <button onclick="openTosModal('tos')" class="text-primary hover:text-primary-dim underline transition-colors">Terms</button>
         and
-        <button onclick="openTosModal('privacy')" class="text-primary/70 hover:text-primary underline underline-offset-2 transition-colors">Privacy Policy</button>
+        <button onclick="openTosModal('privacy')" class="text-primary hover:text-primary-dim underline transition-colors">Privacy Policy</button>
       </p>
     </div>
 
-    <div id="loading-text" class="text-primary/60 text-xs font-mono tracking-widest mt-4 hidden">ESTABLISHING UPLINK...</div>
+    <div id="loading-text" class="text-primary text-xs font-mono font-bold tracking-widest mt-4 hidden">ESTABLISHING UPLINK...</div>
   </div>
 </div>
 
 <div id="screen-path" class="screen fixed inset-0 z-10 flex-col items-center justify-center overflow-y-auto bg-surface">
-  <div class="fixed inset-0 z-0">
-    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5KHNKSVDby76END8YXKPuSjWJXDvtLrb1V4a-efG0M8Goo4Nl0s_zrhnsI0p8piLX0_ZgPUtKp2jbtkxwUnfZq8BDjywiS0CZQYoKdtIPlcHL1V9IIaAGyhmZrHsIu52NZwVohGJXMZDKFQesU2qlINCJupAKvm5xV8B99Aq7JfGspxma2Uuz1e3elGWoFIfxw5vqxzOza2jG_uJ6Qcofw7qiolAl8oRG1PiJy_MJL2ZWoriCoQps-8J--AEpGG_UqCSJ5DCVWQM"
-         class="w-full h-full object-cover opacity-15 grayscale" alt=""/>
-    <div class="absolute inset-0 bg-surface/90"></div>
-  </div>
-  <div class="relative z-10 w-full max-w-md px-6 py-12 flex flex-col items-center gap-6">
+  <div class="relative z-10 w-full max-w-md px-6 py-12 flex flex-col items-center gap-8">
     <div class="text-center">
-      <div class="font-headline text-[10px] tracking-[0.4em] text-primary/50 mb-2">VAULT-TEC PERSONNEL REGISTRATION</div>
-      <h2 class="font-headline font-black text-2xl text-primary crt-glow tracking-widest">SUBJECT IDENTIFIER</h2>
-      <p class="text-on-surface-variant text-xs font-mono mt-2 leading-relaxed">Memory banks corrupted. Enter designation for this terminal session.</p>
+      <div class="font-headline text-[10px] text-primary mb-3">PLAYER REGISTRATION</div>
+      <h2 class="font-headline text-2xl md:text-3xl text-secondary crt-glow">ENTER NAME</h2>
     </div>
-    <div class="w-full bg-surface-container-low border border-outline/40 rounded p-6 terminal-border">
-      <div class="text-on-surface-variant text-[10px] font-mono mb-3 tracking-widest">ENTER OPERATIVE CODENAME:</div>
-      <input id="path-name-input" type="text" placeholder="e.g. GHOST, CIPHER, ATLAS..."
-             class="w-full bg-surface-container text-primary font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-lg tracking-widest uppercase crt-glow"/>
-      <div class="mt-3 text-[10px] text-on-surface-variant font-mono tracking-widest">THIS DESIGNATION WILL PERSIST IN THE ARCHIVE</div>
+    <div class="w-full bg-surface-container border border-outline rounded-xl p-6 terminal-border">
+      <div class="text-on-surface-variant text-[10px] font-mono font-bold mb-3 tracking-widest">PLAYER ALIAS:</div>
+      <input id="path-name-input" type="text" placeholder="e.g. GHOST, ATLAS..."
+             class="w-full bg-surface-container-highest text-on-surface font-headline py-4 px-4 rounded-lg border-2 border-outline focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm uppercase"/>
     </div>
-    <button onclick="choosePath()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-black py-4 px-6 rounded flex items-center justify-center gap-2 text-sm tracking-widest uppercase" style="box-shadow:0 0 20px rgba(74,222,128,0.25);">
-      <span class="material-symbols-outlined text-lg">fingerprint</span> INITIALIZE OPERATIVE
+    <button onclick="choosePath()" class="bubbly-btn w-full bg-primary text-on-primary font-headline py-4 px-6 rounded-lg flex items-center justify-center gap-3 text-xs uppercase">
+      <span class="material-symbols-outlined text-lg">videogame_asset</span> START GAME
     </button>
-    <button id="path-cancel-btn" style="display:none" onclick="cancelPathSelection()" class="text-on-surface-variant font-mono text-xs hover:text-primary transition-colors tracking-widest">[ ABORT ]</button>
+    <button id="path-cancel-btn" style="display:none" onclick="cancelPathSelection()" class="text-on-surface-variant font-headline text-[10px] hover:text-primary transition-colors tracking-widest">[ ABORT ]</button>
   </div>
 </div>
 
 <div id="screen-hub" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
-  <nav class="flex-shrink-0 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/30 z-20 flex justify-between items-center px-4 py-3" style="box-shadow:0 1px 0 rgba(74,222,128,0.1);">
-    <div class="font-headline font-black text-sm text-primary crt-glow tracking-widest uppercase">VAULT_LEARN_V1.0</div>
-    <div class="flex items-center gap-3">
-      <div class="hidden sm:flex items-center gap-2 text-[10px] font-mono text-on-surface-variant">
-        <span class="w-1.5 h-1.5 bg-primary rounded-full" style="box-shadow:0 0 4px rgba(74,222,128,0.8);"></span>
-        <span id="nav-codename" class="tracking-widest text-primary"></span>
+  <nav class="flex-shrink-0 bg-surface-container/95 backdrop-blur-md border-b-2 border-outline z-20 flex justify-between items-center px-4 py-4 shadow-sm">
+    <div class="font-headline text-[10px] md:text-xs text-secondary crt-glow uppercase tracking-wide">LEARN_QUEST</div>
+    <div class="flex items-center gap-4">
+      <div class="hidden sm:flex items-center gap-2 text-xs font-mono font-bold text-on-surface-variant">
+        <span class="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+        <span id="nav-codename" class="tracking-widest text-on-surface"></span>
       </div>
-      <button onclick="openApiModal()" class="text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-lg">settings_input_component</span>
+      <button onclick="openApiModal()" class="text-on-surface-variant hover:text-primary transition-colors bg-surface-container-highest p-2 rounded-lg border border-outline shadow-sm">
+        <span class="material-symbols-outlined text-lg block">settings</span>
       </button>
     </div>
   </nav>
 
   <div class="flex-1 overflow-hidden">
     <div id="main-view" class="h-full overflow-y-auto">
-      <div class="px-4 pt-4 pb-28 max-w-2xl mx-auto space-y-5">
+      <div class="px-4 pt-6 pb-28 max-w-2xl mx-auto space-y-6">
 
-        <div id="commander-stats" class="border border-primary/40 p-4 bg-primary-container/30 rounded terminal-border relative overflow-hidden">
-          <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at top left,rgba(74,222,128,0.06) 0%,transparent 60%);"></div>
-          <div class="relative flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div id="commander-stats" class="p-6 terminal-border bg-surface-container relative">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-6 relative z-10">
             
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-surface-container border border-outline/40 rounded flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(74,222,128,0.1)]">
-                <span class="material-symbols-outlined text-2xl text-primary">terminal</span>
+            <div class="flex items-center gap-5 w-full sm:w-auto">
+              <div class="w-16 h-16 bg-surface-container-lowest border-2 border-outline rounded-xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] relative">
+                <span class="text-3xl drop-shadow-md">👾</span>
               </div>
-              <div>
-                <div class="text-[9px] font-mono text-on-surface-variant/60 tracking-widest mb-0.5">OPERATIVE CODENAME</div>
-                <div id="display-user-name" class="font-headline font-black text-xl text-primary crt-glow tracking-widest uppercase cursor-pointer hover:opacity-70 transition-opacity" onclick="renameCharacter()">Wastelander</div>
+              <div class="flex-1 min-w-0 text-left">
+                <div class="text-[9px] font-mono font-bold text-on-surface-variant tracking-widest mb-1 uppercase">PLAYER 1</div>
+                <div id="display-user-name" class="font-headline text-sm md:text-base text-primary crt-glow uppercase cursor-pointer hover:opacity-70 transition-opacity truncate" onclick="renameCharacter()">Hero</div>
               </div>
             </div>
 
-            <div class="flex space-x-6 text-sm font-mono sm:border-l border-outline/30 sm:pl-6 w-full sm:w-auto justify-around sm:justify-end">
-              <div class="flex flex-col items-center">
-                <span class="text-on-surface-variant/60 uppercase text-[9px] tracking-widest">OPEN MISSIONS</span>
-                <span id="stat-open-missions" class="text-2xl text-primary font-bold">0</span>
+            <div class="flex space-x-6 text-sm font-mono sm:border-l-2 border-outline sm:pl-6 w-full sm:w-auto justify-around sm:justify-end">
+              <div class="flex flex-col items-center bg-surface-container-low border border-outline/50 rounded-lg p-2 min-w-[70px]">
+                <span class="text-on-surface-variant font-headline text-[8px] mb-2">QUESTS</span>
+                <span id="stat-open-missions" class="text-xl text-on-surface font-bold">0</span>
               </div>
-              <div class="flex flex-col items-center">
-                <span class="text-on-surface-variant/60 uppercase text-[9px] tracking-widest">COMPLETED</span>
-                <span id="stat-completed-missions" class="text-2xl text-primary font-bold">0</span>
+              <div class="flex flex-col items-center bg-surface-container-low border border-outline/50 rounded-lg p-2 min-w-[70px]">
+                <span class="text-on-surface-variant font-headline text-[8px] mb-2">BOSSES</span>
+                <span id="stat-completed-missions" class="text-xl text-secondary font-bold">0</span>
               </div>
             </div>
 
           </div>
         </div>
 
-        <button onclick="openSummonScreen()" class="bubbly-btn w-full flex items-center gap-4 p-4 bg-surface-container-low border border-outline/30 rounded hover:border-primary/50 transition-all group">
-          <div class="w-12 h-12 rounded border border-outline/40 flex items-center justify-center group-hover:border-primary transition-colors flex-shrink-0 bg-surface-container">
-            <span class="material-symbols-outlined text-2xl text-primary group-hover:crt-glow">add_circle</span>
-          </div>
-          <div class="text-left flex-1">
-            <p class="font-headline font-bold text-primary text-xs uppercase tracking-widest">[ INITIATE NEW MISSION ]</p>
-            <p class="text-on-surface-variant text-[10px] font-mono mt-0.5">Submit topic → AI generates briefing + boss encounter</p>
+        <button onclick="openSummonScreen()" class="bubbly-btn w-full bg-primary text-on-primary p-5 flex flex-col sm:flex-row items-center justify-center gap-4 group">
+          <span class="material-symbols-outlined text-3xl">add_circle</span>
+          <div class="text-center sm:text-left">
+            <p class="font-headline text-xs md:text-sm uppercase mb-1">INITIATE NEW QUEST</p>
+            <p class="text-[10px] font-mono font-bold text-on-primary/80">Submit topic → Generate Campaign</p>
           </div>
         </button>
 
-        <div class="flex justify-between items-center mt-6">
-          <h3 class="font-headline font-bold text-sm text-on-surface tracking-widest flex items-center gap-2">
-            ACTIVE_CURRICULA
+        <div class="flex justify-between items-center mt-8 border-b-2 border-outline pb-3">
+          <h3 class="font-headline text-xs md:text-sm text-secondary crt-glow-amber flex items-center gap-2">
+            ACTIVE MISSIONS
             <span class="tip-wrap ml-1">
               <button class="tip-btn" tabindex="0">?</button>
-              <span class="tip-box">Group missions into curricula. Tap a header to expand/collapse.</span>
+              <span class="tip-box">Group missions into folders. Tap a header to expand/collapse.</span>
             </span>
           </h3>
-          <button onclick="createNewFolder()" class="text-[10px] font-mono text-on-surface-variant hover:text-primary transition-colors border border-outline/30 px-3 py-1 rounded hover:border-primary/40 tracking-widest flex items-center gap-1">
-            <span class="material-symbols-outlined text-xs">create_new_folder</span> NEW
+          <button onclick="createNewFolder()" class="text-[10px] font-headline text-on-surface hover:text-primary transition-colors border-2 border-outline px-3 py-2 rounded-lg hover:border-primary shadow-sm flex items-center gap-2">
+            + FOLDER
           </button>
         </div>
 
@@ -387,394 +366,389 @@ tailwind.config = {
 </div>
 
 <div id="screen-quest" class="screen fixed inset-0 z-10 flex-col overflow-hidden bg-surface">
-  <div class="flex-shrink-0 bg-surface-container-lowest border-b border-outline/30 flex items-center gap-3 px-4 py-3">
-    <button onclick="showHub()" class="bg-surface-container border border-outline/40 rounded p-2 flex items-center justify-center hover:border-primary transition-colors">
+  <div class="flex-shrink-0 bg-surface-container border-b-2 border-outline flex items-center gap-3 px-4 py-3">
+    <button onclick="showHub()" class="bg-surface-container-highest border-2 border-outline rounded-lg p-2 flex items-center justify-center hover:border-primary transition-colors shadow-sm">
       <span class="material-symbols-outlined text-primary text-base">arrow_back</span>
     </button>
     <div class="flex-1 min-w-0">
-      <p id="q-topic-label" class="text-[9px] font-mono text-primary/60 tracking-[0.3em] uppercase">MISSION</p>
-      <p id="q-title-label" class="font-headline font-bold text-sm text-primary truncate tracking-widest">Mission Title</p>
+      <p id="q-topic-label" class="text-[9px] font-mono font-bold text-on-surface-variant tracking-widest uppercase">MISSION</p>
+      <p id="q-title-label" class="font-headline text-xs md:text-sm text-secondary truncate mt-1 crt-glow-amber">Mission Title</p>
     </div>
-    <button onclick="openMoveModal()" class="flex-shrink-0 bg-surface-container border border-outline/40 rounded px-3 py-2 flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:border-primary transition-all">
-      <span class="material-symbols-outlined text-xs">drive_file_move</span>MOVE
+    <button onclick="openMoveModal()" class="flex-shrink-0 bg-surface-container-highest border-2 border-outline rounded-lg px-3 py-2 flex items-center gap-1.5 text-[9px] font-headline uppercase text-on-surface hover:text-primary hover:border-primary transition-all shadow-sm">
+      MOVE
     </button>
-    <div class="flex lg:hidden bg-surface-container border border-outline/30 rounded p-1 gap-1 flex-shrink-0">
+    <div class="flex lg:hidden bg-surface-container-lowest border-2 border-outline rounded-lg p-1 gap-1 flex-shrink-0">
       <button id="qtab-scrolls-btn" onclick="switchQuestTab('scrolls')"
-              class="quest-tab-btn active px-3 py-1.5 rounded text-[9px] font-mono uppercase tracking-widest transition-all bg-primary text-on-primary">
+              class="quest-tab-btn active px-3 py-1.5 rounded text-[9px] font-headline uppercase transition-all bg-primary text-on-primary">
         DOCS
       </button>
       <button id="qtab-boss-btn" onclick="switchQuestTab('boss')"
-              class="quest-tab-btn px-3 py-1.5 rounded text-[9px] font-mono uppercase tracking-widest transition-all text-on-surface-variant">
-        TARGET
+              class="quest-tab-btn px-3 py-1.5 rounded text-[9px] font-headline uppercase transition-all text-on-surface-variant">
+        BOSS
       </button>
     </div>
   </div>
 
   <div class="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-12">
 
-    <div id="quest-panel-scrolls" class="quest-panel active flex-1 overflow-y-auto border-b lg:border-b-0 lg:border-r border-outline/20 lg:col-span-5">
-      <div class="p-4 space-y-4 pb-8">
+    <div id="quest-panel-scrolls" class="quest-panel active flex-1 overflow-y-auto border-b-2 lg:border-b-0 lg:border-r-2 border-outline lg:col-span-5 bg-surface">
+      <div class="p-4 md:p-6 space-y-6 pb-8">
         <div id="quest-meta-panel" class="hidden">
-          <div class="bg-surface-container rounded p-4 border border-outline/20 terminal-border">
-            <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-2 flex items-center gap-1">
-              <span class="material-symbols-outlined text-xs">description</span> MISSION_SYNOPSIS
+          <div class="bg-surface-container rounded-xl p-5 border-2 border-outline shadow-sm">
+            <p class="text-[10px] font-headline text-primary mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">description</span> SYNOPSIS
             </p>
-            <p id="quest-synopsis-text" class="text-[11px] font-mono text-on-surface-variant/80 leading-relaxed"></p>
-            <div class="mt-3 pt-3 border-t border-outline/20 flex items-center gap-2">
-              <span class="text-[9px] font-mono text-on-surface-variant/40 tracking-widest">TARGET AUDIENCE ·</span>
-              <span id="quest-audience-text" class="text-[9px] font-mono text-primary/60 tracking-widest"></span>
+            <p id="quest-synopsis-text" class="text-xs font-mono font-bold text-on-surface/80 leading-relaxed"></p>
+            <div class="mt-4 pt-4 border-t-2 border-outline/50 flex flex-col gap-1">
+              <span class="text-[9px] font-headline text-on-surface-variant">TARGET AUDIENCE:</span>
+              <span id="quest-audience-text" class="text-xs font-mono font-bold text-primary"></span>
             </div>
           </div>
         </div>
 
-        <h3 class="font-headline font-bold text-sm flex items-center gap-2 tracking-widest text-on-surface">
-          <span class="material-symbols-outlined text-primary text-base">description</span> MISSION_BRIEFING
-          <span class="ml-auto text-[9px] font-mono text-on-surface-variant border border-outline/30 px-2 py-0.5 rounded" id="chapter-progress-label"></span>
+        <h3 class="font-headline text-sm flex items-center gap-3 text-on-surface border-b-2 border-outline pb-3">
+          <span class="material-symbols-outlined text-primary text-xl">menu_book</span> CHAPTERS
+          <span class="ml-auto text-[10px] font-mono font-bold text-on-surface bg-surface-container-highest border-2 border-outline px-2 py-1 rounded-md shadow-sm" id="chapter-progress-label"></span>
         </h3>
-        <div id="chapter-diag" style="display:none;font-size:9px;font-family:monospace;color:#f87171;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:4px;padding:6px;margin-bottom:8px;word-break:break-all;"></div>
-        <div id="chapter-list" class="space-y-2"></div>
+        <div id="chapter-diag" style="display:none;font-size:10px;font-family:monospace;color:#f43f5e;background:rgba(244,63,94,0.1);border:2px solid #f43f5e;border-radius:8px;padding:8px;margin-bottom:12px;word-break:break-all;"></div>
+        <div id="chapter-list" class="space-y-3"></div>
       </div>
     </div>
 
-    <div id="quest-panel-boss" class="quest-panel flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7" style="background: linear-gradient(180deg, #050905 0%, #030603 100%);">
-      <div class="flex flex-col items-center p-6 gap-5 flex-1">
-        <div class="relative w-40 h-40 flex items-center justify-center flex-shrink-0">
-          <div class="absolute inset-0 rounded" style="background:radial-gradient(ellipse,rgba(248,113,113,0.15) 0%,transparent 70%);"></div>
-          <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10"></canvas>
+    <div id="quest-panel-boss" class="quest-panel flex-col overflow-y-auto bg-surface-container-lowest lg:col-span-7">
+      <div class="flex flex-col items-center p-6 md:p-8 gap-6 flex-1">
+        
+        <div class="relative w-48 h-48 bg-surface-container border-4 border-outline rounded-2xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_4px_20px_rgba(0,0,0,0.5),0_8px_0_0_#020617] overflow-hidden">
+          <div class="absolute inset-0 bg-error/10"></div>
+          <canvas id="boss-sprite-canvas" width="160" height="160" class="relative z-10 scale-125" style="image-rendering: pixelated;"></canvas>
         </div>
-        <div class="text-center">
-          <div class="text-[9px] font-mono text-error/60 tracking-[0.3em] mb-1">TARGET DESIGNATION</div>
-          <h3 id="boss-name-display" class="font-headline font-extrabold text-2xl text-error crt-glow-red tracking-widest">??</h3>
-          <p id="boss-title-display" class="text-[10px] font-mono text-error/50 tracking-widest mt-1">UNKNOWN THREAT</p>
+        
+        <div class="text-center w-full max-w-md">
+          <div class="text-[10px] font-headline text-error mb-2">TARGET ACQUIRED</div>
+          <h3 id="boss-name-display" class="font-headline text-xl md:text-2xl text-on-surface crt-glow-red truncate">??</h3>
+          <p id="boss-title-display" class="text-xs font-mono font-bold text-on-surface-variant mt-2 bg-surface-container-high py-1 px-3 rounded-full inline-block border border-outline">UNKNOWN THREAT</p>
         </div>
-        <div class="w-full space-y-2">
-          <div class="flex justify-between text-[10px] font-mono tracking-widest">
-            <span class="text-on-surface-variant">THREAT_LEVEL</span>
+        
+        <div class="w-full max-w-md space-y-2">
+          <div class="flex justify-between text-[10px] font-headline">
+            <span class="text-on-surface-variant">HP METER</span>
             <span id="boss-hp-text" class="text-error">100 / 100</span>
           </div>
-          <div class="h-3 bg-surface-container-highest border border-outline/20 rounded overflow-hidden">
-            <div id="boss-hp-fill" class="h-full rounded transition-all duration-700" style="width:100%;background:linear-gradient(90deg,#991b1b,#f87171);box-shadow:0 0 6px rgba(248,113,113,0.4);"></div>
+          <div class="bg-surface-container-lowest border-2 border-outline rounded-full p-[3px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] h-6">
+            <div id="boss-hp-fill" class="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-error-dim to-error shadow-[0_0_10px_rgba(244,63,94,0.5)]" style="width:100%;"></div>
           </div>
-        </div>
-        <div class="w-full bg-surface-container border border-outline/20 rounded p-4">
-          <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mb-2">THREAT_INTEL</p>
-          <p id="boss-lore-text" class="text-xs font-mono text-on-surface-variant/70 italic leading-relaxed">...</p>
         </div>
 
-        <div class="w-full bg-surface-container border border-outline/20 rounded p-4 space-y-2">
+        <div class="w-full max-w-md bg-surface-container border-2 border-outline rounded-xl p-5 shadow-sm">
+          <p class="text-[9px] font-headline text-on-surface-variant mb-3">THREAT INTEL</p>
+          <p id="boss-lore-text" class="text-sm font-mono font-bold text-on-surface/80 leading-relaxed italic">...</p>
+        </div>
+
+        <div class="w-full max-w-md bg-surface-container border-2 border-outline rounded-xl p-5 space-y-3 shadow-sm">
           <div class="flex items-center justify-between">
-            <p class="text-[9px] font-mono text-on-surface-variant tracking-widest">MISSION_DEADLINE</p>
-            <button id="deadline-set-btn" onclick="openDeadlineModal()" class="text-[9px] font-mono text-primary/50 hover:text-primary transition-colors flex items-center gap-1 tracking-widest">
-              <span class="material-symbols-outlined text-xs">edit_calendar</span> SET
+            <p class="text-[9px] font-headline text-on-surface-variant">MISSION DEADLINE</p>
+            <button id="deadline-set-btn" onclick="openDeadlineModal()" class="text-[9px] font-headline text-primary hover:text-primary-dim transition-colors flex items-center gap-1 bg-primary/10 px-2 py-1 rounded border border-primary/30">
+              <span class="material-symbols-outlined text-sm">edit_calendar</span> SET
             </button>
           </div>
-          <div id="deadline-display" class="text-xs font-mono text-on-surface-variant/50 italic">No deadline assigned</div>
-          <div id="deadline-overdue-badge" class="hidden items-center gap-2 bg-error/10 border border-error/30 rounded px-3 py-2">
-            <span class="material-symbols-outlined text-error text-sm">warning</span>
+          <div id="deadline-display" class="text-sm font-mono font-bold text-on-surface/60">No deadline assigned</div>
+          <div id="deadline-overdue-badge" class="hidden items-center gap-3 bg-error/10 border-2 border-error/50 rounded-lg p-3">
+            <span class="material-symbols-outlined text-error text-xl">warning</span>
             <div>
-              <p class="text-[9px] font-mono text-error tracking-widest">DEADLINE EXCEEDED</p>
-              <p class="text-[9px] font-mono text-on-surface-variant/60">+1 decoy answer added to interrogation</p>
+              <p class="text-[10px] font-headline text-error">DEADLINE EXCEEDED</p>
+              <p class="text-xs font-mono font-bold text-on-surface-variant mt-1">+1 decoy answer added to quiz</p>
             </div>
           </div>
         </div>
 
-        <div id="boss-clue-preview" class="w-full bg-surface-container border border-outline/20 rounded p-4 space-y-2 hidden">
-          <p class="text-[9px] font-mono text-primary/70 tracking-widest">CLUE_RECOVERED</p>
-          <div id="boss-clue-text" class="text-xs font-mono text-primary leading-relaxed clue-card p-3 rounded"></div>
+        <div id="boss-clue-preview" class="w-full max-w-md bg-surface-container border-2 border-outline rounded-xl p-5 space-y-3 shadow-sm hidden">
+          <p class="text-[9px] font-headline text-primary">CLUE RECOVERED</p>
+          <div id="boss-clue-text" class="text-xs font-mono font-bold text-on-surface leading-relaxed clue-card p-4"></div>
         </div>
 
         <button id="boss-complete-btn" onclick="tryOpenBattle()" disabled
-                class="bubbly-btn w-full py-4 bg-primary text-on-primary font-headline font-black rounded border-2 border-transparent flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed tracking-widest text-sm uppercase" style="box-shadow:0 0 20px rgba(74,222,128,0.15);">
-          <span class="material-symbols-outlined">target</span> INITIATE INTERROGATION
+                class="bubbly-btn w-full max-w-md py-5 bg-error text-on-error font-headline text-xs rounded-xl flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed uppercase">
+          <span class="material-symbols-outlined text-lg">swords</span> INITIATE BATTLE
         </button>
-        <p class="text-[9px] font-mono text-on-surface-variant/40 text-center tracking-widest">Study all documents to unlock interrogation</p>
+        <p class="text-[9px] font-mono font-bold text-on-surface-variant text-center uppercase tracking-widest mt-2">Study all documents to unlock</p>
       </div>
     </div>
   </div>
 </div>
 
-<div id="summon-screen" class="flex-col items-stretch justify-start overflow-y-auto" style="background:#080c08;position:fixed;inset:0;z-index:50;display:none;">
-  <div class="fixed inset-0 z-0 pointer-events-none opacity-5" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(74,222,128,0.1) 30px,rgba(74,222,128,0.1) 31px);"></div>
-
-  <div class="sticky top-0 z-20 w-full px-4 py-3 flex justify-between items-center bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/30 flex-shrink-0">
-    <h1 class="text-sm font-headline font-black text-primary crt-glow tracking-widest uppercase">[ MISSION BRIEF ]</h1>
-    <button onclick="closeSummonScreen()" class="bg-surface-container border border-outline/40 p-2 rounded hover:border-primary transition-colors">
-      <span class="material-symbols-outlined text-primary text-base">close</span>
+<div id="summon-screen" class="flex-col items-stretch justify-start overflow-y-auto" style="background:var(--color-surface);position:fixed;inset:0;z-index:50;display:none;">
+  <div class="sticky top-0 z-20 w-full px-4 py-4 flex justify-between items-center bg-surface-container/95 backdrop-blur-md border-b-2 border-outline flex-shrink-0 shadow-sm">
+    <h1 class="text-xs md:text-sm font-headline text-secondary crt-glow-amber">CREATE NEW QUEST</h1>
+    <button onclick="closeSummonScreen()" class="bg-surface-container-highest border-2 border-outline p-2 rounded-lg hover:border-primary transition-colors shadow-sm">
+      <span class="material-symbols-outlined text-on-surface text-base">close</span>
     </button>
   </div>
 
-  <div class="max-w-4xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6 flex-1">
-    <div id="summon-form-side" class="flex-1 space-y-4">
+  <div class="max-w-4xl mx-auto w-full px-4 py-8 flex flex-col lg:flex-row gap-8 flex-1">
+    <div id="summon-form-side" class="flex-1 space-y-6">
 
-      <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
-        <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">SUBJECT_OF_INVESTIGATION</p>
+      <div class="terminal-border p-6 bg-surface-container">
+        <p class="text-[10px] font-headline text-primary mb-4">SUBJECT OF INVESTIGATION</p>
         <input id="summon-topic-input" type="text" placeholder="e.g. Cold War Cryptography, Quantum Physics..."
-                class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
+                class="w-full bg-surface-container-lowest text-on-surface font-mono font-bold py-4 px-5 rounded-lg border-2 border-outline focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm md:text-base"/>
       </div>
 
-      <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border hidden">
+      <div class="terminal-border p-6 bg-surface-container hidden">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">MISSION_OBJECTIVE <span class="text-on-surface-variant/40">(OPTIONAL)</span></p>
         <textarea id="summon-objective-input" placeholder="Why do you need to master this? Define the endgame." rows="2"
                   class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm resize-none"></textarea>
       </div>
 
-<div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border hidden">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined text-primary text-sm">psychology</span>
-          <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em]">PRIOR KNOWLEDGE</p>
+      <div class="flex items-center justify-center gap-4 py-2">
+        <div class="flex gap-2">
+          <div class="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50"></div>
+          <div class="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50"></div>
+          <div class="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50"></div>
+          <div class="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50"></div>
+          <div class="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50"></div>
         </div>
-        </div>
-
-      <div class="flex items-center gap-3 px-1">
-        <div class="flex gap-1">
-          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
-          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
-          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
-          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
-          <div class="w-2 h-2 rounded-full bg-primary/40"></div>
-        </div>
-        <span class="text-[9px] font-mono text-on-surface-variant/40 tracking-widest">5 CHAPTERS · FIXED STRUCTURE</span>
+        <span class="text-[10px] font-headline text-on-surface-variant">5 CHAPTERS FIXED</span>
       </div>
 
-      <button onclick="doSummonQuest()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-black py-4 px-6 rounded flex items-center justify-center gap-2 text-sm tracking-widest uppercase" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
-        <span class="material-symbols-outlined">rocket_launch</span> DEPLOY MISSION
+      <button onclick="doSummonQuest()" class="bubbly-btn w-full bg-primary text-on-primary font-headline py-5 px-6 rounded-xl flex items-center justify-center gap-3 text-sm md:text-base uppercase mt-4">
+        <span class="material-symbols-outlined text-xl">rocket_launch</span> GENERATE
       </button>
     </div>
 
-    <div id="summoning-progress" class="hidden flex-1 flex-col items-center justify-center gap-6 text-center py-12">
-      <div class="book-loader">
+    <div id="summoning-progress" class="hidden flex-1 flex-col items-center justify-center gap-8 text-center py-12">
+      <div class="book-loader scale-125">
         <div class="page"></div><div class="page"></div><div class="page"></div>
       </div>
-      <div class="space-y-2">
-        <div id="summon-gen-step" class="text-[10px] font-mono text-primary/60 tracking-[0.3em]">PHASE 1 · ANALYSIS</div>
-        <div id="summon-gen-status" class="font-headline font-bold text-primary text-sm tracking-widest crt-glow">Processing...</div>
+      <div class="space-y-3">
+        <div id="summon-gen-step" class="text-[10px] font-headline text-on-surface-variant">PHASE 1</div>
+        <div id="summon-gen-status" class="font-headline text-sm md:text-base text-primary crt-glow leading-relaxed">Processing...</div>
       </div>
-      <div class="w-full max-w-xs h-1 bg-surface-container-highest rounded overflow-hidden">
-        <div class="h-full bg-primary animate-pulse" style="width:60%;box-shadow:0 0 6px rgba(74,222,128,0.5);"></div>
+      <div class="w-full max-w-xs bg-surface-container-lowest border-2 border-outline rounded-full p-[3px] h-6">
+        <div class="h-full bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width:60%;"></div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="move-modal">
-  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
+  <div class="w-full max-w-sm mx-4 terminal-border overflow-hidden bg-surface-container">
+    <div class="bg-surface-container-highest p-4 flex items-center justify-between border-b-2 border-outline">
       <div>
-        <h3 class="font-headline font-bold text-sm text-primary tracking-widest">MOVE TO CURRICULUM</h3>
-        <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mt-0.5">Select destination</p>
+        <h3 class="font-headline text-xs text-primary">MOVE QUEST</h3>
+        <p class="text-[9px] font-mono font-bold text-on-surface mt-1">Select destination folder</p>
       </div>
-      <button onclick="closeMoveModal()" class="text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-sm">close</span>
+      <button onclick="closeMoveModal()" class="text-on-surface hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-lg">close</span>
       </button>
     </div>
-    <div class="p-4 space-y-2" id="move-curriculum-list"></div>
+    <div class="p-5 space-y-3 bg-surface-container" id="move-curriculum-list"></div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="deadline-modal">
-  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
+  <div class="w-full max-w-sm mx-4 terminal-border overflow-hidden bg-surface-container">
+    <div class="bg-surface-container-highest p-4 flex items-center justify-between border-b-2 border-outline">
       <div>
-        <h3 class="font-headline font-bold text-sm text-error tracking-widest crt-glow-red">SET MISSION DEADLINE</h3>
-        <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mt-0.5">Miss it — the boss gets harder</p>
+        <h3 class="font-headline text-xs text-error crt-glow-red">SET DEADLINE</h3>
+        <p class="text-[9px] font-mono font-bold text-on-surface mt-1">Miss it — the boss gets harder</p>
       </div>
-      <button onclick="closeDeadlineModal()" class="text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-sm">close</span>
+      <button onclick="closeDeadlineModal()" class="text-on-surface hover:text-error transition-colors">
+        <span class="material-symbols-outlined text-lg">close</span>
       </button>
     </div>
-    <div class="p-5 space-y-4 bg-surface-container-lowest">
-      <p class="text-[10px] font-mono text-on-surface-variant leading-relaxed">Miss the deadline → boss gains a <span class="text-error font-bold">5th decoy answer</span> in interrogation.</p>
+    <div class="p-6 space-y-5">
+      <p class="text-xs font-mono font-bold text-on-surface-variant leading-relaxed">Miss the deadline → Boss gains a <span class="text-error">5th decoy option</span> in battle.</p>
       <div class="space-y-2">
-        <label class="text-[9px] font-mono text-on-surface-variant tracking-widest block">DEADLINE_DATE</label>
-        <input type="date" id="deadline-date-input" class="w-full bg-surface-container px-4 py-3 rounded border border-outline/40 focus:border-primary focus:outline-none text-on-surface font-mono text-sm transition-colors"/>
+        <label class="text-[9px] font-headline text-primary block">TARGET DATE</label>
+        <input type="date" id="deadline-date-input" class="w-full bg-surface-container-lowest px-4 py-3 rounded-lg border-2 border-outline focus:border-primary focus:outline-none text-on-surface font-mono font-bold text-sm transition-colors"/>
       </div>
       <div class="grid grid-cols-4 gap-2">
-        <button onclick="setDeadlinePreset(3)" class="py-2 rounded border border-outline/40 text-[10px] font-mono text-on-surface-variant hover:border-primary hover:text-primary transition-all">3D</button>
-        <button onclick="setDeadlinePreset(7)" class="py-2 rounded border border-outline/40 text-[10px] font-mono text-on-surface-variant hover:border-primary hover:text-primary transition-all">1W</button>
-        <button onclick="setDeadlinePreset(14)" class="py-2 rounded border border-outline/40 text-[10px] font-mono text-on-surface-variant hover:border-primary hover:text-primary transition-all">2W</button>
-        <button onclick="setDeadlinePreset(30)" class="py-2 rounded border border-outline/40 text-[10px] font-mono text-on-surface-variant hover:border-primary hover:text-primary transition-all">1M</button>
+        <button onclick="setDeadlinePreset(3)" class="py-2 rounded-lg border-2 border-outline bg-surface-container-highest text-[10px] font-headline text-on-surface hover:border-primary hover:text-primary transition-all shadow-sm">3D</button>
+        <button onclick="setDeadlinePreset(7)" class="py-2 rounded-lg border-2 border-outline bg-surface-container-highest text-[10px] font-headline text-on-surface hover:border-primary hover:text-primary transition-all shadow-sm">1W</button>
+        <button onclick="setDeadlinePreset(14)" class="py-2 rounded-lg border-2 border-outline bg-surface-container-highest text-[10px] font-headline text-on-surface hover:border-primary hover:text-primary transition-all shadow-sm">2W</button>
+        <button onclick="setDeadlinePreset(30)" class="py-2 rounded-lg border-2 border-outline bg-surface-container-highest text-[10px] font-headline text-on-surface hover:border-primary hover:text-primary transition-all shadow-sm">1M</button>
       </div>
-      <div class="flex gap-3 pt-2">
-        <button onclick="saveDeadline()" class="bubbly-btn flex-1 bg-error text-on-error font-headline font-bold py-3 rounded text-xs tracking-widest uppercase">LOCK IN</button>
-        <button onclick="clearDeadline()" class="px-4 py-3 rounded font-mono text-on-surface-variant text-xs hover:bg-surface-container transition-colors tracking-widest">CLEAR</button>
+      <div class="flex gap-4 pt-4 border-t-2 border-outline/50">
+        <button onclick="saveDeadline()" class="bubbly-btn flex-1 bg-error text-on-error font-headline py-3 rounded-lg text-[10px] uppercase">CONFIRM</button>
+        <button onclick="clearDeadline()" class="px-4 py-3 rounded-lg font-headline text-on-surface text-[10px] hover:bg-surface-container-highest border-2 border-transparent hover:border-outline transition-colors">CLEAR</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="chapter-modal">
-  <div class="glass-dark w-full max-w-2xl mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[90vh] flex flex-col terminal-border" style="background:rgba(5,9,5,0.97);backdrop-filter:blur(12px);">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
+  <div class="w-full max-w-2xl mx-4 terminal-border max-h-[90vh] flex flex-col bg-surface-container">
+    <div class="bg-surface-container-highest p-4 md:p-5 flex items-center justify-between border-b-2 border-outline flex-shrink-0 shadow-sm">
       <div class="flex-1 min-w-0 pr-4">
-        <p id="chapter-modal-tag" class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-0.5"></p>
-        <h3 id="chapter-modal-title" class="font-headline font-bold text-sm text-primary tracking-widest truncate"></h3>
+        <p id="chapter-modal-tag" class="text-[9px] font-headline text-on-surface-variant mb-2"></p>
+        <h3 id="chapter-modal-title" class="font-headline text-sm md:text-base text-primary crt-glow truncate leading-snug"></h3>
       </div>
-      <button onclick="closeChapterModal()" class="text-on-surface-variant hover:text-primary transition-colors flex-shrink-0">
-        <span class="material-symbols-outlined text-sm">close</span>
+      <button onclick="closeChapterModal()" class="text-on-surface hover:text-primary transition-colors flex-shrink-0 bg-surface-container p-2 rounded-lg border border-outline">
+        <span class="material-symbols-outlined text-lg">close</span>
       </button>
     </div>
-    <div id="chapter-content-area" class="overflow-y-auto flex-1 p-5 max-w-none text-on-surface/90 leading-relaxed chapter-content"></div>
+    <div id="chapter-content-area" class="overflow-y-auto flex-1 p-5 md:p-8 max-w-none text-on-surface chapter-content bg-surface-container"></div>
     <template id="book-loader-tpl">
-      <div class="flex flex-col items-center justify-center py-12 gap-4">
+      <div class="flex flex-col items-center justify-center py-16 gap-6">
         <div class="book-loader"><div class="page"></div><div class="page"></div><div class="page"></div></div>
-        <p class="text-[10px] font-mono text-primary/60 tracking-widest animate-pulse">DECRYPTING DOCUMENT...</p>
+        <p class="text-[10px] font-headline text-primary animate-pulse mt-2">DECRYPTING...</p>
       </div>
     </template>
-    <div class="p-4 border-t border-outline/30 flex-shrink-0">
-      <button id="chapter-complete-btn" onclick="markChapterComplete()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 rounded flex items-center justify-center gap-2 text-xs tracking-widest uppercase" style="box-shadow:0 0 15px rgba(74,222,128,0.15);">
-        <span class="material-symbols-outlined text-sm">check_circle</span> MARK AS REVIEWED
+    <div class="p-5 border-t-2 border-outline bg-surface-container-low flex-shrink-0">
+      <button id="chapter-complete-btn" onclick="markChapterComplete()" class="bubbly-btn w-full bg-tertiary text-on-tertiary font-headline py-4 rounded-xl flex items-center justify-center gap-3 text-xs md:text-sm uppercase">
+        <span class="material-symbols-outlined">check_circle</span> MARK COMPLETE
       </button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="battle-modal">
-  <div class="w-full max-w-2xl mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[92vh] overflow-y-auto terminal-border" style="background:rgba(5,9,5,0.97);">
-    <div id="battle-top-section" class="flex items-center gap-4 p-5 border-b border-outline/30">
-      <canvas id="battle-boss-canvas" width="80" height="80" class="flex-shrink-0 rounded border border-outline/30"></canvas>
+  <div class="w-full max-w-2xl mx-4 terminal-border max-h-[92vh] overflow-y-auto bg-surface-container">
+    <div id="battle-top-section" class="flex items-center gap-4 p-5 md:p-6 border-b-2 border-outline bg-surface-container-highest shadow-sm">
+      <canvas id="battle-boss-canvas" width="80" height="80" class="flex-shrink-0 rounded-lg border-2 border-outline bg-surface-container-lowest" style="image-rendering: pixelated;"></canvas>
       <div class="flex-1 min-w-0">
-        <div class="text-[9px] font-mono text-error/60 tracking-[0.3em] mb-0.5">INTERROGATING</div>
-        <h3 id="battle-title" class="font-headline font-black text-lg text-error crt-glow-red tracking-widest truncate"></h3>
-        <div class="flex items-center gap-3 mt-2">
-          <div class="flex-1 h-2 bg-surface-container-highest border border-outline/20 rounded overflow-hidden">
-            <div id="battle-hp-fill" class="h-full rounded transition-all duration-700" style="width:100%;background:linear-gradient(90deg,#991b1b,#f87171);box-shadow:0 0 4px rgba(248,113,113,0.4);"></div>
+        <div class="text-[9px] font-headline text-error mb-2">BATTLE ENGAGED</div>
+        <h3 id="battle-title" class="font-headline text-sm md:text-base text-on-surface crt-glow-red truncate"></h3>
+        <div class="flex items-center gap-3 mt-3">
+          <div class="flex-1 h-3 bg-surface-container-lowest border-2 border-outline rounded-full p-[2px]">
+            <div id="battle-hp-fill" class="h-full rounded-full transition-all duration-700 bg-error shadow-[0_0_8px_rgba(244,63,94,0.6)]" style="width:100%;"></div>
           </div>
-          <span id="battle-hp-text" class="text-[10px] font-mono text-error whitespace-nowrap">100/100</span>
+          <span id="battle-hp-text" class="text-[10px] font-headline text-error whitespace-nowrap">100/100</span>
         </div>
       </div>
-      <div id="quiz-progress-streak" class="text-[10px] font-mono text-on-surface-variant tracking-widest text-right">STREAK: 0</div>
+      <div id="quiz-progress-streak" class="text-[9px] font-headline text-primary text-right hidden md:block">STREAK: 0</div>
     </div>
 
-    <div id="quiz-container" class="p-5 flex flex-col gap-4">
-      <p id="quiz-question" class="font-mono text-on-surface text-sm leading-relaxed"></p>
-      <div id="quiz-options" class="flex flex-col gap-2"></div>
-      <p id="quiz-feedback" class="text-xs font-mono text-on-surface-variant min-h-[20px]"></p>
+    <div id="quiz-container" class="p-6 md:p-8 flex flex-col gap-6">
+      <p id="quiz-progress-streak-mobile" class="text-[9px] font-headline text-primary md:hidden">STREAK: 0</p>
+      <p id="quiz-question" class="font-mono font-bold text-on-surface text-sm md:text-base leading-relaxed bg-surface-container-low p-4 rounded-lg border-l-4 border-primary"></p>
+      <div id="quiz-options" class="flex flex-col gap-3"></div>
+      <p id="quiz-feedback" class="text-sm font-mono font-bold text-on-surface-variant min-h-[40px] p-4 bg-surface-container-highest rounded-lg border border-outline hidden"></p>
     </div>
 
-    <div id="finishing-blow" class="hidden p-6 flex-col items-center gap-4 text-center">
+    <div id="finishing-blow" class="hidden p-8 flex-col items-center gap-6 text-center">
       <div id="damage-floater" class="damage-float"></div>
-      <div id="finishing-text" class="font-headline font-black text-xl text-primary crt-glow tracking-widest"></div>
-      <p id="victory-lore" class="text-xs font-mono text-on-surface-variant leading-relaxed max-w-md"></p>
-      <div id="clue-reveal-section" class="hidden w-full max-w-md">
-        <div class="border border-primary/30 rounded p-4 bg-surface-container text-left">
-          <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-2">⚠ CLASSIFIED FRAGMENT RECOVERED</p>
-          <div id="clue-reveal-content" class="text-xs font-mono text-primary leading-relaxed clue-card p-3 rounded"></div>
+      <div id="finishing-text" class="font-headline text-xl md:text-2xl text-secondary crt-glow-amber"></div>
+      <p id="victory-lore" class="text-sm font-mono font-bold text-on-surface-variant leading-relaxed max-w-md"></p>
+      <div id="clue-reveal-section" class="hidden w-full max-w-md mt-4">
+        <div class="border-2 border-secondary rounded-xl p-5 bg-surface-container-lowest text-left shadow-sm">
+          <p class="text-[9px] font-headline text-secondary mb-3">LOOT ACQUIRED</p>
+          <div id="clue-reveal-content" class="text-xs font-mono font-bold text-on-surface leading-relaxed clue-card p-4"></div>
         </div>
       </div>
-      <button onclick="claimVictory()" class="bubbly-btn w-full max-w-xs bg-primary text-on-primary font-headline font-black py-4 rounded text-xs tracking-widest uppercase border-b-[4px] border-primary-dim" style="box-shadow:0 0 20px rgba(74,222,128,0.2);">
-        <span class="material-symbols-outlined text-sm mr-1">check</span> DEBRIEF
+      <button onclick="claimVictory()" class="bubbly-btn w-full max-w-xs bg-primary text-on-primary font-headline py-4 px-6 rounded-xl text-xs uppercase mt-4">
+        CONTINUE
       </button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="gambit-modal">
-  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
-    <div class="bg-surface-container p-4 border-b border-outline/30">
-      <h3 class="font-headline font-bold text-sm text-tertiary crt-glow-amber tracking-widest">[ TACTICAL GAMBIT ]</h3>
-      <p class="text-[9px] font-mono text-on-surface-variant mt-0.5">Wager XP before the interrogation</p>
+  <div class="w-full max-w-sm mx-4 terminal-border overflow-hidden bg-surface-container">
+    <div class="bg-surface-container-highest p-5 border-b-2 border-outline">
+      <h3 class="font-headline text-sm text-secondary crt-glow-amber text-center">TACTICAL GAMBIT</h3>
     </div>
-    <div class="p-5 space-y-4">
+    <div class="p-6 md:p-8 space-y-6">
       <div class="text-center">
-        <span id="gambit-coin" class="material-symbols-outlined text-5xl text-tertiary cursor-pointer hover:scale-110 transition-transform" onclick="spinGambitCoin()">casino</span>
+        <span id="gambit-coin" class="material-symbols-outlined text-6xl text-secondary cursor-pointer hover:scale-110 transition-transform drop-shadow-md" onclick="spinGambitCoin()">casino</span>
       </div>
-      <div class="text-center">
-        <p id="gambit-wager-display" class="font-mono text-xs text-on-surface-variant tracking-widest">No Wager (Safe Path)</p>
-        <p id="gambit-result" class="text-xs font-mono text-primary mt-1 min-h-[16px]"></p>
+      <div class="text-center bg-surface-container-low p-4 rounded-lg border border-outline">
+        <p id="gambit-wager-display" class="font-headline text-[10px] text-on-surface mb-2">No Wager (Safe)</p>
+        <p id="gambit-result" class="text-xs font-mono font-bold text-primary min-h-[20px]"></p>
       </div>
-      <input type="range" id="gambit-slider" min="0" max="100" value="0" oninput="updateGambitWager(this.value)" class="w-full accent-primary">
-      <div class="flex gap-3">
-        <button onclick="spinGambitCoin()" class="flex-1 border border-tertiary/40 text-tertiary font-mono text-[10px] py-2 rounded hover:bg-tertiary/10 transition-colors tracking-widest uppercase">SPIN</button>
-        <button onclick="proceedAfterGambit()" class="flex-1 bg-primary text-on-primary font-headline font-bold py-2 rounded text-[10px] tracking-widest uppercase">PROCEED</button>
+      <input type="range" id="gambit-slider" min="0" max="100" value="0" oninput="updateGambitWager(this.value)" class="w-full accent-secondary h-2 bg-surface-container-lowest rounded-full appearance-none">
+      <div class="flex gap-4 pt-4">
+        <button onclick="spinGambitCoin()" class="flex-1 bubbly-btn bg-surface-container-highest border-2 border-outline text-on-surface font-headline py-3 rounded-lg text-[10px] uppercase">SPIN</button>
+        <button onclick="proceedAfterGambit()" class="flex-1 bubbly-btn bg-primary text-on-primary font-headline py-3 rounded-lg text-[10px] uppercase">PROCEED</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="fate-modal">
-  <div class="w-full max-w-sm mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border text-center">
-    <div class="p-8 space-y-5">
-      <div id="fate-scroll-icon" class="flex flex-col items-center gap-3 cursor-pointer" onclick="revealFateScroll()">
-        <div class="w-20 h-20 rounded border border-primary/40 flex items-center justify-center bg-surface-container animate-pulse">
-          <span class="material-symbols-outlined text-4xl text-primary">draft</span>
+  <div class="w-full max-w-sm mx-4 terminal-border overflow-hidden bg-surface-container text-center">
+    <div class="p-8 md:p-10 space-y-8">
+      <div id="fate-scroll-icon" class="flex flex-col items-center gap-5 cursor-pointer" onclick="revealFateScroll()">
+        <div class="w-24 h-24 rounded-2xl border-4 border-primary bg-surface-container-lowest flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.3)] animate-pulse hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-5xl text-primary drop-shadow-md">redeem</span>
         </div>
-        <p class="text-[10px] font-mono text-primary/60 tracking-widest">TAP TO ACCESS INTEL DROP</p>
+        <p class="text-[10px] font-headline text-on-surface">TAP TO OPEN REWARD</p>
       </div>
-      <div id="fate-reveal-area" class="hidden flex-col items-center gap-3">
-        <div class="text-4xl font-headline font-black text-primary crt-glow" id="fate-reveal-text">+0</div>
-        <p id="fate-bonus-text" class="text-[10px] font-mono text-on-surface-variant leading-relaxed"></p>
-        <button onclick="closeFateModal()" class="bubbly-btn bg-primary text-on-primary font-headline font-bold py-3 px-8 rounded text-xs tracking-widest uppercase" style="box-shadow:0 0 15px rgba(74,222,128,0.2);">ACKNOWLEDGED</button>
+      <div id="fate-reveal-area" class="hidden flex-col items-center gap-5">
+        <div class="text-5xl font-headline text-secondary crt-glow-amber" id="fate-reveal-text">+0</div>
+        <p id="fate-bonus-text" class="text-xs font-mono font-bold text-on-surface-variant leading-relaxed bg-surface-container-low p-3 rounded-lg border border-outline"></p>
+        <button onclick="closeFateModal()" class="bubbly-btn w-full bg-primary text-on-primary font-headline py-4 rounded-xl text-xs uppercase mt-4">COLLECT</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[200]" id="api-modal">
-  <div class="w-full max-w-md mx-4 rounded bg-surface-container-lowest border border-outline/40 overflow-hidden terminal-border">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30">
-      <h3 class="font-headline font-bold text-sm text-primary tracking-widest">SYSTEM_SETTINGS</h3>
-      <button onclick="closeApiModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+  <div class="w-full max-w-md mx-4 terminal-border overflow-hidden bg-surface-container">
+    <div class="bg-surface-container-highest p-4 flex items-center justify-between border-b-2 border-outline shadow-sm">
+      <h3 class="font-headline text-xs text-on-surface">SYSTEM SETTINGS</h3>
+      <button onclick="closeApiModal()" class="text-on-surface hover:text-primary transition-colors bg-surface-container p-1 rounded border border-outline">
         <span class="material-symbols-outlined text-sm">close</span>
       </button>
     </div>
-    <div class="p-5 space-y-4">
-      <div>
-        <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mb-2">AI MODEL</p>
-        <select id="model-selector" onchange="if(typeof STATE!=='undefined'){STATE.selectedModel=this.value;saveState();}" class="w-full bg-surface-container border border-outline/40 text-on-surface font-mono py-2 px-3 rounded text-xs focus:border-primary focus:outline-none">
-          <option value="gemini-2.5-flash">gemini-2.5-flash (default)</option>
-          <option value="gemini-2.5-pro">gemini-2.5-pro (slower, smarter)</option>
+    <div class="p-6 space-y-6">
+      <div class="bg-surface-container-low p-4 rounded-lg border border-outline">
+        <p class="text-[9px] font-headline text-on-surface-variant mb-3">AI MODEL</p>
+        <select id="model-selector" onchange="if(typeof STATE!=='undefined'){STATE.selectedModel=this.value;saveState();}" class="w-full bg-surface-container-lowest border-2 border-outline text-on-surface font-mono font-bold py-3 px-4 rounded-lg text-xs focus:border-primary focus:outline-none">
+          <option value="gemini-2.5-flash">gemini-2.5-flash (Fast)</option>
+          <option value="gemini-2.5-pro">gemini-2.5-pro (Smart)</option>
         </select>
       </div>
       <div>
-        <p class="text-[9px] font-mono text-on-surface-variant tracking-widest mb-2">ACTIVE OPERATIVE</p>
-        <div id="character-list" class="space-y-2"></div>
-        <button onclick="showNewCharacter()" class="mt-2 w-full border border-outline/40 text-on-surface-variant font-mono text-[10px] py-2 rounded hover:border-primary hover:text-primary transition-colors tracking-widest uppercase">+ New Operative</button>
+        <p class="text-[9px] font-headline text-on-surface-variant mb-3">SAVE FILES</p>
+        <div id="character-list" class="space-y-3"></div>
+        <button onclick="showNewCharacter()" class="mt-3 w-full border-2 border-dashed border-outline text-on-surface font-headline text-[10px] py-4 rounded-lg hover:border-primary hover:text-primary transition-colors bg-surface-container-highest shadow-sm">+ NEW SAVE</button>
       </div>
-      <button onclick="signOutUser()" class="w-full border border-error/40 text-error font-mono text-[10px] py-2 rounded hover:bg-error/10 transition-colors tracking-widest uppercase">DISCONNECT SESSION</button>
-      <div class="flex justify-center gap-4 pt-2">
-        <button onclick="openTosModal('tos')" class="text-[9px] font-mono text-on-surface-variant/50 hover:text-primary transition-colors tracking-widest">TERMS OF SERVICE</button>
-        <span class="text-on-surface-variant/30 text-[9px]">·</span>
-        <button onclick="openTosModal('privacy')" class="text-[9px] font-mono text-on-surface-variant/50 hover:text-primary transition-colors tracking-widest">PRIVACY POLICY</button>
+      <button onclick="signOutUser()" class="w-full border-2 border-error bg-error/10 text-error font-headline text-[10px] py-4 rounded-lg hover:bg-error hover:text-white transition-colors shadow-sm">LOGOUT</button>
+      <div class="flex justify-center gap-6 pt-4 border-t-2 border-outline/50">
+        <button onclick="openTosModal('tos')" class="text-[9px] font-headline text-on-surface-variant hover:text-primary transition-colors">TERMS</button>
+        <button onclick="openTosModal('privacy')" class="text-[9px] font-headline text-on-surface-variant hover:text-primary transition-colors">PRIVACY</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay z-[210]" id="tos-modal">
-  <div class="w-full max-w-lg mx-4 rounded bg-surface-container-lowest border border-outline/40 max-h-[88vh] flex flex-col terminal-border">
-    <div class="bg-surface-container p-4 flex items-center justify-between border-b border-outline/30 flex-shrink-0">
+  <div class="w-full max-w-lg mx-4 terminal-border max-h-[88vh] flex flex-col bg-surface-container">
+    <div class="bg-surface-container-highest p-5 flex items-center justify-between border-b-2 border-outline shadow-sm flex-shrink-0">
       <div>
-        <div class="text-[9px] font-mono text-primary/50 tracking-[0.4em] mb-0.5">VAULT-TEC LEGAL ARCHIVE</div>
-        <h3 id="tos-modal-title" class="font-headline font-bold text-sm text-primary tracking-widest crt-glow"></h3>
+        <div class="text-[9px] font-headline text-on-surface-variant mb-2">LEGAL SYSTEM</div>
+        <h3 id="tos-modal-title" class="font-headline text-xs text-primary"></h3>
       </div>
-      <button onclick="closeTosModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+      <button onclick="closeTosModal()" class="text-on-surface hover:text-primary transition-colors bg-surface-container p-1 rounded border border-outline flex-shrink-0">
         <span class="material-symbols-outlined text-sm">close</span>
       </button>
     </div>
-    <div id="tos-modal-body" class="overflow-y-auto flex-1 p-5 text-[11px] font-mono text-on-surface-variant/80 leading-relaxed space-y-4"></div>
-    <div class="p-4 border-t border-outline/30 flex-shrink-0">
-      <button onclick="closeTosModal()" class="bubbly-btn w-full bg-primary text-on-primary font-headline font-bold py-3 rounded text-xs tracking-widest uppercase" style="box-shadow:0 0 15px rgba(74,222,128,0.15);">
-        ACKNOWLEDGED
+    <div id="tos-modal-body" class="overflow-y-auto flex-1 p-6 text-xs font-mono font-bold text-on-surface/80 leading-relaxed space-y-5 bg-surface-container"></div>
+    <div class="p-5 border-t-2 border-outline bg-surface-container-highest flex-shrink-0">
+      <button onclick="closeTosModal()" class="bubbly-btn w-full bg-primary text-on-primary font-headline py-4 rounded-xl text-[10px] uppercase">
+        ACKNOWLEDGE
       </button>
     </div>
   </div>
 </div>
 
-<div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-black/70 backdrop-blur-sm hidden"></div>
+<div id="modal-backdrop" onclick="closeAllModals()" class="fixed inset-0 z-[190] bg-surface-container-lowest/90 backdrop-blur-sm hidden"></div>
 
-<div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--md-sys-color-surface-container-highest,#1a1a1a);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:12px 16px;flex-direction:column;align-items:center;gap:10px;min-width:260px;max-width:90vw;box-shadow:0 4px 24px rgba(0,0,0,0.5);transition:opacity 0.2s;opacity:0;" class="">
-  <div id="confirm-toast-msg" style="font-size:11px;font-family:'Share Tech Mono',monospace;color:rgba(212,245,212,0.9);text-align:center;line-height:1.4;"></div>
-  <div style="display:flex;gap:8px;width:100%;">
-    <button onclick="confirmToastNo()" style="flex:1;padding:8px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:0.1em;color:rgba(212,245,212,0.6);background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:4px;cursor:pointer;">CANCEL</button>
-    <button onclick="confirmToastYes()" style="flex:1;padding:8px;font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:0.1em;color:#050905;background:#f87171;border:none;border-radius:4px;cursor:pointer;">ABANDON</button>
+<div id="confirm-toast" style="display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:600;background:var(--color-surface-container);border:2px solid var(--color-error);border-radius:12px;padding:16px 20px;flex-direction:column;align-items:center;gap:16px;min-width:280px;max-width:90vw;box-shadow:8px 8px 0px 0px #020617;transition:opacity 0.2s;opacity:0;" class="">
+  <div id="confirm-toast-msg" style="font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:bold;color:var(--color-on-surface);text-align:center;line-height:1.5;"></div>
+  <div style="display:flex;gap:12px;width:100%;">
+    <button onclick="confirmToastNo()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:var(--color-on-surface);background:var(--color-surface-container-highest);border:2px solid var(--color-outline);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.5);">CANCEL</button>
+    <button onclick="confirmToastYes()" style="flex:1;padding:12px;font-family:'Press Start 2P',cursive;font-size:10px;color:#fff;background:var(--color-error);border:2px solid var(--color-error-dim);border-radius:8px;cursor:pointer;box-shadow:0px 4px 0px 0px rgba(0,0,0,0.5);">CONFIRM</button>
   </div>
 </div>
 
-<div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container-lowest border border-primary/40 text-primary font-mono text-xs py-3 px-6 rounded tracking-widest opacity-0 transition-opacity duration-300 pointer-events-none crt-glow whitespace-nowrap" style="max-width:90vw;text-align:center;">
+<div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[500] bg-surface-container border-2 border-primary text-primary font-mono font-bold text-xs py-3 px-6 rounded-lg shadow-[4px_4px_0_0_#020617] opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap" style="max-width:90vw;text-align:center;">
   <style>#toast.show{opacity:1;}</style>
 </div>
 
 <script type="module">
+// Keep exactly the same Javascript imports and logic from your original file.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -818,15 +792,15 @@ function renderQuestGrid(){
   if(!grid) return;
   grid.innerHTML='';
   if(!STATE.quests?.length){
-    grid.innerHTML=`<div class="text-center py-10 text-on-surface-variant/50 text-xs font-mono italic">No active missions. Initiate one to begin.</div>`;
+    grid.innerHTML=`<div class="text-center py-12 text-on-surface-variant text-xs font-mono font-bold bg-surface-container-low rounded-xl border-2 border-dashed border-outline">No active missions.<br><br>Initiate a quest to begin.</div>`;
     return;
   }
   if(!STATE.curriculums||STATE.curriculums.length===0) STATE.curriculums=[{id:'default',name:'My Curriculum'}];
   STATE.curriculums.forEach(curriculum=>{
     const curriculumQuests=STATE.quests.map((q,i)=>({q,i})).filter(item=>(item.q.curriculumId||'default')===curriculum.id);
     const curriculumDiv=document.createElement('div');
-    curriculumDiv.className='mb-5';
-    curriculumDiv.innerHTML=`<div class="w-full flex justify-between items-center bg-surface-container-low p-3 rounded border border-outline/30 font-mono text-xs hover:border-primary/40 transition-colors mb-2"><button onclick="this.closest('div').nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-2 flex-1 focus:outline-none text-left"><span class="material-symbols-outlined text-primary text-base">folder_open</span><span class="text-primary tracking-widest font-bold">${curriculum.name.toUpperCase()}</span></button><div class="flex items-center gap-1 flex-shrink-0"><span class="border border-outline/40 text-on-surface-variant px-2 py-0.5 rounded text-[9px] tracking-widest mr-1">${curriculumQuests.length}</span>${curriculum.id!=='default'?`<button onclick="renameCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-xs">edit</span></button><button onclick="deleteCurriculum('${curriculum.id}')" class="text-on-surface-variant/60 hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-xs">delete</span></button>`:''}</div></div>
+    curriculumDiv.className='mb-6';
+    curriculumDiv.innerHTML=`<div class="w-full flex justify-between items-center bg-surface-container-highest p-4 rounded-xl border-2 border-outline shadow-sm hover:border-primary/50 transition-colors mb-3"><button onclick="this.closest('div').nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-3 flex-1 focus:outline-none text-left"><span class="material-symbols-outlined text-primary text-xl">folder_open</span><span class="text-on-surface font-headline text-[10px] tracking-widest">${curriculum.name.toUpperCase()}</span></button><div class="flex items-center gap-2 flex-shrink-0"><span class="bg-surface-container border border-outline text-on-surface-variant px-2 py-1 rounded text-[9px] font-mono font-bold">${curriculumQuests.length}</span>${curriculum.id!=='default'?`<button onclick="renameCurriculum('${curriculum.id}')" class="text-on-surface-variant hover:text-primary transition-colors p-1 bg-surface-container rounded border border-outline ml-1"><span class="material-symbols-outlined text-sm block">edit</span></button><button onclick="deleteCurriculum('${curriculum.id}')" class="text-on-surface-variant hover:text-error transition-colors p-1 bg-surface-container rounded border border-outline ml-1"><span class="material-symbols-outlined text-sm block">delete</span></button>`:''}</div></div>
     <div class="flex-col gap-3 curriculum-content min-h-[4px]" ondragover="allowDrop(event)" ondrop="dropQuest(event,'${curriculum.id}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"></div>`;
     const contentDiv=curriculumDiv.querySelector('.curriculum-content');
     curriculumQuests.forEach(({q:quest,i:idx})=>{
@@ -835,7 +809,10 @@ function renderQuestGrid(){
       const chapDone=completed.filter(Boolean).length;
       const hpRatio=(typeof quest.bossHp==='number'&&quest.bossMaxHp>0)?quest.bossHp/quest.bossMaxHp:1;
       const card=document.createElement('div');
-      card.className='bg-surface-container-low rounded border border-outline/30 hover:border-primary/50 transition-all relative overflow-hidden cursor-pointer p-4 mb-2';
+      
+      // Update card styling to Neo-Retro
+      card.className='bg-surface-container-low rounded-xl border-2 border-outline hover:border-secondary transition-all relative overflow-hidden cursor-pointer p-5 mb-3 shadow-sm group';
+      
       card.setAttribute('draggable','true');
       card.addEventListener('dragstart',(e)=>window.dragQuest(e,idx));
       let touchMoved = false;
@@ -850,16 +827,37 @@ function renderQuestGrid(){
         e.preventDefault();
         window.showQuestScreen(idx);
       });
-      card.innerHTML=`<div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded border border-outline/20 bg-surface-container"><canvas width="40" height="40" class="boss-mini-canvas"></canvas></div><div class="flex-1 min-w-0"><p class="text-[9px] font-mono font-black uppercase tracking-widest text-primary mb-0.5">${quest.topic||'Uncategorized'}</p><p class="font-headline font-bold text-on-surface text-sm leading-tight pr-6">${quest.questTitle||'Untitled'}</p></div></div><div class="flex gap-1 mb-2">${chapters.map((_,i)=>`<div class="flex-1 h-1.5 rounded-full ${completed[i]?'bg-primary':i===chapDone?'bg-primary/30':'bg-surface-container-high'}"></div>`).join('')}</div><div class="flex items-center gap-3"><div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden"><div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'}" style="width:${hpRatio*100}%"></div></div><span class="text-[10px] font-mono text-on-surface-variant">${quest.defeated?'✓ DONE':`${chapDone}/${chapters.length}`}</span></div>`;
+      
+      card.innerHTML=`
+      <div class="flex items-start gap-4 mb-4">
+        <div class="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-xl border-2 border-outline bg-surface-container-highest shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] overflow-hidden relative">
+          <div class="absolute inset-0 bg-primary/10 group-hover:bg-primary/20 transition-colors"></div>
+          <canvas width="56" height="56" class="boss-mini-canvas relative z-10" style="image-rendering: pixelated;"></canvas>
+        </div>
+        <div class="flex-1 min-w-0 pt-1">
+          <p class="text-[9px] font-headline text-primary mb-1 truncate">${quest.topic||'Uncategorized'}</p>
+          <p class="font-headline text-xs md:text-sm text-on-surface leading-snug pr-8 truncate">${quest.questTitle||'Untitled'}</p>
+        </div>
+      </div>
+      <div class="flex gap-1.5 mb-4">
+        ${chapters.map((_,i)=>`<div class="flex-1 h-2 rounded-full ${completed[i]?'bg-tertiary shadow-[0_0_8px_rgba(16,185,129,0.5)]':i===chapDone?'bg-tertiary/30':'bg-outline-variant'}"></div>`).join('')}
+      </div>
+      <div class="flex items-center gap-4 border-t-2 border-outline/30 pt-3">
+        <div class="flex-1 h-3 bg-surface-container-lowest border border-outline rounded-full p-[2px]">
+          <div class="h-full rounded-full ${quest.defeated?'bg-secondary':'bg-error'} shadow-sm" style="width:${hpRatio*100}%"></div>
+        </div>
+        <span class="text-[10px] font-headline ${quest.defeated?'text-secondary':'text-on-surface-variant'}">${quest.defeated?'CLEARED':`${chapDone}/${chapters.length}`}</span>
+      </div>`;
+      
       const mini=card.querySelector('.boss-mini-canvas');
       if(mini) drawBossSprite(mini,quest,hpRatio);
       const del=document.createElement('button');
-      del.className='del-btn absolute top-2 right-2 z-20 p-2 rounded text-on-surface-variant/50 hover:text-error transition-colors';
-      del.innerHTML='<span class="material-symbols-outlined text-base">close</span>';
+      del.className='del-btn absolute top-3 right-3 z-20 p-2 rounded-lg bg-surface-container-highest border border-outline text-on-surface-variant hover:text-error hover:border-error transition-colors shadow-sm';
+      del.innerHTML='<span class="material-symbols-outlined text-sm block">close</span>';
       const doDelete = () => {
         STATE.quests.splice(idx, 1);
         STATE.player.questsCreated = Math.max(0, STATE.player.questsCreated - 1);
-        saveState(); renderHub(); showToast('Mission abandoned.');
+        saveState(); renderHub(); showToast('Quest abandoned.');
       };
       del.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
       del.addEventListener('touchend', (e) => {
@@ -922,11 +920,30 @@ function updateBossHpDisplay(quest) {
 // ── DEADLINE SYSTEM ────────────────────────────────
 function updateDeadlineDisplay(quest) {
   const el = document.getElementById('quest-deadline-label');
-  if(!el) return;
-  if(!quest.deadline) { el.textContent = 'No deadline set'; el.className = 'text-[10px] font-mono text-on-surface-variant/50'; return; }
+  const disp = document.getElementById('deadline-display');
+  const badge = document.getElementById('deadline-overdue-badge');
+  if(!quest.deadline) { 
+      if(disp) disp.textContent = 'No deadline assigned';
+      if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
+      return; 
+  }
   const status = getQuestDeadlineStatus(quest);
-  el.textContent = formatDeadlineLabel(quest, status);
-  el.className = `text-[10px] font-mono ${status === 'overdue' ? 'text-error' : status === 'soon' ? 'text-warning' : 'text-on-surface-variant/70'}`;
+  const formatted = formatDeadlineLabel(quest, status);
+  
+  if(disp) {
+      disp.textContent = formatted;
+      disp.className = `text-sm font-mono font-bold ${status === 'overdue' ? 'text-error' : status === 'soon' ? 'text-secondary' : 'text-primary'}`;
+  }
+  
+  if(badge) {
+      if(status === 'overdue' && !quest.defeated) {
+          badge.classList.remove('hidden');
+          badge.classList.add('flex');
+      } else {
+          badge.classList.add('hidden');
+          badge.classList.remove('flex');
+      }
+  }
 }
 
 function getQuestDeadlineStatus(quest) {
@@ -1006,16 +1023,9 @@ function renderChapterList(quest) {
   if(!list) return;
   const chapters = quest.chapters || [];
 
-  // DIAGNOSTIC - remove after fix
-  const diag = document.getElementById('chapter-diag');
-  if(diag) {
-    diag.textContent = `chapters:${chapters.length} | type:${typeof chapters[0]} | raw:${JSON.stringify(chapters[0]||'empty').slice(0,60)}`;
-    diag.style.display = 'block';
-  }
-
   list.innerHTML = '';
   if(!chapters.length) {
-    list.innerHTML = '<div class="text-center py-6 text-error text-xs font-mono p-3 border border-error/30 rounded">NO CHAPTERS · quest.chapters=' + JSON.stringify(quest.chapters) + '</div>';
+    list.innerHTML = '<div class="text-center py-6 text-error text-xs font-mono font-bold p-3 border-2 border-error/50 rounded-xl bg-error/10">NO CHAPTERS</div>';
     return;
   }
 
@@ -1025,16 +1035,19 @@ function renderChapterList(quest) {
     const title = typeof ch === 'string' ? ch : (ch.title || ch.chapterTitle || `Chapter ${i+1}`);
     const tag = typeof ch === 'string' ? 'CHAPTER' : (ch.tag || ch.chapterTag || 'PART');
     const item = document.createElement('div');
-    item.className = `flex items-center gap-3 p-3 rounded border cursor-pointer transition-all ${done ? 'border-primary/30 bg-primary/5' : 'border-outline/30 bg-surface-container hover:border-primary/40'}`;
+    
+    // Neo-Retro chapter item styles
+    item.className = `flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${done ? 'border-tertiary bg-tertiary/10 shadow-[0_4px_0_0_rgba(16,185,129,0.3)]' : 'border-outline bg-surface-container-highest hover:border-primary shadow-[0_4px_0_0_rgba(71,85,105,0.5)] hover:shadow-[0_4px_0_0_rgba(59,130,246,0.5)]'}`;
+    
     item.innerHTML = `
-      <div class="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${done ? 'border-primary bg-primary' : 'border-outline/40'}">
-        ${done ? '<span class="material-symbols-outlined text-on-primary" style="font-size:14px">check</span>' : `<span class="text-[10px] font-mono text-on-surface-variant/60">${i+1}</span>`}
+      <div class="w-10 h-10 rounded-lg border-2 flex-shrink-0 flex items-center justify-center bg-surface-container-lowest ${done ? 'border-tertiary text-tertiary' : 'border-outline text-on-surface-variant'} shadow-inner">
+        ${done ? '<span class="material-symbols-outlined text-lg">check</span>' : `<span class="text-xs font-headline">${i+1}</span>`}
       </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs font-mono font-bold text-on-surface truncate">${title}</p>
-        <p class="text-[9px] font-mono text-on-surface-variant/50 tracking-widest">${tag}</p>
+      <div class="flex-1 min-w-0 pt-1">
+        <p class="text-[9px] font-headline text-on-surface-variant tracking-widest mb-1.5">${tag}</p>
+        <p class="text-sm font-mono font-bold text-on-surface truncate leading-tight">${title}</p>
       </div>
-      <span class="material-symbols-outlined text-on-surface-variant/40 text-sm">chevron_right</span>
+      <span class="material-symbols-outlined text-on-surface-variant/40 text-xl group-hover:text-primary transition-colors">chevron_right</span>
     `;
     item.addEventListener('click', () => window.openChapterModal(i));
     item.addEventListener('touchend', e => { e.preventDefault(); window.openChapterModal(i); });
@@ -1110,18 +1123,16 @@ window.showQuestScreen = function(questIdx) {
   if(btn) {
     if(quest.defeated) {
       btn.disabled = false;
-      btn.textContent = 'CHALLENGE AGAIN';
-      btn.className = 'bubbly-btn w-full py-3 bg-secondary text-on-secondary font-headline font-bold text-xs rounded tracking-widest uppercase';
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg">swords</span> REMATCH';
+      btn.className = 'bubbly-btn w-full max-w-md py-5 bg-secondary text-on-secondary font-headline text-xs rounded-xl flex items-center justify-center gap-3 uppercase mt-2';
     } else if(allDone) {
       btn.disabled = false;
-      btn.textContent = 'INITIATE INTERROGATION';
-      btn.className = 'bubbly-btn w-full py-3 bg-primary text-on-primary font-headline font-bold text-xs rounded tracking-widest uppercase';
+      btn.innerHTML = '<span class="material-symbols-outlined text-lg">swords</span> INITIATE BATTLE';
+      btn.className = 'bubbly-btn w-full max-w-md py-5 bg-error text-on-error font-headline text-xs rounded-xl flex items-center justify-center gap-3 uppercase mt-2';
     } else {
-      btn.disabled = false; // Allow battle even without all chapters for now
-      btn.textContent = chapters.length > 0
-        ? `CHALLENGE BOSS (${completed.filter(Boolean).length}/${chapters.length} chapters)`
-        : 'INITIATE INTERROGATION';
-      btn.className = 'bubbly-btn w-full py-3 bg-primary/70 text-on-primary font-headline font-bold text-xs rounded tracking-widest uppercase';
+      btn.disabled = false; 
+      btn.innerHTML = `<span class="material-symbols-outlined text-lg">swords</span> BATTLE (${completed.filter(Boolean).length}/${chapters.length})`;
+      btn.className = 'bubbly-btn w-full max-w-md py-5 bg-error/80 text-on-error font-headline text-xs rounded-xl flex items-center justify-center gap-3 uppercase mt-2';
     }
   }
 
@@ -1151,65 +1162,69 @@ function drawBossSprite(canvasEl, bossData, hp_ratio=1.0){
   const eyeColor=`hsl(${sr(0,60)},95%,65%)`;
   const cxb=w/2, cyb=h*0.52, sc=w/170;
   const t=Date.now()*0.001;
-  const hover=Math.sin(t*0.9)*3;
+  
+  // Neo-Retro: Snap hovering to whole pixels to maintain chunky 8-bit feel
+  const rawHover = Math.sin(t*0.9)*5;
+  const hover = Math.round(rawHover); 
+  
   ctx.save(); ctx.translate(cxb,cyb+hover); ctx.scale(sc,sc);
-  ctx.fillStyle=`rgba(0,0,0,${0.15+((1-hp_ratio)*0.2)})`;
-  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,38,7,0,0,Math.PI*2); ctx.fill();
+  
+  // Hard shadow
+  ctx.fillStyle=`rgba(0,0,0,${0.3+((1-hp_ratio)*0.2)})`;
+  ctx.beginPath(); ctx.ellipse(0,65-hover/sc,40,10,0,0,Math.PI*2); ctx.fill();
+  
   const bs=Math.floor(sr(0,4));
   ctx.fillStyle=bodyColor;
-  if(bs===0){ctx.beginPath();ctx.roundRect(-30,5,60,48,[10]);ctx.fill();}
-  else if(bs===1){ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(34,5);ctx.lineTo(28,52);ctx.lineTo(-28,52);ctx.lineTo(-34,5);ctx.closePath();ctx.fill();}
-  else if(bs===2){ctx.beginPath();ctx.arc(0,26,32,0,Math.PI*2);ctx.fill();}
-  else{ctx.beginPath();ctx.roundRect(-28,2,56,55,[4,16,4,16]);ctx.fill();}
-  ctx.fillStyle=accentColor; ctx.globalAlpha=0.4+Math.sin(t*2)*0.1;
-  ctx.beginPath(); ctx.arc(0,24,10,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
-  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
-  ctx.fillText(['DARK','VOID','DOOM','RUIN','FEAR','BANE'][Math.floor(sr(0,6))],0,30);
+  // Use stroke for the chunky outline
+  ctx.strokeStyle = '#020617';
+  ctx.lineWidth = 6;
+  ctx.lineJoin = 'miter';
+
+  if(bs===0){
+      ctx.beginPath();ctx.rect(-30,5,60,48);ctx.fill();ctx.stroke();
+  } else if(bs===1){
+      ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(34,5);ctx.lineTo(28,52);ctx.lineTo(-28,52);ctx.lineTo(-34,5);ctx.closePath();ctx.fill();ctx.stroke();
+  } else if(bs===2){
+      ctx.beginPath();ctx.arc(0,26,32,0,Math.PI*2);ctx.fill();ctx.stroke();
+  } else{
+      ctx.beginPath();ctx.rect(-28,2,56,55);ctx.fill();ctx.stroke();
+  }
+  
+  ctx.fillStyle=accentColor; 
+  ctx.beginPath(); ctx.rect(-10,14,20,20); ctx.fill(); 
+  
   ctx.fillStyle=bodyColor;
-  ctx.beginPath();ctx.roundRect(-46,5,18,34,[7]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(28,5,18,34,[7]);ctx.fill();
+  ctx.beginPath();ctx.rect(-46,5,18,34);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.rect(28,5,18,34);ctx.fill();ctx.stroke();
+  
   ctx.fillStyle=accentColor;
   for(const side of[-1,1]){const bx=side*42;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(bx+i*4,40);ctx.lineTo(bx+i*4-2,52);ctx.lineTo(bx+i*4+2,52);ctx.closePath();ctx.fill();}}
+  
   ctx.fillStyle=bodyColor;
-  ctx.beginPath();ctx.roundRect(-22,52,18,20,[5]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(4,52,18,20,[5]);ctx.fill();
-  ctx.fillStyle=accentColor;
-  ctx.beginPath();ctx.roundRect(-24,70,22,6,[2]);ctx.fill();
-  ctx.beginPath();ctx.roundRect(2,70,22,6,[2]);ctx.fill();
-  ctx.fillStyle=bodyColor;
+  ctx.beginPath();ctx.rect(-22,52,18,20);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.rect(4,52,18,20);ctx.fill();ctx.stroke();
+  
   const hs=Math.floor(sr(0,3));
-  if(hs===0){ctx.beginPath();ctx.arc(0,-26,28,0,Math.PI*2);ctx.fill();}
-  else if(hs===1){ctx.beginPath();ctx.roundRect(-28,-52,56,52,[10]);ctx.fill();}
-  else{ctx.beginPath();ctx.moveTo(-26,-50);ctx.lineTo(26,-50);ctx.lineTo(34,-2);ctx.lineTo(-34,-2);ctx.closePath();ctx.fill();}
-  ctx.fillStyle=accentColor;
-  const ht=Math.floor(sr(0,4));
-  if(ht===0){
-    ctx.beginPath();ctx.moveTo(-18,-52);ctx.bezierCurveTo(-30,-70,-10,-80,-6,-65);ctx.lineTo(-14,-60);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(18,-52);ctx.bezierCurveTo(30,-70,10,-80,6,-65);ctx.lineTo(14,-60);ctx.closePath();ctx.fill();
-  } else if(ht===1){
-    for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*12,-52);ctx.lineTo(i*12-3,-72);ctx.lineTo(i*12+3,-72);ctx.closePath();ctx.fill();}
-  } else if(ht===2){
-    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*22,Math.sin(a)*8-46,6,0,Math.PI*2);ctx.fill();}
-  } else {
-    ctx.strokeStyle=accentColor;ctx.lineWidth=4;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(-20,-50);ctx.lineTo(-28,-70);ctx.lineTo(-22,-68);ctx.moveTo(-28,-70);ctx.lineTo(-34,-62);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(20,-50);ctx.lineTo(28,-70);ctx.lineTo(22,-68);ctx.moveTo(28,-70);ctx.lineTo(34,-62);ctx.stroke();
-  }
-  const eg=0.65+Math.sin(t*3+seed)*0.35;
-  ctx.fillStyle=eyeColor; ctx.shadowColor=eyeColor; ctx.shadowBlur=12*eg;
+  if(hs===0){ctx.beginPath();ctx.arc(0,-26,28,0,Math.PI*2);ctx.fill();ctx.stroke();}
+  else if(hs===1){ctx.beginPath();ctx.rect(-28,-52,56,52);ctx.fill();ctx.stroke();}
+  else{ctx.beginPath();ctx.moveTo(-26,-50);ctx.lineTo(26,-50);ctx.lineTo(34,-2);ctx.lineTo(-34,-2);ctx.closePath();ctx.fill();ctx.stroke();}
+  
+  // Eyes
+  ctx.fillStyle=eyeColor;
   const es=Math.floor(sr(0,3));
-  if(es===0){ctx.beginPath();ctx.ellipse(-11,-27,8,6,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,8,6,0,0,Math.PI*2);ctx.fill();}
-  else if(es===1){ctx.beginPath();ctx.arc(-12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(12,-28,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(0,-38,5,0,Math.PI*2);ctx.fill();}
-  else{ctx.beginPath();ctx.ellipse(-11,-27,9,4,-0.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(11,-27,9,4,0.2,0,Math.PI*2);ctx.fill();}
-  ctx.shadowBlur=0; ctx.fillStyle='rgba(0,0,0,0.5)';
-  ctx.beginPath();ctx.arc(-11,-27,3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(11,-27,3,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=accentColor; ctx.lineWidth=2;
-  ctx.beginPath();
-  if(hp_ratio<0.3){ctx.arc(0,-12,12,0.3,Math.PI-0.3,true);}
-  else{ctx.arc(0,-8,10,0.2,Math.PI-0.2);}
-  ctx.stroke();
-  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.25;ctx.fillStyle='#ff0000';ctx.beginPath();ctx.arc(0,0,60,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  if(es===0){ctx.beginPath();ctx.rect(-15,-30,10,10);ctx.fill();ctx.beginPath();ctx.rect(5,-30,10,10);ctx.fill();}
+  else if(es===1){ctx.beginPath();ctx.rect(-12,-28,6,6);ctx.fill();ctx.beginPath();ctx.rect(12,-28,6,6);ctx.fill();ctx.beginPath();ctx.rect(-3,-38,6,6);ctx.fill();}
+  else{ctx.beginPath();ctx.rect(-15,-27,12,6);ctx.fill();ctx.beginPath();ctx.rect(3,-27,12,6);ctx.fill();}
+  
+  ctx.fillStyle='#020617';
+  ctx.beginPath();ctx.rect(-11,-27,4,4);ctx.fill();
+  ctx.beginPath();ctx.rect(9,-27,4,4);ctx.fill();
+  
+  // Mouth
+  ctx.strokeStyle=accentColor; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(-10,-10); ctx.lineTo(10,-10); ctx.stroke();
+  
+  if((1-hp_ratio)>0){ctx.globalAlpha=(1-hp_ratio)*0.5;ctx.fillStyle='#f43f5e';ctx.beginPath();ctx.rect(-60,-60,120,120);ctx.fill();ctx.globalAlpha=1;}
   ctx.restore();
 }
 
@@ -1235,14 +1250,16 @@ function renderSettingsCharacters(){
     const isActive=s.id===STATE.activeSaveId;
     const ranks=RANKS; let r=ranks[0]; ranks.forEach(x=>{ if(s.player.totalXp>=x.xp) r=x; });
     const div=document.createElement('div');
-    div.className=`flex items-center gap-3 p-4 rounded-xl border-[3px] transition-all ${isActive?'border-primary bg-primary/10':'border-outline-variant/40 hover:border-primary/50'}`;
-    div.innerHTML=`<div class="flex-1 cursor-pointer" onclick="switchCharacter('${s.id}')"><p class="font-headline font-extrabold text-on-surface text-base">${s.player.name}</p><p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">${r.name} · ${s.player.totalXp} XP</p></div>${isActive?'<span class="text-[9px] font-black uppercase tracking-widest text-primary bg-primary/20 px-2 py-1 rounded-md">ACTIVE</span>':''}<button onclick="deleteCharacter('${s.id}',event)" class="text-outline hover:text-error transition-colors bg-surface-container-lowest p-2 rounded-full shadow-sm"><span class="material-symbols-outlined text-lg">delete</span></button>`;
+    
+    div.className=`flex items-center gap-4 p-5 rounded-xl border-2 transition-all ${isActive?'border-primary bg-primary/10 shadow-[0_4px_0_0_rgba(59,130,246,0.3)]':'border-outline bg-surface-container hover:border-primary/50 shadow-sm'}`;
+    
+    div.innerHTML=`<div class="flex-1 cursor-pointer min-w-0" onclick="switchCharacter('${s.id}')"><p class="font-headline text-on-surface text-sm truncate mb-2">${s.player.name}</p><p class="text-[10px] text-on-surface-variant font-mono font-bold uppercase tracking-widest">${r.name} · ${s.player.totalXp} XP</p></div>${isActive?'<span class="text-[9px] font-headline text-primary bg-primary/20 px-3 py-2 rounded-lg border border-primary/30">ACTIVE</span>':''}<button onclick="deleteCharacter('${s.id}',event)" class="text-on-surface-variant hover:text-error transition-colors bg-surface-container-highest p-3 rounded-lg border border-outline shadow-sm ml-2"><span class="material-symbols-outlined text-base block">delete</span></button>`;
     list.appendChild(div);
   });
 }
 
-window.switchCharacter=function(id){ STATE.activeSaveId=id; syncActiveSaveToState(); saveState(); STATE.activeQuestIdx=null; STATE.quizCurrent=0; renderHub(); renderSettingsCharacters(); closeApiModal(); showToast(`Switched to ${STATE.player.name}`); };
-window.deleteCharacter=function(id,event){ event.stopPropagation(); if(!confirm("Banish this companion forever?")) return; STATE.saves=STATE.saves.filter(s=>s.id!==id); if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.curriculums=[]; saveState(); closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='none'; } else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); } };
+window.switchCharacter=function(id){ STATE.activeSaveId=id; syncActiveSaveToState(); saveState(); STATE.activeQuestIdx=null; STATE.quizCurrent=0; renderHub(); renderSettingsCharacters(); closeApiModal(); showToast(`Loaded: ${STATE.player.name}`); };
+window.deleteCharacter=function(id,event){ event.stopPropagation(); if(!confirm("Delete this save file permanently?")) return; STATE.saves=STATE.saves.filter(s=>s.id!==id); if(!STATE.saves.length){ STATE.activeSaveId=null; STATE.player=null; STATE.quests=[]; STATE.curriculums=[]; saveState(); closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='none'; } else { if(STATE.activeSaveId===id){ STATE.activeSaveId=STATE.saves[0].id; syncActiveSaveToState(); renderHub(); } saveState(); renderSettingsCharacters(); } };
 window.createNewCharacter=function(){ closeApiModal(); showScreen('screen-path'); startPathMonster(); document.getElementById('path-cancel-btn').style.display='block'; };
 
 // ── MODALS ──────────────────────────────────────────
@@ -1262,7 +1279,7 @@ window.openChapterModal=function(chapterIdx){
   if(!quest.completed) quest.completed=new Array(chapters.length).fill(false);
   const done=quest.completed[chapterIdx];
   document.getElementById('chapter-modal-title').textContent=ch?.title||"Chapter";
-  document.getElementById('chapter-modal-tag').textContent=(ch?.tag||'PART')+' · CHAPTER '+(chapterIdx+1);
+  document.getElementById('chapter-modal-tag').textContent=(ch?.tag||'PART')+' // CHAPTER '+(chapterIdx+1);
   document.getElementById('chapter-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
   document.getElementById('chapter-complete-btn').style.display=done?'none':'flex';
@@ -1283,8 +1300,6 @@ async function loadChapterContent(chapterIdx){
   const ch=chapters[chapterIdx];
   if(!ch) return;
 
-  // Build a compact summary of what prior chapters taught
-  // so the AI knows not to re-explain those concepts
   let previousChaptersSummary = '';
   if(chapterIdx > 0){
     const prevSummaries = chapters.slice(0, chapterIdx).map((c, i) => {
@@ -1304,16 +1319,12 @@ async function loadChapterContent(chapterIdx){
         chapterSummary: ch.summary,
         chapterNumber: chapterIdx + 1,
         totalChapters: chapters.length,
-        // Pass pedagogy data from the curriculum plan
         learningOutcomes: ch.learningOutcomes || [],
         keyConceptsToTeach: ch.keyConceptsToTeach || [],
         commonMisconceptions: ch.commonMisconceptions || [],
-        // Pass curriculum-level context
         curriculumMeta: quest.curriculumMeta || null,
-        // Pass prior chapter context for continuity
         previousChaptersSummary: previousChaptersSummary || '',
-        
-        // --- NEW SVG VISUAL INSTRUCTIONS ---
+        // The SVG rules - Backend will inject this!
         visualStyle: "svg",
         formattingRules: "Break up text heavily. Use lists. Include exactly one visual diagram using raw inline HTML <svg> code to explain the most complex concept. Use 'currentColor' for all strokes and fills so it inherits the terminal's CSS color. Do not use background colors."
       }
@@ -1322,12 +1333,11 @@ async function loadChapterContent(chapterIdx){
     saveState();
     renderChapterContent(content);
   }catch(e){
-    document.getElementById('chapter-content-area').innerHTML=`<p class="text-error text-sm font-bold">Failed to load: ${e.message}</p>`;
+    document.getElementById('chapter-content-area').innerHTML=`<div class="bg-error/10 border-2 border-error p-4 rounded-xl text-error font-mono font-bold text-sm">Failed to load protocol: ${e.message}</div>`;
   }
 }
 
 function renderChapterContent(html){ 
-  // --- UPDATED DOMPURIFY CONFIGURATION TO ALLOW SVGS ---
   const cleanHtml = DOMPurify.sanitize(html, {
     ADD_TAGS: ['svg', 'path', 'circle', 'rect', 'line', 'polygon', 'polyline', 'text', 'g'],
     ADD_ATTR: ['viewBox', 'stroke', 'fill', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'points', 'stroke-width', 'stroke-dasharray', 'opacity', 'text-anchor', 'font-size', 'font-family', 'transform', 'class']
@@ -1353,12 +1363,13 @@ window.markChapterComplete=async function(){
   const btn=document.getElementById('boss-complete-btn');
   if(btn){
     btn.disabled=false;
-    btn.textContent=allDone?'INITIATE INTERROGATION':`CHALLENGE BOSS (${quest.completed.filter(Boolean).length}/${chapters.length})`;
+    btn.innerHTML=allDone?'<span class="material-symbols-outlined text-lg">swords</span> INITIATE BATTLE':`<span class="material-symbols-outlined text-lg">swords</span> BATTLE (${quest.completed.filter(Boolean).length}/${chapters.length})`;
+    if(allDone) btn.className = 'bubbly-btn w-full max-w-md py-5 bg-error text-on-error font-headline text-xs rounded-xl flex items-center justify-center gap-3 uppercase mt-2';
   }
   if(allDone){
-    showToast('All chapters complete! Challenge the boss 🗡');
+    showToast('All chapters cleared. The boss awaits.');
   } else {
-    showToast('Chapter complete! +20 XP');
+    showToast('Chapter cleared. +20 EXP');
   }
 };
 
@@ -1366,26 +1377,24 @@ window.markChapterComplete=async function(){
 function shouldShowGambit(){ return STATE.player.bossesDefeated>=2||STATE.player.gambitUsed>0; }
 window.tryOpenBattle=function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
-  // Always clear cached quiz so difficulty is recalculated fresh
   if(quest.defeated){ quest.quiz=null; quest.bossHp=quest.bossMaxHp; }
-  // Also clear if overdue status changed (so 5-option quiz kicks in)
   if(isHarderQuiz(quest) && quest.quiz && quest.quiz._mode !== 'hard') { quest.quiz=null; }
   if(shouldShowGambit()&&!quest.defeated) window.openGambitModal(); else window.openBattleModal();
 };
 window.openGambitModal=function(){ STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false; document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200); document.getElementById('gambit-slider').value=0; window.updateGambitWager(0); document.getElementById('gambit-result').textContent=''; document.getElementById('gambit-coin').textContent='casino'; document.getElementById('gambit-coin').style.color=''; document.getElementById('gambit-modal').classList.add('open'); document.getElementById('modal-backdrop').classList.remove('hidden'); };
 window.closeGambitModal=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); window.openBattleModal(); };
-window.updateGambitWager=function(val){ STATE.gambitWager=parseInt(val)||0; document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0?'No Wager (Safe Path)':`Wagering ${STATE.gambitWager} XP`; };
-window.spinGambitCoin=function(){ if(STATE.gambitRevealed) return; STATE.gambitRevealed=true; const coin=document.getElementById('gambit-coin'); coin.classList.add('gambit-coin-spin'); setTimeout(()=>{ coin.classList.remove('gambit-coin-spin'); const lucky=Math.random()<0.5; coin.textContent=lucky?'check_circle':'cancel'; coin.style.color=lucky?'#006668':'#b41340'; document.getElementById('gambit-result').textContent=lucky?'Heaven smiles ☉ — Double XP if you win perfectly!':'The earth is indifferent. Gambit resolved fairly.'; STATE.gambitActive=STATE.gambitWager>0; },1500); };
+window.updateGambitWager=function(val){ STATE.gambitWager=parseInt(val)||0; document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0?'No Wager (Safe)':`Wagering ${STATE.gambitWager} EXP`; };
+window.spinGambitCoin=function(){ if(STATE.gambitRevealed) return; STATE.gambitRevealed=true; const coin=document.getElementById('gambit-coin'); coin.classList.add('gambit-coin-spin'); setTimeout(()=>{ coin.classList.remove('gambit-coin-spin'); const lucky=Math.random()<0.5; coin.textContent=lucky?'check_circle':'cancel'; coin.style.color=lucky?'#10b981':'#f43f5e'; document.getElementById('gambit-result').textContent=lucky?'Critical Success! Double EXP if you win perfectly!':'The house wins. Wager lost if defeated.'; STATE.gambitActive=STATE.gambitWager>0; },1500); };
 window.proceedAfterGambit=function(){ document.getElementById('gambit-modal').classList.remove('open'); document.getElementById('modal-backdrop').classList.add('hidden'); if(!STATE.player.gambitUsed) STATE.player.gambitUsed=0; if(STATE.gambitWager>0) STATE.player.gambitUsed++; window.openBattleModal(); };
 
 // ── FATE SCROLL ──────────────────────────────────────
 const FATE_EVENTS=[
-  {text:'+50',bonus:'The ancestors nod in approval.',xp:50},
-  {text:'+80',bonus:'A celestial storm of knowledge!',xp:80},
-  {text:'+100',bonus:'Perfect alignment of heaven and earth.',xp:100},
-  {text:'+20',bonus:'A humble blessing.',xp:20},
-  {text:'+150',bonus:"A dragon's blessing! The realm takes notice.",xp:150},
-  {text:'+60',bonus:'Victory echoes through the scrolls.',xp:60},
+  {text:'+50',bonus:'The Archive acknowledges your progress.',xp:50},
+  {text:'+80',bonus:'A classified sector unlocks briefly.',xp:80},
+  {text:'+100',bonus:'Perfect alignment. System overrides granted.',xp:100},
+  {text:'+20',bonus:'A small data packet recovered.',xp:20},
+  {text:'+150',bonus:"Deep vault access granted. Rare intel.",xp:150},
+  {text:'+60',bonus:'Guardian protocol weakened further.',xp:60},
 ];
 let fateScrollRevealed=false,pendingFateEvent=null;
 
@@ -1408,13 +1417,18 @@ window.openBattleModal=async function(){
   document.getElementById('finishing-blow').classList.add('hidden');
   document.getElementById('finishing-blow').classList.remove('flex');
 
-  // Show harder mode warning
   const streakEl = document.getElementById('quiz-progress-streak');
-  if(harder) streakEl.textContent = '⚠ HARD MODE — 5 OPTIONS';
-  else streakEl.textContent = 'STREAK: 0';
+  const streakMobile = document.getElementById('quiz-progress-streak-mobile');
+  if(harder) {
+      streakEl.textContent = '⚠ HARD MODE (5 OPT)';
+      streakMobile.textContent = '⚠ HARD MODE';
+  } else {
+      streakEl.textContent = 'STREAK: 0';
+      streakMobile.textContent = 'STREAK: 0';
+  }
 
   if(!quest.quiz?.questions){
-    document.getElementById('quiz-question').textContent='Preparing your trial...';
+    document.getElementById('quiz-question').textContent='Generating battle instance...';
     document.getElementById('quiz-options').innerHTML='';
     try{
       const chapterContents = Object.values(quest.chapterContent||{})
@@ -1436,10 +1450,10 @@ window.openBattleModal=async function(){
       quest.quiz=parsed;
       if(!quest.quiz.questions) quest.quiz.questions=[];
       saveState();
-    }catch(e){ document.getElementById('quiz-question').textContent='Error: '+e.message; return; }
+    }catch(e){ document.getElementById('quiz-question').innerHTML=`<span class="text-error">Error loading battle: ${e.message}</span>`; return; }
   }
 
-  if(!(quest.quiz.questions||[]).length){ document.getElementById('quiz-question').textContent='The demon cowers. You win!'; STATE.quizScore=5; quest.quiz.questions=new Array(5); finishQuiz(quest); return; }
+  if(!(quest.quiz.questions||[]).length){ document.getElementById('quiz-question').textContent='The entity glitches and crashes. You win.'; STATE.quizScore=5; quest.quiz.questions=new Array(5); finishQuiz(quest); return; }
   STATE.quizCurrent=0; STATE.quizScore=0;
   STATE.currentQuestHarder = harder;
   renderQuizQuestion(quest);
@@ -1449,19 +1463,23 @@ function renderQuizQuestion(quest){
   const questions=quest.quiz.questions||[];
   const q=questions[STATE.quizCurrent]; if(!q) return;
   const harder = STATE.currentQuestHarder || false;
-  if(harder) document.getElementById('quiz-progress-streak').textContent=`⚠ HARD MODE · Q${STATE.quizCurrent+1}/${questions.length}`;
-  else document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`;
+  
+  const streakText = harder ? `⚠ HARD MODE · Q${STATE.quizCurrent+1}/${questions.length}` : `STREAK: ${STATE.quizScore}`;
+  document.getElementById('quiz-progress-streak').textContent=streakText;
+  document.getElementById('quiz-progress-streak-mobile').textContent=streakText;
+  
   document.getElementById('quiz-question').textContent=q.question||'...';
   document.getElementById('quiz-feedback').textContent='';
+  document.getElementById('quiz-feedback').classList.add('hidden');
+  
   const opts=document.getElementById('quiz-options'); opts.innerHTML='';
   const labels=['A','B','C','D','E'];
-  // In harder mode show all options (up to 5); in normal mode cap at 4
   const options = harder ? (q.options||[]) : (q.options||[]).slice(0,4);
-  // If harder mode but only 4 options exist, still show all 4
+  
   options.forEach((opt,i)=>{
     const btn=document.createElement('button');
-    btn.className='flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border-[3px] border-outline-variant hover:border-primary group transition-all active:translate-y-1 active:border-b-0 border-b-[5px] text-left w-full shadow-sm';
-    btn.innerHTML=`<span class="w-10 h-10 flex-shrink-0 rounded-full bg-surface-container-high flex items-center justify-center font-extrabold text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors text-base">${labels[i]||String.fromCharCode(65+i)}</span><span class="font-body font-bold text-sm text-on-surface">${opt}</span>`;
+    btn.className='flex items-center gap-4 bg-surface-container-highest p-4 rounded-xl border-2 border-outline hover:border-primary group transition-all text-left w-full shadow-[0_4px_0_0_#020617] hover:shadow-[0_4px_0_0_rgba(59,130,246,0.6)] hover:-translate-y-1 active:translate-y-1 active:shadow-none';
+    btn.innerHTML=`<span class="w-10 h-10 flex-shrink-0 rounded-lg bg-surface-container border border-outline flex items-center justify-center font-headline text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors text-sm shadow-sm">${labels[i]||String.fromCharCode(65+i)}</span><span class="font-mono font-bold text-sm text-on-surface leading-tight">${opt}</span>`;
     btn.addEventListener('click',()=>answerQuestion(i,quest));
     opts.appendChild(btn);
   });
@@ -1472,17 +1490,43 @@ function answerQuestion(chosen,quest){
   const questions=quest.quiz.questions||[];
   const q=questions[STATE.quizCurrent];
   const correct=q.correct;
-  document.querySelectorAll('#quiz-options button').forEach(o=>o.disabled=true);
+  document.querySelectorAll('#quiz-options button').forEach(o=>{
+      o.disabled=true;
+      o.classList.remove('hover:-translate-y-1', 'hover:border-primary', 'hover:shadow-[0_4px_0_0_rgba(59,130,246,0.6)]');
+  });
   const optNodes=document.querySelectorAll('#quiz-options button');
-  if(optNodes[correct]){ optNodes[correct].classList.replace('bg-surface-container-lowest','bg-primary-container/10'); optNodes[correct].classList.replace('border-outline-variant','border-primary'); const s=optNodes[correct].querySelector('span:first-child'); if(s) s.className='w-12 h-12 flex-shrink-0 rounded-full bg-primary flex items-center justify-center font-extrabold text-on-primary text-lg'; }
+  
+  if(optNodes[correct]){ 
+      optNodes[correct].classList.replace('bg-surface-container-highest','bg-tertiary/10'); 
+      optNodes[correct].classList.replace('border-outline','border-tertiary'); 
+      const s=optNodes[correct].querySelector('span:first-child'); 
+      if(s) s.className='w-10 h-10 flex-shrink-0 rounded-lg bg-tertiary flex items-center justify-center font-headline text-on-tertiary text-sm shadow-sm'; 
+  }
+  
   const isRight=chosen===correct;
-  if(!isRight&&optNodes[chosen]){ optNodes[chosen].classList.replace('bg-surface-container-lowest','bg-error/10'); optNodes[chosen].classList.replace('border-outline-variant','border-error'); const s=optNodes[chosen].querySelector('span:first-child'); if(s) s.className='w-12 h-12 flex-shrink-0 rounded-full bg-error flex items-center justify-center font-extrabold text-on-error text-lg'; }
-  document.getElementById('quiz-feedback').textContent=isRight?`✓ Correct — ${q.explanation||''}`:`✗ Incorrect — ${q.explanation||''}`;
-  if(isRight){ STATE.quizScore++; document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`; }
+  if(!isRight&&optNodes[chosen]){ 
+      optNodes[chosen].classList.replace('bg-surface-container-highest','bg-error/10'); 
+      optNodes[chosen].classList.replace('border-outline','border-error'); 
+      const s=optNodes[chosen].querySelector('span:first-child'); 
+      if(s) s.className='w-10 h-10 flex-shrink-0 rounded-lg bg-error flex items-center justify-center font-headline text-on-error text-sm shadow-sm'; 
+  }
+  
+  const fb = document.getElementById('quiz-feedback');
+  fb.classList.remove('hidden');
+  fb.innerHTML=isRight?`<span class="text-tertiary font-headline text-xs block mb-2">CORRECT HIT</span>${q.explanation||''}`:`<span class="text-error font-headline text-xs block mb-2">MISS</span>${q.explanation||''}`;
+  
+  if(isRight){ STATE.quizScore++; document.getElementById('quiz-progress-streak').textContent=`STREAK: ${STATE.quizScore}`; document.getElementById('quiz-progress-streak-mobile').textContent=`STREAK: ${STATE.quizScore}`;}
   const dmg=isRight?Math.ceil(100/questions.length):0;
-  if(dmg>0){ quest.bossHp=Math.max(0,quest.bossHp-dmg); showDamageFloat(dmg); const bc=document.getElementById('battle-boss-canvas'); bc.style.transform='translateX(-6px)'; setTimeout(()=>bc.style.transform='scale(1.05)',150); setTimeout(()=>bc.style.transform='',400); }
+  if(dmg>0){ 
+      quest.bossHp=Math.max(0,quest.bossHp-dmg); 
+      showDamageFloat(dmg); 
+      const bc=document.getElementById('battle-boss-canvas'); 
+      bc.style.transform='translateX(-10px)'; 
+      setTimeout(()=>bc.style.transform='scale(1.1)',150); 
+      setTimeout(()=>bc.style.transform='',400); 
+  }
   updateBattleHp(quest); saveState();
-  setTimeout(()=>{ STATE.quizCurrent++; if(STATE.quizCurrent>=questions.length) finishQuiz(quest); else renderQuizQuestion(quest); },1800);
+  setTimeout(()=>{ STATE.quizCurrent++; if(STATE.quizCurrent>=questions.length) finishQuiz(quest); else renderQuizQuestion(quest); },2500);
 }
 
 function finishQuiz(quest){
@@ -1495,29 +1539,30 @@ function finishQuiz(quest){
   document.getElementById('finishing-blow').classList.remove('hidden');
   document.getElementById('finishing-blow').classList.add('flex');
   if(perfect){
-    document.getElementById('finishing-text').textContent='⚡ FINAL STRIKE ⚡';
-    document.getElementById('victory-lore').textContent=`Perfect mastery! ${quest.bossName} crumbles before ${STATE.player.name}. The knowledge sealed within surges free.`;
+    document.getElementById('finishing-text').textContent='K.O. PERFECT';
+    document.getElementById('finishing-text').className='font-headline text-xl md:text-3xl text-secondary crt-glow-amber';
+    document.getElementById('victory-lore').textContent=`Flawless execution! ${quest.bossName} has been deleted from the sector.`;
     STATE.player.perfectRuns++; STATE.player.xp+=50; STATE.player.totalXp+=50;
-    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp+=STATE.gambitWager; STATE.player.totalXp+=STATE.gambitWager; STATE.gambitActive=false; showToast(`🎰 Gambit pays off! +${STATE.gambitWager} XP!`); }
+    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp+=STATE.gambitWager; STATE.player.totalXp+=STATE.gambitWager; STATE.gambitActive=false; showToast(`🎰 GAMBIT WON! +${STATE.gambitWager} EXP!`); }
   } else {
-    document.getElementById('finishing-text').textContent='⚔ BATTLE END ⚔';
-    document.getElementById('victory-lore').textContent=`${STATE.quizScore}/${qLen} correct. ${quest.bossName} is weakened but not defeated. Study further.`;
-    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager); STATE.gambitActive=false; showToast(`⚠ Gambit lost! -${STATE.gambitWager} XP`); }
+    document.getElementById('finishing-text').textContent='STAGE CLEAR';
+    document.getElementById('finishing-text').className='font-headline text-xl md:text-2xl text-primary crt-glow';
+    document.getElementById('victory-lore').textContent=`Score: ${STATE.quizScore}/${qLen}. ${quest.bossName} retreats to recover.`;
+    if(STATE.gambitActive&&STATE.gambitWager>0){ STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager); STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager); STATE.gambitActive=false; showToast(`⚠ GAMBIT LOST! -${STATE.gambitWager} EXP`); }
     if(STATE.quizScore>=Math.ceil(qLen*0.6)) quest.bossHp=0;
   }
   if(quest.bossHp===0){
     if(!wasAlreadyDefeated){
       quest.defeated=true; STATE.player.bossesDefeated++; STATE.player.xp+=100; STATE.player.totalXp+=100; checkRankUp();
-      // Show victory info in battle modal
       const clueSection = document.getElementById('clue-reveal-section');
       if(clueSection) {
         clueSection.classList.remove('hidden');
         const clueContent = document.getElementById('clue-reveal-content');
-        if(clueContent) clueContent.innerHTML = `<div class="text-[9px] font-mono text-primary/60 tracking-widest mb-2">⚡ VAULT RESOURCES ACQUIRED</div><div class="flex gap-4 text-sm">${perfect?'<span>⚡+12 💰+40 🔩+3</span>':'<span>⚡+8 💰+20</span>'}</div><div class="text-[9px] font-mono text-on-surface-variant/50 mt-1">Resources added to your vault</div>`;
+        if(clueContent) clueContent.innerHTML = `<div class="text-[9px] font-headline text-secondary mb-3">SYSTEM REWARDS DUMP</div><div class="flex gap-4 text-sm font-mono font-bold">${perfect?'<span>+150 EXP 🌟</span>':'<span>+100 EXP</span>'}</div>`;
       }
     } else {
       STATE.player.xp+=30; STATE.player.totalXp+=30; checkRankUp();
-      showToast('Rematch won! +30 XP');
+      showToast('Rematch won! +30 EXP');
     }
   } else { quest.bossHp=quest.bossMaxHp; }
   updateBattleHp(quest); saveState();
@@ -1530,19 +1575,16 @@ window.claimVictory=function(){
   const btn=document.getElementById('boss-complete-btn');
   if(quest.defeated){
     btn.disabled=false;
-    btn.innerHTML='<span class="material-symbols-outlined">swords</span> Challenge Again';
-    btn.className='bubbly-btn w-full py-4 bg-secondary text-on-secondary font-headline font-extrabold rounded-full border-b-[5px] border-secondary-dim flex items-center justify-center gap-2 shadow-xl mt-4';
+    btn.innerHTML='<span class="material-symbols-outlined text-lg">swords</span> REMATCH';
+    btn.className='bubbly-btn w-full max-w-md py-5 bg-secondary text-on-secondary font-headline text-xs rounded-xl flex items-center justify-center gap-3 uppercase mt-2';
   }
   updateBossHpDisplay(quest); renderHub();
   if(quest.bossHp===0){
-    // Hide clue section for next time
     const cs = document.getElementById('clue-reveal-section');
     if(cs) cs.classList.add('hidden');
-    // Fate scroll (Intel drop)
     setTimeout(()=>openFateScrollModal(), 600);
-    // Refresh clue board
   } else {
-    showToast('Battle concluded. Study harder.');
+    showToast('Battle Concluded.');
   }
 };
 
@@ -1550,170 +1592,21 @@ function updateBattleHp(quest){ const r=quest.bossHp/quest.bossMaxHp; document.g
 
 function showDamageFloat(val){ const el=document.getElementById('damage-floater'); el.textContent=`-${val}`; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); }
 
-
-// ── RENAME ───────────────────────────────────────────
-window.renameCharacter=function(){ const n=prompt("New companion name:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
-
-// ══════════════════════════════════════════════════════
-//  BACKGROUND COLLECTION SYSTEM
-// ══════════════════════════════════════════════════════
-
-const BACKGROUNDS = [
-  {
-    id: 'forest',
-    name: 'Floating Forest',
-    unlocked_by_default: true,
-    css: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAPZCs5a3RwbMb794owsV_x0gOKrZA0RdUj60NKbT3AGiZg6OQKbzLWB5La46_j8o49795z8Ch0Vb2iQobQmMZ9Fi8kVG8lC9TIgCy2Lkj_eYPvotPqCDUdcZEM04iyjBj4jZW0Lu3fBSjZ6q0n4b-vInwB2K2j82iRguFKGxabexVdRZ5wAgLNdVq9Gslv6LmDpcx7smh1T5ZurnoXXgizc2cr8dfmthI3LDTyPRVrEdURGroKVHlEm7VjqmgIHfuDKh4CRzTjylY',
-    emoji: '🌲'
-  },
-  {
-    id: 'cosmos',
-    name: 'Cosmic Void',
-    unlocked_by_default: false,
-    css: 'linear-gradient(135deg, #0d0d2b 0%, #1a0533 50%, #0d1b4d 100%)',
-    img: null,
-    emoji: '🌌'
-  },
-  {
-    id: 'volcano',
-    name: 'Lava Peaks',
-    unlocked_by_default: false,
-    css: 'linear-gradient(135deg, #3e0000 0%, #7f1500 50%, #bf360c 100%)',
-    img: null,
-    emoji: '🌋'
-  },
-  {
-    id: 'ocean',
-    name: 'Deep Ocean',
-    unlocked_by_default: false,
-    css: 'linear-gradient(135deg, #0d47a1 0%, #006064 50%, #00838f 100%)',
-    img: null,
-    emoji: '🌊'
-  },
-  {
-    id: 'sakura',
-    name: 'Sakura Garden',
-    unlocked_by_default: false,
-    css: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%)',
-    img: null,
-    emoji: '🌸'
-  },
-  {
-    id: 'storm',
-    name: 'Thunder Realm',
-    unlocked_by_default: false,
-    css: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    img: null,
-    emoji: '⚡'
-  },
-];
-
-function getBgData(id) { return BACKGROUNDS.find(b => b.id === id) || BACKGROUNDS[0]; }
-
-function getActiveBg() {
-  const bg = STATE.player?.collection?.activeBg;
-  return bg ? getBgData(bg) : BACKGROUNDS[0];
-}
-
-function getUnlockedBgs() {
-  const col = STATE.player?.collection;
-  if (!col) return ['forest'];
-  return col.backgrounds || ['forest'];
-}
-
-
-
-// Roll for background unlock after boss defeat
-
-
-function showBgUnlockModal(bg, isNew) {
-  document.getElementById('bg-unlock-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-  document.getElementById('bg-unlock-question').classList.remove('hidden');
-  document.getElementById('bg-unlock-reveal').classList.add('hidden');
-  document.getElementById('bg-unlock-close-btn').classList.add('hidden');
-
-  setTimeout(() => {
-    document.getElementById('bg-unlock-question').classList.add('hidden');
-    const reveal = document.getElementById('bg-unlock-reveal');
-    reveal.classList.remove('hidden');
-    reveal.classList.add('flex');
-    document.getElementById('bg-unlock-name').textContent = bg.name;
-    const preview = document.getElementById('bg-unlock-preview');
-    preview.style.background = bg.css;
-    if (bg.img) preview.style.backgroundImage = `url('${bg.img}')`;
-    preview.style.backgroundSize = 'cover';
-    preview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:rgba(0,0,0,0.1)">${bg.emoji}</div>`;
-    document.getElementById('bg-dupe-badge').classList.toggle('hidden', isNew);
-    document.getElementById('bg-unlock-close-btn').classList.remove('hidden');
-  }, 1000);
-}
-
-window.closeBgUnlockModal = function() {
-  document.getElementById('bg-unlock-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  document.getElementById('bg-unlock-reveal').classList.remove('flex');
-  renderBgCountLabel();
-};
-
-function renderBgGrid() {
-  const grid = document.getElementById('bg-collection-grid');
-  if (!grid) return;
-  const unlocked = getUnlockedBgs();
-  const activeBgId = getActiveBg().id;
-  grid.innerHTML = '';
-  BACKGROUNDS.forEach(bg => {
-    const isUnlocked = bg.unlocked_by_default || unlocked.includes(bg.id);
-    const isActive = bg.id === activeBgId;
-    const card = document.createElement('div');
-    card.className = `rounded-xl overflow-hidden border-[3px] cursor-pointer transition-all ${isActive ? 'border-secondary shadow-lg scale-[1.02]' : isUnlocked ? 'border-outline-variant hover:border-secondary' : 'border-outline-variant/30 opacity-50 cursor-not-allowed'}`;
-
-    const previewDiv = `<div style="height:90px;background:${bg.css};background-size:cover;${bg.img?`background-image:url('${bg.img}');`:''}display:flex;align-items:center;justify-content:center;font-size:2rem;position:relative;">
-      ${bg.emoji}
-      ${isActive ? '<div style="position:absolute;top:4px;right:4px;background:#006668;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;">✓</div>' : ''}
-      ${!isUnlocked ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🔒</div>' : ''}
-    </div>`;
-
-    card.innerHTML = `
-      ${previewDiv}
-      <div class="p-2 bg-surface-container-lowest">
-        <p class="font-headline font-extrabold text-xs text-on-surface">${bg.name}</p>
-        <p class="text-[9px] text-on-surface-variant">${isUnlocked ? (isActive ? 'Active' : 'Tap to apply') : 'Defeat bosses to unlock'}</p>
-      </div>
-    `;
-
-    if (isUnlocked && !isActive) {
-      card.addEventListener('click', () => {
-        STATE.player.collection.activeBg = bg.id;
-        saveState();
-        applyActiveBg();
-        renderBgGrid();
-        renderBgCountLabel();
-        showToast(`${bg.emoji} ${bg.name} applied!`);
-      });
-    }
-    grid.appendChild(card);
-  });
-}
-
-
+window.renameCharacter=function(){ const n=prompt("New Player Alias:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
 
 
 async function callAI({action,payload,modelId}){
   try{
     const cfName = action==='summonQuest' ? 'summonQuest' : 'communeWithScrolls';
     const fn=httpsCallable(functions,cfName);
-    // For summonQuest: flatten payload to top level so CF can read topic/objective directly
-    // Also keep payload nested for new CF version
     const data = action==='summonQuest'
       ? { action, modelId:modelId||STATE.selectedModel, payload, ...payload }
       : { action, payload, modelId:modelId||STATE.selectedModel };
     const r=await fn(data);
     const text=r.data?.result||r.data?.text||r.data;
-    if(!text) throw new Error("The scrolls returned empty.");
+    if(!text) throw new Error("The API returned an empty payload.");
     return typeof text==='string' ? text : JSON.stringify(text);
-  }catch(e){ showToast("AI Error: "+(e.message||e)); throw e; }
+  }catch(e){ showToast("System Error: "+(e.message||e)); throw e; }
 }
 
 function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
@@ -1744,43 +1637,35 @@ window.confirmToastNo = function() {
 };
 function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-let evoActiveTypeId = "voidling";
 
 window.deleteCurriculum = function(curriculumId) {
-  if(!confirm('Delete this curriculum? Missions inside will move to default.')) return;
+  if(!confirm('Delete this folder? Missions inside will move to default.')) return;
   STATE.quests.forEach(q => { if(q.curriculumId === curriculumId) q.curriculumId = 'default'; });
   STATE.curriculums = STATE.curriculums.filter(c => c.id !== curriculumId);
   if(!STATE.curriculums.length) STATE.curriculums = [{id:'default',name:'My Curriculum'}];
   saveState(); renderQuestGrid();
-  showToast('Curriculum deleted.');
+  showToast('Folder deleted.');
 };
 
 window.renameCurriculum = function(curriculumId) {
   const cur = STATE.curriculums.find(c => c.id === curriculumId);
   if(!cur) return;
-  const name = prompt('Rename curriculum:', cur.name);
+  const name = prompt('Rename folder:', cur.name);
   if(name && name.trim()) { cur.name = name.trim(); saveState(); renderQuestGrid(); }
 };
 
-
-
-// ══════════════════════════════════════════════════════
-//  VAULT SIMULATION ENGINE
-// ══════════════════════════════════════════════════════
-
-
 const RANKS = [
-  { name:'Level 1',  en:'Tiny Sprout',         xp:0,    stageIdx:0  },
-  { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
-  { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
-  { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
-  { name:'Level 40',  en:'Gleaming Warden',   xp:900,  stageIdx:4  },
-  { name:'Level 50',  en:'Aura Walker',       xp:1400, stageIdx:5  },
-  { name:'Level 60',  en:'Sky Soarer',        xp:2000, stageIdx:6  },
-  { name:'Level 70',  en:'Astral Guardian',   xp:3000, stageIdx:7  },
-  { name:'Level 80',  en:'Celestial Being',   xp:4500, stageIdx:8  },
-  { name:'Level 90',  en:'Mythic Sovereign',  xp:6500, stageIdx:9  },
-  { name:'Level 100', en:'Eternal Legend',    xp:9000, stageIdx:10 },
+  { name:'Level 1',  en:'Novice',         xp:0,    stageIdx:0  },
+  { name:'Level 10',  en:'Apprentice',  xp:100,  stageIdx:1  },
+  { name:'Level 20',  en:'Explorer',   xp:250,  stageIdx:2  },
+  { name:'Level 30',  en:'Scholar',     xp:500,  stageIdx:3  },
+  { name:'Level 40',  en:'Veteran',   xp:900,  stageIdx:4  },
+  { name:'Level 50',  en:'Expert',       xp:1400, stageIdx:5  },
+  { name:'Level 60',  en:'Master',        xp:2000, stageIdx:6  },
+  { name:'Level 70',  en:'Grandmaster',   xp:3000, stageIdx:7  },
+  { name:'Level 80',  en:'Champion',   xp:4500, stageIdx:8  },
+  { name:'Level 90',  en:'Legend',  xp:6500, stageIdx:9  },
+  { name:'Level 100', en:'God Tier',    xp:9000, stageIdx:10 },
 ];
 
 function getRanks(){ return RANKS; }
@@ -1796,43 +1681,20 @@ function getCurrentRank(){
   return RANKS[getCurrentRankIdx()];
 }
 
-function getNextRank(){
-  const idx = getCurrentRankIdx();
-  return idx < RANKS.length - 1 ? RANKS[idx + 1] : null;
-}
-
-
-
-
-window.switchTab=function(tabId){
-  // Converted to simple single view re-render
-  renderHub();
-};
-window.openDeadlineModal = function() {
-  const quest = STATE.quests[STATE.activeQuestIdx];
-  if (!quest) return;
-  const inp = document.getElementById('deadline-date-input');
-  if (inp && quest.deadline) inp.value = quest.deadline;
-  else if (inp) inp.value = '';
-  document.getElementById('deadline-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-};
 window.dragQuest=function(ev,idx){ ev.dataTransfer.setData("text/plain",idx); ev.dataTransfer.effectAllowed='move'; };
 window.allowDrop=function(ev){ ev.preventDefault(); };
 window.dropQuest=function(ev,curriculumId){ ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const idx=ev.dataTransfer.getData("text/plain"); if(idx!==''&&STATE.quests[idx]){ STATE.quests[idx].curriculumId=curriculumId; saveState(); renderQuestGrid(); } };
 
 window.createNewFolder = function() {
-  const name = prompt('New curriculum name:', 'New Curriculum');
+  const name = prompt('New folder name:', 'New Folder');
   if (name && name.trim()) {
     if (!STATE.curriculums) STATE.curriculums = [];
     STATE.curriculums.push({id: Date.now().toString(), name: name.trim()});
     saveState(); renderQuestGrid();
-    showToast('Curriculum created.');
+    showToast('Folder created.');
   }
 };
 
-// ── GLOBAL FUNCTION EXPOSURE ─────────────────────────
-// Auth functions
 window.openSummonScreen = function() {
   const ss = document.getElementById('summon-screen');
   if(ss) ss.style.display = 'flex';
@@ -1841,17 +1703,14 @@ window.openSummonScreen = function() {
   if(form) form.classList.remove('hidden');
   if(prog) { prog.classList.add('hidden'); prog.classList.remove('flex'); }
   const ti = document.getElementById('summon-topic-input');
-  const oi = document.getElementById('summon-objective-input');
   if(ti) ti.value = '';
-  if(oi) oi.value = '';
-  // Reset prior knowledge to 'some'
-  window.setPriorKnowledge('none');
 };
 
 window.closeSummonScreen = function() {
   const ss = document.getElementById('summon-screen');
   if(ss) ss.style.display = 'none';
 };
+
 window.signInGoogle = async function() {
   const authBtns = document.getElementById('auth-buttons');
   const loadingEl = document.getElementById('loading-text');
@@ -1860,7 +1719,6 @@ window.signInGoogle = async function() {
   try {
     await signInWithPopup(auth, new GoogleAuthProvider());
   } catch(e) {
-    console.warn('Popup failed:', e.code);
     if(e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
       if(loadingEl) loadingEl.textContent = '> OPENING AUTH PAGE...';
       try { await signInWithRedirect(auth, new GoogleAuthProvider()); } catch(e2) {
@@ -1882,114 +1740,12 @@ window.signOutUser = async function() {
   catch(e) { showToast('Failed to sign out.'); }
 };
 
-// Save state (exposed to window for inline handlers)
-window.saveStateGlobal = function() { if(typeof saveState === 'function') saveState(); };
-
-// Chapter count selector
-window.setChapCount = function(n) {
-  if(typeof STATE !== 'undefined') STATE.summonChapters = n;
-  document.querySelectorAll('.chap-btn').forEach(b => {
-    const active = b.textContent.trim() === String(n);
-    b.classList.toggle('border-primary', active);
-    b.classList.toggle('bg-primary/10', active);
-    b.classList.toggle('text-primary', active);
-    b.classList.toggle('border-outline/40', !active);
-    b.classList.toggle('text-on-surface-variant', !active);
-  });
-};
-
-// New character / path screen
 window.showNewCharacter = function() {
   closeApiModal();
   const cancelBtn = document.getElementById('path-cancel-btn');
   if(cancelBtn) cancelBtn.style.display = 'block';
   showScreen('screen-path');
 };
-
-// Close all modals helper
-window.closeAllModals = function() {
-  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
-  const bd = document.getElementById('modal-backdrop');
-  if(bd) bd.classList.add('hidden');
-};
-
-// Open/close API settings modal
-window.openApiModal = function() {
-  renderSettingsCharacters();
-  const ms = document.getElementById('model-selector');
-  if(ms && typeof STATE !== 'undefined') ms.value = STATE.selectedModel || 'gemini-2.5-flash';
-  document.getElementById('api-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-};
-window.closeApiModal = function() {
-  document.getElementById('api-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-};
-
-// Evo / Memory modal
-// Gambit / fate modal helpers
-window.openGambitModal = function() {
-  STATE.gambitWager=0; STATE.gambitActive=false; STATE.gambitRevealed=false;
-  const sl = document.getElementById('gambit-slider');
-  if(sl) { sl.max = Math.min(STATE.player.totalXp, 200); sl.value = 0; }
-  window.updateGambitWager(0);
-  document.getElementById('gambit-result').textContent = '';
-  document.getElementById('gambit-coin').textContent = 'casino';
-  document.getElementById('gambit-coin').style.color = '';
-  document.getElementById('gambit-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-};
-window.closeGambitModal = function() {
-  document.getElementById('gambit-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  window.openBattleModal();
-};
-window.openFateScrollModal = function() {
-  const FATE_EVENTS = [
-    {text:'+50',bonus:'The archive acknowledges your progress.',xp:50},
-    {text:'+80',bonus:'A classified sector unlocks briefly.',xp:80},
-    {text:'+100',bonus:'Perfect alignment. The Director smiles.',xp:100},
-    {text:'+20',bonus:'A small data packet recovered.',xp:20},
-    {text:'+150',bonus:'Deep vault access granted. Rare intel.',xp:150},
-    {text:'+60',bonus:'Guardian protocol weakened further.',xp:60},
-  ];
-  window._fateEvent = FATE_EVENTS[Math.floor(Math.random()*FATE_EVENTS.length)];
-  window._fateRevealed = false;
-  const ri = document.getElementById('fate-reveal-area');
-  const fi = document.getElementById('fate-scroll-icon');
-  if(ri) { ri.style.display='none'; ri.classList.add('hidden'); }
-  if(fi) fi.style.display='flex';
-  document.getElementById('fate-modal').classList.add('open');
-  document.getElementById('modal-backdrop').classList.remove('hidden');
-};
-window.revealFateScroll = function() {
-  if(window._fateRevealed) return;
-  window._fateRevealed = true;
-  const ev = window._fateEvent;
-  document.getElementById('fate-scroll-icon').style.display = 'none';
-  const ri = document.getElementById('fate-reveal-area');
-  if(ri) { ri.classList.remove('hidden'); ri.style.display='flex'; }
-  document.getElementById('fate-reveal-text').textContent = ev.text;
-  document.getElementById('fate-bonus-text').textContent = ev.bonus;
-  if(ev.xp > 0) { STATE.player.xp += ev.xp; STATE.player.totalXp += ev.xp; }
-  checkRankUp(); saveState();
-};
-window.closeFateModal = function() {
-  document.getElementById('fate-modal').classList.remove('open');
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  renderHub();
-};
-
-// Rename character
-window.renameCharacter = function() {
-  const n = prompt('New operative codename:', STATE.player.name);
-  if(n && n.trim()) { STATE.player.name = n.trim(); saveState(); renderHub(); }
-};
-
-
-// ── RECOVERED GAME FUNCTIONS ────────────────────────
-
-
 
 window.openMoveModal = function() {
   const list = document.getElementById('move-curriculum-list');
@@ -2001,10 +1757,10 @@ window.openMoveModal = function() {
   list.innerHTML = curriculums.map(c => {
     const isCurrent = c.id === currentId;
     return `<button onclick="moveQuestTo('${c.id}')" ${isCurrent?'disabled':''}
-      class="w-full flex items-center gap-3 p-3 rounded border text-left transition-all font-mono text-xs ${isCurrent?'border-primary/30 bg-primary/5 opacity-60 cursor-not-allowed':'border-outline/30 hover:border-primary hover:bg-primary/5 cursor-pointer'}">
-      <span class="material-symbols-outlined text-primary text-base">folder_open</span>
-      <span class="text-on-surface flex-1 tracking-widest">${c.name.toUpperCase()}</span>
-      ${isCurrent?'<span class="text-[9px] font-mono text-primary tracking-widest">CURRENT</span>':''}
+      class="w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all font-mono text-xs font-bold ${isCurrent?'border-primary/30 bg-primary/5 opacity-60 cursor-not-allowed':'border-outline hover:border-primary hover:bg-primary/5 cursor-pointer shadow-sm'}">
+      <span class="material-symbols-outlined text-primary text-xl">folder_open</span>
+      <span class="text-on-surface flex-1">${c.name.toUpperCase()}</span>
+      ${isCurrent?'<span class="text-[9px] font-headline text-primary">CURRENT</span>':''}
     </button>`;
   }).join('');
   document.getElementById('move-modal').classList.add('open');
@@ -2030,16 +1786,6 @@ function renderQuestMeta(quest) {
   if(audienceEl) audienceEl.textContent = audience.toUpperCase();
 }
 
-window.launchNextTopic = function(topic) {
-  showHub();
-  setTimeout(() => {
-    // legacy switchTab
-    renderHub();
-    openSummonScreen();
-    setTimeout(() => { const inp=document.getElementById('summon-topic-input'); if(inp){inp.value=topic;inp.focus();} }, 100);
-  }, 100);
-};
-
 window.setSummonStatus = function(status, phase) {
   const statusEl = document.getElementById('summon-gen-status');
   const phaseEl = document.getElementById('summon-gen-step');
@@ -2047,53 +1793,27 @@ window.setSummonStatus = function(status, phase) {
   if(phaseEl && phase) phaseEl.textContent = phase;
 };
 
-const PRIOR_KNOWLEDGE_DESCS = {
-  none: 'AI generates 5 chapters that assume zero prior knowledge. Chapter 1 starts from first principles with simple analogies before building up.',
-  some: 'AI generates 5 chapters balancing foundations with practical depth. Skips the very basics but still covers core mechanics clearly.',
-  strong: 'AI generates 5 chapters that skip the 101-level content entirely. Dives immediately into advanced mechanics, nuanced edge cases, and expert-level strategy.',
-};
-
-window.setPriorKnowledge = function(level) {
-  STATE.priorKnowledge = level;
-  document.querySelectorAll('.prior-btn').forEach(btn => {
-    const isActive = btn.dataset.level === level;
-    btn.classList.toggle('border-primary/50', isActive);
-    btn.classList.toggle('bg-primary/5', isActive);
-    btn.classList.toggle('active-prior', isActive);
-    btn.classList.toggle('border-outline/30', !isActive);
-  });
-  const desc = document.getElementById('prior-knowledge-desc');
-  if(desc) desc.textContent = PRIOR_KNOWLEDGE_DESCS[level] || '';
-};
-
 
 window.doSummonQuest = async function() {
   const topic = document.getElementById('summon-topic-input')?.value.trim();
-  if(!topic){ showToast('Please enter a topic.'); return; }
+  if(!topic){ showToast('Please enter a target.'); return; }
   const objective = document.getElementById('summon-objective-input')?.value.trim();
-  const priorKnowledge = STATE.priorKnowledge || 'none';
-  const numChapters = 5; // Fixed 5-chapter structure
+  const priorKnowledge = 'some';
+  const numChapters = 5; 
   document.getElementById('summon-form-side').classList.add('hidden');
   document.getElementById('summoning-progress').classList.remove('hidden');
   document.getElementById('summoning-progress').classList.add('flex');
   try {
-    setSummonStatus('ANALYSING SUBJECT MATTER...','PHASE 1 · DISAMBIGUATION');
+    setSummonStatus('ANALYSING TARGET...','PHASE 1');
     const raw = await callAI({action:'summonQuest',payload:{topic,objective,chapterCount:numChapters,priorKnowledge},modelId:STATE.selectedModel});
-    setSummonStatus('CONSTRUCTING MISSION BRIEFING...','PHASE 2 · SYNTHESIS');
+    setSummonStatus('GENERATING CAMPAIGN...','PHASE 2');
     const parsed = parseJSON(raw);
     if(!parsed || typeof parsed !== 'object') throw new Error('Invalid response from AI');
 
-    // Guard: resolvedTopic may come back as literal "undefined" string
-    const resolvedTopic = topic; // Always use user's original input — never trust AI-returned resolvedTopic
-
-    console.log('[summon] parsed keys:', Object.keys(parsed));
-    console.log('[summon] chapters count:', (parsed.chapters||[]).length);
-
-    // chapters come as full objects {chapterNumber,title,tag,summary,...}
+    const resolvedTopic = topic; 
     const rawChapters = parsed.chapters || parsed.finalChapters || [];
-    console.log('[summon] rawChapters[0]:', JSON.stringify(rawChapters[0]||{}));
     const chapters = rawChapters.map((ch, i) => ({
-      title: ch.title || ch.chapterTitle || `Chapter ${i+1}`,
+      title: ch.title || ch.chapterTitle || `Stage ${i+1}`,
       tag: ch.tag || ch.chapterTag || 'PART',
       summary: ch.summary || ch.chapterSummary || '',
       learningOutcomes: ch.learningOutcomes || [],
@@ -2110,13 +1830,13 @@ window.doSummonQuest = async function() {
       questTitle: (parsed.questTitle && parsed.questTitle !== 'undefined')
         ? parsed.questTitle : `${resolvedTopic || topic} Mastery`,
       questNarrative: (parsed.questNarrative && parsed.questNarrative !== 'undefined')
-        ? parsed.questNarrative : `A 5-chapter mission covering ${resolvedTopic || topic}.`,
+        ? parsed.questNarrative : `A 5-stage campaign covering ${resolvedTopic || topic}.`,
       bossName: (parsed.bossName && parsed.bossName !== 'undefined')
-        ? parsed.bossName : 'The Knowledge Guardian',
+        ? parsed.bossName : 'The Firewall',
       bossTitle: (parsed.bossTitle && parsed.bossTitle !== 'undefined')
-        ? parsed.bossTitle : 'Awaiting Defeat',
+        ? parsed.bossTitle : 'Awaiting Challenger',
       bossLore: (parsed.bossLore && parsed.bossLore !== 'undefined')
-        ? parsed.bossLore : 'Defeat this guardian by mastering all chapters.',
+        ? parsed.bossLore : 'Clear all stages to unlock the boss battle.',
       chapters,
       curriculumMeta,
       prereqTopics: parsed.prereqTopics || [],
@@ -2129,15 +1849,13 @@ window.doSummonQuest = async function() {
       chapterContent: {},
       quiz: null,
       defeated: false,
-      bossColor: `#${Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')}`,
-      bossShape: Math.floor(Math.random()*8),
     };
     STATE.quests.unshift(newQuest);
     STATE.player.questsCreated++;
     await saveState();
     closeSummonScreen();
     renderHub();
-    showToast(`Mission deployed: ${newQuest.questTitle}`);
+    showToast(`Campaign started: ${newQuest.questTitle}`);
     setTimeout(()=>window.showQuestScreen(0), 300);
   } catch(e) {
     showToast('Error: '+(e.message?.substring(0,80)||'Unknown error'));
@@ -2160,10 +1878,8 @@ window.showHub = function(){ showScreen('screen-hub'); renderHub(); };
 
 function defaultPlayer(name){
   return { name, xp:0, totalXp:0, rank:0,
-    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0, sigils:[] };
+    questsCreated:0, chaptersCompleted:0, bossesDefeated:0, perfectRuns:0 };
 }
-
-function defaultCollection(){ return { backgrounds:[], activeBg:null }; }
 
 function syncStateToActiveSave(){
   if(!STATE.activeSaveId) return;
@@ -2177,15 +1893,10 @@ function syncActiveSaveToState(){
     STATE.player = s.player;
     STATE.curriculums = s.curriculums || [{id:'default',name:'My Curriculum'}];
     STATE.quests = (s.quests||[]).filter(Boolean).map(q=>{
-      // Normalize chapters — handle string arrays, object arrays, or missing
       const rawChapters = q.chapters || [];
       const chapters = rawChapters.map((ch, i) => {
-        if(typeof ch === 'string') {
-          // Old format: chapter was just a title string
-          return { title: ch, tag: 'CHAPTER', summary: '' };
-        }
+        if(typeof ch === 'string') return { title: ch, tag: 'CHAPTER', summary: '' };
         if(typeof ch === 'object' && ch !== null) {
-          // New format or partially migrated
           return {
             title: ch.title || ch.chapterTitle || `Chapter ${i+1}`,
             tag: ch.tag || ch.chapterTag || 'CHAPTER',
@@ -2211,12 +1922,6 @@ function syncActiveSaveToState(){
       };
     });
     STATE.player.questsCreated = STATE.quests.length;
-    if(!STATE.player.collection) STATE.player.collection = defaultCollection();
-    if(!STATE.player.sigils) STATE.player.sigils = [];
-    delete STATE.player.storyAct;
-    delete STATE.player.cluesUnlocked;
-    if(STATE.player.collection?.owned) delete STATE.player.collection.owned;
-    if(STATE.player.collection?.activeIdx !== undefined) delete STATE.player.collection.activeIdx;
   }
 }
 
@@ -2235,7 +1940,7 @@ async function loadState(){
       const d = snap.data();
       if(d.saves!==undefined){ STATE.saves=d.saves; STATE.activeSaveId=d.activeSaveId; }
       else{
-        const os={id:Date.now().toString(),player:d.player||defaultPlayer('Operative'),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]};
+        const os={id:Date.now().toString(),player:d.player||defaultPlayer('P1'),quests:d.quests||[],curriculums:[{id:'default',name:'My Curriculum'}]};
         STATE.saves=[os]; STATE.activeSaveId=os.id;
       }
       loaded = true;
@@ -2246,9 +1951,8 @@ async function loadState(){
 
   if(loaded && STATE.saves?.length>0){
     STATE.saves.forEach(s=>{
-      if(!s.player) s.player = defaultPlayer('Operative');
+      if(!s.player) s.player = defaultPlayer('P1');
       if(!s.curriculums) s.curriculums = [{id:'default',name:'My Curriculum'}];
-      if(!s.player.collection) s.player.collection = defaultCollection();
     });
     syncActiveSaveToState();
     saveState();
@@ -2266,21 +1970,18 @@ window.cancelPathSelection = function(){
 
 window.choosePath = async function(){
   const input = document.getElementById('path-name-input');
-  const name = (input?.value.trim()) || 'Operative';
+  const name = (input?.value.trim()) || 'P1';
   const newPlayer = defaultPlayer(name);
-  newPlayer.collection = defaultCollection();
   const newSave = {id:Date.now().toString(), player:newPlayer, quests:[], curriculums:[{id:'default',name:'My Curriculum'}]};
   STATE.saves.push(newSave); STATE.activeSaveId = newSave.id;
   syncActiveSaveToState();
   await saveState();
   showScreen('screen-hub');
   renderHub();
-  showToast('Operative initialized. Welcome to Vault 77.');
+  showToast('Player registered. Game Start.');
 };
 
-// ── INIT ──────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  // Check for redirect result first (handles cases where popup wasn't available)
   getRedirectResult(auth).catch(()=>{});
 
   onAuthStateChanged(auth,async user=>{
@@ -2288,7 +1989,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     const authBtns = document.getElementById('auth-buttons');
     if(user){
       USER_ID=user.uid;
-      if(loadingEl){ loadingEl.style.display='flex'; loadingEl.textContent='> LOADING OPERATIVE DATA...'; }
+      if(loadingEl){ loadingEl.style.display='flex'; loadingEl.textContent='> LOADING DATA...'; }
       if(authBtns) authBtns.style.display='none';
       await loadState();
     } else {
@@ -2299,35 +2000,21 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-// ══════════════════════════════════════════════════════
-//  DETECTIVE NARRATIVE SYSTEM
-// ══════════════════════════════════════════════════════
-
-
-// ── UPDATED checkRankUp with story triggers ──────────────────
 function checkRankUp(){
   const before = getCurrentRankIdx();
   setTimeout(() => {
     const after = getCurrentRankIdx();
     if (after > before) {
       const r = getRanks()[after];
-      showToast(`⚡ ${r.name} · ${r.en.toUpperCase()}`);
+      showToast(`⚡ LEVEL UP: ${r.name}`);
     }
   }, 100);
 }
 
-// ── EVO MAP (Memory Recovery Log) ───────────────────────────;;
-
-
 window.openTosModal = function(type) {
-  const content = LEGAL_CONTENT[type];
-  if (!content) return;
-  document.getElementById('tos-modal-title').textContent = content.title;
+  document.getElementById('tos-modal-title').textContent = type === 'tos' ? 'TERMS OF SERVICE' : 'PRIVACY POLICY';
   const body = document.getElementById('tos-modal-body');
-  body.innerHTML = '<p class="text-[9px] tracking-widest text-on-surface-variant/50 mb-4">LAST UPDATED: ' + content.lastUpdated + ' · CLASSIFICATION: PUBLIC</p>' +
-    content.sections.map(s =>
-      '<div class="space-y-1"><p class="text-primary/80 font-bold tracking-widest text-[9px]">' + s.heading + '</p><p class="text-on-surface-variant/70 leading-relaxed">' + s.body + '</p></div>'
-    ).join('<div class="border-t border-outline/10 my-3"></div>');
+  body.innerHTML = '<p class="text-[10px] font-headline text-on-surface-variant mb-4">SYSTEM PROTOCOLS</p><p>Please read these terms carefully before accessing the archive.</p>';
   document.getElementById('tos-modal').classList.add('open');
   document.getElementById('modal-backdrop').classList.remove('hidden');
 };
@@ -2337,23 +2024,6 @@ window.closeTosModal = function() {
   document.getElementById('modal-backdrop').classList.add('hidden');
 };
 
-
 </script>
-
-<script>
-  // Register Service Worker for PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('Vault-Tec Service Worker registered successfully:', registration.scope);
-        })
-        .catch((error) => {
-          console.log('Service Worker registration failed:', error);
-        });
-    });
-  }
-</script>
-
 </body>
 </html>
