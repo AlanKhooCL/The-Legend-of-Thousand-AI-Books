@@ -1600,8 +1600,27 @@ async function callAI({action,payload,modelId}){
   }catch(e){ showToast("System Error: "+(e.message||e)); throw e; }
 }
 
-function parseJSON(text){ if(!text||typeof text!=='string') return {}; try{ return JSON.parse(text); }catch(e){} const c=text.replace(/```json/gi,'').replace(/
-```/gi,'').trim(); try{ return JSON.parse(c); }catch(e){} const m=c.match(/\{[\s\S]*\}/); if(m){ try{ return JSON.parse(m[0]); }catch(e){} } return {}; }
+function parseJSON(text) {
+  if (!text || typeof text !== 'string') return {};
+  try {
+    return JSON.parse(text);
+  } catch (e) {}
+
+  // The fix is here: ensure this replace chain is on one single line
+  const c = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+
+  try {
+    return JSON.parse(c);
+  } catch (e) {}
+
+  const m = c.match(/\{[\s\S]*\}/);
+  if (m) {
+    try {
+      return JSON.parse(m[0]);
+    } catch (e) {}
+  }
+  return {};
+}
 
 // ── UTILS ─────────────────────────────────────────────
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500); }
