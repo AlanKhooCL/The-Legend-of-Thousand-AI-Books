@@ -1,4 +1,4 @@
-const CACHE_NAME = 'learnow-vault-v2'; // Bumped version to v2
+const CACHE_NAME = 'learnow-vault-v3'; // Bumped version to v3
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
