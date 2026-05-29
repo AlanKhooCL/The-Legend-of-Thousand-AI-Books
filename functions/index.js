@@ -181,6 +181,7 @@ exports.communeWithScrolls = onCall(
         chapterNumber, totalChapters,
         learningOutcomes, keyConceptsToTeach, commonMisconceptions,
         curriculumMeta, previousChaptersSummary,
+        visualStyle, formattingRules
       } = payload;
 
       const domain = curriculumMeta?.domain || "the relevant field";
@@ -198,6 +199,7 @@ STRUCTURE RULES — every chapter must include ALL of these in order:
 5. Where relevant, a <div class="code-example"><pre><code> block with real, working code or commands
 6. A <div class="chapter-summary"> with 3-5 bullet points summarising what was covered
 7. A <blockquote class="chapter-takeaway"> with ONE sharp, memorable takeaway sentence
+${formattingRules ? `8. VISUAL DIAGRAM: ${formattingRules}` : ""}
 
 CONTENT RULES:
 - Feynman clarity: explain as if to a smart person encountering this for the first time
@@ -207,7 +209,6 @@ CONTENT RULES:
 - Build on prior chapters, never re-explain already-covered concepts
 
 OUTPUT: HTML only using these tags and classes. No markdown. No wrapper div. No inline styles.`;
-
 
       const prompt = `Write Chapter ${chapterNumber || 1} of ${totalChapters || "?"} on: "${topic}"
 
