@@ -206,6 +206,20 @@ tailwind.config = {
 .chapter-content .code-example { margin: 1rem 0; }
 .chapter-content .chapter-summary { background: rgba(5,9,5,0.6); border: 1px solid rgba(74,222,128,0.15); border-radius: 4px; padding: 0.75rem 1rem; margin: 1.25rem 0; }
 .chapter-content .chapter-summary::before { content: '// SUMMARY'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: rgba(74,222,128,0.6); margin-bottom: 0.5rem; font-family: 'Orbitron', monospace; }
+
+/* ── SVG DIAGRAM STYLES ── */
+.chapter-content svg {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+  background: rgba(5,9,5,0.5);
+  border: 1px solid rgba(74,222,128,0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #050905; }
 ::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 2px; }
@@ -495,7 +509,7 @@ tailwind.config = {
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border">
         <p class="text-[9px] font-mono text-primary/60 tracking-[0.3em] mb-3">SUBJECT_OF_INVESTIGATION</p>
         <input id="summon-topic-input" type="text" placeholder="e.g. Cold War Cryptography, Quantum Physics..."
-               class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
+                class="w-full bg-surface-container text-on-surface font-mono py-3 px-4 rounded border border-outline/40 focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40 text-sm"/>
       </div>
 
       <div class="border border-outline/30 rounded p-4 bg-surface-container-low terminal-border hidden">
@@ -1298,6 +1312,10 @@ async function loadChapterContent(chapterIdx){
         curriculumMeta: quest.curriculumMeta || null,
         // Pass prior chapter context for continuity
         previousChaptersSummary: previousChaptersSummary || '',
+        
+        // --- NEW SVG VISUAL INSTRUCTIONS ---
+        visualStyle: "svg",
+        formattingRules: "Break up text heavily. Use lists. Include exactly one visual diagram using raw inline HTML <svg> code to explain the most complex concept. Use 'currentColor' for all strokes and fills so it inherits the terminal's CSS color. Do not use background colors."
       }
     });
     quest.chapterContent[chapterIdx]=content;
@@ -1308,7 +1326,14 @@ async function loadChapterContent(chapterIdx){
   }
 }
 
-function renderChapterContent(html){ document.getElementById('chapter-content-area').innerHTML=DOMPurify.sanitize(html); }
+function renderChapterContent(html){ 
+  // --- UPDATED DOMPURIFY CONFIGURATION TO ALLOW SVGS ---
+  const cleanHtml = DOMPurify.sanitize(html, {
+    ADD_TAGS: ['svg', 'path', 'circle', 'rect', 'line', 'polygon', 'polyline', 'text', 'g'],
+    ADD_ATTR: ['viewBox', 'stroke', 'fill', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'points', 'stroke-width', 'stroke-dasharray', 'opacity', 'text-anchor', 'font-size', 'font-family', 'transform', 'class']
+  });
+  document.getElementById('chapter-content-area').innerHTML = cleanHtml;
+}
 
 window.markChapterComplete=async function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
@@ -1530,16 +1555,6 @@ function showDamageFloat(val){ const el=document.getElementById('damage-floater'
 window.renameCharacter=function(){ const n=prompt("New companion name:",STATE.player.name); if(n&&n.trim()){ STATE.player.name=n.trim(); saveState(); renderHub(); } };
 
 // ══════════════════════════════════════════════════════
-//  MONSTER COLLECTION SYSTEM
-// ══════════════════════════════════════════════════════
-
-
-
-// Override startCharCanvas to use active monster type
-
-
-
-// ══════════════════════════════════════════════════════
 //  BACKGROUND COLLECTION SYSTEM
 // ══════════════════════════════════════════════════════
 
@@ -1641,9 +1656,6 @@ window.closeBgUnlockModal = function() {
   document.getElementById('bg-unlock-reveal').classList.remove('flex');
   renderBgCountLabel();
 };
-
-;
-;
 
 function renderBgGrid() {
   const grid = document.getElementById('bg-collection-grid');
@@ -1758,7 +1770,7 @@ window.renameCurriculum = function(curriculumId) {
 
 
 const RANKS = [
-  { name:'Level 1',   en:'Tiny Sprout',        xp:0,    stageIdx:0  },
+  { name:'Level 1',  en:'Tiny Sprout',         xp:0,    stageIdx:0  },
   { name:'Level 10',  en:'Awakened Flicker',  xp:100,  stageIdx:1  },
   { name:'Level 20',  en:'Mystic Seedling',   xp:250,  stageIdx:2  },
   { name:'Level 30',  en:'Arcane Sprout',     xp:500,  stageIdx:3  },
