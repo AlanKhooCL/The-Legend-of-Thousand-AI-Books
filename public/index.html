@@ -135,9 +135,29 @@ body::before {
 .screen.active { display: flex; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
-.modal-overlay { display: none; position: fixed; inset: 0; z-index: 600; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
-.modal-overlay.open { display: flex; }
+/* Enhanced Modal Overlay for Mobile Solidness */
+.modal-overlay { 
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    z-index: 9999; /* Ensure it is always on top */
+    align-items: center; 
+    justify-content: center; 
+    background-color: #0a0a0a !important; /* Force solid color */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
 
+.modal-overlay.open { 
+    display: flex !important; 
+    opacity: 1; 
+}
+
+/* Ensure the modal content itself has a background */
+.terminal-border {
+    background-color: #1c1917 !important; /* Force solid surface color */
+    border: 2px solid #57534e;
+}
 /* ── ANIMATIONS ── */
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 .cursor-blink { animation: blink 1s -end infinite; }
@@ -760,6 +780,19 @@ import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+
+// Add these to your script section to ensure clean state
+window.openMoveModal = function() {
+  const modal = document.getElementById('move-modal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden'; // Prevents mobile background scroll
+};
+
+window.closeMoveModal = function() {
+  const modal = document.getElementById('move-modal');
+  modal.classList.remove('open');
+  document.body.style.overflow = ''; // Restores scrolling
+};
 
 const firebaseConfig = {
   apiKey: "AIzaSyB80OS8Lh0xDHhWl95PphjN1B1WiOoK33M",
