@@ -311,12 +311,12 @@ body::before {
     <div id="main-view" class="h-full overflow-y-auto">
       <div class="px-4 pt-6 pb-28 max-w-2xl mx-auto space-y-6">
 
-        <div id="commander-stats" class="p-6 terminal-border bg-surface-container relative">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-6 relative z-10">
+      <div id="commander-stats" class="p-5 md:p-6 terminal-border bg-surface-container relative">
+          <div class="flex flex-col sm:flex-row gap-5 items-start sm:items-center relative z-10">
             
-            <div class="flex items-center gap-5 w-full sm:w-auto">
-              <div class="w-16 h-16 bg-surface-container-lowest border-2 border-outline rounded-xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] relative">
-                <span class="text-3xl drop-shadow-md">👾</span>
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+              <div class="w-14 h-14 bg-surface-container-lowest border-2 border-outline rounded-xl flex items-center justify-center flex-shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)]">
+                <span class="text-2xl drop-shadow-md">👾</span>
               </div>
               <div class="flex-1 min-w-0 text-left">
                 <div class="text-[9px] font-mono font-bold text-on-surface-variant tracking-widest mb-1 uppercase">PLAYER 1</div>
@@ -324,14 +324,14 @@ body::before {
               </div>
             </div>
 
-            <div class="flex space-x-6 text-sm font-mono sm:border-l-2 border-outline sm:pl-6 w-full sm:w-auto justify-around sm:justify-end">
-              <div class="flex flex-col items-center bg-surface-container-low border border-outline/50 rounded-lg p-2 min-w-[70px]">
-                <span class="text-on-surface-variant font-headline text-[8px] mb-2">QUESTS</span>
-                <span id="stat-open-missions" class="text-xl text-on-surface font-bold">0</span>
+            <div class="grid grid-cols-2 gap-3 w-full sm:w-auto sm:ml-auto sm:border-l-2 border-outline sm:pl-6">
+              <div class="flex flex-col items-center justify-center bg-surface-container-low border border-outline/50 rounded-lg py-2 px-4">
+                <span class="text-on-surface-variant font-headline text-[8px] mb-1.5">QUESTS</span>
+                <span id="stat-open-missions" class="text-lg text-on-surface font-bold">0</span>
               </div>
-              <div class="flex flex-col items-center bg-surface-container-low border border-outline/50 rounded-lg p-2 min-w-[70px]">
-                <span class="text-on-surface-variant font-headline text-[8px] mb-2">BOSSES</span>
-                <span id="stat-completed-missions" class="text-xl text-secondary font-bold">0</span>
+              <div class="flex flex-col items-center justify-center bg-surface-container-low border border-outline/50 rounded-lg py-2 px-4">
+                <span class="text-on-surface-variant font-headline text-[8px] mb-1.5">BOSSES</span>
+                <span id="stat-completed-missions" class="text-lg text-secondary font-bold">0</span>
               </div>
             </div>
 
@@ -2025,5 +2025,21 @@ window.closeTosModal = function() {
 };
 
 </script>
+
+<script>
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Neo-Retro Service Worker registered:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
