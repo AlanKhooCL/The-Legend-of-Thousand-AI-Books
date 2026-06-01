@@ -4,6 +4,7 @@
 
 <link rel="manifest" href="/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="LearNow">
 <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
@@ -181,7 +182,6 @@ body::after {
 @keyframes marchUp   { from{background-position:0 0} to{background-position:0 -32px} }
 @keyframes scanline  { 0%{top:-10%} 100%{top:110%} }
 @keyframes dmgAnim   { 0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} 100%{opacity:0;transform:translateX(-50%) translateY(-60px) scale(1.5)} }
-@keyframes gambitSpin{ to{transform:rotate(720deg) scale(1.3)} }
 @keyframes wflap     { from{transform:rotate(-8deg) scaleY(0.9)} to{transform:rotate(4deg) scaleY(1.1)} }
 @keyframes cpulse    { 0%,100%{opacity:1} 50%{opacity:0.2} }
 @keyframes xpbar     { from{width:0} }
@@ -223,8 +223,6 @@ body::after {
 }
 .damage-float.show { animation:dmgAnim 1.5s ease-out forwards; }
 
-/* ── GAMBIT ── */
-.gambit-coin-spin { animation:gambitSpin 1.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
 /* ── DRAG OVER ── */
 .drag-over { border-color:#f5c518 !important; background:rgba(245,197,24,0.08) !important; }
@@ -669,12 +667,6 @@ body::after {
           </div>
         </div>
 
-        <!-- Clue preview -->
-        <div id="boss-clue-preview" class="w-full max-w-md pixel-panel p-4 space-y-3 hidden">
-          <p class="font-headline text-[7px] text-primary">CLUE RECOVERED</p>
-          <div id="boss-clue-text" class="font-display text-base text-on-surface leading-relaxed clue-card p-4"></div>
-        </div>
-
         <!-- Battle button -->
         <button id="boss-complete-btn" onclick="tryOpenBattle()" disabled
                 class="px-btn px-btn-red w-full max-w-md py-5 flex items-center justify-center gap-3 text-[9px] uppercase">
@@ -852,39 +844,11 @@ body::after {
       <div id="damage-floater" class="damage-float"></div>
       <div id="finishing-text" class="font-headline text-xl md:text-2xl text-primary crt-glow"></div>
       <p id="victory-lore" class="font-display text-lg text-on-surface-variant leading-relaxed max-w-md"></p>
-      <div id="clue-reveal-section" class="hidden w-full max-w-md mt-4">
-        <div class="pixel-panel p-4 text-left">
-          <p class="font-headline text-[7px] text-primary mb-3">LOOT ACQUIRED</p>
-          <div id="clue-reveal-content" class="font-display text-base text-on-surface leading-relaxed clue-card p-4"></div>
-        </div>
       </div>
       <button onclick="claimVictory()"
               class="px-btn px-btn-gold w-full max-w-xs py-4 px-6 text-[9px] uppercase mt-4">
         CONTINUE ▶
       </button>
-    </div>
-  </div>
-</div>
-
-<!-- Gambit modal -->
-<div class="modal-overlay z-[200]" id="gambit-modal">
-  <div class="w-full max-w-sm mx-4 px-modal">
-    <div class="px-header-stripe text-center">TACTICAL GAMBIT</div>
-    <div class="p-6 md:p-8 space-y-5">
-      <div class="text-center">
-        <span id="gambit-coin" class="material-symbols-outlined text-6xl text-primary cursor-pointer hover:scale-110 transition-transform" onclick="spinGambitCoin()">casino</span>
-      </div>
-      <div class="text-center border-2 border-outline p-4" style="background:#000;">
-        <p id="gambit-wager-display" class="font-headline text-[8px] text-on-surface mb-2">No Wager (Safe)</p>
-        <p id="gambit-result" class="font-display text-base text-primary min-h-[20px]"></p>
-      </div>
-      <input type="range" id="gambit-slider" min="0" max="100" value="0"
-             oninput="updateGambitWager(this.value)"
-             class="w-full h-2 accent-primary bg-outline appearance-none"/>
-      <div class="flex gap-3 pt-3">
-        <button onclick="spinGambitCoin()"     class="flex-1 px-btn px-btn-ghost py-3 text-[8px] uppercase">SPIN</button>
-        <button onclick="proceedAfterGambit()" class="flex-1 px-btn px-btn-gold  py-3 text-[8px] uppercase">PROCEED</button>
-      </div>
     </div>
   </div>
 </div>
@@ -1020,7 +984,7 @@ let STATE = {
   publicQuests: [], quests: [], player: null, curriculums: [],
   activeQuestIdx: null, activeChapterIdx: null,
   quizData: null, quizCurrent: 0, quizScore: 0,
-  gambitWager: 0, gambitActive: false, gambitRevealed: false,
+
   currentQuestHarder: false,
   priorKnowledge: 'some',
 };
@@ -1413,18 +1377,12 @@ window.openMoveModal=function(){
 window.closeMoveModal=function(){document.getElementById('move-modal').classList.remove('open');document.getElementById('modal-backdrop').classList.add('hidden');};
 window.moveQuestTo=function(curriculumId){const quest=STATE.quests[STATE.activeQuestIdx];if(!quest)return;const target=(STATE.curriculums||[]).find(c=>c.id===curriculumId);quest.curriculumId=curriculumId;saveState();closeMoveModal();showToast(`Moved to "${target?.name||'Curriculum'}"`);renderQuestGrid();};
 
-/* ── GAMBIT ───────────────────────────────────────────── */
-function shouldShowGambit(){return STATE.player.bossesDefeated>=2||STATE.player.gambitUsed>0;}
 window.tryOpenBattle=function(){
   const quest=STATE.quests[STATE.activeQuestIdx];
   if(quest.defeated){quest.quiz=null;quest.bossHp=quest.bossMaxHp;}
   if(isHarderQuiz(quest)&&quest.quiz&&quest.quiz._mode!=='hard'){quest.quiz=null;}
-  if(shouldShowGambit()&&!quest.defeated)window.openGambitModal();else window.openBattleModal();
+  window.openBattleModal();
 };
-window.openGambitModal=function(){STATE.gambitWager=0;STATE.gambitActive=false;STATE.gambitRevealed=false;document.getElementById('gambit-slider').max=Math.min(STATE.player.totalXp,200);document.getElementById('gambit-slider').value=0;window.updateGambitWager(0);document.getElementById('gambit-result').textContent='';document.getElementById('gambit-coin').textContent='casino';document.getElementById('gambit-coin').style.color='';document.getElementById('gambit-modal').classList.add('open');document.getElementById('modal-backdrop').classList.remove('hidden');};
-window.updateGambitWager=function(val){STATE.gambitWager=parseInt(val)||0;document.getElementById('gambit-wager-display').textContent=STATE.gambitWager===0?'No Wager (Safe)':`Wagering ${STATE.gambitWager} EXP`;};
-window.spinGambitCoin=function(){if(STATE.gambitRevealed)return;STATE.gambitRevealed=true;const coin=document.getElementById('gambit-coin');coin.classList.add('gambit-coin-spin');setTimeout(()=>{coin.classList.remove('gambit-coin-spin');const lucky=Math.random()<0.5;coin.textContent=lucky?'check_circle':'cancel';coin.style.color=lucky?'#4caf50':'#ef4444';document.getElementById('gambit-result').textContent=lucky?'Critical Success! Double EXP if you win perfectly!':'The house wins. Wager lost if defeated.';STATE.gambitActive=STATE.gambitWager>0;},1500);};
-window.proceedAfterGambit=function(){document.getElementById('gambit-modal').classList.remove('open');document.getElementById('modal-backdrop').classList.add('hidden');if(!STATE.player.gambitUsed)STATE.player.gambitUsed=0;if(STATE.gambitWager>0)STATE.player.gambitUsed++;window.openBattleModal();};
 
 /* ── FATE SCROLL ──────────────────────────────────────── */
 const FATE_EVENTS=[{text:'+50',bonus:'The Archive acknowledges your progress.',xp:50},{text:'+80',bonus:'A classified sector unlocks briefly.',xp:80},{text:'+100',bonus:'Perfect alignment. System overrides granted.',xp:100},{text:'+20',bonus:'A small data packet recovered.',xp:20},{text:'+150',bonus:"Deep vault access granted.",xp:150},{text:'+60',bonus:'Guardian protocol weakened further.',xp:60}];
@@ -1526,19 +1484,15 @@ function finishQuiz(quest){
     document.getElementById('finishing-text').className='font-headline text-xl md:text-2xl text-primary crt-glow';
     document.getElementById('victory-lore').textContent=`Flawless execution! ${quest.bossName} has been deleted from the sector.`;
     STATE.player.perfectRuns++;STATE.player.xp+=50;STATE.player.totalXp+=50;
-    if(STATE.gambitActive&&STATE.gambitWager>0){STATE.player.xp+=STATE.gambitWager;STATE.player.totalXp+=STATE.gambitWager;STATE.gambitActive=false;showToast(`GAMBIT WON! +${STATE.gambitWager} EXP!`);}
   } else {
     document.getElementById('finishing-text').textContent='STAGE CLEAR';
     document.getElementById('finishing-text').className='font-headline text-xl md:text-2xl text-secondary crt-glow-green';
     document.getElementById('victory-lore').textContent=`Score: ${STATE.quizScore}/${qLen}. ${quest.bossName} retreats to recover.`;
-    if(STATE.gambitActive&&STATE.gambitWager>0){STATE.player.xp=Math.max(0,STATE.player.xp-STATE.gambitWager);STATE.player.totalXp=Math.max(0,STATE.player.totalXp-STATE.gambitWager);STATE.gambitActive=false;showToast(`GAMBIT LOST! -${STATE.gambitWager} EXP`);}
     if(STATE.quizScore>=Math.ceil(qLen*0.6))quest.bossHp=0;
   }
   if(quest.bossHp===0){
     if(!wasAlreadyDefeated){
       quest.defeated=true;STATE.player.bossesDefeated++;STATE.player.xp+=100;STATE.player.totalXp+=100;checkRankUp();
-      const cs=document.getElementById('clue-reveal-section');
-      if(cs){cs.classList.remove('hidden');const cc=document.getElementById('clue-reveal-content');if(cc)cc.innerHTML=`<div class="font-headline text-[7px] text-primary mb-3">REWARD DUMP</div><div class="flex gap-4 font-display text-base">${perfect?'<span>+150 EXP ★</span>':'<span>+100 EXP</span>'}</div>`;}
     } else {STATE.player.xp+=30;STATE.player.totalXp+=30;checkRankUp();showToast('Rematch won! +30 EXP');}
   } else {quest.bossHp=quest.bossMaxHp;}
   updateBattleHp(quest);saveState();
@@ -1551,7 +1505,7 @@ window.claimVictory=function(){
   const btn=document.getElementById('boss-complete-btn');
   if(quest.defeated){btn.disabled=false;btn.innerHTML='<span class="material-symbols-outlined text-lg">swords</span> REMATCH';btn.className='px-btn px-btn-green w-full max-w-md py-5 flex items-center justify-center gap-3 text-[9px] uppercase';}
   updateBossHpDisplay(quest);renderHub();
-  if(quest.bossHp===0){const cs=document.getElementById('clue-reveal-section');if(cs)cs.classList.add('hidden');setTimeout(()=>openFateScrollModal(),600);}
+  if(quest.bossHp===0){setTimeout(()=>openFateScrollModal(),600);}
   else{showToast('Battle Concluded.');}
 };
 
@@ -1759,8 +1713,23 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 <script>
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      // Check for updates every time app loads
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+            // New version available — skip waiting and reload
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+          }
+        });
+      });
+    } catch(e) {
+      console.warn('SW registration failed:', e);
+    }
   });
 }
 </script>
